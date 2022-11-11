@@ -1,0 +1,62 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "clean",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "clean",
+                "${workspaceFolder}/EmbyKinopoiskRu.sln"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "build",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/EmbyKinopoiskRu.sln",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "move file",
+            "command": "mv",
+            "type": "shell",
+            "args": [
+                "${workspaceFolder}/EmbyKinopoiskRu/bin/Debug/net6.0/EmbyKinopoiskRu.dll",
+                "~/ws/emby/emby/plugins/"
+            ],
+            "problemMatcher": {
+                "owner": "shell",
+                "fileLocation": [
+                    "relative",
+                    "${workspaceFolder}"
+                ],
+                "pattern": {
+                    "regexp": "^mv: cannont stat .* No such file or directory$"
+                }
+            }
+        },
+        {
+            "label": "start emby",
+            "command": "/opt/emby-server/bin/emby-server",
+            "type": "shell"
+        },
+        {
+            "label": "build, deploy, start server",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "clean",
+                "build",
+                "move file",
+                "start emby"
+            ],
+            "problemMatcher": []
+        }
+    ]
+}

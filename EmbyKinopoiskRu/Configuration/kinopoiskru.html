@@ -1,0 +1,36 @@
+﻿<div data-role="page" class="page type-interior libraryFileOrganizerLogPage pluginConfigurationPage fullWidthContent"
+    data-controller="__plugin/kinopoiskrujs">
+
+    <div class="content-primary padded-top">
+
+        <form>
+            <div style="height:0; overflow: hidden;"><input type="text" name="fakeusernameremembered"
+                    tabindex="-1" /><input type="password" name="fakepasswordremembered" tabindex="-1" /></div>
+
+            <div style="display: none;">
+                <input type="text" id="PreventChromeAutocomplete" name="PreventChromeAutocomplete"
+                    autocomplete="address-level4" />
+            </div>
+
+            <div class="inputContainer">
+                <input is="emby-input" type="text" class="txtToken" autocomplete="off" label="Token" />
+            </div>
+
+            <div data-role="controlgroup" data-type="horizontal" data-mini="true">
+                <input type="radio" name="radioAPI" class="radioTabButton" id="radioAPI_dev" value="kinopoisk.dev">
+                <label for="kinopoisk.dev">kinopoisk.dev. <a is="emby-linkbutton" class="button-link" target="_blank"
+                        href="https://kinopoisk.dev">Get token from here</a></label>
+                <br />
+                <input type="radio" name="radioAPI" class="radioTabButton" id="radioAPI_unoff"
+                    value="kinopoiskapiunofficial.tech">
+                <label for="kinopoiskapiunofficial.tech">kinopoiskapiunofficial.tech <a is="emby-linkbutton"
+                        class="button-link" target="_blank" href="https://kinopoiskapiunofficial.tech">Get token from
+                        here</a></label>
+            </div>
+
+            <div>
+                <button is="emby-button" type="submit" class="raised button-submit block"><span>${Save}</span></button>
+            </div>
+        </form>
+    </div>
+</div>

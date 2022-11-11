@@ -1,0 +1,45 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <!-- project setup -->
+    <TargetFramework>net6.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <OutputType>Library</OutputType>
+    <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
+
+    <!-- nuget setup -->
+    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <Authors>Evgeniy Luzman</Authors>
+    <Copyright>Copyright (c) 2022 Evgeniy Luzman</Copyright>
+    <Description>Emby plugin to update metadata from Kinopoisk.ru</Description>
+    <FileVersion>1.0.0.0</FileVersion>
+    <PackageId>Emby.Kinopoisk.Ru</PackageId>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <!-- <PackageProjectUrl></PackageProjectUrl> -->
+    <PackageTags>emby plugin kinopoisk kinopoiskru kp</PackageTags>
+    <PackageReadmeFile>https://raw.githubusercontent.com/luzmane/emby.kinopoisk.ru/master/README.md</PackageReadmeFile>
+    <!-- <PackageReleaseNotes></PackageReleaseNotes> -->
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/luzmane/emby.kinopoisk.ru/</RepositoryUrl>
+    <Title>Emby plugin to update metadata from Kinopoisk.ru</Title>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+
+
+  <ItemGroup>
+    <PackageReference Include="mediabrowser.server.core" Version="4.7.7" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Remove="thumb.png" />
+    <None Remove="Configuration/kinopoiskru.html" />
+    <None Remove="Configuration/kinopoiskru.js" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="thumb.png" />
+    <EmbeddedResource Include="Configuration/kinopoiskru.html" />
+    <EmbeddedResource Include="Configuration/kinopoiskru.js" />
+  </ItemGroup>
+
+</Project>
