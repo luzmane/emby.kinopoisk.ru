@@ -24,6 +24,18 @@
             "problemMatcher": "$msCompile"
         },
         {
+            "label": "build release",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/EmbyKinopoiskRu.sln",
+                "-c",
+                "Release"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+        {
             "label": "move file",
             "command": "mv",
             "type": "shell",
