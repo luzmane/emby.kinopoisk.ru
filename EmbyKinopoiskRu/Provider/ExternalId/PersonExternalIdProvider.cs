@@ -2,7 +2,7 @@ using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Entities;
 
-namespace EmbyKinopoiskRu.Provider
+namespace EmbyKinopoiskRu.Provider.ExternalId
 {
     /// <summary>
     /// Add link on kinopoisk page to metadate of the Person

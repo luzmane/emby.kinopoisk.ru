@@ -192,76 +192,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             return toReturn;
         }
-        private async Task UpdatePersonsList(MetadataResult<Movie> result, List<KpMovie.KpPerson>? persons, CancellationToken cancellationToken)
-        {
-            if (persons == null)
-            {
-                _log.Warn($"Received persons list is null for movie with id '{result.Item.GetProviderId(Plugin.PluginName)}'");
-                return;
-            }
-
-            _log.Info($"Updating persons list of the movie with id '{result.Item.GetProviderId(Plugin.PluginName)}'");
-            string movieId = result.Item.GetProviderId(Plugin.PluginName);
-            KpSearchResult<KpPerson> personsByMovieId = await _api.GetPersonsByMovieId(movieId, cancellationToken);
-            personsByMovieId.Docs
-                .ForEach(a =>
-                    a.Movies.RemoveAll(b =>
-                        b.Id.ToString(CultureInfo.InvariantCulture) != movieId
-                            || string.IsNullOrWhiteSpace(b.Description)
-                        ));
-
-            Dictionary<long, string?> idRoleDictionary = personsByMovieId.Docs
-                .ToDictionary(
-                    c => c.Id,
-                    c => c.Movies.FirstOrDefault()?.Description);
-
-            string movieName = result.Item.Name;
-            foreach (KpMovie.KpPerson kpPerson in persons)
-            {
-                PersonType? personType = KpHelper.GetPersonType(kpPerson.EnProfession);
-                if (personType == null)
-                {
-                    _log.Warn($"Skip adding {kpPerson.EnName} as '{kpPerson.EnProfession}' to {movieName}");
-                }
-                else
-                {
-                    _log.Debug($"Adding {kpPerson.EnName} as '{personType}' to {movieName}");
-                    _ = idRoleDictionary.TryGetValue(kpPerson.Id, out string? role);
-                    PersonInfo person = new()
-                    {
-                        Name = kpPerson.EnName,
-                        ImageUrl = kpPerson.Photo,
-                        Type = (PersonType)personType,
-                        Role = role,
-                    };
-                    person.SetProviderId(Plugin.PluginName, kpPerson.Id.ToString(CultureInfo.InvariantCulture));
-
-                    result.AddPerson(person);
-                }
-            }
-            _log.Info($"Added {result.People.Count} persons to the movie with id '{result.Item.GetProviderId(Plugin.PluginName)}'");
-        }
-        private static DateTimeOffset? GetEndDate(List<KpYearRange>? releaseYears)
-        {
-            if (releaseYears == null || releaseYears.Count == 0)
-            {
-                return null;
-            }
-            int max = 0;
-            releaseYears
-                .Where(i => i.End != null)
-                .ToList()
-                .ForEach(i => max = Math.Max((int)max, (int)i.End!));
-
-            return DateTimeOffset.TryParseExact(
-                            max.ToString(CultureInfo.InvariantCulture),
-                            "yyyy",
-                            CultureInfo.InvariantCulture,
-                            DateTimeStyles.None,
-                            out DateTimeOffset result)
-                ? result
-                : null;
-        }
         #endregion
 
         #region SeriesProvider
@@ -421,55 +351,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 .ToList()
                 .ForEach(j => toReturn.AddTrailerUrl(j));
             return toReturn;
-        }
-        private async Task UpdatePersonsList(MetadataResult<Series> result, List<KpMovie.KpPerson>? persons, CancellationToken cancellationToken)
-        {
-            if (persons == null)
-            {
-                _log.Warn($"Received persons list is null for series with id '{result.Item.GetProviderId(Plugin.PluginName)}'");
-                return;
-            }
-
-            _log.Info($"Updating persons list of the series with id '{result.Item.GetProviderId(Plugin.PluginName)}'");
-            string seriesId = result.Item.GetProviderId(Plugin.PluginName);
-            KpSearchResult<KpPerson> personsBySeriesId = await _api.GetPersonsByMovieId(seriesId, cancellationToken);
-            personsBySeriesId.Docs
-                .ForEach(a =>
-                    a.Movies.RemoveAll(b =>
-                        b.Id.ToString(CultureInfo.InvariantCulture) != seriesId
-                            || string.IsNullOrWhiteSpace(b.Description)
-                        ));
-
-            Dictionary<long, string?> idRoleDictionary = personsBySeriesId.Docs
-                .ToDictionary(
-                    c => c.Id,
-                    c => c.Movies.FirstOrDefault()?.Description);
-
-            string seriesName = result.Item.Name;
-            foreach (KpMovie.KpPerson kpPerson in persons)
-            {
-                PersonType? personType = KpHelper.GetPersonType(kpPerson.EnProfession);
-                if (personType == null)
-                {
-                    _log.Warn($"Skip adding {kpPerson.EnName} as '{kpPerson.EnProfession}' to {seriesName}");
-                }
-                else
-                {
-                    _log.Debug($"Adding {kpPerson.EnName} as '{personType}' to {seriesName}");
-                    _ = idRoleDictionary.TryGetValue(kpPerson.Id, out string? role);
-                    PersonInfo person = new()
-                    {
-                        Name = kpPerson.EnName,
-                        ImageUrl = kpPerson.Photo,
-                        Type = (PersonType)personType,
-                        Role = role,
-                    };
-                    person.SetProviderId(Plugin.PluginName, kpPerson.Id.ToString(CultureInfo.InvariantCulture));
-
-                    result.AddPerson(person);
-                }
-            }
-            _log.Info($"Added {result.People.Count} persons to the series with id '{result.Item.GetProviderId(Plugin.PluginName)}'");
         }
         #endregion
 
@@ -744,5 +625,84 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         }
         #endregion
 
+        #region Common
+        private static DateTimeOffset? GetEndDate(List<KpYearRange>? releaseYears)
+        {
+            if (releaseYears == null || releaseYears.Count == 0)
+            {
+                return null;
+            }
+            int max = 0;
+            releaseYears
+                .Where(i => i.End != null)
+                .ToList()
+                .ForEach(i => max = Math.Max((int)max, (int)i.End!));
+
+            return DateTimeOffset.TryParseExact(
+                            max.ToString(CultureInfo.InvariantCulture),
+                            "yyyy",
+                            CultureInfo.InvariantCulture,
+                            DateTimeStyles.None,
+                            out DateTimeOffset result)
+                ? result
+                : null;
+        }
+        private async Task UpdatePersonsList<T>(MetadataResult<T> result, List<KpMovie.KpPerson>? persons, CancellationToken cancellationToken)
+            where T : BaseItem
+        {
+            if (persons == null)
+            {
+                _log.Warn($"Received persons list is null for series with id '{result.Item.GetProviderId(Plugin.PluginName)}'");
+                return;
+            }
+
+            _log.Info($"Updating persons list of the series with id '{result.Item.GetProviderId(Plugin.PluginName)}'");
+            string seriesId = result.Item.GetProviderId(Plugin.PluginName);
+            string movieName = result.Item.Name;
+            KpSearchResult<KpPerson> personsBySeriesId = await _api.GetPersonsByMovieId(seriesId, cancellationToken);
+            personsBySeriesId.Docs
+                .ForEach(a =>
+                    a.Movies.RemoveAll(b =>
+                        b.Id.ToString(CultureInfo.InvariantCulture) != seriesId
+                            || string.IsNullOrWhiteSpace(b.Description)
+                        ));
+
+            Dictionary<long, string?> idRoleDictionary = personsBySeriesId.Docs
+                .ToDictionary(
+                    c => c.Id,
+                    c => c.Movies.FirstOrDefault()?.Description);
+
+            string seriesName = result.Item.Name;
+            foreach (KpMovie.KpPerson kpPerson in persons)
+            {
+                PersonType? personType = KpHelper.GetPersonType(kpPerson.EnProfession);
+                string? name = string.IsNullOrWhiteSpace(kpPerson.Name) ? kpPerson.EnName : kpPerson.Name;
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    _log.Warn($"Skip adding staff with id '{kpPerson.Id.ToString(CultureInfo.InvariantCulture)}' as nameless to '{movieName}'");
+                }
+                else if (personType == null)
+                {
+                    _log.Warn($"Skip adding {name} as '{kpPerson.EnProfession}' to {seriesName}");
+                }
+                else
+                {
+                    _log.Debug($"Adding {name} as '{personType}' to {seriesName}");
+                    _ = idRoleDictionary.TryGetValue(kpPerson.Id, out string? role);
+                    PersonInfo person = new()
+                    {
+                        Name = name,
+                        ImageUrl = kpPerson.Photo,
+                        Type = (PersonType)personType,
+                        Role = role,
+                    };
+                    person.SetProviderId(Plugin.PluginName, kpPerson.Id.ToString(CultureInfo.InvariantCulture));
+
+                    result.AddPerson(person);
+                }
+            }
+            _log.Info($"Added {result.People.Count} persons to the series with id '{result.Item.GetProviderId(Plugin.PluginName)}'");
+        }
+        #endregion
     }
 }

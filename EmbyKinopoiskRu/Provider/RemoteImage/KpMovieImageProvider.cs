@@ -11,7 +11,7 @@ using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Providers;
 
-namespace EmbyKinopoiskRu.Provider
+namespace EmbyKinopoiskRu.Provider.RemoteImage
 {
     public class KpImageProvider : IRemoteImageProvider
     {

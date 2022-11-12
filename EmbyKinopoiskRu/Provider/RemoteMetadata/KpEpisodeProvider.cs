@@ -1,21 +1,21 @@
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using EmbyKinopoiskRu.Api;
 using MediaBrowser.Common.Net;
-using MediaBrowser.Controller.Entities.Movies;
+using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Providers;
 
-namespace EmbyKinopoiskRu.Provider
+namespace EmbyKinopoiskRu.Provider.RemoteMetadata
 {
-    public class KpMovieProvider : IRemoteMetadataProvider<Movie, MovieInfo>
+    public class KpEpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>
     {
         private readonly IHttpClient _httpClient;
-
         public string Name => Plugin.PluginName;
 
-        public KpMovieProvider(IHttpClient httpClient)
+        public KpEpisodeProvider(IHttpClient httpClient)
         {
             _httpClient = httpClient;
         }
@@ -29,13 +29,13 @@ namespace EmbyKinopoiskRu.Provider
                 BufferContent = false
             });
         }
-        public async Task<MetadataResult<Movie>> GetMetadata(MovieInfo info, CancellationToken cancellationToken)
+        public async Task<MetadataResult<Episode>> GetMetadata(EpisodeInfo info, CancellationToken cancellationToken)
         {
             return await KinopoiskRuServiceFactory.GetService().GetMetadata(info, cancellationToken);
         }
-        public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(MovieInfo searchInfo, CancellationToken cancellationToken)
+        public Task<IEnumerable<RemoteSearchResult>> GetSearchResults(EpisodeInfo searchInfo, CancellationToken cancellationToken)
         {
-            return await KinopoiskRuServiceFactory.GetService().GetSearchResults(searchInfo, cancellationToken);
+            throw new NotImplementedException();
         }
     }
 }

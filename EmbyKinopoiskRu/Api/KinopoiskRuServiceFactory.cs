@@ -30,7 +30,7 @@ namespace EmbyKinopoiskRu.Api
         {
             if (PluginConfiguration.KINOPOISKDEV.Equals(Plugin.Instance?.Configuration.ApiType, StringComparison.Ordinal))
             {
-                _log!.Info($"Creating {PluginConfiguration.KINOPOISKDEV} service");
+                _log!.Info($"Fetching {PluginConfiguration.KINOPOISKDEV} service");
                 if (!_kinopoiskServiciesDictionary.TryGetValue("KinopoiskDev", out IKinopoiskRuService? result))
                 {
                     result = new KinopoiskDevService(_logManager!, _httpClient!, _jsonSerializer!);
@@ -40,7 +40,7 @@ namespace EmbyKinopoiskRu.Api
             }
             if (PluginConfiguration.KINOPOISKAPIUNOFFICIALTECH.Equals(Plugin.Instance?.Configuration.ApiType, StringComparison.Ordinal))
             {
-                _log!.Info($"Creating {PluginConfiguration.KINOPOISKAPIUNOFFICIALTECH} service");
+                _log!.Info($"Fetching {PluginConfiguration.KINOPOISKAPIUNOFFICIALTECH} service");
                 if (!_kinopoiskServiciesDictionary.TryGetValue("KinopoiskUnofficial", out IKinopoiskRuService? result))
                 {
                     result = new KinopoiskUnofficialService(_logManager!, _httpClient!, _jsonSerializer!);

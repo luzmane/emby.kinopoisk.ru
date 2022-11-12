@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -8,14 +7,14 @@ using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Providers;
 
-namespace EmbyKinopoiskRu.Provider
+namespace EmbyKinopoiskRu.Provider.RemoteMetadata
 {
-    public class KpEpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>
+    public class KpSeriesProvider : IRemoteMetadataProvider<Series, SeriesInfo>
     {
         private readonly IHttpClient _httpClient;
         public string Name => Plugin.PluginName;
 
-        public KpEpisodeProvider(IHttpClient httpClient)
+        public KpSeriesProvider(IHttpClient httpClient)
         {
             _httpClient = httpClient;
         }
@@ -29,13 +28,15 @@ namespace EmbyKinopoiskRu.Provider
                 BufferContent = false
             });
         }
-        public async Task<MetadataResult<Episode>> GetMetadata(EpisodeInfo info, CancellationToken cancellationToken)
+
+        public async Task<MetadataResult<Series>> GetMetadata(SeriesInfo info, CancellationToken cancellationToken)
         {
             return await KinopoiskRuServiceFactory.GetService().GetMetadata(info, cancellationToken);
         }
-        public Task<IEnumerable<RemoteSearchResult>> GetSearchResults(EpisodeInfo searchInfo, CancellationToken cancellationToken)
+
+        public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(SeriesInfo searchInfo, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return await KinopoiskRuServiceFactory.GetService().GetSearchResults(searchInfo, cancellationToken);
         }
     }
 }

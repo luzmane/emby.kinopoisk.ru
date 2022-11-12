@@ -154,35 +154,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             }
 
         }
-        private void UpdatePersonsList(MetadataResult<Movie> result, List<KpFilmStaff> staffList, string? movieName)
-        {
-            foreach (KpFilmStaff staff in staffList)
-            {
-                PersonType? personType = KpHelper.GetPersonType(staff.ProfessionKey);
-                if (personType == null)
-                {
-                    _log.Warn($"Skip adding {staff.NameRu} as '{staff.ProfessionKey}' to {movieName}");
-                }
-                else
-                {
-                    _log.Debug($"Adding {staff.NameRu} as '{personType}' to {movieName}");
-                    PersonInfo person = new()
-                    {
-                        Name = staff.NameRu,
-                        ImageUrl = staff.PosterUrl,
-                        Type = (PersonType)personType,
-                        Role = staff.Description,
-                    };
-                    if (!string.IsNullOrWhiteSpace(staff.StaffId))
-                    {
-                        person.SetProviderId(Plugin.PluginName, staff.StaffId.ToString(CultureInfo.InvariantCulture));
-                    }
-
-                    result.AddPerson(person);
-                }
-            }
-            _log.Info($"Added {result.People.Count} persons to the movie with id '{result.Item.GetProviderId(Plugin.PluginName)}'");
-        }
         private Movie CreateMovieFromKpFilm(KpFilm movie)
         {
             _log.Info($"Movie '{movie.NameRu}' with {Plugin.PluginName} id '{movie.KinopoiskId}' found");
@@ -432,35 +403,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     .ForEach(v => result.Item.AddTrailerUrl(v));
             }
         }
-        private void UpdatePersonsList(MetadataResult<Series> result, List<KpFilmStaff> staffList, string? movieName)
-        {
-            foreach (KpFilmStaff staff in staffList)
-            {
-                PersonType? personType = KpHelper.GetPersonType(staff.ProfessionKey);
-                if (personType == null)
-                {
-                    _log.Warn($"Skip adding {staff.NameRu} as '{staff.ProfessionKey}' to {movieName}");
-                }
-                else
-                {
-                    _log.Debug($"Adding {staff.NameRu} as '{personType}' to {movieName}");
-                    PersonInfo person = new()
-                    {
-                        Name = staff.NameRu,
-                        ImageUrl = staff.PosterUrl,
-                        Type = (PersonType)personType,
-                        Role = staff.Description,
-                    };
-                    if (!string.IsNullOrWhiteSpace(staff.StaffId))
-                    {
-                        person.SetProviderId(Plugin.PluginName, staff.StaffId.ToString(CultureInfo.InvariantCulture));
-                    }
-
-                    result.AddPerson(person);
-                }
-            }
-            _log.Info($"Added {result.People.Count} persons to the series with id '{result.Item.GetProviderId(Plugin.PluginName)}'");
-        }
         private Series CreateSeriesFromKpFilm(KpFilm series)
         {
             _log.Info($"Series '{series.NameRu}' with {Plugin.PluginName} id '{series.KinopoiskId}' found");
@@ -705,6 +647,45 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 toReturn.Overview = string.Join('\n', facts);
             }
             return toReturn;
+        }
+
+        #endregion
+
+        #region Common
+        private void UpdatePersonsList<T>(MetadataResult<T> result, List<KpFilmStaff> staffList, string? movieName)
+            where T : BaseItem
+        {
+            foreach (KpFilmStaff staff in staffList)
+            {
+                PersonType? personType = KpHelper.GetPersonType(staff.ProfessionKey);
+                string? name = string.IsNullOrWhiteSpace(staff.NameRu) ? staff.NameEn : staff.NameRu;
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    _log.Warn($"Skip adding staff with id '{staff.StaffId?.ToString(CultureInfo.InvariantCulture)}' as nameless to '{movieName}'");
+                }
+                else if (personType == null)
+                {
+                    _log.Warn($"Skip adding '{name}' as '{staff.ProfessionKey}' to '{movieName}'");
+                }
+                else
+                {
+                    _log.Debug($"Adding '{name}' as '{personType}' to '{movieName}'");
+                    PersonInfo person = new()
+                    {
+                        Name = name,
+                        ImageUrl = staff.PosterUrl,
+                        Type = (PersonType)personType,
+                        Role = staff.Description,
+                    };
+                    if (!string.IsNullOrWhiteSpace(staff.StaffId))
+                    {
+                        person.SetProviderId(Plugin.PluginName, staff.StaffId.ToString(CultureInfo.InvariantCulture));
+                    }
+
+                    result.AddPerson(person);
+                }
+            }
+            _log.Info($"Added {result.People.Count} persons to the movie with id '{result.Item.GetProviderId(Plugin.PluginName)}'");
         }
 
         #endregion

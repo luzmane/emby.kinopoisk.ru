@@ -3,18 +3,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using EmbyKinopoiskRu.Api;
 using MediaBrowser.Common.Net;
-using MediaBrowser.Controller.Entities.TV;
+using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Providers;
 
-namespace EmbyKinopoiskRu.Provider
+namespace EmbyKinopoiskRu.Provider.RemoteMetadata
 {
-    public class KpSeriesProvider : IRemoteMetadataProvider<Series, SeriesInfo>
+    public class KpPersonProvider : IRemoteMetadataProvider<Person, PersonLookupInfo>
     {
         private readonly IHttpClient _httpClient;
         public string Name => Plugin.PluginName;
 
-        public KpSeriesProvider(IHttpClient httpClient)
+        public KpPersonProvider(IHttpClient httpClient)
         {
             _httpClient = httpClient;
         }
@@ -28,13 +28,11 @@ namespace EmbyKinopoiskRu.Provider
                 BufferContent = false
             });
         }
-
-        public async Task<MetadataResult<Series>> GetMetadata(SeriesInfo info, CancellationToken cancellationToken)
+        public async Task<MetadataResult<Person>> GetMetadata(PersonLookupInfo info, CancellationToken cancellationToken)
         {
             return await KinopoiskRuServiceFactory.GetService().GetMetadata(info, cancellationToken);
         }
-
-        public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(SeriesInfo searchInfo, CancellationToken cancellationToken)
+        public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(PersonLookupInfo searchInfo, CancellationToken cancellationToken)
         {
             return await KinopoiskRuServiceFactory.GetService().GetSearchResults(searchInfo, cancellationToken);
         }
