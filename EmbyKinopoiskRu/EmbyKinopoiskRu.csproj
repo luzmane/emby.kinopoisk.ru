@@ -8,23 +8,31 @@
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 
     <!-- nuget setup -->
-    <AssemblyVersion>1.0.0.0</AssemblyVersion>
+    <AssemblyVersion>1.1.0</AssemblyVersion>
+    <Version>1.1.0</Version>
+    <FileVersion>1.1.0</FileVersion>
     <Authors>Evgeniy Luzman</Authors>
     <Copyright>Copyright (c) 2022 Evgeniy Luzman</Copyright>
     <Description>Emby plugin to update metadata from Kinopoisk.ru</Description>
-    <FileVersion>1.0.0.0</FileVersion>
     <PackageId>Emby.Kinopoisk.Ru</PackageId>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <!-- <PackageProjectUrl></PackageProjectUrl> -->
     <PackageTags>emby plugin kinopoisk kinopoiskru kp</PackageTags>
-    <PackageReadmeFile>https://raw.githubusercontent.com/luzmane/emby.kinopoisk.ru/master/README.md</PackageReadmeFile>
-    <!-- <PackageReleaseNotes></PackageReleaseNotes> -->
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <PackageReleaseNotes>$([System.IO.File]::ReadAllText("$(MSBuildProjectDirectory)/../RELEASE-NOTES.txt"))</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/luzmane/emby.kinopoisk.ru/</RepositoryUrl>
     <Title>Emby plugin to update metadata from Kinopoisk.ru</Title>
-    <Version>1.0.0</Version>
   </PropertyGroup>
 
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>EmbyKinopoiskRu.Tests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="../README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="mediabrowser.server.core" Version="4.7.7" />

@@ -661,7 +661,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 string? name = string.IsNullOrWhiteSpace(staff.NameRu) ? staff.NameEn : staff.NameRu;
                 if (string.IsNullOrWhiteSpace(name))
                 {
-                    _log.Warn($"Skip adding staff with id '{staff.StaffId?.ToString(CultureInfo.InvariantCulture)}' as nameless to '{movieName}'");
+                    _log.Warn($"Skip adding staff with id '{staff.StaffId.ToString(CultureInfo.InvariantCulture)}' as nameless to '{movieName}'");
                 }
                 else if (personType == null)
                 {
@@ -677,10 +677,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                         Type = (PersonType)personType,
                         Role = staff.Description,
                     };
-                    if (!string.IsNullOrWhiteSpace(staff.StaffId))
-                    {
-                        person.SetProviderId(Plugin.PluginName, staff.StaffId.ToString(CultureInfo.InvariantCulture));
-                    }
+                    person.SetProviderId(Plugin.PluginName, staff.StaffId.ToString(CultureInfo.InvariantCulture));
 
                     result.AddPerson(person);
                 }

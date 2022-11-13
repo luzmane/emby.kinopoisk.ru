@@ -1,0 +1,9 @@
+v.1.1.0
+- Add detection of КиноПоиск Id in file name
+- Bug fixes
+- Refactoring
+- Add external API tests
+
+v.1.0.0
+- Initial release
+- Support data load of movie, series and staff

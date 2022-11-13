@@ -5,7 +5,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Film
         /// <summary>
         /// KinopoiskId
         /// </summary>
-        public string? StaffId { get; set; }
+        public long StaffId { get; set; }
         public string? NameRu { get; set; }
         public string? NameEn { get; set; }
         public string? Description { get; set; }
