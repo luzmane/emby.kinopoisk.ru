@@ -8,7 +8,9 @@ using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Film;
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Person;
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Season;
 using MediaBrowser.Common.Net;
+using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Logging;
+using MediaBrowser.Model.Notifications;
 using MediaBrowser.Model.Serialization;
 
 namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
@@ -18,12 +20,18 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         private readonly IHttpClient _httpClient;
         private readonly ILogger _log;
         private readonly IJsonSerializer _jsonSerializer;
+        private readonly IActivityManager _activityManager;
 
-        internal KinopoiskUnofficialApi(ILogger log, IHttpClient httpClient, IJsonSerializer jsonSerializer)
+        internal KinopoiskUnofficialApi(
+            ILogger log
+            , IHttpClient httpClient
+            , IJsonSerializer jsonSerializer
+            , IActivityManager activityManager)
         {
             _httpClient = httpClient;
             _log = log;
             _jsonSerializer = jsonSerializer;
+            _activityManager = activityManager;
         }
 
         internal async Task<KpFilm?> GetFilmById(string movieId, CancellationToken cancellationToken)
@@ -96,9 +104,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     {
                         case 401:
                             _log.Error($"Token is invalid: '{token}'");
+                            AddToActivityLog($"Token '{token}' is invalid", "Token is invalid");
                             return string.Empty;
                         case 402:
                             _log.Warn("Request limit exceeded (either daily or total). Currently daily limit is 500 requests");
+                            AddToActivityLog("Request limit exceeded (either daily or total). Currently daily limit is 500 requests", "Request limit exceeded");
                             return string.Empty;
                         case 404:
                             _log.Info($"Data not found for URL: {url}");
@@ -150,6 +160,17 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 _log.ErrorException($"Unable to fetch data from URL '{url}' due to {ex.Message}", ex);
                 return string.Empty;
             }
+        }
+        private void AddToActivityLog(string overview, string shortOverview)
+        {
+            _activityManager.Create(new()
+            {
+                Name = Plugin.PluginName,
+                Type = NotificationType.PluginError.ToString(),
+                Overview = overview,
+                ShortOverview = shortOverview,
+                Severity = LogSeverity.Error
+            });
         }
     }
 }

@@ -1,3 +1,6 @@
+v.1.2.0
+- Add entry to activity log once an error happens on request to external API
+
 v.1.1.0
 - Add detection of КиноПоиск Id in file name
 - Bug fixes

@@ -2,6 +2,7 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model;
@@ -9,22 +10,32 @@ using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Person;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Season;
 using MediaBrowser.Common.Net;
+using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Logging;
+using MediaBrowser.Model.Notifications;
 using MediaBrowser.Model.Serialization;
 
 namespace EmbyKinopoiskRu.Api.KinopoiskDev
 {
     internal class KinopoiskDevApi
     {
+        private static readonly Regex _tokenRegex = new(@"token=(?<token>[0-9A-Z-]*)&", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
         private readonly IHttpClient _httpClient;
         private readonly ILogger _log;
         private readonly IJsonSerializer _jsonSerializer;
+        private readonly IActivityManager _activityManager;
 
-        internal KinopoiskDevApi(ILogger log, IHttpClient httpClient, IJsonSerializer jsonSerializer)
+        internal KinopoiskDevApi(
+            ILogger log
+            , IHttpClient httpClient
+            , IJsonSerializer jsonSerializer
+            , IActivityManager activityManager)
         {
             _httpClient = httpClient;
             _log = log;
             _jsonSerializer = jsonSerializer;
+            _activityManager = activityManager;
         }
 
         internal async Task<KpMovie?> GetMovieById(string movieId, CancellationToken cancellationToken)
@@ -39,7 +50,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             string url = new StringBuilder($"https://api.kinopoisk.dev/movie?token={token}")
                 .Append(CultureInfo.InvariantCulture, $"&field=id&search={movieId}")
                 .ToString();
-            string? json = await SendRequest(url, cancellationToken);
+            string json = await SendRequest(url, cancellationToken);
             return _jsonSerializer.DeserializeFromString<KpMovie>(json);
         }
         internal async Task<KpSearchResult<KpMovie>> GetMoviesByMetadata(string? name, int? year, bool isStrict, CancellationToken cancellationToken)
@@ -64,7 +75,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             if (hasName && hasYear)
             {
                 string request = url + namePart + yearPart;
-                string? json = await SendRequest(request, cancellationToken);
+                string json = await SendRequest(request, cancellationToken);
                 KpSearchResult<KpMovie>? toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
                 if (toReturn != null && toReturn.Docs.Count > 0)
                 {
@@ -76,7 +87,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             if (hasName)
             {
                 string request = url + namePart;
-                string? json = await SendRequest(request, cancellationToken);
+                string json = await SendRequest(request, cancellationToken);
                 KpSearchResult<KpMovie>? toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
                 if (toReturn != null && toReturn.Docs.Count > 0)
                 {
@@ -109,7 +120,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             if (hasName && hasYear)
             {
                 string request = url + namePart + yearPart;
-                string? json = await SendRequest(request, cancellationToken);
+                string json = await SendRequest(request, cancellationToken);
                 KpSearchResult<KpMovie>? toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
                 if (toReturn != null && toReturn.Docs.Count > 0)
                 {
@@ -121,7 +132,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             if (hasName)
             {
                 string request = url + namePart;
-                string? json = await SendRequest(request, cancellationToken);
+                string json = await SendRequest(request, cancellationToken);
                 KpSearchResult<KpMovie>? toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
                 if (toReturn != null && toReturn.Docs.Count > 0)
                 {
@@ -133,7 +144,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             if (hasAlternativeName && hasYear)
             {
                 string request = url + alternativeNamePart + yearPart;
-                string? json = await SendRequest(request, cancellationToken);
+                string json = await SendRequest(request, cancellationToken);
                 KpSearchResult<KpMovie>? toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
                 if (toReturn != null && toReturn.Docs.Count > 0)
                 {
@@ -145,7 +156,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             if (hasAlternativeName)
             {
                 string request = url + alternativeNamePart;
-                string? json = await SendRequest(request, cancellationToken);
+                string json = await SendRequest(request, cancellationToken);
                 KpSearchResult<KpMovie>? toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
                 if (toReturn != null && toReturn.Docs.Count > 0)
                 {
@@ -166,7 +177,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             string request = $"https://api.kinopoisk.dev/person?token={token}&field=id&search={personId}";
-            string? json = await SendRequest(request, cancellationToken);
+            string json = await SendRequest(request, cancellationToken);
             return _jsonSerializer.DeserializeFromString<KpPerson>(json);
         }
         internal async Task<KpSearchResult<KpPerson>> GetPersonsByName(string name, CancellationToken cancellationToken)
@@ -179,7 +190,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             string url = $"https://api.kinopoisk.dev/movie?token={token}&field=name&search={Uri.EscapeDataString(name)}";
-            string? json = await SendRequest(url, cancellationToken);
+            string json = await SendRequest(url, cancellationToken);
             KpSearchResult<KpPerson>? toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpPerson>>(json);
             if (toReturn != null && toReturn.Docs.Count > 0)
             {
@@ -202,7 +213,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                  .Append("&selectFields=id movies")
                  .Append("&limit=1000")
                  .ToString();
-            string? json = await SendRequest(url, cancellationToken);
+            string json = await SendRequest(url, cancellationToken);
             KpSearchResult<KpPerson>? toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpPerson>>(json);
             if (toReturn != null && toReturn.Docs.Count > 0)
             {
@@ -224,11 +235,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 .Append(CultureInfo.InvariantCulture, $"&field=movieId&search={seriesId}")
                 .Append($"&limit=50")
                 .ToString();
-            string? json = await SendRequest(url, cancellationToken);
+            string json = await SendRequest(url, cancellationToken);
             return _jsonSerializer.DeserializeFromString<KpSearchResult<KpSeason>>(json);
         }
 
-        private async Task<string?> SendRequest(string url, CancellationToken cancellationToken)
+        private async Task<string> SendRequest(string url, CancellationToken cancellationToken)
         {
             _log.Info($"Sending request to {url}");
             HttpRequestOptions options = new()
@@ -244,24 +255,58 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             try
             {
                 using HttpResponseInfo response = await _httpClient.SendAsync(options, "GET");
-                if (((int)response.StatusCode) is >= 200 and < 300)
+                switch ((int)response.StatusCode)
                 {
-                    using StreamReader reader = new(response.Content);
-                    string result = await reader.ReadToEndAsync();
-                    _log.Info($"Received response: '{result}'");
-                    return result;
-                }
-                else
-                {
-                    _log.Error($"Received '{response.StatusCode}' from API");
-                    return null;
+                    case int n when n is >= 200 and < 300:
+                        using (StreamReader reader = new(response.Content))
+                        {
+                            string result = await reader.ReadToEndAsync();
+                            _log.Info($"Received response: '{result}'");
+                            return result;
+                        }
+                    case 401:
+                        Match match = _tokenRegex.Match(url);
+                        if (match.Success)
+                        {
+                            string token = match.Groups["token"].Value;
+                            _log.Error($"Token is invalid: '{token}'");
+                            AddToActivityLog($"Token '{token}' is invalid", "Token is invalid");
+                        }
+                        else
+                        {
+                            _log.Error($"Token is invalid");
+                            AddToActivityLog($"Token is invalid", "Token is invalid");
+                        }
+                        return string.Empty;
+                    case 402:
+                        _log.Warn("Request limit exceeded (either daily or total). Currently daily limit is 100 requests");
+                        AddToActivityLog("Request limit exceeded (either daily or total). Currently daily limit is 100 requests", "Request limit exceeded");
+                        return string.Empty;
+                    case 429:
+                        _log.Info("Too many requests per second. Waiting 2 sec");
+                        await Task.Delay(2000, cancellationToken);
+                        return await SendRequest(url, cancellationToken);
+                    default:
+                        _log.Error($"Received '{response.StatusCode}' from API");
+                        return string.Empty;
                 }
             }
             catch (Exception ex)
             {
                 _log.ErrorException($"Unable to fetch data from URL '{url}' due to {ex.Message}", ex);
-                return null;
+                return string.Empty;
             }
+        }
+        private void AddToActivityLog(string overview, string shortOverview)
+        {
+            _activityManager.Create(new()
+            {
+                Name = Plugin.PluginName,
+                Type = NotificationType.PluginError.ToString(),
+                Overview = overview,
+                ShortOverview = shortOverview,
+                Severity = LogSeverity.Error
+            });
         }
     }
 }

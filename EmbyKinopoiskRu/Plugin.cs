@@ -6,6 +6,7 @@ using EmbyKinopoiskRu.Configuration;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Common.Plugins;
+using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Drawing;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Plugins;
@@ -27,13 +28,14 @@ namespace EmbyKinopoiskRu
             IXmlSerializer xmlSerializer,
             ILogManager logManager,
             IHttpClient httpClient,
-            IJsonSerializer jsonSerializer
+            IJsonSerializer jsonSerializer,
+            IActivityManager activityManager
             )
             : base(applicationPaths, xmlSerializer)
         {
             Instance = this;
             SetId(new Guid("0417364b-5a93-4ad0-a5f0-b8756957cf80"));
-            KinopoiskRuServiceFactory.Init(logManager, httpClient, jsonSerializer);
+            KinopoiskRuServiceFactory.Init(logManager, httpClient, jsonSerializer, activityManager);
         }
         public Stream GetThumbImage()
         {

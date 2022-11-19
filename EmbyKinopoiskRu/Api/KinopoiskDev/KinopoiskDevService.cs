@@ -14,6 +14,7 @@ using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Providers;
+using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Logging;
@@ -27,10 +28,14 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         private readonly ILogger _log;
         private readonly KinopoiskDevApi _api;
 
-        internal KinopoiskDevService(ILogManager logManager, IHttpClient httpClient, IJsonSerializer jsonSerializer)
+        internal KinopoiskDevService(
+            ILogManager logManager
+            , IHttpClient httpClient
+            , IJsonSerializer jsonSerializer
+            , IActivityManager activityManager)
         {
             _log = logManager.GetLogger(GetType().Name);
-            _api = new KinopoiskDevApi(_log, httpClient, jsonSerializer);
+            _api = new KinopoiskDevApi(_log, httpClient, jsonSerializer, activityManager);
         }
 
         #region MovieProvider

@@ -76,7 +76,8 @@
         {
             "label": "start emby",
             "command": "/opt/emby-server/bin/emby-server",
-            "type": "shell"
+            "type": "shell",
+            "problemMatcher": []
         },
         {
             "label": "build, deploy, start server",
@@ -106,7 +107,7 @@
             "command": "dotnet",
             "args": [
                 "test",
-                "${workspaceFolder}/EmbyKinopoiskRu.Tests",
+                "${workspaceFolder}/EmbyKinopoiskRu.Tests"
             ],
             "group": "test"
         },
