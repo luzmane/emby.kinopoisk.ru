@@ -53,7 +53,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             string json = await SendRequest(url, cancellationToken);
             return _jsonSerializer.DeserializeFromString<KpMovie>(json);
         }
-        internal async Task<KpSearchResult<KpMovie>> GetMoviesByMetadata(string? name, int? year, bool isStrict, CancellationToken cancellationToken)
+        internal async Task<KpSearchResult<KpMovie>> GetMoviesByMetadata(string? name, int? year, CancellationToken cancellationToken)
         {
             string? token = Plugin.Instance?.Configuration.GetToken();
             if (string.IsNullOrWhiteSpace(token))
@@ -66,7 +66,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             bool hasYear = year is not null and > 1000;
             string url = new StringBuilder($"https://api.kinopoisk.dev/movie?token={token}")
                 .Append("&limit=50")
-                .Append(CultureInfo.InvariantCulture, $"&isStrict={isStrict}")
                 .Append("&selectFields=externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan")
                 .ToString();
             string namePart = hasName ? $"&field=name&search={name}" : string.Empty;
@@ -112,6 +111,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             bool hasAlternativeName = !string.IsNullOrWhiteSpace(alternativeName);
             string url = new StringBuilder($"https://api.kinopoisk.dev/movie?token={token}")
                 .Append($"&limit=50")
+                .Append("&selectFields=externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan")
                 .ToString();
             string namePart = hasName ? $"&field=name&search={name}" : string.Empty;
             string alternativeNamePart = hasAlternativeName ? $"&field=alternativeName&search={alternativeName}" : string.Empty;

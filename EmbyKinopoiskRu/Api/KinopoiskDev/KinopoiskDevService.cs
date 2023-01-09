@@ -71,7 +71,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             _log.Info($"Searching movie by name {info.Name}");
-            KpSearchResult<KpMovie> movies = await _api.GetMoviesByMetadata(info.Name, info.Year, info.IsAutomated, cancellationToken);
+            KpSearchResult<KpMovie> movies = await _api.GetMoviesByMetadata(info.Name, info.Year, cancellationToken);
             if (movies.Docs.Count != 1)
             {
                 _log.Error($"Found {movies.Docs.Count} movies, skipping movie update");
@@ -119,7 +119,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             _log.Info($"Searching movies by available metadata");
-            KpSearchResult<KpMovie> movies = await _api.GetMoviesByMetadata(searchInfo.Name, searchInfo.Year, searchInfo.IsAutomated, cancellationToken);
+            KpSearchResult<KpMovie> movies = await _api.GetMoviesByMetadata(searchInfo.Name, searchInfo.Year, cancellationToken);
             foreach (KpMovie movie in movies.Docs)
             {
                 string imageUrl = (movie.Poster?.PreviewUrl ?? movie.Poster?.Url) ?? string.Empty;
@@ -167,9 +167,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 toReturn.ProviderIds.Add(MetadataProviders.Imdb.ToString(), movie.ExternalId.Imdb);
             }
 
-            if (!string.IsNullOrWhiteSpace(movie.ExternalId?.Tmdb))
+            if (movie.ExternalId?.Tmdb != null)
             {
-                toReturn.ProviderIds.Add(MetadataProviders.Tmdb.ToString(), movie.ExternalId.Tmdb);
+                toReturn.ProviderIds.Add(MetadataProviders.Tmdb.ToString(), movie.ExternalId.Tmdb.ToString());
             }
 
             IEnumerable<string?>? genres = movie.Genres?.Select(i => i.Name).AsEnumerable();
@@ -232,7 +232,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             _log.Info($"Searching series by name {info.Name}");
-            KpSearchResult<KpMovie> series = await _api.GetMoviesByMetadata(info.Name, info.Year, info.IsAutomated, cancellationToken);
+            KpSearchResult<KpMovie> series = await _api.GetMoviesByMetadata(info.Name, info.Year, cancellationToken);
             if (series.Docs.Count != 1)
             {
                 _log.Error($"Found {series.Docs.Count} series, skipping series update");
@@ -280,7 +280,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             _log.Info($"Searching series by available metadata");
-            KpSearchResult<KpMovie> seriesResult = await _api.GetMoviesByMetadata(searchInfo.Name, searchInfo.Year, searchInfo.IsAutomated, cancellationToken);
+            KpSearchResult<KpMovie> seriesResult = await _api.GetMoviesByMetadata(searchInfo.Name, searchInfo.Year, cancellationToken);
             foreach (KpMovie series in seriesResult.Docs)
             {
                 string imageUrl = (series.Poster?.PreviewUrl ?? series.Poster?.Url) ?? string.Empty;
@@ -328,9 +328,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 toReturn.ProviderIds.Add(MetadataProviders.Imdb.ToString(), series.ExternalId.Imdb);
             }
 
-            if (!string.IsNullOrWhiteSpace(series.ExternalId?.Tmdb))
+            if (series.ExternalId?.Tmdb != null)
             {
-                toReturn.ProviderIds.Add(MetadataProviders.Tmdb.ToString(), series.ExternalId.Tmdb);
+                toReturn.ProviderIds.Add(MetadataProviders.Tmdb.ToString(), series.ExternalId.Tmdb.ToString());
             }
 
             IEnumerable<string?>? genres = series.Genres?.Select(i => i.Name).AsEnumerable();

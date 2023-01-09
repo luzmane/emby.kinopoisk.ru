@@ -4,6 +4,8 @@ Fetches metadata from https://www.kinopoisk.ru/. This site is popular in the Rus
 
 Плагин для Emby для загрузки метаданных фильмов, сериалов с сайта https://www.kinopoisk.ru.
 
+Если что-то не работает - смело создавай новый issue. Я не пользуюсь плагином 24/7 - могу и не знать о сломавшейся функциональности.
+
 ## Установка
 
 * Положить dll в папку plugins
