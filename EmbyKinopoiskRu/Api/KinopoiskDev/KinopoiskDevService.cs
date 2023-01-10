@@ -156,7 +156,14 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 ProductionLocations = movie.Countries?.Select(i => i.Name).ToArray(),
                 ProductionYear = movie.Year,
                 Size = movie.MovieLength,
-                SortName = !string.IsNullOrWhiteSpace(movie.EnName) ? movie.EnName : movie.Name,
+                SortName =
+                    string.IsNullOrWhiteSpace(movie.Name) ?
+                        string.IsNullOrWhiteSpace(movie.AlternativeName) ?
+                            string.IsNullOrWhiteSpace(movie.EnName) ?
+                                string.Empty
+                                : movie.EnName
+                            : movie.AlternativeName
+                        : movie.Name,
                 Tagline = movie.Slogan
             };
 
@@ -317,7 +324,14 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 ProductionLocations = series.Countries?.Select(i => i.Name).ToArray(),
                 ProductionYear = series.Year,
                 Size = series.MovieLength,
-                SortName = !string.IsNullOrWhiteSpace(series.EnName) ? series.EnName : series.Name,
+                SortName =
+                    string.IsNullOrWhiteSpace(series.Name) ?
+                        string.IsNullOrWhiteSpace(series.AlternativeName) ?
+                            string.IsNullOrWhiteSpace(series.EnName) ?
+                                string.Empty
+                                : series.EnName
+                            : series.AlternativeName
+                        : series.Name,
                 Tagline = series.Slogan
             };
 
