@@ -192,13 +192,17 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             movie.Videos?.Teasers?
-                .Select(i => i.Url)
-                .Where(i => !string.IsNullOrWhiteSpace(i))
+                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && "youtube".Equals(i.Type, StringComparison.Ordinal))
+                .Select(i => i.Url!
+                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
+                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
                 .ToList()
                 .ForEach(j => toReturn.AddTrailerUrl(j));
             movie.Videos?.Trailers?
-                .Select(i => i.Url)
-                .Where(i => !string.IsNullOrWhiteSpace(i))
+                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && "youtube".Equals(i.Type, StringComparison.Ordinal))
+                .Select(i => i.Url!
+                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
+                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
                 .ToList()
                 .ForEach(j => toReturn.AddTrailerUrl(j));
 
@@ -360,13 +364,17 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             series.Videos?.Teasers?
-                .Select(i => i.Url)
-                .Where(i => !string.IsNullOrWhiteSpace(i))
+                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && "youtube".Equals(i.Type, StringComparison.Ordinal))
+                .Select(i => i.Url!
+                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
+                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
                 .ToList()
                 .ForEach(j => toReturn.AddTrailerUrl(j));
             series.Videos?.Trailers?
-                .Select(i => i.Url)
-                .Where(i => !string.IsNullOrWhiteSpace(i))
+                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && "youtube".Equals(i.Type, StringComparison.Ordinal))
+                .Select(i => i.Url!
+                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
+                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
                 .ToList()
                 .ForEach(j => toReturn.AddTrailerUrl(j));
             return toReturn;

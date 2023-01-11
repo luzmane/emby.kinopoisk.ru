@@ -152,8 +152,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             if (result.HasMetadata && videosList != null && videosList.Count > 0)
             {
                 videosList
-                    .Select(v => v.Url)
-                    .Where(v => !string.IsNullOrWhiteSpace(v))
+                    .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube"))
+                    .Select(i => i.Url!
+                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
+                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
                     .ToList()
                     .ForEach(v => result.Item.AddTrailerUrl(v));
             }
@@ -402,8 +404,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             if (result.HasMetadata && videosList != null && videosList.Count > 0)
             {
                 videosList
-                    .Select(v => v.Url)
-                    .Where(v => !string.IsNullOrWhiteSpace(v))
+                    .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube"))
+                    .Select(i => i.Url!
+                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
+                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
                     .ToList()
                     .ForEach(v => result.Item.AddTrailerUrl(v));
             }
