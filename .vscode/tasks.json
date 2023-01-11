@@ -75,7 +75,7 @@
         },
         {
             "label": "start emby",
-            "command": "/opt/emby-server/bin/emby-server",
+            "command": "export EMBY_DATA=~/ws/emby/emby/; /opt/emby-server/bin/emby-server",
             "type": "shell",
             "problemMatcher": []
         },
