@@ -14,7 +14,7 @@ namespace EmbyKinopoiskRu.Tests
     [TestFixture]
     public class DevApiTests
     {
-        private static readonly string _token = File.ReadAllLines("kinopoisk.dev.token").FirstOrDefault() ?? string.Empty;
+        private static readonly string _token = "8DA0EV2-KTP4A5Q-G67QP3K-S2VFBX7";
         private static readonly HttpClient httpClient = new();
         private static readonly JsonSerializerOptions jsonOptions = new() { PropertyNameCaseInsensitive = true };
 
