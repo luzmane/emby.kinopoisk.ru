@@ -9,10 +9,10 @@ using EmbyKinopoiskRu.Api.KinopoiskDev.Model;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Person;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Season;
+using EmbyKinopoiskRu.Helper;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Logging;
-using MediaBrowser.Model.Notifications;
 using MediaBrowser.Model.Serialization;
 
 namespace EmbyKinopoiskRu.Api.KinopoiskDev
@@ -299,14 +299,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         }
         private void AddToActivityLog(string overview, string shortOverview)
         {
-            _activityManager.Create(new()
-            {
-                Name = Plugin.PluginName,
-                Type = NotificationType.PluginError.ToString(),
-                Overview = overview,
-                ShortOverview = shortOverview,
-                Severity = LogSeverity.Error
-            });
+            KpHelper.AddToActivityLog(_activityManager, overview, shortOverview);
         }
     }
 }

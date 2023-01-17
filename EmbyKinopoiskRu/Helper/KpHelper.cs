@@ -1,7 +1,9 @@
 using System;
 using System.Globalization;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie;
+using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Entities;
+using MediaBrowser.Model.Logging;
 
 namespace EmbyKinopoiskRu.Helper
 {
@@ -73,5 +75,17 @@ namespace EmbyKinopoiskRu.Helper
         {
             return Enum.TryParse(enProfesson, true, out PersonType result) ? result : null;
         }
+        internal static void AddToActivityLog(IActivityManager activityManager, string overview, string shortOverview)
+        {
+            activityManager.Create(new()
+            {
+                Name = Plugin.PluginName,
+                Type = "PluginError",
+                Overview = overview,
+                ShortOverview = shortOverview,
+                Severity = LogSeverity.Error
+            });
+        }
+
     }
 }
