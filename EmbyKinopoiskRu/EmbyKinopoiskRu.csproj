@@ -18,8 +18,7 @@
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
     <PackageTags>emby plugin kinopoisk kinopoiskru kp</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>
-      $([System.IO.File]::ReadAllText("$(MSBuildProjectDirectory)/../RELEASE-NOTES.txt"))</PackageReleaseNotes>
+    <PackageReleaseNotes>$([System.IO.File]::ReadAllText("$(MSBuildProjectDirectory)/../RELEASE-NOTES.txt"))</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/luzmane/emby.kinopoisk.ru/</RepositoryUrl>
     <Title>Emby plugin to update metadata from Kinopoisk.ru</Title>
@@ -36,7 +35,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="mediabrowser.server.core" Version="4.8.0.20-beta9" />
+    <PackageReference Include="mediabrowser.server.core" Version="4.7.7" />
   </ItemGroup>
 
   <ItemGroup>
