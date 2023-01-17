@@ -1,3 +1,7 @@
+v.1.5.0
+- Update dependency
+- Add default token for KinopoiskDev API
+
 v.1.4.0
 - Change default sort name to be taken from Russian and not the original title
 - Add trailers from youtube only - emby can play trailers only from youtube

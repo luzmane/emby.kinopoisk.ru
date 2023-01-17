@@ -1,8 +1,8 @@
 # emby.kinopoisk.ru
 
-Fetches metadata from https://www.kinopoisk.ru/. This site is popular in the Russian-speaking community and contains almost no English-language information, so further description will be in Russian.
+Fetches metadata from [kinopoisk.ru](https://www.kinopoisk.ru). This site is popular in the Russian-speaking community and contains almost no English-language information, so further description will be in Russian.
 
-Плагин для Emby для загрузки метаданных фильмов, сериалов с сайта https://www.kinopoisk.ru.
+Плагин для Emby для загрузки метаданных фильмов, сериалов с сайта [kinopoisk.ru](https://www.kinopoisk.ru).
 
 Если что-то не работает - смело создавай новый issue. Я не пользуюсь плагином 24/7 - могу и не знать о сломавшейся функциональности.
 
@@ -15,18 +15,20 @@ Fetches metadata from https://www.kinopoisk.ru/. This site is popular in the Rus
 
 Параметры плагина искать в: Администрирование - Панель - Расширенное - Плагины - вкладка "Мои плагины" - KinopoiskRu.
 
-Плагин умеет работать с двумя сайтами (https://kinopoiskapiunofficial.tech, https://kinopoisk.dev) в настройках можно выбрать откуда получать информацию. По умолчанию запросы идут на https://kinopoiskapiunofficial.tech, работая с общим API токеном. Ограничение для него порядка 20 запросов/сек - для общего Token быстро заканчивается. Поэтому лучше зарегестрировать свой собственный (и указать в параметрах). Для https://kinopoisk.dev общего токена нет, так что перед использованием надо зарегестрироваться.
+Плагин умеет работать с двумя сайтами ([kinopoiskapiunofficial.tech](https://kinopoiskapiunofficial.tech), [kinopoisk.dev](https://kinopoisk.dev)) в настройках можно выбрать откуда получать информацию. По умолчанию запросы идут на [kinopoiskapiunofficial.tech](https://kinopoiskapiunofficial.tech), работая с общим API токеном. Ограничение для него 500 запросов в день - для общего Token быстро заканчивается. Поэтому лучше зарегестрировать свой собственный (и указать в параметрах). Для [kinopoisk.dev](https://kinopoisk.dev) также есть общий токен, его хватает на 200 запросов в день (спасибо [mdwitr](https://github.com/mdwitr0)) - для общего Token быстро заканчивается. Поэтому лучше зарегестрировать свой собственный (и указать в параметрах).
 
 Плагин умеет подхватывать ID КиноПоиска в имени файла по шаблону "<текст>kp<ID КиноПоиска><текст без цифр><текст>" или "<текст>kp-<ID КиноПоиска><текст без цифр><текст>" и использовать его для поиска в базе.
 
 ## Использование
 
 Поддерживаются:
+
 - Фильмы
 - Сериалы
 - Актёры
 
 На данный момент грузятся:
+
 - Жанры
 - Название
 - Оригинальное название (на английском)
