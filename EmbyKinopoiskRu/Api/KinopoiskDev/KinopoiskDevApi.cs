@@ -53,49 +53,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             string json = await SendRequest(url, cancellationToken);
             return _jsonSerializer.DeserializeFromString<KpMovie>(json);
         }
-        internal async Task<KpSearchResult<KpMovie>> GetMoviesByMetadata(string? name, int? year, CancellationToken cancellationToken)
+        internal async Task<KpSearchResult<KpMovie>> GetMoviesByMovieDetails(string? name, int? year, CancellationToken cancellationToken)
         {
-            string? token = Plugin.Instance?.Configuration.GetToken();
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                _log.Error("The token is empty. Skip request");
-                return new KpSearchResult<KpMovie>();
-            }
-
-            bool hasName = !string.IsNullOrWhiteSpace(name);
-            bool hasYear = year is not null and > 1000;
-            string url = new StringBuilder($"https://api.kinopoisk.dev/movie?token={token}")
-                .Append("&limit=50")
-                .Append("&selectFields=externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan")
-                .ToString();
-            string namePart = hasName ? $"&field=name&search={name}" : string.Empty;
-            string yearPart = hasYear ? $"&field=year&search={year}" : string.Empty;
-
-            if (hasName && hasYear)
-            {
-                string request = url + namePart + yearPart;
-                string json = await SendRequest(request, cancellationToken);
-                KpSearchResult<KpMovie>? toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
-                if (toReturn != null && toReturn.Docs.Count > 0)
-                {
-                    _log.Info($"Found {toReturn.Docs.Count} movies");
-                    return toReturn;
-                }
-            }
-
-            if (hasName)
-            {
-                string request = url + namePart;
-                string json = await SendRequest(request, cancellationToken);
-                KpSearchResult<KpMovie>? toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
-                if (toReturn != null && toReturn.Docs.Count > 0)
-                {
-                    _log.Info($"Found {toReturn.Docs.Count} movies");
-                    return toReturn;
-                }
-            }
-
-            return new KpSearchResult<KpMovie>();
+            return await GetMoviesByMovieDetails(name, name, year, cancellationToken);
         }
         internal async Task<KpSearchResult<KpMovie>> GetMoviesByMovieDetails(string? name, string? alternativeName, int? year, CancellationToken cancellationToken)
         {

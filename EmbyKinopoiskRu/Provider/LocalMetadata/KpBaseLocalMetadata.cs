@@ -22,7 +22,7 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
             _log = logManager.GetLogger(GetType().FullName);
         }
 
-        public Task<MetadataResult<T>> GetMetadata(ItemInfo info, LibraryOptions libraryOptions, IDirectoryService directoryService, CancellationToken cancellationToken)
+        public virtual Task<MetadataResult<T>> GetMetadata(ItemInfo info, LibraryOptions libraryOptions, IDirectoryService directoryService, CancellationToken cancellationToken)
         {
             _log.Info("GetMetadata");
             _log.Info($"info.Path - {info.Path}");
@@ -34,10 +34,10 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
                 if (match.Success && int.TryParse(match.Groups["kinopoiskId"].Value, out int kinopoiskId))
                 {
                     _log.Info($"Detected kinopoisk id '{kinopoiskId}' for file '{info.Path}'");
-                    T movie = new();
-                    movie.SetProviderId(Plugin.PluginName, match.Groups["kinopoiskId"].Value);
+                    T item = new();
+                    item.SetProviderId(Plugin.PluginName, match.Groups["kinopoiskId"].Value);
 
-                    result.Item = movie;
+                    result.Item = item;
                     result.HasMetadata = true;
                 }
             }

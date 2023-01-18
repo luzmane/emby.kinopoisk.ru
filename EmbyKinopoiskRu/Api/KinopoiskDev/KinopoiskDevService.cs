@@ -39,6 +39,24 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         }
 
         #region MovieProvider
+        public async Task<List<Movie>> GetMoviesByOriginalNameAndYear(string name, int? year, CancellationToken cancellationToken)
+        {
+            List<Movie> result = new();
+
+            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetToken()))
+            {
+                _log.Warn($"The Token for {Plugin.PluginName} is empty");
+                return result;
+            }
+
+            KpSearchResult<KpMovie> movies = await _api.GetMoviesByMovieDetails(name, year, cancellationToken);
+            foreach (KpMovie movie in movies.Docs)
+            {
+                result.Add(CreateMovieFromKpMovie(movie));
+            }
+            _log.Info($"By alternative name '{name}' found {result.Count} movies");
+            return result;
+        }
         public async Task<MetadataResult<Movie>> GetMetadata(MovieInfo info, CancellationToken cancellationToken)
         {
             MetadataResult<Movie> result = new()
@@ -71,7 +89,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             _log.Info($"Searching movie by name {info.Name}");
-            KpSearchResult<KpMovie> movies = await _api.GetMoviesByMetadata(info.Name, info.Year, cancellationToken);
+            KpSearchResult<KpMovie> movies = await _api.GetMoviesByMovieDetails(info.Name, info.Year, cancellationToken);
             if (movies.Docs.Count != 1)
             {
                 _log.Error($"Found {movies.Docs.Count} movies, skipping movie update");
@@ -119,7 +137,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             _log.Info($"Searching movies by available metadata");
-            KpSearchResult<KpMovie> movies = await _api.GetMoviesByMetadata(searchInfo.Name, searchInfo.Year, cancellationToken);
+            KpSearchResult<KpMovie> movies = await _api.GetMoviesByMovieDetails(searchInfo.Name, searchInfo.Year, cancellationToken);
             foreach (KpMovie movie in movies.Docs)
             {
                 string imageUrl = (movie.Poster?.PreviewUrl ?? movie.Poster?.Url) ?? string.Empty;
@@ -243,7 +261,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             _log.Info($"Searching series by name {info.Name}");
-            KpSearchResult<KpMovie> series = await _api.GetMoviesByMetadata(info.Name, info.Year, cancellationToken);
+            KpSearchResult<KpMovie> series = await _api.GetMoviesByMovieDetails(info.Name, info.Year, cancellationToken);
             if (series.Docs.Count != 1)
             {
                 _log.Error($"Found {series.Docs.Count} series, skipping series update");
@@ -291,7 +309,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             _log.Info($"Searching series by available metadata");
-            KpSearchResult<KpMovie> seriesResult = await _api.GetMoviesByMetadata(searchInfo.Name, searchInfo.Year, cancellationToken);
+            KpSearchResult<KpMovie> seriesResult = await _api.GetMoviesByMovieDetails(searchInfo.Name, searchInfo.Year, cancellationToken);
             foreach (KpMovie series in seriesResult.Docs)
             {
                 string imageUrl = (series.Poster?.PreviewUrl ?? series.Poster?.Url) ?? string.Empty;

@@ -14,6 +14,7 @@ namespace EmbyKinopoiskRu.Api
     {
         Task<MetadataResult<Movie>> GetMetadata(MovieInfo info, CancellationToken cancellationToken);
         Task<IEnumerable<RemoteSearchResult>> GetSearchResults(MovieInfo searchInfo, CancellationToken cancellationToken);
+        Task<List<Movie>> GetMoviesByOriginalNameAndYear(string name, int? year, CancellationToken cancellationToken);
 
         Task<MetadataResult<Series>> GetMetadata(SeriesInfo info, CancellationToken cancellationToken);
         Task<IEnumerable<RemoteSearchResult>> GetSearchResults(SeriesInfo searchInfo, CancellationToken cancellationToken);

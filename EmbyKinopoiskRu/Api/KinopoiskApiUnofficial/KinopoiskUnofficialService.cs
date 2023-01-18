@@ -134,6 +134,24 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             _log.Info($"By name '{searchInfo.Name}' found {result.Count} movies");
             return result;
         }
+        public async Task<List<Movie>> GetMoviesByOriginalNameAndYear(string name, int? year, CancellationToken cancellationToken)
+        {
+            List<Movie> result = new();
+
+            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetToken()))
+            {
+                _log.Warn($"The Token for {Plugin.PluginName} is empty");
+                return result;
+            }
+
+            KpSearchResult<KpFilm> movies = await _api.GetFilmsByName(name, cancellationToken);
+            foreach (KpFilm movie in movies.Items)
+            {
+                result.Add(CreateMovieFromKpFilm(movie));
+            }
+            _log.Info($"By keywords '{name}' found {result.Count} movies");
+            return result;
+        }
 
         private async Task CreateMovie(MetadataResult<Movie> result, KpFilm movie, CancellationToken cancellationToken)
         {
