@@ -17,7 +17,7 @@ namespace EmbyKinopoiskRu.Helper
             {
                 return null;
             }
-            _ = instance.SeriesProviderIds.TryGetValue(name, out string? value);
+            _ = instance.SeriesProviderIds.TryGetValue(name, out var value);
             return value;
         }
     }

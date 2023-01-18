@@ -3,7 +3,9 @@ using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+
 using EmbyKinopoiskRu.Api;
+
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Configuration;
@@ -14,9 +16,9 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
 {
     public class KpMovieLocalMetadata : KpBaseLocalMetadata<Movie>
     {
-        private static readonly Regex _alphaNumeric = new(@"[^0-9A-ZА-Я-]", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private static readonly Regex _dubleWhitespace = new(@" {2,}", RegexOptions.Compiled);
-        private static readonly Regex _year = new("(?<year>[0-9]{4})", RegexOptions.Compiled);
+        private static readonly Regex AlphaNumeric = new(@"[^0-9A-ZА-Я-]", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex DubleWhitespace = new(@" {2,}", RegexOptions.Compiled);
+        private static readonly Regex Year = new("(?<year>[0-9]{4})", RegexOptions.Compiled);
 
         private readonly ILogger _log;
 
@@ -37,10 +39,10 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
 
             var movieName = info.Name;
             _log.Info($"info.Name - {movieName}");
-            movieName = _dubleWhitespace.Replace(_alphaNumeric.Replace(movieName, " "), " ");
+            movieName = DubleWhitespace.Replace(AlphaNumeric.Replace(movieName, " "), " ");
 
             var yearSt = DetectYearFromMoviePath(info.Path, info.Name);
-            _ = int.TryParse(yearSt, out int year);
+            _ = int.TryParse(yearSt, out var year);
             _log.Info($"Searching movie by name - {movieName} and year - {year}");
             List<Movie> movies = await KinopoiskRuServiceFactory.GetService().GetMoviesByOriginalNameAndYear(movieName, year, cancellationToken);
 
@@ -64,11 +66,11 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
         }
         private static string DetectYearFromMoviePath(string filePath, string movieName)
         {
-            string fileName = Path.GetFileNameWithoutExtension(filePath);
+            var fileName = Path.GetFileNameWithoutExtension(filePath);
             fileName = fileName.Replace(movieName, " ");
             if (!string.IsNullOrWhiteSpace(fileName))
             {
-                Match match = _year.Match(fileName);
+                Match match = Year.Match(fileName);
                 return match.Success ? match.Groups["year"].Value : string.Empty;
             }
             return string.Empty;

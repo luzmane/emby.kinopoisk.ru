@@ -15,7 +15,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Film
         public float? RatingKinopoisk { get; set; }
         public string? Type { get; set; } // FILM, VIDEO, TV_SERIES, MINI_SERIES, TV_SHOW
         public int? Year { get; set; }
-        
+
         public string? CoverUrl { get; set; } // backdrop
         public string? Description { get; set; }
         public int? EndYear { get; set; }

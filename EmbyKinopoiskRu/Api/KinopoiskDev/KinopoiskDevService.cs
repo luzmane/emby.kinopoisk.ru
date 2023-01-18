@@ -4,11 +4,13 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Person;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Season;
 using EmbyKinopoiskRu.Helper;
+
 using MediaBrowser.Common.Net;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
@@ -72,7 +74,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             if (info.HasProviderId(Plugin.PluginName))
             {
-                string movieId = info.GetProviderId(Plugin.PluginName);
+                var movieId = info.GetProviderId(Plugin.PluginName);
                 if (!string.IsNullOrWhiteSpace(movieId))
                 {
                     _log.Info($"Searching movie by movie id '{movieId}'");
@@ -112,14 +114,14 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             if (searchInfo.HasProviderId(Plugin.PluginName))
             {
-                string movieId = searchInfo.GetProviderId(Plugin.PluginName);
+                var movieId = searchInfo.GetProviderId(Plugin.PluginName);
                 if (!string.IsNullOrWhiteSpace(movieId))
                 {
                     _log.Info($"Searching movie by id '{movieId}'");
                     KpMovie? movie = await _api.GetMovieById(movieId, cancellationToken);
                     if (movie != null)
                     {
-                        string imageUrl = (movie.Poster?.PreviewUrl ?? movie.Poster?.Url) ?? string.Empty;
+                        var imageUrl = (movie.Poster?.PreviewUrl ?? movie.Poster?.Url) ?? string.Empty;
                         RemoteSearchResult item = new()
                         {
                             Name = movie.Name,
@@ -140,7 +142,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             KpSearchResult<KpMovie> movies = await _api.GetMoviesByMovieDetails(searchInfo.Name, searchInfo.Year, cancellationToken);
             foreach (KpMovie movie in movies.Docs)
             {
-                string imageUrl = (movie.Poster?.PreviewUrl ?? movie.Poster?.Url) ?? string.Empty;
+                var imageUrl = (movie.Poster?.PreviewUrl ?? movie.Poster?.Url) ?? string.Empty;
                 RemoteSearchResult item = new()
                 {
                     Name = movie.Name,
@@ -159,7 +161,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             _log.Info($"Movie '{movie.Name}' with {Plugin.PluginName} id '{movie.Id}' found");
 
-            string movieId = movie.Id.ToString(CultureInfo.InvariantCulture);
+            var movieId = movie.Id.ToString(CultureInfo.InvariantCulture);
             Movie toReturn = new()
             {
                 CommunityRating = movie.Rating?.Kp,
@@ -244,7 +246,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             if (info.HasProviderId(Plugin.PluginName))
             {
-                string seriesId = info.GetProviderId(Plugin.PluginName);
+                var seriesId = info.GetProviderId(Plugin.PluginName);
                 if (!string.IsNullOrWhiteSpace(seriesId))
                 {
                     _log.Info($"Fetching series by series id '{seriesId}'");
@@ -284,14 +286,14 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             if (searchInfo.HasProviderId(Plugin.PluginName))
             {
-                string seriesId = searchInfo.GetProviderId(Plugin.PluginName);
+                var seriesId = searchInfo.GetProviderId(Plugin.PluginName);
                 if (!string.IsNullOrWhiteSpace(seriesId))
                 {
                     _log.Info($"Searching series by id '{seriesId}'");
                     KpMovie? series = await _api.GetMovieById(seriesId, cancellationToken);
                     if (series != null)
                     {
-                        string imageUrl = (series.Poster?.PreviewUrl ?? series.Poster?.Url) ?? string.Empty;
+                        var imageUrl = (series.Poster?.PreviewUrl ?? series.Poster?.Url) ?? string.Empty;
                         RemoteSearchResult item = new()
                         {
                             Name = series.Name,
@@ -312,7 +314,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             KpSearchResult<KpMovie> seriesResult = await _api.GetMoviesByMovieDetails(searchInfo.Name, searchInfo.Year, cancellationToken);
             foreach (KpMovie series in seriesResult.Docs)
             {
-                string imageUrl = (series.Poster?.PreviewUrl ?? series.Poster?.Url) ?? string.Empty;
+                var imageUrl = (series.Poster?.PreviewUrl ?? series.Poster?.Url) ?? string.Empty;
                 RemoteSearchResult item = new()
                 {
                     Name = series.Name,
@@ -331,7 +333,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             _log.Info($"Series '{series.Name}' with KinopoiskId '{series.Id}' found");
 
-            string seriesId = series.Id.ToString(CultureInfo.InvariantCulture);
+            var seriesId = series.Id.ToString(CultureInfo.InvariantCulture);
             Series toReturn = new()
             {
                 CommunityRating = series.Rating?.Kp,
@@ -413,7 +415,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return result;
             }
 
-            string? seriesId = info.GetSeriesProviderId(Plugin.PluginName);
+            var seriesId = info.GetSeriesProviderId(Plugin.PluginName);
             if (string.IsNullOrWhiteSpace(seriesId))
             {
                 _log.Debug($"SeriesProviderId not exists for {Plugin.PluginName}, checking ProviderId");
@@ -486,7 +488,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             if (info.HasProviderId(Plugin.PluginName))
             {
-                string personId = info.ProviderIds[Plugin.PluginName];
+                var personId = info.ProviderIds[Plugin.PluginName];
                 if (!string.IsNullOrWhiteSpace(personId))
                 {
                     _log.Info($"Fetching person by person id '{personId}'");
@@ -524,7 +526,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             if (searchInfo.HasProviderId(Plugin.PluginName))
             {
-                string personId = searchInfo.ProviderIds[Plugin.PluginName];
+                var personId = searchInfo.ProviderIds[Plugin.PluginName];
                 if (!string.IsNullOrWhiteSpace(personId))
                 {
                     _log.Info($"Searching person by id '{personId}'");
@@ -604,7 +606,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             if (item.HasProviderId(Plugin.PluginName))
             {
-                string movieId = item.ProviderIds[Plugin.PluginName];
+                var movieId = item.ProviderIds[Plugin.PluginName];
                 if (!string.IsNullOrWhiteSpace(movieId))
                 {
                     _log.Info($"Searching images by movie id '{movieId}'");
@@ -677,7 +679,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             {
                 return null;
             }
-            int max = 0;
+            var max = 0;
             releaseYears
                 .Where(i => i.End != null)
                 .ToList()
@@ -702,8 +704,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             _log.Info($"Updating persons list of the series with id '{result.Item.GetProviderId(Plugin.PluginName)}'");
-            string seriesId = result.Item.GetProviderId(Plugin.PluginName);
-            string movieName = result.Item.Name;
+            var seriesId = result.Item.GetProviderId(Plugin.PluginName);
+            var movieName = result.Item.Name;
             KpSearchResult<KpPerson> personsBySeriesId = await _api.GetPersonsByMovieId(seriesId, cancellationToken);
             personsBySeriesId.Docs
                 .ForEach(a =>
@@ -717,11 +719,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                     c => c.Id,
                     c => c.Movies.FirstOrDefault()?.Description);
 
-            string seriesName = result.Item.Name;
+            var seriesName = result.Item.Name;
             foreach (KpMovie.KpPerson kpPerson in persons)
             {
                 PersonType? personType = KpHelper.GetPersonType(kpPerson.EnProfession);
-                string? name = string.IsNullOrWhiteSpace(kpPerson.Name) ? kpPerson.EnName : kpPerson.Name;
+                var name = string.IsNullOrWhiteSpace(kpPerson.Name) ? kpPerson.EnName : kpPerson.Name;
                 if (string.IsNullOrWhiteSpace(name))
                 {
                     _log.Warn($"Skip adding staff with id '{kpPerson.Id.ToString(CultureInfo.InvariantCulture)}' as nameless to '{movieName}'");
@@ -733,7 +735,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 else
                 {
                     _log.Debug($"Adding {name} as '{personType}' to {seriesName}");
-                    _ = idRoleDictionary.TryGetValue(kpPerson.Id, out string? role);
+                    _ = idRoleDictionary.TryGetValue(kpPerson.Id, out var role);
                     PersonInfo person = new()
                     {
                         Name = name,

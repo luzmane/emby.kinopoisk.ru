@@ -3,10 +3,12 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Person;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Season;
+
 using NUnit.Framework;
 
 namespace EmbyKinopoiskRu.Tests
@@ -14,19 +16,19 @@ namespace EmbyKinopoiskRu.Tests
     [TestFixture]
     public class DevApiTests
     {
-        private static readonly string _token = "8DA0EV2-KTP4A5Q-G67QP3K-S2VFBX7";
-        private static readonly HttpClient httpClient = new();
-        private static readonly JsonSerializerOptions jsonOptions = new() { PropertyNameCaseInsensitive = true };
+        private static readonly string Token = "8DA0EV2-KTP4A5Q-G67QP3K-S2VFBX7";
+        private static readonly HttpClient HttpClient = new();
+        private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
 
         [Test]
         public async Task GetMovieById()
         {
-            string request = $"https://api.kinopoisk.dev/movie?token={_token}&field=id&search=326";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            var request = $"https://api.kinopoisk.dev/movie?token={Token}&field=id&search=326";
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            KpMovie? kpMovie = JsonSerializer.Deserialize<KpMovie>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            KpMovie? kpMovie = JsonSerializer.Deserialize<KpMovie>(response, JsonOptions);
             Assert.NotNull(kpMovie);
             Assert.AreEqual("The Shawshank Redemption", kpMovie!.AlternativeName);
             Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1672343/2a0000016b03d1f5365474a90d26998e2a9f/orig", kpMovie.Backdrop?.Url);
@@ -60,15 +62,15 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetMoviesByMetadataStrictNameYear()
         {
-            string request = $"https://api.kinopoisk.dev/movie?token={_token}";
+            var request = $"https://api.kinopoisk.dev/movie?token={Token}";
             request += "&limit=50";
             request += "&selectFields=externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
             request += "&field=name&search=Побег из Шоушенка";
             request += "&field=year&search=1994";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, JsonOptions);
             Assert.NotNull(searchResultMovie);
             Assert.AreEqual(1, searchResultMovie!.Docs.Count);
             KpMovie kpMovie = searchResultMovie!.Docs[0];
@@ -100,14 +102,14 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetMoviesByMetadataStrictName()
         {
-            string request = $"https://api.kinopoisk.dev/movie?token={_token}";
+            var request = $"https://api.kinopoisk.dev/movie?token={Token}";
             request += "&limit=50";
             request += "&selectFields=externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
             request += "&field=name&search=Побег из Шоушенка";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, JsonOptions);
             Assert.NotNull(searchResultMovie);
             Assert.AreEqual(1, searchResultMovie!.Docs.Count);
             KpMovie kpMovie = searchResultMovie!.Docs[0];
@@ -139,15 +141,15 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetMoviesByMetadataNotStrictNameYear()
         {
-            string request = $"https://api.kinopoisk.dev/movie?token={_token}";
+            var request = $"https://api.kinopoisk.dev/movie?token={Token}";
             request += "&limit=50";
             request += "&selectFields=externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
             request += "&field=name&search=Побег из Шоушенка";
             request += "&field=year&search=1994";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, JsonOptions);
             Assert.NotNull(searchResultMovie);
             Assert.AreEqual(1, searchResultMovie!.Docs.Count);
             KpMovie kpMovie = searchResultMovie!.Docs[0];
@@ -179,14 +181,14 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetMoviesByMetadataNotStrictName()
         {
-            string request = $"https://api.kinopoisk.dev/movie?token={_token}";
+            var request = $"https://api.kinopoisk.dev/movie?token={Token}";
             request += "&limit=50";
             request += "&selectFields=externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
             request += "&field=name&search=Побег из Шоушенка";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, JsonOptions);
             Assert.NotNull(searchResultMovie);
             Assert.AreEqual(1, searchResultMovie!.Docs.Count);
             KpMovie kpMovie = searchResultMovie!.Docs[0];
@@ -218,15 +220,15 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetMoviesByMovieDetailsAlternativeNameYear()
         {
-            string request = $"https://api.kinopoisk.dev/movie?token={_token}";
+            var request = $"https://api.kinopoisk.dev/movie?token={Token}";
             request += "&limit=50";
             request += "&field=alternativeName&search=The Shawshank Redemption";
             request += "&field=year&search=1994";
             request += "&selectFields=externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, JsonOptions);
             Assert.NotNull(searchResultMovie);
             Assert.AreEqual(1, searchResultMovie!.Docs.Count);
             KpMovie kpMovie = searchResultMovie!.Docs[0];
@@ -258,14 +260,14 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetMoviesByMovieDetailsAlternativeName()
         {
-            string request = $"https://api.kinopoisk.dev/movie?token={_token}";
+            var request = $"https://api.kinopoisk.dev/movie?token={Token}";
             request += "&limit=50";
             request += "&field=alternativeName&search=The Shawshank Redemption";
             request += "&selectFields=externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, JsonOptions);
             Assert.NotNull(searchResultMovie);
             Assert.AreEqual(2, searchResultMovie!.Docs.Count);
             KpMovie kpMovie = searchResultMovie!.Docs[0];
@@ -297,11 +299,11 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetPersonById()
         {
-            string request = $"https://api.kinopoisk.dev/person?token={_token}&field=id&search=7987";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            var request = $"https://api.kinopoisk.dev/person?token={Token}&field=id&search=7987";
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            KpPerson? kpPerson = JsonSerializer.Deserialize<KpPerson>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            KpPerson? kpPerson = JsonSerializer.Deserialize<KpPerson>(response, JsonOptions);
             Assert.NotNull(kpPerson);
             Assert.AreEqual(3, kpPerson!.BirthPlace.Count);
             Assert.AreEqual("1958-10-16T00:00:00.000Z", kpPerson.Birthday);
@@ -315,11 +317,11 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetPersonByName()
         {
-            string request = $"https://api.kinopoisk.dev/person?token={_token}&field=name&search=Тим Роббинс";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            var request = $"https://api.kinopoisk.dev/person?token={Token}&field=name&search=Тим Роббинс";
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            KpSearchResult<KpPerson>? searchResultKpPerson = JsonSerializer.Deserialize<KpSearchResult<KpPerson>>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            KpSearchResult<KpPerson>? searchResultKpPerson = JsonSerializer.Deserialize<KpSearchResult<KpPerson>>(response, JsonOptions);
             Assert.NotNull(searchResultKpPerson);
             Assert.AreEqual(2, searchResultKpPerson!.Docs.Count);
             KpPerson kpPerson = searchResultKpPerson.Docs[0];
@@ -331,14 +333,14 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetPersonByMovieId()
         {
-            string request = $"https://api.kinopoisk.dev/person?token={_token}";
+            var request = $"https://api.kinopoisk.dev/person?token={Token}";
             request += "&field=movies.id&search=326";
             request += "&selectFields=id movies";
             request += "&limit=1000";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            KpSearchResult<KpPerson>? searchResultKpPerson = JsonSerializer.Deserialize<KpSearchResult<KpPerson>>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            KpSearchResult<KpPerson>? searchResultKpPerson = JsonSerializer.Deserialize<KpSearchResult<KpPerson>>(response, JsonOptions);
             Assert.NotNull(searchResultKpPerson);
             Assert.AreEqual(112, searchResultKpPerson!.Docs.Count);
             KpPerson? kpPerson = searchResultKpPerson.Docs.FirstOrDefault(i => i.Id == 1929007);
@@ -350,13 +352,13 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetEpisodesBySeriesId()
         {
-            string request = $"https://api.kinopoisk.dev/season?token={_token}";
+            var request = $"https://api.kinopoisk.dev/season?token={Token}";
             request += "&field=movieId&search=77044";
             request += "&limit=50";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            KpSearchResult<KpSeason>? searchResultKpSeason = JsonSerializer.Deserialize<KpSearchResult<KpSeason>>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            KpSearchResult<KpSeason>? searchResultKpSeason = JsonSerializer.Deserialize<KpSearchResult<KpSeason>>(response, JsonOptions);
             Assert.NotNull(searchResultKpSeason);
             Assert.AreEqual(10, searchResultKpSeason!.Docs.Count);
             KpSeason? kpSeason = searchResultKpSeason.Docs.FirstOrDefault(i => i.Number == 1);

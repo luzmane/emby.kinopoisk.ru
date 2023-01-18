@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Configuration;
@@ -12,7 +13,7 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
     public abstract class KpBaseLocalMetadata<T> : ILocalMetadataProvider<T>
         where T : BaseItem, IHasProviderIds, new()
     {
-        private static readonly Regex _kinopoiskIdRegex = new(@"kp-?(?<kinopoiskId>\d+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex KinopoiskIdRegex = new(@"kp-?(?<kinopoiskId>\d+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private readonly ILogger _log;
 
         public string Name => Plugin.PluginName;
@@ -30,8 +31,8 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
 
             if (!string.IsNullOrEmpty(info.Path))
             {
-                Match match = _kinopoiskIdRegex.Match(info.Path);
-                if (match.Success && int.TryParse(match.Groups["kinopoiskId"].Value, out int kinopoiskId))
+                Match match = KinopoiskIdRegex.Match(info.Path);
+                if (match.Success && int.TryParse(match.Groups["kinopoiskId"].Value, out var kinopoiskId))
                 {
                     _log.Info($"Detected kinopoisk id '{kinopoiskId}' for file '{info.Path}'");
                     T item = new();

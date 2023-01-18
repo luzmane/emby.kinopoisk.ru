@@ -2,10 +2,12 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Text.Json;
 using System.Threading.Tasks;
+
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model;
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Film;
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Person;
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Season;
+
 using NUnit.Framework;
 
 namespace EmbyKinopoiskRu.Tests
@@ -13,23 +15,23 @@ namespace EmbyKinopoiskRu.Tests
     [TestFixture]
     public class UnofficialApiTests
     {
-        private static readonly HttpClient httpClient = new();
-        private static readonly JsonSerializerOptions jsonOptions = new() { PropertyNameCaseInsensitive = true };
+        private static readonly HttpClient HttpClient = new();
+        private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
         [OneTimeSetUp]
         public void UnofficialApiTestsSetUp()
         {
-            httpClient.DefaultRequestHeaders.Add("X-API-KEY", "0f162131-81c1-4979-b46c-3eea4263fb11");
+            HttpClient.DefaultRequestHeaders.Add("X-API-KEY", "0f162131-81c1-4979-b46c-3eea4263fb11");
         }
 
         [Test]
         public async Task GetFilm()
         {
-            string request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/326";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/326";
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            KpFilm? film = JsonSerializer.Deserialize<KpFilm>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            KpFilm? film = JsonSerializer.Deserialize<KpFilm>(response, JsonOptions);
             Assert.NotNull(film);
             Assert.AreEqual(film!.Countries?.Count, 1);
             Assert.AreEqual(film.CoverUrl, "https://avatars.mds.yandex.net/get-ott/1672343/2a0000016b03d1f5365474a90d26998e2a9f/orig");
@@ -51,11 +53,11 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetSeasons()
         {
-            string request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/77044/seasons";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/77044/seasons";
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            KpSearchResult<KpSeason>? seasons = JsonSerializer.Deserialize<KpSearchResult<KpSeason>>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            KpSearchResult<KpSeason>? seasons = JsonSerializer.Deserialize<KpSearchResult<KpSeason>>(response, JsonOptions);
             Assert.NotNull(seasons);
             Assert.AreEqual(seasons!.Items.Count, 10);
             KpSeason kpSeason = seasons.Items[0];
@@ -71,11 +73,11 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetVideos()
         {
-            string request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/77044/videos";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/77044/videos";
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            KpSearchResult<KpVideo>? videos = JsonSerializer.Deserialize<KpSearchResult<KpVideo>>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            KpSearchResult<KpVideo>? videos = JsonSerializer.Deserialize<KpSearchResult<KpVideo>>(response, JsonOptions);
             Assert.NotNull(videos);
             Assert.AreEqual(videos!.Items.Count, 8);
             KpVideo kpVideo = videos.Items[0];
@@ -87,11 +89,11 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetStaff()
         {
-            string request = $"https://kinopoiskapiunofficial.tech/api/v1/staff/7987";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            var request = $"https://kinopoiskapiunofficial.tech/api/v1/staff/7987";
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            KpPerson? kpPerson = JsonSerializer.Deserialize<KpPerson>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            KpPerson? kpPerson = JsonSerializer.Deserialize<KpPerson>(response, JsonOptions);
             Assert.NotNull(kpPerson);
             Assert.AreEqual(kpPerson!.Birthday, "1958-10-16");
             Assert.AreEqual(kpPerson.BirthPlace, "Уэст-Ковина, штат Калифорния, США");
@@ -107,11 +109,11 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetFilmsStaff()
         {
-            string request = $"https://kinopoiskapiunofficial.tech/api/v1/staff?filmId=326";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            var request = $"https://kinopoiskapiunofficial.tech/api/v1/staff?filmId=326";
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            List<KpFilmStaff>? filmStaffList = JsonSerializer.Deserialize<List<KpFilmStaff>>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            List<KpFilmStaff>? filmStaffList = JsonSerializer.Deserialize<List<KpFilmStaff>>(response, JsonOptions);
             Assert.NotNull(filmStaffList);
             Assert.AreEqual(filmStaffList!.Count, 89);
             KpFilmStaff filmStaff = filmStaffList[1];
@@ -126,11 +128,11 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task SearchFilmByName()
         {
-            string request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films?keyword=100 шагов";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films?keyword=100 шагов";
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            KpSearchResult<KpFilm>? filmSearchResult = JsonSerializer.Deserialize<KpSearchResult<KpFilm>>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            KpSearchResult<KpFilm>? filmSearchResult = JsonSerializer.Deserialize<KpSearchResult<KpFilm>>(response, JsonOptions);
             Assert.NotNull(filmSearchResult);
             Assert.AreEqual(filmSearchResult!.Items.Count, 3);
             KpFilm film = filmSearchResult.Items[2];
@@ -150,11 +152,11 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task SearchStaffByName()
         {
-            string request = $"https://kinopoiskapiunofficial.tech/api/v1/persons?name=Тим Роббинс";
-            using HttpResponseMessage responseMessage = await httpClient.GetAsync(request);
+            var request = $"https://kinopoiskapiunofficial.tech/api/v1/persons?name=Тим Роббинс";
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
-            string response = await responseMessage.Content.ReadAsStringAsync();
-            KpSearchResult<KpStaff>? staffSearchResult = JsonSerializer.Deserialize<KpSearchResult<KpStaff>>(response, jsonOptions);
+            var response = await responseMessage.Content.ReadAsStringAsync();
+            KpSearchResult<KpStaff>? staffSearchResult = JsonSerializer.Deserialize<KpSearchResult<KpStaff>>(response, JsonOptions);
             Assert.NotNull(staffSearchResult);
             Assert.AreEqual(staffSearchResult!.Items.Count, 4);
             KpStaff staff = staffSearchResult.Items[0];

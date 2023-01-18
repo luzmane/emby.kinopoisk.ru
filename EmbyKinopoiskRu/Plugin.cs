@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+
 using EmbyKinopoiskRu.Api;
 using EmbyKinopoiskRu.Configuration;
+
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Common.Plugins;
