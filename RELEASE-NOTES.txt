@@ -1,5 +1,8 @@
-v.1.5.0
+v.1.6.0
 - Update dependency
+- Add movie name detection from file name
+
+v.1.5.0
 - Add default token for KinopoiskDev API
 
 v.1.4.0
