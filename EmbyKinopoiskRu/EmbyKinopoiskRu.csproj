@@ -8,9 +8,9 @@
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 
     <!-- nuget setup -->
-    <AssemblyVersion>1.6.0</AssemblyVersion>
-    <Version>1.6.0</Version>
-    <FileVersion>1.6.0</FileVersion>
+    <AssemblyVersion>1.6.1</AssemblyVersion>
+    <Version>1.6.1</Version>
+    <FileVersion>1.6.1</FileVersion>
     <Authors>Evgeniy Luzman</Authors>
     <Copyright>Copyright (c) 2022 Evgeniy Luzman</Copyright>
     <Description>Emby plugin to update metadata from Kinopoisk.ru</Description>

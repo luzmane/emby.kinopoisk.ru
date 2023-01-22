@@ -64,7 +64,7 @@ namespace EmbyKinopoiskRu.Tests
         {
             var request = $"https://api.kinopoisk.dev/movie?token={Token}";
             request += "&limit=50";
-            request += "&selectFields=externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
+            request += "&selectFields=videos externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
             request += "&field=name&search=Побег из Шоушенка";
             request += "&field=year&search=1994";
             using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
@@ -97,6 +97,8 @@ namespace EmbyKinopoiskRu.Tests
             Assert.AreEqual("Страх - это кандалы. Надежда - это свобода", kpMovie.Slogan);
             Assert.AreEqual("movie", kpMovie.Type);
             Assert.AreEqual(1994, kpMovie.Year);
+            Assert.AreEqual(0, kpMovie.Videos!.Teasers.Count);
+            Assert.AreEqual(4, kpMovie.Videos!.Trailers.Count);
         }
 
         [Test]
@@ -104,7 +106,7 @@ namespace EmbyKinopoiskRu.Tests
         {
             var request = $"https://api.kinopoisk.dev/movie?token={Token}";
             request += "&limit=50";
-            request += "&selectFields=externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
+            request += "&selectFields=videos externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
             request += "&field=name&search=Побег из Шоушенка";
             using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
@@ -136,6 +138,8 @@ namespace EmbyKinopoiskRu.Tests
             Assert.AreEqual("Страх - это кандалы. Надежда - это свобода", kpMovie.Slogan);
             Assert.AreEqual("movie", kpMovie.Type);
             Assert.AreEqual(1994, kpMovie.Year);
+            Assert.AreEqual(0, kpMovie.Videos!.Teasers.Count);
+            Assert.AreEqual(4, kpMovie.Videos!.Trailers.Count);
         }
 
         [Test]
@@ -143,7 +147,7 @@ namespace EmbyKinopoiskRu.Tests
         {
             var request = $"https://api.kinopoisk.dev/movie?token={Token}";
             request += "&limit=50";
-            request += "&selectFields=externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
+            request += "&selectFields=videos externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
             request += "&field=name&search=Побег из Шоушенка";
             request += "&field=year&search=1994";
             using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
@@ -176,6 +180,8 @@ namespace EmbyKinopoiskRu.Tests
             Assert.AreEqual("Страх - это кандалы. Надежда - это свобода", kpMovie.Slogan);
             Assert.AreEqual("movie", kpMovie.Type);
             Assert.AreEqual(1994, kpMovie.Year);
+            Assert.AreEqual(0, kpMovie.Videos!.Teasers.Count);
+            Assert.AreEqual(4, kpMovie.Videos!.Trailers.Count);
         }
 
         [Test]
@@ -183,7 +189,7 @@ namespace EmbyKinopoiskRu.Tests
         {
             var request = $"https://api.kinopoisk.dev/movie?token={Token}";
             request += "&limit=50";
-            request += "&selectFields=externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
+            request += "&selectFields=videos externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
             request += "&field=name&search=Побег из Шоушенка";
             using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
@@ -215,6 +221,8 @@ namespace EmbyKinopoiskRu.Tests
             Assert.AreEqual("Страх - это кандалы. Надежда - это свобода", kpMovie.Slogan);
             Assert.AreEqual("movie", kpMovie.Type);
             Assert.AreEqual(1994, kpMovie.Year);
+            Assert.AreEqual(0, kpMovie.Videos!.Teasers.Count);
+            Assert.AreEqual(4, kpMovie.Videos!.Trailers.Count);
         }
 
         [Test]
@@ -224,7 +232,7 @@ namespace EmbyKinopoiskRu.Tests
             request += "&limit=50";
             request += "&field=alternativeName&search=The Shawshank Redemption";
             request += "&field=year&search=1994";
-            request += "&selectFields=externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
+            request += "&selectFields=videos externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
             using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
             var response = await responseMessage.Content.ReadAsStringAsync();
@@ -255,6 +263,8 @@ namespace EmbyKinopoiskRu.Tests
             Assert.AreEqual("Страх - это кандалы. Надежда - это свобода", kpMovie.Slogan);
             Assert.AreEqual("movie", kpMovie.Type);
             Assert.AreEqual(1994, kpMovie.Year);
+            Assert.AreEqual(0, kpMovie.Videos!.Teasers.Count);
+            Assert.AreEqual(4, kpMovie.Videos!.Trailers.Count);
         }
 
         [Test]
@@ -263,7 +273,7 @@ namespace EmbyKinopoiskRu.Tests
             var request = $"https://api.kinopoisk.dev/movie?token={Token}";
             request += "&limit=50";
             request += "&field=alternativeName&search=The Shawshank Redemption";
-            request += "&selectFields=externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
+            request += "&selectFields=videos externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
             using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
             var response = await responseMessage.Content.ReadAsStringAsync();
@@ -294,6 +304,8 @@ namespace EmbyKinopoiskRu.Tests
             Assert.AreEqual("Страх - это кандалы. Надежда - это свобода", kpMovie.Slogan);
             Assert.AreEqual("movie", kpMovie.Type);
             Assert.AreEqual(1994, kpMovie.Year);
+            Assert.AreEqual(0, kpMovie.Videos!.Teasers.Count);
+            Assert.AreEqual(4, kpMovie.Videos!.Trailers.Count);
         }
 
         [Test]

@@ -1,3 +1,6 @@
+v.1.6.1
+- Add trailers and teasers to movie search by name result
+
 v.1.6.0
 - Update dependency
 - Add movie name detection from file name

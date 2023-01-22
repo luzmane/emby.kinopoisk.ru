@@ -73,7 +73,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             var hasAlternativeName = !string.IsNullOrWhiteSpace(alternativeName);
             var url = new StringBuilder($"https://api.kinopoisk.dev/movie?token={token}")
                 .Append($"&limit=50")
-                .Append("&selectFields=externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan")
+                .Append("&selectFields=videos externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan")
                 .ToString();
             var namePart = hasName ? $"&field=name&search={name}" : string.Empty;
             var alternativeNamePart = hasAlternativeName ? $"&field=alternativeName&search={alternativeName}" : string.Empty;
