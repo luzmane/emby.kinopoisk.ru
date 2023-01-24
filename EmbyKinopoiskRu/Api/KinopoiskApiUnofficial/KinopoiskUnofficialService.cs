@@ -176,6 +176,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     .Select(i => i.Url!
                         .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
                         .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
+                    .Reverse()
                     .ToList()
                     .ForEach(v => result.Item.AddTrailerUrl(v));
             }
@@ -428,6 +429,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     .Select(i => i.Url!
                         .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
                         .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
+                    .Reverse()
                     .ToList()
                     .ForEach(v => result.Item.AddTrailerUrl(v));
             }

@@ -1,3 +1,6 @@
+v.1.6.2
+- Fix trailers, add latest trailer from API to be the first, suppose it will be on Russian
+
 v.1.6.1
 - Add trailers and teasers to movie search by name result
 

@@ -8,15 +8,15 @@
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 
     <!-- nuget setup -->
-    <AssemblyVersion>1.6.1</AssemblyVersion>
-    <Version>1.6.1</Version>
-    <FileVersion>1.6.1</FileVersion>
+    <AssemblyVersion>1.6.2</AssemblyVersion>
+    <Version>1.6.2</Version>
+    <FileVersion>1.6.2</FileVersion>
     <Authors>Evgeniy Luzman</Authors>
-    <Copyright>Copyright (c) 2022 Evgeniy Luzman</Copyright>
+    <Copyright>Copyright (c) 2023 Evgeniy Luzman</Copyright>
     <Description>Emby plugin to update metadata from Kinopoisk.ru</Description>
     <PackageId>Emby.Kinopoisk.Ru</PackageId>
     <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
-    <PackageTags>emby plugin kinopoisk kinopoiskru kp</PackageTags>
+    <PackageTags>emby kinopoisk</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageReleaseNotes>$([System.IO.File]::ReadAllText("$(MSBuildProjectDirectory)/../RELEASE-NOTES.txt"))</PackageReleaseNotes>
     <RepositoryType>git</RepositoryType>
