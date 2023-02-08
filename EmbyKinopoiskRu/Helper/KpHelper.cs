@@ -1,5 +1,7 @@
 using System;
 using System.Globalization;
+using System.IO;
+using System.Text.RegularExpressions;
 
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie;
 
@@ -11,6 +13,8 @@ namespace EmbyKinopoiskRu.Helper
 {
     internal class KpHelper
     {
+        private static readonly Regex Year = new("(?<year>[0-9]{4})", RegexOptions.Compiled);
+
         internal static DateTimeOffset? GetPremierDate(KpPremiere? premiere)
         {
             if (premiere == null)
@@ -88,6 +92,19 @@ namespace EmbyKinopoiskRu.Helper
                 Severity = LogSeverity.Error
             });
         }
-
+        internal static int? DetectYearFromMoviePath(string filePath, string movieName)
+        {
+            var fileName = Path.GetFileNameWithoutExtension(filePath);
+            fileName = fileName.Replace(movieName, " ");
+            var yearSt = string.Empty;
+            if (!string.IsNullOrWhiteSpace(fileName))
+            {
+                Match match = Year.Match(fileName);
+                yearSt = match.Success ? match.Groups["year"].Value : string.Empty;
+            }
+            _ = int.TryParse(yearSt, out var year);
+            _ = int.TryParse(DateTime.Now.ToString("yyyy", CultureInfo.InvariantCulture), out var currentYear);
+            return (year > 1800 && year <= currentYear + 1) ? year : null;
+        }
     }
 }

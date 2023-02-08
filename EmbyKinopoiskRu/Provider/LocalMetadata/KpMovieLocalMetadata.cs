@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
 using EmbyKinopoiskRu.Api;
+using EmbyKinopoiskRu.Helper;
 
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Providers;
@@ -16,9 +19,8 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
 {
     public class KpMovieLocalMetadata : KpBaseLocalMetadata<Movie>
     {
-        private static readonly Regex AlphaNumeric = new(@"[^0-9A-ZА-Я-]", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private static readonly Regex DubleWhitespace = new(@" {2,}", RegexOptions.Compiled);
-        private static readonly Regex Year = new("(?<year>[0-9]{4})", RegexOptions.Compiled);
+        private static readonly Regex NotAlphaNumeric = new(@"[^0-9ЁA-ZА-Я-]", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex MultiSpaces = new(@" {2,}", RegexOptions.Compiled);
 
         private readonly ILogger _log;
 
@@ -29,7 +31,6 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
 
         public override async Task<MetadataResult<Movie>> GetMetadata(ItemInfo info, LibraryOptions libraryOptions, IDirectoryService directoryService, CancellationToken cancellationToken)
         {
-            _log.Info("GetMetadata");
             MetadataResult<Movie> result = await base.GetMetadata(info, libraryOptions, directoryService, cancellationToken);
             if (result.HasMetadata)
             {
@@ -39,10 +40,8 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
 
             var movieName = info.Name;
             _log.Info($"info.Name - {movieName}");
-            movieName = DubleWhitespace.Replace(AlphaNumeric.Replace(movieName, " "), " ");
-
-            var yearSt = DetectYearFromMoviePath(info.Path, info.Name);
-            _ = int.TryParse(yearSt, out var year);
+            movieName = MultiSpaces.Replace(NotAlphaNumeric.Replace(movieName, " "), " ");
+            var year = KpHelper.DetectYearFromMoviePath(info.Path, info.Name);
             _log.Info($"Searching movie by name - {movieName} and year - {year}");
             List<Movie> movies = await KinopoiskRuServiceFactory.GetService().GetMoviesByOriginalNameAndYear(movieName, year, cancellationToken);
 
@@ -64,16 +63,6 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
             }
             return result;
         }
-        private static string DetectYearFromMoviePath(string filePath, string movieName)
-        {
-            var fileName = Path.GetFileNameWithoutExtension(filePath);
-            fileName = fileName.Replace(movieName, " ");
-            if (!string.IsNullOrWhiteSpace(fileName))
-            {
-                Match match = Year.Match(fileName);
-                return match.Success ? match.Groups["year"].Value : string.Empty;
-            }
-            return string.Empty;
-        }
+
     }
 }
