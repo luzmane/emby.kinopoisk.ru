@@ -1,7 +1,5 @@
-using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -57,8 +55,20 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
             }
             else
             {
-                _log.Info($"Found {movies.Count} movies. Taking the first one. For movie name '{movieName}' found movie with KP id = '{movies[0].GetProviderId(Plugin.PluginName)}'");
-                result.Item = movies[0];
+                Movie? movieWithHighestRating = movies
+                    .Where(m => m.CommunityRating != null)
+                    .OrderByDescending(m => m.CommunityRating)
+                    .FirstOrDefault();
+                if (movieWithHighestRating != null)
+                {
+                    _log.Info($"Found {movies.Count} movies. Taking the first one with highest rating in KP. For movie name '{movieName}' found movie with KP id = '{movies[0].GetProviderId(Plugin.PluginName)}'");
+                    result.Item = movieWithHighestRating;
+                }
+                else
+                {
+                    _log.Info($"Found {movies.Count} movies. Taking the first one. For movie name '{movieName}' found movie with KP id = '{movies[0].GetProviderId(Plugin.PluginName)}'");
+                    result.Item = movies[0];
+                }
                 result.HasMetadata = true;
             }
             return result;
