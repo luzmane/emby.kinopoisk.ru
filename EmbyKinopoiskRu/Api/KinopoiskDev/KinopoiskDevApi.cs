@@ -150,13 +150,23 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 _log.Error("The token is empty. Skip request");
                 return new KpSearchResult<KpPerson>();
             }
+            var url = $"https://api.kinopoisk.dev/movie?token={token}";
+            var namePart = $"&field=name&search={Uri.EscapeDataString(name)}";
+            var enNamePart = $"&field=enName&search={Uri.EscapeDataString(name)}";
 
-            var url = $"https://api.kinopoisk.dev/movie?token={token}&field=name&search={Uri.EscapeDataString(name)}";
-            var json = await SendRequest(url, cancellationToken);
+            var json = await SendRequest(url + namePart, cancellationToken);
             KpSearchResult<KpPerson>? toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpPerson>>(json);
             if (toReturn != null && toReturn.Docs.Count > 0)
             {
-                _log.Info($"Found {toReturn.Docs.Count} persons");
+                _log.Info($"Found {toReturn.Docs.Count} persons by '{name}'");
+                return toReturn;
+            }
+
+            json = await SendRequest(url + enNamePart, cancellationToken);
+            toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpPerson>>(json);
+            if (toReturn != null && toReturn.Docs.Count > 0)
+            {
+                _log.Info($"Found {toReturn.Docs.Count} persons by '{name}'");
                 return toReturn;
             }
             return new KpSearchResult<KpPerson>();
