@@ -75,9 +75,37 @@
         },
         {
             "label": "start emby",
-            "command": "export EMBY_DATA=~/ws/emby/emby/; /opt/emby-server/bin/emby-server",
-            "type": "shell",
-            "problemMatcher": []
+            "command": "/usr/bin/nohup",
+            "type": "process",
+            "isBackground": true,
+            "options": {
+                "env": {
+                    "EMBY_DATA": "/home/alkid/ws/emby/emby/"
+                },
+                "shell": {
+                    "executable": "/bin/bash"
+                }
+            },
+            "args": [
+                "/opt/emby-server/bin/emby-server"
+            ],
+            "problemMatcher": [
+                {
+                    "pattern": [
+                        {
+                            "regexp": ".",
+                            "file": 1,
+                            "location": 2,
+                            "message": 3
+                        }
+                    ],
+                    "background": {
+                        "activeOnStart": true,
+                        "beginsPattern": ".",
+                        "endsPattern": ".",
+                    }
+                }
+            ]
         },
         {
             "label": "build, deploy, start server",
@@ -87,8 +115,7 @@
                 "build library",
                 "move file",
                 "start emby"
-            ],
-            "problemMatcher": []
+            ]
         },
         {
             "label": "pack",

@@ -4,6 +4,9 @@
 ## Get latest from https://github.com/github/gitignore/blob/main/VisualStudio.gitignore
 
 kinopoisk.dev.token
+Examples/*
+nohup.out
+EmbyDlls/*
 
 # User-specific files
 *.rsuser
