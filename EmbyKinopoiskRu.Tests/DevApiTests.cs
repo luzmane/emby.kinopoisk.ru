@@ -12,6 +12,11 @@ using NUnit.Framework;
 
 namespace EmbyKinopoiskRu.Tests
 {
+    /// <summary>
+    /// Swagger documentation: 
+    ///     https://api.kinopoisk.dev/v1/documentation-json
+    ///     https://api.kinopoisk.dev/v1/documentation-yaml
+    /// </summary>
     [TestFixture]
     public class DevApiTests
     {
@@ -19,53 +24,59 @@ namespace EmbyKinopoiskRu.Tests
         private static readonly HttpClient HttpClient = new();
         private static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
 
+        [OneTimeSetUp]
+        public void Init()
+        {
+            HttpClient.DefaultRequestHeaders.Add("X-API-KEY", Token);
+        }
+
 
         [Test]
         public async Task GetMovieById()
         {
-            var request = $"https://api.kinopoisk.dev/movie?token={Token}&field=id&search=326";
+            var request = $"https://api.kinopoisk.dev/v1/movie/435";
             using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
             var response = await responseMessage.Content.ReadAsStringAsync();
             KpMovie? kpMovie = JsonSerializer.Deserialize<KpMovie>(response, JsonOptions);
             Assert.NotNull(kpMovie);
-            Assert.AreEqual("The Shawshank Redemption", kpMovie!.AlternativeName);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1672343/2a0000016b03d1f5365474a90d26998e2a9f/orig", kpMovie.Backdrop?.Url);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1672343/2a0000016b03d1f5365474a90d26998e2a9f/orig", kpMovie.Backdrop?.PreviewUrl);
+            Assert.AreEqual("The Green Mile", kpMovie!.AlternativeName);
+            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/224348/2a00000169e39ef77f588ccdfe574dae8227/orig", kpMovie.Backdrop?.Url);
+            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/224348/2a00000169e39ef77f588ccdfe574dae8227/x1000", kpMovie.Backdrop?.PreviewUrl);
             Assert.AreEqual(1, kpMovie.Countries.Count);
-            Assert.AreEqual("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.", kpMovie.Description);
-            Assert.IsNull(kpMovie.EnName);
-            Assert.AreEqual("tt0111161", kpMovie.ExternalId?.Imdb);
-            Assert.AreEqual(1, kpMovie.Genres.Count);
-            Assert.AreEqual(326, kpMovie.Id);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1648503/2a000001705c8bf514c033f1019473a4caae/orig", kpMovie.Logo?.Url);
-            Assert.AreEqual(142, kpMovie.MovieLength);
-            Assert.AreEqual("Побег из Шоушенка", kpMovie.Name);
-            Assert.AreEqual(112, kpMovie.Persons.Count);
-            Assert.AreEqual("https://st.kp.yandex.net/images/film_big/326.jpg", kpMovie.Poster?.Url);
-            Assert.AreEqual("https://st.kp.yandex.net/images/film_iphone/iphone360_326.jpg", kpMovie.Poster?.PreviewUrl);
-            Assert.AreEqual("1994-09-10T00:00:00.000Z", kpMovie.Premiere?.World);
-            Assert.AreEqual(1, kpMovie.ProductionCompanies.Count);
+            Assert.AreEqual("Пол Эджкомб — начальник блока смертников в тюрьме «Холодная гора», каждый из узников которого однажды проходит «зеленую милю» по пути к месту казни. Пол повидал много заключённых и надзирателей за время работы. Однако гигант Джон Коффи, обвинённый в страшном преступлении, стал одним из самых необычных обитателей блока.", kpMovie.Description);
+            Assert.AreEqual("tt0120689", kpMovie.ExternalId?.Imdb);
+            Assert.AreEqual(497, kpMovie.ExternalId?.Tmdb);
+            Assert.AreEqual(3, kpMovie.Genres.Count);
+            Assert.AreEqual(435, kpMovie.Id);
+            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/239697/2a0000016f12f1eb8870b609ee94313774b2/orig", kpMovie.Logo?.Url);
+            Assert.AreEqual(189, kpMovie.MovieLength);
+            Assert.AreEqual("Зеленая миля", kpMovie.Name);
+            Assert.AreEqual(87, kpMovie.Persons.Count);
+            Assert.AreEqual("https://st.kp.yandex.net/images/film_big/435.jpg", kpMovie.Poster?.Url);
+            Assert.AreEqual("https://st.kp.yandex.net/images/film_iphone/iphone360_435.jpg", kpMovie.Poster?.PreviewUrl);
+            Assert.AreEqual("1999-12-06T00:00:00.000Z", kpMovie.Premiere?.World);
+            Assert.AreEqual(4, kpMovie.ProductionCompanies.Count);
             Assert.IsNotNull(kpMovie.Rating?.Kp);
             Assert.IsNotNull(kpMovie.Rating?.FilmCritics);
             Assert.AreEqual("r", kpMovie.RatingMpaa);
-            Assert.AreEqual("Страх - это кандалы. Надежда - это свобода", kpMovie.Slogan);
-            Assert.AreEqual("Выпущен", kpMovie.Status);
-            Assert.AreEqual("movie", kpMovie.Type);
-            Assert.IsNotNull(kpMovie.Videos);
-            Assert.AreEqual(0, kpMovie.Videos!.Teasers.Count);
-            Assert.AreEqual(4, kpMovie.Videos!.Trailers.Count);
-            Assert.AreEqual(1994, kpMovie.Year);
+            Assert.AreEqual("Пол Эджкомб не верил в чудеса. Пока не столкнулся с одним из них", kpMovie.Slogan);
+            Assert.AreEqual(0, kpMovie.Videos?.Teasers.Count);
+            Assert.AreEqual(2, kpMovie.Videos?.Trailers.Count);
+            Assert.AreEqual(1999, kpMovie.Year);
+            Assert.AreEqual(21, kpMovie.Facts.Count);
+            Assert.AreEqual(0, kpMovie.SequelsAndPrequels.Count);
+            Assert.AreEqual(1, kpMovie.Top250);
         }
 
         [Test]
-        public async Task GetMoviesByMetadataStrictNameYear()
+        public async Task GetMoviesByMovieDetailsNameYear()
         {
-            var request = $"https://api.kinopoisk.dev/movie?token={Token}";
+            var request = $"https://api.kinopoisk.dev/v1/movie?";
             request += "&limit=50";
-            request += "&selectFields=videos externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
-            request += "&field=name&search=Побег из Шоушенка";
-            request += "&field=year&search=1994";
+            request += "&selectFields=alternativeName backdrop countries description enName externalId genres id logo movieLength name persons poster premiere productionCompanies rating ratingMpaa slogan videos year sequelsAndPrequels top250 facts releaseYears seasonsInfo";
+            request += "&name=Гарри Поттер и философский камень";
+            request += "&year=2001"; // 689
             using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
             var response = await responseMessage.Content.ReadAsStringAsync();
@@ -73,165 +84,43 @@ namespace EmbyKinopoiskRu.Tests
             Assert.NotNull(searchResultMovie);
             Assert.AreEqual(1, searchResultMovie!.Docs.Count);
             KpMovie kpMovie = searchResultMovie!.Docs[0];
-            Assert.AreEqual("The Shawshank Redemption", kpMovie.AlternativeName);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1672343/2a0000016b03d1f5365474a90d26998e2a9f/orig", kpMovie.Backdrop?.Url);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1672343/2a0000016b03d1f5365474a90d26998e2a9f/orig", kpMovie.Backdrop?.PreviewUrl);
-            Assert.AreEqual(1, kpMovie.Countries.Count);
-            Assert.AreEqual("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.", kpMovie.Description);
-            Assert.IsNull(kpMovie.EnName);
-            Assert.AreEqual("tt0111161", kpMovie.ExternalId?.Imdb);
-            Assert.AreEqual(1, kpMovie.Genres.Count);
-            Assert.AreEqual(326, kpMovie.Id);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1648503/2a000001705c8bf514c033f1019473a4caae/orig", kpMovie.Logo?.Url);
-            Assert.AreEqual(142, kpMovie.MovieLength);
-            Assert.AreEqual("Побег из Шоушенка", kpMovie.Name);
-            Assert.AreEqual(112, kpMovie.Persons.Count);
-            Assert.AreEqual("https://st.kp.yandex.net/images/film_big/326.jpg", kpMovie.Poster?.Url);
-            Assert.AreEqual("https://st.kp.yandex.net/images/film_iphone/iphone360_326.jpg", kpMovie.Poster?.PreviewUrl);
-            Assert.AreEqual("1994-09-10T00:00:00.000Z", kpMovie.Premiere?.World);
-            Assert.AreEqual(1, kpMovie.ProductionCompanies.Count);
+            Assert.AreEqual("Harry Potter and the Sorcerer's Stone", kpMovie.AlternativeName);
+            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/223007/2a0000016fb3ac87014aae4f0c64329f64e0/orig", kpMovie.Backdrop?.Url);
+            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/223007/2a0000016fb3ac87014aae4f0c64329f64e0/x1000", kpMovie.Backdrop?.PreviewUrl);
+            Assert.AreEqual(2, kpMovie.Countries.Count);
+            Assert.AreEqual("Жизнь десятилетнего Гарри Поттера нельзя назвать сладкой: родители умерли, едва ему исполнился год, а от дяди и тёти, взявших сироту на воспитание, достаются лишь тычки да подзатыльники. Но в одиннадцатый день рождения Гарри всё меняется. Странный гость, неожиданно появившийся на пороге, приносит письмо, из которого мальчик узнаёт, что на самом деле он - волшебник и зачислен в школу магии под названием Хогвартс. А уже через пару недель Гарри будет мчаться в поезде Хогвартс-экспресс навстречу новой жизни, где его ждут невероятные приключения, верные друзья и самое главное — ключ к разгадке тайны смерти его родителей.", kpMovie.Description);
+            Assert.AreEqual("tt0241527", kpMovie.ExternalId?.Imdb);
+            Assert.AreEqual(671, kpMovie.ExternalId?.Tmdb);
+            Assert.AreEqual(52, kpMovie.Facts.Count);
+            Assert.AreEqual(3, kpMovie.Genres.Count);
+            Assert.AreEqual(689, kpMovie.Id);
+            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/223007/2a0000017e127a46aa2122ff48cb306de98b/orig", kpMovie.Logo?.Url);
+            Assert.AreEqual(152, kpMovie.MovieLength);
+            Assert.AreEqual("Гарри Поттер и философский камень", kpMovie.Name);
+            Assert.AreEqual(173, kpMovie.Persons.Count);
+            Assert.AreEqual("https://st.kp.yandex.net/images/film_big/689.jpg", kpMovie.Poster?.Url);
+            Assert.AreEqual("https://st.kp.yandex.net/images/film_iphone/iphone360_689.jpg", kpMovie.Poster?.PreviewUrl);
+            Assert.AreEqual("2001-11-04T00:00:00.000Z", kpMovie.Premiere?.World);
+            Assert.AreEqual(3, kpMovie.ProductionCompanies.Count);
             Assert.IsNotNull(kpMovie.Rating?.Kp);
             Assert.IsNotNull(kpMovie.Rating?.FilmCritics);
-            Assert.AreEqual("r", kpMovie.RatingMpaa);
-            Assert.AreEqual("Страх - это кандалы. Надежда - это свобода", kpMovie.Slogan);
-            Assert.AreEqual("movie", kpMovie.Type);
-            Assert.AreEqual(1994, kpMovie.Year);
+            Assert.AreEqual("pg", kpMovie.RatingMpaa);
+            Assert.AreEqual(8, kpMovie.SequelsAndPrequels.Count);
+            Assert.AreEqual("Путешествие в твою мечту", kpMovie.Slogan);
             Assert.AreEqual(0, kpMovie.Videos!.Teasers.Count);
-            Assert.AreEqual(4, kpMovie.Videos!.Trailers.Count);
-        }
-
-        [Test]
-        public async Task GetMoviesByMetadataStrictName()
-        {
-            var request = $"https://api.kinopoisk.dev/movie?token={Token}";
-            request += "&limit=50";
-            request += "&selectFields=videos externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
-            request += "&field=name&search=Побег из Шоушенка";
-            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
-            _ = responseMessage.EnsureSuccessStatusCode();
-            var response = await responseMessage.Content.ReadAsStringAsync();
-            KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, JsonOptions);
-            Assert.NotNull(searchResultMovie);
-            Assert.AreEqual(1, searchResultMovie!.Docs.Count);
-            KpMovie kpMovie = searchResultMovie!.Docs[0];
-            Assert.AreEqual("The Shawshank Redemption", kpMovie.AlternativeName);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1672343/2a0000016b03d1f5365474a90d26998e2a9f/orig", kpMovie.Backdrop?.Url);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1672343/2a0000016b03d1f5365474a90d26998e2a9f/orig", kpMovie.Backdrop?.PreviewUrl);
-            Assert.AreEqual(1, kpMovie.Countries.Count);
-            Assert.AreEqual("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.", kpMovie.Description);
-            Assert.IsNull(kpMovie.EnName);
-            Assert.AreEqual("tt0111161", kpMovie.ExternalId?.Imdb);
-            Assert.AreEqual(1, kpMovie.Genres.Count);
-            Assert.AreEqual(326, kpMovie.Id);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1648503/2a000001705c8bf514c033f1019473a4caae/orig", kpMovie.Logo?.Url);
-            Assert.AreEqual(142, kpMovie.MovieLength);
-            Assert.AreEqual("Побег из Шоушенка", kpMovie.Name);
-            Assert.AreEqual(112, kpMovie.Persons.Count);
-            Assert.AreEqual("https://st.kp.yandex.net/images/film_big/326.jpg", kpMovie.Poster?.Url);
-            Assert.AreEqual("https://st.kp.yandex.net/images/film_iphone/iphone360_326.jpg", kpMovie.Poster?.PreviewUrl);
-            Assert.AreEqual("1994-09-10T00:00:00.000Z", kpMovie.Premiere?.World);
-            Assert.AreEqual(1, kpMovie.ProductionCompanies.Count);
-            Assert.IsNotNull(kpMovie.Rating?.Kp);
-            Assert.IsNotNull(kpMovie.Rating?.FilmCritics);
-            Assert.AreEqual("r", kpMovie.RatingMpaa);
-            Assert.AreEqual("Страх - это кандалы. Надежда - это свобода", kpMovie.Slogan);
-            Assert.AreEqual("movie", kpMovie.Type);
-            Assert.AreEqual(1994, kpMovie.Year);
-            Assert.AreEqual(0, kpMovie.Videos!.Teasers.Count);
-            Assert.AreEqual(4, kpMovie.Videos!.Trailers.Count);
-        }
-
-        [Test]
-        public async Task GetMoviesByMetadataNotStrictNameYear()
-        {
-            var request = $"https://api.kinopoisk.dev/movie?token={Token}";
-            request += "&limit=50";
-            request += "&selectFields=videos externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
-            request += "&field=name&search=Побег из Шоушенка";
-            request += "&field=year&search=1994";
-            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
-            _ = responseMessage.EnsureSuccessStatusCode();
-            var response = await responseMessage.Content.ReadAsStringAsync();
-            KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, JsonOptions);
-            Assert.NotNull(searchResultMovie);
-            Assert.AreEqual(1, searchResultMovie!.Docs.Count);
-            KpMovie kpMovie = searchResultMovie!.Docs[0];
-            Assert.AreEqual("The Shawshank Redemption", kpMovie.AlternativeName);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1672343/2a0000016b03d1f5365474a90d26998e2a9f/orig", kpMovie.Backdrop?.Url);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1672343/2a0000016b03d1f5365474a90d26998e2a9f/orig", kpMovie.Backdrop?.PreviewUrl);
-            Assert.AreEqual(1, kpMovie.Countries.Count);
-            Assert.AreEqual("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.", kpMovie.Description);
-            Assert.IsNull(kpMovie.EnName);
-            Assert.AreEqual("tt0111161", kpMovie.ExternalId?.Imdb);
-            Assert.AreEqual(1, kpMovie.Genres.Count);
-            Assert.AreEqual(326, kpMovie.Id);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1648503/2a000001705c8bf514c033f1019473a4caae/orig", kpMovie.Logo?.Url);
-            Assert.AreEqual(142, kpMovie.MovieLength);
-            Assert.AreEqual("Побег из Шоушенка", kpMovie.Name);
-            Assert.AreEqual(112, kpMovie.Persons.Count);
-            Assert.AreEqual("https://st.kp.yandex.net/images/film_big/326.jpg", kpMovie.Poster?.Url);
-            Assert.AreEqual("https://st.kp.yandex.net/images/film_iphone/iphone360_326.jpg", kpMovie.Poster?.PreviewUrl);
-            Assert.AreEqual("1994-09-10T00:00:00.000Z", kpMovie.Premiere?.World);
-            Assert.AreEqual(1, kpMovie.ProductionCompanies.Count);
-            Assert.IsNotNull(kpMovie.Rating?.Kp);
-            Assert.IsNotNull(kpMovie.Rating?.FilmCritics);
-            Assert.AreEqual("r", kpMovie.RatingMpaa);
-            Assert.AreEqual("Страх - это кандалы. Надежда - это свобода", kpMovie.Slogan);
-            Assert.AreEqual("movie", kpMovie.Type);
-            Assert.AreEqual(1994, kpMovie.Year);
-            Assert.AreEqual(0, kpMovie.Videos!.Teasers.Count);
-            Assert.AreEqual(4, kpMovie.Videos!.Trailers.Count);
-        }
-
-        [Test]
-        public async Task GetMoviesByMetadataNotStrictName()
-        {
-            var request = $"https://api.kinopoisk.dev/movie?token={Token}";
-            request += "&limit=50";
-            request += "&selectFields=videos externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
-            request += "&field=name&search=Побег из Шоушенка";
-            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
-            _ = responseMessage.EnsureSuccessStatusCode();
-            var response = await responseMessage.Content.ReadAsStringAsync();
-            KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, JsonOptions);
-            Assert.NotNull(searchResultMovie);
-            Assert.AreEqual(1, searchResultMovie!.Docs.Count);
-            KpMovie kpMovie = searchResultMovie!.Docs[0];
-            Assert.AreEqual("The Shawshank Redemption", kpMovie.AlternativeName);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1672343/2a0000016b03d1f5365474a90d26998e2a9f/orig", kpMovie.Backdrop?.Url);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1672343/2a0000016b03d1f5365474a90d26998e2a9f/orig", kpMovie.Backdrop?.PreviewUrl);
-            Assert.AreEqual(1, kpMovie.Countries.Count);
-            Assert.AreEqual("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.", kpMovie.Description);
-            Assert.IsNull(kpMovie.EnName);
-            Assert.AreEqual("tt0111161", kpMovie.ExternalId?.Imdb);
-            Assert.AreEqual(1, kpMovie.Genres.Count);
-            Assert.AreEqual(326, kpMovie.Id);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1648503/2a000001705c8bf514c033f1019473a4caae/orig", kpMovie.Logo?.Url);
-            Assert.AreEqual(142, kpMovie.MovieLength);
-            Assert.AreEqual("Побег из Шоушенка", kpMovie.Name);
-            Assert.AreEqual(112, kpMovie.Persons.Count);
-            Assert.AreEqual("https://st.kp.yandex.net/images/film_big/326.jpg", kpMovie.Poster?.Url);
-            Assert.AreEqual("https://st.kp.yandex.net/images/film_iphone/iphone360_326.jpg", kpMovie.Poster?.PreviewUrl);
-            Assert.AreEqual("1994-09-10T00:00:00.000Z", kpMovie.Premiere?.World);
-            Assert.AreEqual(1, kpMovie.ProductionCompanies.Count);
-            Assert.IsNotNull(kpMovie.Rating?.Kp);
-            Assert.IsNotNull(kpMovie.Rating?.FilmCritics);
-            Assert.AreEqual("r", kpMovie.RatingMpaa);
-            Assert.AreEqual("Страх - это кандалы. Надежда - это свобода", kpMovie.Slogan);
-            Assert.AreEqual("movie", kpMovie.Type);
-            Assert.AreEqual(1994, kpMovie.Year);
-            Assert.AreEqual(0, kpMovie.Videos!.Teasers.Count);
-            Assert.AreEqual(4, kpMovie.Videos!.Trailers.Count);
+            Assert.AreEqual(20, kpMovie.Videos!.Trailers.Count);
+            Assert.AreEqual(2001, kpMovie.Year);
+            Assert.Less(0, kpMovie.Top250);
         }
 
         [Test]
         public async Task GetMoviesByMovieDetailsAlternativeNameYear()
         {
-            var request = $"https://api.kinopoisk.dev/movie?token={Token}";
+            var request = $"https://api.kinopoisk.dev/v1/movie?";
             request += "&limit=50";
-            request += "&field=alternativeName&search=The Shawshank Redemption";
-            request += "&field=year&search=1994";
-            request += "&selectFields=videos externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
+            request += "&selectFields=alternativeName backdrop countries description enName externalId genres id logo movieLength name persons poster premiere productionCompanies rating ratingMpaa slogan videos year sequelsAndPrequels top250 facts releaseYears seasonsInfo";
+            request += "&alternativeName=Harry Potter and the Sorcerer's Stone";
+            request += "&year=2001"; // 689
             using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
             var response = await responseMessage.Content.ReadAsStringAsync();
@@ -239,86 +128,67 @@ namespace EmbyKinopoiskRu.Tests
             Assert.NotNull(searchResultMovie);
             Assert.AreEqual(1, searchResultMovie!.Docs.Count);
             KpMovie kpMovie = searchResultMovie!.Docs[0];
-            Assert.AreEqual("The Shawshank Redemption", kpMovie.AlternativeName);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1672343/2a0000016b03d1f5365474a90d26998e2a9f/orig", kpMovie.Backdrop?.Url);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1672343/2a0000016b03d1f5365474a90d26998e2a9f/orig", kpMovie.Backdrop?.PreviewUrl);
-            Assert.AreEqual(1, kpMovie.Countries.Count);
-            Assert.AreEqual("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.", kpMovie.Description);
-            Assert.IsNull(kpMovie.EnName);
-            Assert.AreEqual("tt0111161", kpMovie.ExternalId?.Imdb);
-            Assert.AreEqual(1, kpMovie.Genres.Count);
-            Assert.AreEqual(326, kpMovie.Id);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1648503/2a000001705c8bf514c033f1019473a4caae/orig", kpMovie.Logo?.Url);
-            Assert.AreEqual(142, kpMovie.MovieLength);
-            Assert.AreEqual("Побег из Шоушенка", kpMovie.Name);
-            Assert.AreEqual(112, kpMovie.Persons.Count);
-            Assert.AreEqual("https://st.kp.yandex.net/images/film_big/326.jpg", kpMovie.Poster?.Url);
-            Assert.AreEqual("https://st.kp.yandex.net/images/film_iphone/iphone360_326.jpg", kpMovie.Poster?.PreviewUrl);
-            Assert.AreEqual("1994-09-10T00:00:00.000Z", kpMovie.Premiere?.World);
-            Assert.AreEqual(1, kpMovie.ProductionCompanies.Count);
+            Assert.AreEqual("Harry Potter and the Sorcerer's Stone", kpMovie.AlternativeName);
+            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/223007/2a0000016fb3ac87014aae4f0c64329f64e0/orig", kpMovie.Backdrop?.Url);
+            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/223007/2a0000016fb3ac87014aae4f0c64329f64e0/x1000", kpMovie.Backdrop?.PreviewUrl);
+            Assert.AreEqual(2, kpMovie.Countries.Count);
+            Assert.AreEqual("Жизнь десятилетнего Гарри Поттера нельзя назвать сладкой: родители умерли, едва ему исполнился год, а от дяди и тёти, взявших сироту на воспитание, достаются лишь тычки да подзатыльники. Но в одиннадцатый день рождения Гарри всё меняется. Странный гость, неожиданно появившийся на пороге, приносит письмо, из которого мальчик узнаёт, что на самом деле он - волшебник и зачислен в школу магии под названием Хогвартс. А уже через пару недель Гарри будет мчаться в поезде Хогвартс-экспресс навстречу новой жизни, где его ждут невероятные приключения, верные друзья и самое главное — ключ к разгадке тайны смерти его родителей.", kpMovie.Description);
+            Assert.AreEqual("tt0241527", kpMovie.ExternalId?.Imdb);
+            Assert.AreEqual(671, kpMovie.ExternalId?.Tmdb);
+            Assert.AreEqual(52, kpMovie.Facts.Count);
+            Assert.AreEqual(3, kpMovie.Genres.Count);
+            Assert.AreEqual(689, kpMovie.Id);
+            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/223007/2a0000017e127a46aa2122ff48cb306de98b/orig", kpMovie.Logo?.Url);
+            Assert.AreEqual(152, kpMovie.MovieLength);
+            Assert.AreEqual("Гарри Поттер и философский камень", kpMovie.Name);
+            Assert.AreEqual(173, kpMovie.Persons.Count);
+            Assert.AreEqual("https://st.kp.yandex.net/images/film_big/689.jpg", kpMovie.Poster?.Url);
+            Assert.AreEqual("https://st.kp.yandex.net/images/film_iphone/iphone360_689.jpg", kpMovie.Poster?.PreviewUrl);
+            Assert.AreEqual("2001-11-04T00:00:00.000Z", kpMovie.Premiere?.World);
+            Assert.AreEqual(3, kpMovie.ProductionCompanies.Count);
             Assert.IsNotNull(kpMovie.Rating?.Kp);
             Assert.IsNotNull(kpMovie.Rating?.FilmCritics);
-            Assert.AreEqual("r", kpMovie.RatingMpaa);
-            Assert.AreEqual("Страх - это кандалы. Надежда - это свобода", kpMovie.Slogan);
-            Assert.AreEqual("movie", kpMovie.Type);
-            Assert.AreEqual(1994, kpMovie.Year);
+            Assert.AreEqual("pg", kpMovie.RatingMpaa);
+            Assert.AreEqual(8, kpMovie.SequelsAndPrequels.Count);
+            Assert.AreEqual("Путешествие в твою мечту", kpMovie.Slogan);
             Assert.AreEqual(0, kpMovie.Videos!.Teasers.Count);
-            Assert.AreEqual(4, kpMovie.Videos!.Trailers.Count);
+            Assert.AreEqual(20, kpMovie.Videos!.Trailers.Count);
+            Assert.AreEqual(2001, kpMovie.Year);
+            Assert.Less(0, kpMovie.Top250);
         }
 
         [Test]
-        public async Task GetMoviesByMovieDetailsAlternativeName()
+        public async Task GetMoviesByTop250()
         {
-            var request = $"https://api.kinopoisk.dev/movie?token={Token}";
-            request += "&limit=50";
-            request += "&field=alternativeName&search=The Shawshank Redemption";
-            request += "&selectFields=videos externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan";
+            var request = $"https://api.kinopoisk.dev/v1/movie?";
+            request += "selectFields=alternativeName externalId id name top250 typeNumber";
+            request += "&limit=1000";
+            request += "&top250=!null";
             using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
             var response = await responseMessage.Content.ReadAsStringAsync();
-            KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, JsonOptions);
-            Assert.NotNull(searchResultMovie);
-            Assert.AreEqual(2, searchResultMovie!.Docs.Count);
-            KpMovie kpMovie = searchResultMovie!.Docs[0];
-            Assert.AreEqual("The Shawshank Redemption", kpMovie.AlternativeName);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1672343/2a0000016b03d1f5365474a90d26998e2a9f/orig", kpMovie.Backdrop?.Url);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1672343/2a0000016b03d1f5365474a90d26998e2a9f/orig", kpMovie.Backdrop?.PreviewUrl);
-            Assert.AreEqual(1, kpMovie.Countries.Count);
-            Assert.AreEqual("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.", kpMovie.Description);
-            Assert.IsNull(kpMovie.EnName);
-            Assert.AreEqual("tt0111161", kpMovie.ExternalId?.Imdb);
-            Assert.AreEqual(1, kpMovie.Genres.Count);
-            Assert.AreEqual(326, kpMovie.Id);
-            Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/1648503/2a000001705c8bf514c033f1019473a4caae/orig", kpMovie.Logo?.Url);
-            Assert.AreEqual(142, kpMovie.MovieLength);
-            Assert.AreEqual("Побег из Шоушенка", kpMovie.Name);
-            Assert.AreEqual(112, kpMovie.Persons.Count);
-            Assert.AreEqual("https://st.kp.yandex.net/images/film_big/326.jpg", kpMovie.Poster?.Url);
-            Assert.AreEqual("https://st.kp.yandex.net/images/film_iphone/iphone360_326.jpg", kpMovie.Poster?.PreviewUrl);
-            Assert.AreEqual("1994-09-10T00:00:00.000Z", kpMovie.Premiere?.World);
-            Assert.AreEqual(1, kpMovie.ProductionCompanies.Count);
-            Assert.IsNotNull(kpMovie.Rating?.Kp);
-            Assert.IsNotNull(kpMovie.Rating?.FilmCritics);
-            Assert.AreEqual("r", kpMovie.RatingMpaa);
-            Assert.AreEqual("Страх - это кандалы. Надежда - это свобода", kpMovie.Slogan);
-            Assert.AreEqual("movie", kpMovie.Type);
-            Assert.AreEqual(1994, kpMovie.Year);
-            Assert.AreEqual(0, kpMovie.Videos!.Teasers.Count);
-            Assert.AreEqual(4, kpMovie.Videos!.Trailers.Count);
+            KpSearchResult<KpMovie>? kpMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, JsonOptions);
+            Assert.IsNotNull(kpMovie);
+            Assert.LessOrEqual(499, kpMovie!.Docs.Count);
         }
+
 
         [Test]
         public async Task GetPersonById()
         {
-            var request = $"https://api.kinopoisk.dev/person?token={Token}&field=id&search=7987";
+            var request = $"https://api.kinopoisk.dev/v1/person/7987";
             using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
             var response = await responseMessage.Content.ReadAsStringAsync();
             KpPerson? kpPerson = JsonSerializer.Deserialize<KpPerson>(response, JsonOptions);
             Assert.NotNull(kpPerson);
-            Assert.AreEqual(3, kpPerson!.BirthPlace.Count);
-            Assert.AreEqual("1958-10-16T00:00:00.000Z", kpPerson.Birthday);
+            Assert.AreEqual("1958-10-16T00:00:00.000Z", kpPerson!.Birthday);
+            Assert.AreEqual(3, kpPerson.BirthPlace.Count);
+            Assert.IsNull(kpPerson.Death);
+            Assert.AreEqual(0, kpPerson.DeathPlace.Count);
+            Assert.IsNull(kpPerson.Description);
             Assert.AreEqual(4, kpPerson.Facts.Count);
+            Assert.AreEqual("Tim Robbins", kpPerson.EnName);
             Assert.AreEqual(7987, kpPerson.Id);
             Assert.AreEqual(241, kpPerson.Movies.Count);
             Assert.AreEqual("Тим Роббинс", kpPerson.Name);
@@ -328,7 +198,7 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetPersonByName()
         {
-            var request = $"https://api.kinopoisk.dev/person?token={Token}&field=name&search=Тим Роббинс";
+            var request = $"https://api.kinopoisk.dev/v1/person?name=Тим Роббинс";
             using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
             var response = await responseMessage.Content.ReadAsStringAsync();
@@ -344,9 +214,9 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetPersonByMovieId()
         {
-            var request = $"https://api.kinopoisk.dev/person?token={Token}";
-            request += "&field=movies.id&search=326";
-            request += "&selectFields=id movies";
+            var request = $"https://api.kinopoisk.dev/v1/person?";
+            request += "&movies.id=326";
+            request += "&selectFields=id movies name";
             request += "&limit=1000";
             using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
@@ -354,17 +224,18 @@ namespace EmbyKinopoiskRu.Tests
             KpSearchResult<KpPerson>? searchResultKpPerson = JsonSerializer.Deserialize<KpSearchResult<KpPerson>>(response, JsonOptions);
             Assert.NotNull(searchResultKpPerson);
             Assert.AreEqual(112, searchResultKpPerson!.Docs.Count);
-            KpPerson? kpPerson = searchResultKpPerson.Docs.FirstOrDefault(i => i.Id == 1929007);
+            KpPerson? kpPerson = searchResultKpPerson.Docs.FirstOrDefault(i => i.Id == 7987);
             Assert.NotNull(kpPerson);
-            Assert.AreEqual(1929007, kpPerson!.Id);
-            Assert.GreaterOrEqual(kpPerson.Movies.Count, 757);
+            Assert.AreEqual(7987, kpPerson!.Id);
+            Assert.AreEqual("Тим Роббинс", kpPerson.Name);
+            Assert.LessOrEqual(241, kpPerson.Movies.Count);
         }
 
         [Test]
         public async Task GetEpisodesBySeriesId()
         {
-            var request = $"https://api.kinopoisk.dev/season?token={Token}";
-            request += "&field=movieId&search=77044";
+            var request = $"https://api.kinopoisk.dev/v1/season?";
+            request += "movieId=77044";
             request += "&limit=50";
             using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request);
             _ = responseMessage.EnsureSuccessStatusCode();
@@ -378,9 +249,10 @@ namespace EmbyKinopoiskRu.Tests
             Assert.AreEqual(24, kpSeason.Episodes.Count);
             KpEpisode? kpEpisode = kpSeason.Episodes.FirstOrDefault(i => i.Number == 1);
             Assert.NotNull(kpEpisode);
-            Assert.AreEqual("1994-09-22T00:00:00.000Z", kpEpisode!.Date);
+            Assert.AreEqual("1994-09-22", kpEpisode!.Date);
             Assert.AreEqual("The One Where Monica Gets a Roommate", kpEpisode.EnName);
             Assert.AreEqual("Эпизод, где Моника берёт новую соседку", kpEpisode.Name);
+            Assert.IsNull(kpEpisode.Description);
         }
 
     }

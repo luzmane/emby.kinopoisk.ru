@@ -2,7 +2,6 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -21,8 +20,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 {
     internal class KinopoiskDevApi
     {
-        private static readonly Regex TokenRegex = new(@"token=(?<token>[0-9A-Z-]*)&", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
         private readonly IHttpClient _httpClient;
         private readonly ILogger _log;
         private readonly IJsonSerializer _jsonSerializer;
@@ -42,17 +39,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         internal async Task<KpMovie?> GetMovieById(string movieId, CancellationToken cancellationToken)
         {
-            var token = Plugin.Instance?.Configuration.GetToken();
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                _log.Error("The token is empty. Skip request");
-                return null;
-            }
-
-            var url = new StringBuilder($"https://api.kinopoisk.dev/movie?token={token}")
-                .Append(CultureInfo.InvariantCulture, $"&field=id&search={movieId}")
-                .ToString();
-            var json = await SendRequest(url, cancellationToken);
+            var json = await SendRequest($"https://api.kinopoisk.dev/v1/movie/{movieId}", cancellationToken);
             return _jsonSerializer.DeserializeFromString<KpMovie>(json);
         }
         internal async Task<KpSearchResult<KpMovie>> GetMoviesByMovieDetails(string? name, int? year, CancellationToken cancellationToken)
@@ -61,23 +48,16 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         }
         internal async Task<KpSearchResult<KpMovie>> GetMoviesByMovieDetails(string? name, string? alternativeName, int? year, CancellationToken cancellationToken)
         {
-            var token = Plugin.Instance?.Configuration.GetToken();
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                _log.Error("The token is empty. Skip request");
-                return new KpSearchResult<KpMovie>();
-            }
-
             var hasName = !string.IsNullOrWhiteSpace(name);
             var hasYear = year is not null and > 1000;
             var hasAlternativeName = !string.IsNullOrWhiteSpace(alternativeName);
-            var url = new StringBuilder($"https://api.kinopoisk.dev/movie?token={token}")
-                .Append($"&limit=50")
-                .Append("&selectFields=videos externalId logo poster rating movieLength id type name description year alternativeName enName backdrop countries genres persons premiere productionCompanies ratingMpaa slogan")
+            var url = new StringBuilder($"https://api.kinopoisk.dev/v1/movie?")
+                .Append($"limit=50")
+                .Append("&selectFields=alternativeName backdrop countries description enName externalId genres id logo movieLength name persons poster premiere productionCompanies rating ratingMpaa slogan videos year sequelsAndPrequels top250 facts releaseYears seasonsInfo")
                 .ToString();
-            var namePart = hasName ? $"&field=name&search={name}" : string.Empty;
-            var alternativeNamePart = hasAlternativeName ? $"&field=alternativeName&search={alternativeName}" : string.Empty;
-            var yearPart = hasYear ? $"&field=year&search={year}" : string.Empty;
+            var namePart = hasName ? $"&name={name}" : string.Empty;
+            var alternativeNamePart = hasAlternativeName ? $"&alternativeName={alternativeName}" : string.Empty;
+            var yearPart = hasYear ? $"&year={year}" : string.Empty;
 
             if (hasName && hasYear)
             {
@@ -131,28 +111,14 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         internal async Task<KpPerson?> GetPersonById(string personId, CancellationToken cancellationToken)
         {
-            var token = Plugin.Instance?.Configuration.GetToken();
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                _log.Error("The token is empty. Skip request");
-                return null;
-            }
-
-            var request = $"https://api.kinopoisk.dev/person?token={token}&field=id&search={personId}";
-            var json = await SendRequest(request, cancellationToken);
+            var json = await SendRequest($"https://api.kinopoisk.dev/v1/person/{personId}", cancellationToken);
             return _jsonSerializer.DeserializeFromString<KpPerson>(json);
         }
         internal async Task<KpSearchResult<KpPerson>> GetPersonsByName(string name, CancellationToken cancellationToken)
         {
-            var token = Plugin.Instance?.Configuration.GetToken();
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                _log.Error("The token is empty. Skip request");
-                return new KpSearchResult<KpPerson>();
-            }
-            var url = $"https://api.kinopoisk.dev/movie?token={token}";
-            var namePart = $"&field=name&search={Uri.EscapeDataString(name)}";
-            var enNamePart = $"&field=enName&search={Uri.EscapeDataString(name)}";
+            var url = $"https://api.kinopoisk.dev/v1/person";
+            var namePart = $"&name={name}";
+            var enNamePart = $"&enName={name}";
 
             var json = await SendRequest(url + namePart, cancellationToken);
             KpSearchResult<KpPerson>? toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpPerson>>(json);
@@ -166,22 +132,15 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpPerson>>(json);
             if (toReturn != null && toReturn.Docs.Count > 0)
             {
-                _log.Info($"Found {toReturn.Docs.Count} persons by '{name}'");
+                _log.Info($"Found {toReturn.Docs.Count} persons by '{enNamePart}'");
                 return toReturn;
             }
             return new KpSearchResult<KpPerson>();
         }
         internal async Task<KpSearchResult<KpPerson>> GetPersonsByMovieId(string movieId, CancellationToken cancellationToken)
         {
-            var token = Plugin.Instance?.Configuration.GetToken();
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                _log.Error("The token is empty. Skip request");
-                return new KpSearchResult<KpPerson>();
-            }
-
-            var url = new StringBuilder($"https://api.kinopoisk.dev/person?token={token}")
-                 .Append(CultureInfo.InvariantCulture, $"&field=movies.id&search={movieId}")
+            var url = new StringBuilder("https://api.kinopoisk.dev/v1/person?")
+                 .Append(CultureInfo.InvariantCulture, $"&movies.id={movieId}")
                  .Append("&selectFields=id movies")
                  .Append("&limit=1000")
                  .ToString();
@@ -197,14 +156,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         internal async Task<KpSearchResult<KpSeason>?> GetEpisodesBySeriesId(string seriesId, CancellationToken cancellationToken)
         {
-            var token = Plugin.Instance?.Configuration.GetToken();
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                _log.Error("The token is empty. Skip request");
-                return null;
-            }
-            var url = new StringBuilder($"https://api.kinopoisk.dev/season?token={token}")
-                .Append(CultureInfo.InvariantCulture, $"&field=movieId&search={seriesId}")
+            var url = new StringBuilder("https://api.kinopoisk.dev/v1/season?")
+                .Append(CultureInfo.InvariantCulture, $"movieId={seriesId}")
                 .Append($"&limit=50")
                 .ToString();
             var json = await SendRequest(url, cancellationToken);
@@ -214,6 +167,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         private async Task<string> SendRequest(string url, CancellationToken cancellationToken)
         {
             _log.Info($"Sending request to {url}");
+            var token = Plugin.Instance?.Configuration.GetToken();
+            if (string.IsNullOrWhiteSpace(token))
+            {
+                _log.Error("The token is empty. Skip request");
+                return string.Empty;
+            }
             HttpRequestOptions options = new()
             {
                 CancellationToken = cancellationToken,
@@ -223,43 +182,29 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 CacheMode = CacheMode.Unconditional,
                 TimeoutMs = 180000
             };
+            options.RequestHeaders.Add("X-API-KEY", token);
             options.Sanitation.SanitizeDefaultParams = false;
             try
             {
-                using HttpResponseInfo response = await _httpClient.SendAsync(options, "GET");
+                using HttpResponseInfo response = await _httpClient.GetResponse(options);
+                using StreamReader reader = new(response.Content);
+                var result = await reader.ReadToEndAsync();
                 switch ((int)response.StatusCode)
                 {
                     case int n when n is >= 200 and < 300:
-                        using (StreamReader reader = new(response.Content))
-                        {
-                            var result = await reader.ReadToEndAsync();
-                            _log.Info($"Received response: '{result}'");
-                            return result;
-                        }
+                        _log.Info($"Received response: '{result}'");
+                        return result;
                     case 401:
-                        Match match = TokenRegex.Match(url);
-                        if (match.Success)
-                        {
-                            var token = match.Groups["token"].Value;
-                            _log.Error($"Token is invalid: '{token}'");
-                            AddToActivityLog($"Token '{token}' is invalid", "Token is invalid");
-                        }
-                        else
-                        {
-                            _log.Error($"Token is invalid");
-                            AddToActivityLog($"Token is invalid", "Token is invalid");
-                        }
+                        _log.Error($"Token is invalid: '{token}'");
+                        AddToActivityLog($"Token '{token}' is invalid", "Token is invalid");
                         return string.Empty;
-                    case 402:
-                        _log.Warn("Request limit exceeded (either daily or total). Currently daily limit is 100 requests");
-                        AddToActivityLog("Request limit exceeded (either daily or total). Currently daily limit is 100 requests", "Request limit exceeded");
+                    case 403:
+                        _log.Warn("Request limit exceeded (either daily or total)");
+                        AddToActivityLog("Request limit exceeded (either daily or total)", "Request limit exceeded");
                         return string.Empty;
-                    case 429:
-                        _log.Info("Too many requests per second. Waiting 2 sec");
-                        await Task.Delay(2000, cancellationToken);
-                        return await SendRequest(url, cancellationToken);
                     default:
-                        _log.Error($"Received '{response.StatusCode}' from API");
+                        KpErrorResponse error = _jsonSerializer.DeserializeFromString<KpErrorResponse>(result);
+                        _log.Error($"Received '{response.StatusCode}' from API: Error-'{error.Error}', Message-'{error.Message}'");
                         return string.Empty;
                 }
             }

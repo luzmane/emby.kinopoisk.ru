@@ -19,7 +19,7 @@
                 "build",
                 "${workspaceFolder}/EmbyKinopoiskRu.sln",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+                "/consoleloggerparameters:Summary"
             ],
             "problemMatcher": "$msCompile",
             "group": {
@@ -35,7 +35,7 @@
                 "build",
                 "${workspaceFolder}/EmbyKinopoiskRu.Tests/EmbyKinopoiskRu.Tests.csproj",
                 "/property:GenerateFullPaths=true",
-                "/consoleloggerparameters:NoSummary"
+                "/consoleloggerparameters:Summary"
             ],
             "problemMatcher": "$msCompile",
             "group": {

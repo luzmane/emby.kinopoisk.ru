@@ -166,7 +166,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             {
                 CommunityRating = movie.Rating?.Kp,
                 CriticRating = movie.Rating?.FilmCritics * 10,
-                EndDate = GetEndDate(movie.ReleaseYears),
                 ExternalId = movieId,
                 Name = movie.Name,
                 OfficialRating = movie.RatingMpaa,
@@ -179,9 +178,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 SortName =
                     string.IsNullOrWhiteSpace(movie.Name) ?
                         string.IsNullOrWhiteSpace(movie.AlternativeName) ?
-                            string.IsNullOrWhiteSpace(movie.EnName) ?
-                                string.Empty
-                                : movie.EnName
+                            string.Empty
                             : movie.AlternativeName
                         : movie.Name,
                 Tagline = movie.Slogan
@@ -353,9 +350,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 SortName =
                     string.IsNullOrWhiteSpace(series.Name) ?
                         string.IsNullOrWhiteSpace(series.AlternativeName) ?
-                            string.IsNullOrWhiteSpace(series.EnName) ?
-                                string.Empty
-                                : series.EnName
+                            string.Empty
                             : series.AlternativeName
                         : series.Name,
                 Tagline = series.Slogan
