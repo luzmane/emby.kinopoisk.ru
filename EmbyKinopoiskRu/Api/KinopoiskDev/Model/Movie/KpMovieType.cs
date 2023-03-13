@@ -2,7 +2,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
 {
     public enum KpMovieType
     {
-        Movie = 1,
+        None,
+        Movie,
         TvSeries,
         Cartoon,
         Anime,

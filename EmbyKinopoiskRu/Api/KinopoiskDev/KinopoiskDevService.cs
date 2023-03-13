@@ -45,7 +45,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             List<Movie> result = new();
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetToken()))
+            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -66,7 +66,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 ResultLanguage = "ru"
             };
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetToken()))
+            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -106,7 +106,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             List<RemoteSearchResult> result = new();
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetToken()))
+            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -209,18 +209,18 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             movie.Videos?.Teasers?
-                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube"))
+                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube", StringComparison.OrdinalIgnoreCase))
                 .Select(i => i.Url!
-                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
-                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
+                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase)
+                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase))
                 .Reverse()
                 .ToList()
                 .ForEach(j => toReturn.AddTrailerUrl(j));
             movie.Videos?.Trailers?
-                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube"))
+                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube", StringComparison.OrdinalIgnoreCase))
                 .Select(i => i.Url!
-                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
-                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
+                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase)
+                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase))
                 .Reverse()
                 .ToList()
                 .ForEach(j => toReturn.AddTrailerUrl(j));
@@ -237,7 +237,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 ResultLanguage = "ru"
             };
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetToken()))
+            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -277,7 +277,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             List<RemoteSearchResult> result = new();
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetToken()))
+            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -381,18 +381,18 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             series.Videos?.Teasers?
-                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube"))
+                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube", StringComparison.OrdinalIgnoreCase))
                 .Select(i => i.Url!
-                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
-                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
+                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase)
+                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase))
                 .Reverse()
                 .ToList()
                 .ForEach(j => toReturn.AddTrailerUrl(j));
             series.Videos?.Trailers?
-                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube"))
+                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube", StringComparison.OrdinalIgnoreCase))
                 .Select(i => i.Url!
-                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
-                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
+                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase)
+                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase))
                 .Reverse()
                 .ToList()
                 .ForEach(j => toReturn.AddTrailerUrl(j));
@@ -408,7 +408,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 ResultLanguage = "ru"
             };
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetToken()))
+            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -444,7 +444,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 _log.Info($"Season with index '{info.ParentIndexNumber}' not found");
                 return result;
             }
-            KpEpisode? kpEpisode = kpSeason.Episodes.FirstOrDefault(e => e.Number == info.IndexNumber);
+            KpEpisode? kpEpisode = kpSeason.Episodes?.FirstOrDefault(e => e.Number == info.IndexNumber);
             if (kpEpisode == null)
             {
                 _log.Info($"Episode with index '{info.IndexNumber}' not found");
@@ -479,7 +479,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 ResultLanguage = "ru"
             };
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetToken()))
+            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -517,7 +517,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             List<RemoteSearchResult> result = new();
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetToken()))
+            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -597,7 +597,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             List<RemoteImageInfo> result = new();
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetToken()))
+            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -693,7 +693,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 ? result
                 : null;
         }
-        private async Task UpdatePersonsList<T>(MetadataResult<T> result, List<KpMovie.KpPerson>? persons, CancellationToken cancellationToken)
+        private async Task UpdatePersonsList<T>(MetadataResult<T> result, List<KpPersonMovie>? persons, CancellationToken cancellationToken)
             where T : BaseItem
         {
             if (persons == null)
@@ -708,18 +708,18 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             KpSearchResult<KpPerson> personsBySeriesId = await _api.GetPersonsByMovieId(seriesId, cancellationToken);
             personsBySeriesId.Docs
                 .ForEach(a =>
-                    a.Movies.RemoveAll(b =>
+                    a.Movies?.RemoveAll(b =>
                         b.Id.ToString(CultureInfo.InvariantCulture) != seriesId
                             || string.IsNullOrWhiteSpace(b.Description)
                         ));
 
-            Dictionary<long, string?> idRoleDictionary = personsBySeriesId.Docs
+            var idRoleDictionary = personsBySeriesId.Docs
                 .ToDictionary(
                     c => c.Id,
-                    c => c.Movies.FirstOrDefault()?.Description);
+                    c => c.Movies?.FirstOrDefault()?.Description);
 
             var seriesName = result.Item.Name;
-            foreach (KpMovie.KpPerson kpPerson in persons)
+            foreach (KpPersonMovie kpPerson in persons)
             {
                 PersonType? personType = KpHelper.GetPersonType(kpPerson.EnProfession);
                 var name = string.IsNullOrWhiteSpace(kpPerson.Name) ? kpPerson.EnName : kpPerson.Name;

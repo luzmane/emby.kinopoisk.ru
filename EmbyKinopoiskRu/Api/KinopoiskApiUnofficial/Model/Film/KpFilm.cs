@@ -4,8 +4,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Film
 {
     public class KpFilm
     {
-        public List<KpCountry>? Countries { get; set; }
-        public List<KpGenre>? Genres { get; set; }
+        public List<KpCountry> Countries { get; init; } = new();
+        public List<KpGenre>? Genres { get; init; }
         public string? ImdbId { get; set; }
         public long KinopoiskId { get; set; }
         public string? NameOriginal { get; set; }

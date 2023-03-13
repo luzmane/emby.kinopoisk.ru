@@ -18,7 +18,7 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
 
         public string Name => Plugin.PluginName;
 
-        public KpBaseLocalMetadata(ILogManager logManager)
+        protected KpBaseLocalMetadata(ILogManager logManager)
         {
             _log = logManager.GetLogger(GetType().FullName);
         }

@@ -95,7 +95,7 @@ namespace EmbyKinopoiskRu.Helper
         internal static int? DetectYearFromMoviePath(string filePath, string movieName)
         {
             var fileName = Path.GetFileNameWithoutExtension(filePath);
-            fileName = fileName.Replace(movieName, " ");
+            fileName = fileName.Replace(movieName, " ", StringComparison.OrdinalIgnoreCase);
             var yearSt = string.Empty;
             if (!string.IsNullOrWhiteSpace(fileName))
             {

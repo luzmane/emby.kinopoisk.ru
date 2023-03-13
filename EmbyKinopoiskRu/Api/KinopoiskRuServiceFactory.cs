@@ -12,7 +12,7 @@ using MediaBrowser.Model.Serialization;
 
 namespace EmbyKinopoiskRu.Api
 {
-    public class KinopoiskRuServiceFactory
+    public static class KinopoiskRuServiceFactory
     {
         private static readonly Dictionary<string, IKinopoiskRuService> KinopoiskServiciesDictionary = new();
         private static IHttpClient? _httpClient;
@@ -37,9 +37,9 @@ namespace EmbyKinopoiskRu.Api
         }
         public static IKinopoiskRuService GetService()
         {
-            if (PluginConfiguration.KINOPOISKDEV.Equals(Plugin.Instance?.Configuration.ApiType, StringComparison.Ordinal))
+            if (PluginConfiguration.KinopoiskDev.Equals(Plugin.Instance?.Configuration.ApiType, StringComparison.Ordinal))
             {
-                _log!.Info($"Fetching {PluginConfiguration.KINOPOISKDEV} service");
+                _log!.Info($"Fetching {PluginConfiguration.KinopoiskDev} service");
                 if (!KinopoiskServiciesDictionary.TryGetValue("KinopoiskDev", out IKinopoiskRuService? result))
                 {
                     result = new KinopoiskDevService(_logManager!, _httpClient!, _jsonSerializer!, _activityManager!);
@@ -47,9 +47,9 @@ namespace EmbyKinopoiskRu.Api
                 }
                 return result;
             }
-            if (PluginConfiguration.KINOPOISKAPIUNOFFICIALTECH.Equals(Plugin.Instance?.Configuration.ApiType, StringComparison.Ordinal))
+            if (PluginConfiguration.KinopoiskAPIUnofficialTech.Equals(Plugin.Instance?.Configuration.ApiType, StringComparison.Ordinal))
             {
-                _log!.Info($"Fetching {PluginConfiguration.KINOPOISKAPIUNOFFICIALTECH} service");
+                _log!.Info($"Fetching {PluginConfiguration.KinopoiskAPIUnofficialTech} service");
                 if (!KinopoiskServiciesDictionary.TryGetValue("KinopoiskUnofficial", out IKinopoiskRuService? result))
                 {
                     result = new KinopoiskUnofficialService(_logManager!, _httpClient!, _jsonSerializer!, _activityManager!);
@@ -57,9 +57,7 @@ namespace EmbyKinopoiskRu.Api
                 }
                 return result;
             }
-#pragma warning disable CA2201
             throw new Exception($"Unable to recognize provided API type '{Plugin.Instance?.Configuration.ApiType}'");
-#pragma warning restore CA2201
         }
 
     }

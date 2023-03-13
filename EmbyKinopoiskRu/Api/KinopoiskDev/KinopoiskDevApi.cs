@@ -167,7 +167,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         private async Task<string> SendRequest(string url, CancellationToken cancellationToken)
         {
             _log.Info($"Sending request to {url}");
-            var token = Plugin.Instance?.Configuration.GetToken();
+            var token = Plugin.Instance?.Configuration.GetCurrentToken();
             if (string.IsNullOrWhiteSpace(token))
             {
                 _log.Error("The token is empty. Skip request");

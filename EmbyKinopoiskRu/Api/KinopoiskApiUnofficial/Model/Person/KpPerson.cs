@@ -8,7 +8,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Person
         public string? BirthPlace { get; set; }
         public string? Death { get; set; }
         public string? DeathPlace { get; set; }
-        public List<string> Facts { get; set; } = new();
+        public List<string>? Facts { get; init; }
         public string? NameEn { get; set; }
         public string? NameRu { get; set; }
         /// <summary>
