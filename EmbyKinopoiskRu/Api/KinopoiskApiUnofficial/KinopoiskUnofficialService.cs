@@ -29,6 +29,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
     {
         private readonly ILogger _log;
         private readonly KinopoiskUnofficialApi _api;
+        private Plugin PluginInstance { get; set; }
 
         public KinopoiskUnofficialService(
             ILogManager logManager
@@ -38,6 +39,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         {
             _log = logManager.GetLogger(GetType().Name);
             _api = new KinopoiskUnofficialApi(_log, httpClient, jsonSerializer, activityManager);
+            if (Plugin.Instance == null)
+            {
+                throw new NullReferenceException($"Plugin '{Plugin.PluginName}' instance is null");
+            }
+            PluginInstance = Plugin.Instance;
         }
 
         #region MovieProvider
@@ -48,7 +54,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 ResultLanguage = "ru"
             };
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -84,7 +90,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         {
             List<RemoteSearchResult> result = new();
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -140,7 +146,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         {
             List<Movie> result = new();
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -238,7 +244,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         {
             List<RemoteImageInfo> result = new();
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -319,7 +325,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 ResultLanguage = "ru"
             };
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -355,7 +361,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         {
             List<RemoteSearchResult> result = new();
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -493,7 +499,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 ResultLanguage = "ru"
             };
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -567,7 +573,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 ResultLanguage = "ru"
             };
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -605,7 +611,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         {
             List<RemoteSearchResult> result = new();
 
-            if (string.IsNullOrWhiteSpace(Plugin.Instance?.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;

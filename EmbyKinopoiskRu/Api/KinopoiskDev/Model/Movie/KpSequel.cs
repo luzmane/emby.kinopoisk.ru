@@ -1,6 +1,6 @@
 namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
 {
-    public class Sequel
+    public class KpSequel
     {
         public long Id { get; set; }
         public string? Name { get; set; }

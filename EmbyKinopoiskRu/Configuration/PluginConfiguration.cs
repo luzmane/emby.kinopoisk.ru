@@ -13,6 +13,7 @@ namespace EmbyKinopoiskRu.Configuration
 
         public string Token { get; set; } = string.Empty;
         public string ApiType { get; set; } = KinopoiskAPIUnofficialTech;
+        public bool CreateCollections { get; set; } = true;
 
         public string GetCurrentToken()
         {
@@ -21,6 +22,10 @@ namespace EmbyKinopoiskRu.Configuration
                 : KinopoiskAPIUnofficialTech.Equals(ApiType, StringComparison.Ordinal)
                     ? DefaultUnofficialToken
                     : DefaultDevToken;
+        }
+        public bool NeedToCreateCollection()
+        {
+            return KinopoiskDev.Equals(ApiType, StringComparison.Ordinal) && CreateCollections;
         }
 
     }

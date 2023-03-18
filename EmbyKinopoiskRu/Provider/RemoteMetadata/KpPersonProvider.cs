@@ -32,11 +32,11 @@ namespace EmbyKinopoiskRu.Provider.RemoteMetadata
         }
         public async Task<MetadataResult<Person>> GetMetadata(PersonLookupInfo info, CancellationToken cancellationToken)
         {
-            return await KinopoiskRuServiceFactory.GetService().GetMetadata(info, cancellationToken);
+            return await Plugin.Instance!.GetService().GetMetadata(info, cancellationToken);
         }
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(PersonLookupInfo searchInfo, CancellationToken cancellationToken)
         {
-            return await KinopoiskRuServiceFactory.GetService().GetSearchResults(searchInfo, cancellationToken);
+            return await Plugin.Instance!.GetService().GetSearchResults(searchInfo, cancellationToken);
         }
     }
 }

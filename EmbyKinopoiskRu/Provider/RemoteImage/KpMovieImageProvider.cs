@@ -2,8 +2,6 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 
-using EmbyKinopoiskRu.Api;
-
 using MediaBrowser.Common.Net;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
@@ -49,7 +47,7 @@ namespace EmbyKinopoiskRu.Provider.RemoteImage
         }
         public async Task<IEnumerable<RemoteImageInfo>> GetImages(BaseItem item, LibraryOptions libraryOptions, CancellationToken cancellationToken)
         {
-            return await KinopoiskRuServiceFactory.GetService().GetImages(item, libraryOptions, cancellationToken);
+            return await Plugin.Instance!.GetService().GetImages(item, libraryOptions, cancellationToken);
         }
     }
 }

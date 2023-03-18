@@ -28,7 +28,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
         public KpRating? Rating { get; set; }
         public string? RatingMpaa { get; set; }
         public List<KpYearRange>? ReleaseYears { get; init; }
-        public List<Sequel>? SequelsAndPrequels { get; init; }
+        public List<KpSequel> SequelsAndPrequels { get; init; } = new();
         public string? Slogan { get; set; }
         public int? Top250 { get; set; }
         public KpMovieType? TypeNumber { get; set; }

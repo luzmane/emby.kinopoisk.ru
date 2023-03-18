@@ -41,7 +41,7 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
             movieName = MultiSpaces.Replace(NotAlphaNumeric.Replace(movieName, " "), " ");
             var year = KpHelper.DetectYearFromMoviePath(info.Path, info.Name);
             _log.Info($"Searching movie by name - {movieName} and year - {year}");
-            List<Movie> movies = await KinopoiskRuServiceFactory.GetService().GetMoviesByOriginalNameAndYear(movieName, year, cancellationToken);
+            List<Movie> movies = await Plugin.Instance!.GetService().GetMoviesByOriginalNameAndYear(movieName, year, cancellationToken);
 
             if (movies.Count == 0)
             {

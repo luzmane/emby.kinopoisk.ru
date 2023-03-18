@@ -60,7 +60,7 @@
             "type": "shell",
             "args": [
                 "${workspaceFolder}/EmbyKinopoiskRu/bin/Debug/net6.0/EmbyKinopoiskRu.dll",
-                "~/ws/emby/emby/plugins/"
+                "${workspaceFolder}/../emby/plugins/"
             ],
             "problemMatcher": {
                 "owner": "shell",
@@ -80,7 +80,7 @@
             "isBackground": true,
             "options": {
                 "env": {
-                    "EMBY_DATA": "/home/alkid/ws/emby/emby/"
+                    "EMBY_DATA": "${workspaceFolder}/../emby/"
                 },
                 "shell": {
                     "executable": "/bin/bash"

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -41,6 +42,16 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             var json = await SendRequest($"https://api.kinopoisk.dev/v1/movie/{movieId}", cancellationToken);
             return _jsonSerializer.DeserializeFromString<KpMovie>(json);
+        }
+        internal async Task<KpSearchResult<KpMovie>> GetMoviesByIds(List<string> movieIdList, CancellationToken cancellationToken)
+        {
+            var url = new StringBuilder($"https://api.kinopoisk.dev/v1/movie?")
+                .Append(CultureInfo.InvariantCulture, $"limit={movieIdList.Count}")
+                .Append("&selectFields=alternativeName backdrop countries description enName externalId genres id logo movieLength name persons poster premiere productionCompanies rating ratingMpaa slogan videos year sequelsAndPrequels top250 facts releaseYears seasonsInfo")
+                .Append(CultureInfo.InvariantCulture, $"&id={string.Join("&id=", movieIdList)}")
+                .ToString();
+            var json = await SendRequest(url, cancellationToken);
+            return _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
         }
         internal async Task<KpSearchResult<KpMovie>> GetMoviesByMovieDetails(string? name, int? year, CancellationToken cancellationToken)
         {
