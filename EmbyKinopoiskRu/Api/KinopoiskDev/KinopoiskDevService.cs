@@ -9,6 +9,7 @@ using EmbyKinopoiskRu.Api.KinopoiskDev.Model;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Person;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Season;
+using EmbyKinopoiskRu.Configuration;
 using EmbyKinopoiskRu.Helper;
 
 using MediaBrowser.Common.Net;
@@ -33,7 +34,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         private readonly KinopoiskDevApi _api;
         private readonly ILibraryManager _libraryManager;
         private readonly ICollectionManager _collectionManager;
-        private Plugin PluginInstance { get; set; }
+        private PluginConfiguration PluginConfig { get; set; }
+        private readonly List<KpMovieType?> _movieTypes = new() { KpMovieType.Anime, KpMovieType.Movie, KpMovieType.Cartoon };
 
         internal KinopoiskDevService(
             ILogManager logManager
@@ -51,7 +53,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             {
                 throw new NullReferenceException($"Plugin '{Plugin.PluginName}' instance is null");
             }
-            PluginInstance = Plugin.Instance;
+            PluginConfig = Plugin.Instance.Configuration;
         }
 
         #region MovieProvider
@@ -59,7 +61,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             List<Movie> result = new();
 
-            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -80,7 +82,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 ResultLanguage = "ru"
             };
 
-            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -120,7 +122,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             List<RemoteSearchResult> result = new();
 
-            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -239,13 +241,14 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 .ToList()
                 .ForEach(j => toReturn.AddTrailerUrl(j));
 
-            if (PluginInstance.Configuration.NeedToCreateCollection() && movie.SequelsAndPrequels.Any())
+            if (PluginConfig.NeedToCreateCollection() && movie.SequelsAndPrequels.Any())
             {
                 await AddMovieToCollection(toReturn, movie, cancellationToken);
             }
 
             return toReturn;
         }
+
         #endregion
 
         #region SeriesProvider
@@ -256,7 +259,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 ResultLanguage = "ru"
             };
 
-            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -296,7 +299,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             List<RemoteSearchResult> result = new();
 
-            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -416,7 +419,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 .ToList()
                 .ForEach(j => toReturn.AddTrailerUrl(j));
 
-            if (PluginInstance.Configuration.NeedToCreateCollection() && series.SequelsAndPrequels.Any())
+            if (PluginConfig.NeedToCreateCollection() && series.SequelsAndPrequels.Any())
             {
                 await AddMovieToCollection(toReturn, series, cancellationToken);
             }
@@ -433,7 +436,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 ResultLanguage = "ru"
             };
 
-            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -504,7 +507,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 ResultLanguage = "ru"
             };
 
-            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -542,7 +545,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             List<RemoteSearchResult> result = new();
 
-            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -622,7 +625,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             List<RemoteImageInfo> result = new();
 
-            if (string.IsNullOrWhiteSpace(PluginInstance.Configuration.GetCurrentToken()))
+            if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
                 return result;
@@ -778,12 +781,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             _log.Info($"Adding '{toReturn.Name}' to collection");
 
-            var skip = true;
-            if (skip)
-            {
-                return;
-            }
-
             CollectionFolder? rootCollectionFolder = await EmbyHelper.InsureCollectionLibraryFolder(_libraryManager, _log);
             if (rootCollectionFolder == null)
             {
@@ -792,7 +789,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             // Get internalIds of each object in sequence
-            List<BaseItem> internalCollectionItems = await EmbyHelper.GetInternalIds(movie, _libraryManager, _log, _api, cancellationToken);
+            var itemsToAdd = movie.SequelsAndPrequels.Select(seq => seq.Id).ToList();
+            List<BaseItem> internalCollectionItems = await EmbyHelper.GetInternalIds(itemsToAdd, _libraryManager, _log, _api, cancellationToken);
             var internalIdArray = internalCollectionItems.Select(item => item.InternalId).ToList();
 
             BoxSet? collection = EmbyHelper.SearchExistingCollection(internalIdArray, _libraryManager, _log);
@@ -815,7 +813,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 {
                     if (item.AddCollection(collection))
                     {
-                        _log.Warn($"Adding '{item.Name}' to collection '{collection.Name}'");
+                        _log.Info($"Adding '{item.Name}' to collection '{collection.Name}'");
                         item.UpdateToRepository(ItemUpdateType.MetadataEdit);
                     }
                     else
@@ -835,5 +833,87 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         #endregion
 
+        #region Scheduled Tasks
+        public async Task<List<Movie>> GetTop250MovieCollection(CancellationToken cancellationToken)
+        {
+            List<Movie> toReturn = new();
+            KpSearchResult<KpMovie> movies = await _api.GetTop250Collection(cancellationToken);
+            movies.Docs
+                .Where(m => _movieTypes.Contains(m.TypeNumber))
+                .ToList()
+                .ForEach(m =>
+                {
+                    var movie = new Movie()
+                    {
+                        Name = m.Name,
+                        OriginalTitle = m.AlternativeName
+                    };
+                    movie.SetProviderId(Plugin.PluginName, m.Id.ToString(CultureInfo.InvariantCulture));
+                    if (!string.IsNullOrWhiteSpace(m.ExternalId?.Imdb))
+                    {
+                        movie.SetProviderId(MetadataProviders.Imdb.ToString(), m.ExternalId.Imdb);
+                    }
+                    if (m.ExternalId?.Tmdb != null && m.ExternalId.Tmdb > 0)
+                    {
+                        movie.SetProviderId(MetadataProviders.Tmdb.ToString(), m.ExternalId.Tmdb.ToString());
+                    }
+
+                    toReturn.Add(movie);
+                });
+            return toReturn;
+        }
+        public async Task<List<Series>> GetTop250SeriesCollection(CancellationToken cancellationToken)
+        {
+            List<Series> toReturn = new();
+            KpSearchResult<KpMovie> movies = await _api.GetTop250Collection(cancellationToken);
+            movies.Docs
+                .Where(m => !_movieTypes.Contains(m.TypeNumber))
+                .ToList()
+                .ForEach(m =>
+                {
+                    var series = new Series()
+                    {
+                        Name = m.Name,
+                        OriginalTitle = m.AlternativeName
+                    };
+                    series.SetProviderId(Plugin.PluginName, m.Id.ToString(CultureInfo.InvariantCulture));
+                    if (!string.IsNullOrWhiteSpace(m.ExternalId?.Imdb))
+                    {
+                        series.SetProviderId(MetadataProviders.Imdb.ToString(), m.ExternalId.Imdb);
+                    }
+                    if (m.ExternalId?.Tmdb != null && m.ExternalId.Tmdb > 0)
+                    {
+                        series.SetProviderId(MetadataProviders.Tmdb.ToString(), m.ExternalId.Tmdb.ToString());
+                    }
+
+                    toReturn.Add(series);
+                });
+            return toReturn;
+        }
+        public async Task<Dictionary<string, long>> GetKpIdByAnotherId(string externalIdType, List<string> idList, CancellationToken cancellationToken)
+        {
+            KpSearchResult<KpMovie> movies = await _api.GetKpIdByAnotherId(externalIdType, idList, cancellationToken);
+            if (MetadataProviders.Imdb.ToString() == externalIdType)
+            {
+                return movies.Docs
+                    .Where(m => !string.IsNullOrWhiteSpace(m.ExternalId?.Imdb))
+                    .ToDictionary(
+                        m => m.ExternalId!.Imdb!,
+                        m => m.Id
+                    );
+            }
+            if (MetadataProviders.Tmdb.ToString() == externalIdType)
+            {
+                return movies.Docs
+                    .Where(m => m.ExternalId?.Tmdb != null && m.ExternalId.Tmdb > 0)
+                    .ToDictionary(
+                        m => ((long)m.ExternalId!.Tmdb!).ToString(CultureInfo.InvariantCulture),
+                        m => m.Id
+                    );
+            }
+            return new Dictionary<string, long>();
+        }
+
+        #endregion
     }
 }

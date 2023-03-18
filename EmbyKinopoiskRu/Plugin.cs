@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using EmbyKinopoiskRu.Api;
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial;
@@ -20,7 +21,7 @@ using MediaBrowser.Model.Serialization;
 
 namespace EmbyKinopoiskRu
 {
-    public class Plugin : BasePlugin<PluginConfiguration>, IHasThumbImage, IHasWebPages
+    public class Plugin : BasePlugin<PluginConfiguration>, IHasThumbImage, IHasWebPages, IHasTranslations
     {
         public const string PluginName = "KinopoiskRu";
 
@@ -82,7 +83,20 @@ namespace EmbyKinopoiskRu
                 }
             };
         }
-        public IKinopoiskRuService GetService()
+        public TranslationInfo[] GetTranslations()
+        {
+            var basePath = GetType().Namespace + ".Configuration.strings.";
+            return GetType().Assembly.GetManifestResourceNames()
+                .Where(i => i.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
+                .Select(i =>
+                    new TranslationInfo()
+                    {
+                        Locale = Path.GetFileNameWithoutExtension(i[basePath.Length..]),
+                        EmbeddedResourcePath = i
+                    })
+                .ToArray();
+        }
+        public IKinopoiskRuService GetKinopoiskService()
         {
             if (PluginConfiguration.KinopoiskDev.Equals(Configuration.ApiType, StringComparison.Ordinal))
             {

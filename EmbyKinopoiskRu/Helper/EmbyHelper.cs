@@ -49,32 +49,31 @@ namespace EmbyKinopoiskRu.Helper
             return FindCollectionFolders(libraryManager).FirstOrDefault(f => "Collections".Equals(f.Name, StringComparison.Ordinal));
         }
         internal static async Task<List<BaseItem>> GetInternalIds(
-            KpMovie movie,
+            List<long> choosenItems,
             ILibraryManager libraryManager,
             ILogger logger,
             KinopoiskDevApi api,
             CancellationToken cancellationToken)
         {
             logger.Info($"Get internalIds of each object in sequence");
-            var itemsToAdd = movie.SequelsAndPrequels.Select(seq => seq.Id).ToList();
             QueryResult<BaseItem> collectionItems = libraryManager.QueryItems(new InternalItemsQuery()
             {
-                AnyProviderIdEquals = itemsToAdd.Select(id => new KeyValuePair<string, string>(Plugin.PluginName, id.ToString(CultureInfo.InvariantCulture))).ToList()
+                AnyProviderIdEquals = choosenItems.Select(id => new KeyValuePair<string, string>(Plugin.PluginName, id.ToString(CultureInfo.InvariantCulture))).ToList()
             });
             var toReturn = collectionItems.Items.ToList();
             logger.Info($"Internal objects with Kinopoisk ids: {toReturn.Count}");
 
-            if (toReturn.Count != itemsToAdd.Count)
+            if (toReturn.Count != choosenItems.Count)
             {
                 logger.Info("Searching for another objects with another metadata providers");
                 foreach (BaseItem item in collectionItems.Items)
                 {
                     if (long.TryParse(item.GetProviderId(Plugin.PluginName), out var id))
                     {
-                        _ = itemsToAdd.Remove(id);
+                        _ = choosenItems.Remove(id);
                     }
                 }
-                KpSearchResult<KpMovie> kpSearchResult = await api.GetMoviesByIds(itemsToAdd.Select(i => i.ToString(CultureInfo.InvariantCulture)).ToList(), cancellationToken);
+                KpSearchResult<KpMovie> kpSearchResult = await api.GetMoviesByIds(choosenItems.Select(i => i.ToString(CultureInfo.InvariantCulture)).ToList(), cancellationToken);
                 var kpExternalIdist = kpSearchResult.Docs
                     .Where(m => m.ExternalId != null)
                     .Select(m => m.ExternalId)

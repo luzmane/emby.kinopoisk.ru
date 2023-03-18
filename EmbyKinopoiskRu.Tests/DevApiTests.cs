@@ -127,7 +127,7 @@ namespace EmbyKinopoiskRu.Tests
             KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, JsonOptions);
             Assert.NotNull(searchResultMovie);
             Assert.AreEqual(2, searchResultMovie!.Docs.Count);
-            
+
             KpMovie kpMovie = searchResultMovie!.Docs.First(i => i.Id == 689);
             Assert.AreEqual("Harry Potter and the Sorcerer's Stone", kpMovie.AlternativeName);
             Assert.AreEqual("https://avatars.mds.yandex.net/get-ott/223007/2a0000016fb3ac87014aae4f0c64329f64e0/orig", kpMovie.Backdrop?.Url);
@@ -247,6 +247,33 @@ namespace EmbyKinopoiskRu.Tests
             Assert.LessOrEqual(499, kpMovie!.Docs.Count);
         }
 
+        [Test]
+        public async Task GetMoviesByExternalIds()
+        {
+            var request = $"https://api.kinopoisk.dev/v1/movie?";
+            request += "selectFields=alternativeName externalId.imdb id name&limit=1000";
+            request += "&externalId.imdb=tt0241527";
+            request += "&externalId.imdb=tt0120689";
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(new Uri(request)).ConfigureAwait(false);
+            _ = responseMessage.EnsureSuccessStatusCode();
+            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+            KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, JsonOptions);
+            Assert.IsNotNull(searchResultMovie);
+            Assert.AreEqual(2, searchResultMovie!.Docs.Count);
+
+            KpMovie kpMovie = searchResultMovie!.Docs.First(i => i.Id == 689);
+            Assert.AreEqual("Harry Potter and the Sorcerer's Stone", kpMovie.AlternativeName);
+            Assert.AreEqual("tt0241527", kpMovie.ExternalId?.Imdb);
+            Assert.AreEqual(689, kpMovie.Id);
+            Assert.AreEqual("Гарри Поттер и философский камень", kpMovie.Name);
+
+            kpMovie = searchResultMovie!.Docs.First(i => i.Id == 435);
+            Assert.NotNull(kpMovie);
+            Assert.AreEqual("The Green Mile", kpMovie!.AlternativeName);
+            Assert.AreEqual("tt0120689", kpMovie.ExternalId?.Imdb);
+            Assert.AreEqual(435, kpMovie.Id);
+            Assert.AreEqual("Зеленая миля", kpMovie.Name);
+        }
 
         [Test]
         public async Task GetPersonById()

@@ -3,6 +3,9 @@ v.1.7.0
 - Add search by English name of the person
 - Support of the new API version of kinopoisk.dev
 - Added option to create collections based on sequels data from kinopoisk.dev. Configured by the checkbox in plugin setup page
+- Translated plugin config
+- Added scheduled task to create Kinopoisk Top 250 collection
+- Added scheduled task to update movie/series with Kinopoisk ID based on IMDB or TMDB
 
 v.1.6.2
 - Fix trailers, add latest trailer from API to be the first, suppose it will be on Russian

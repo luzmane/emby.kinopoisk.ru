@@ -1,35 +1,44 @@
 ﻿<div data-role="page" class="page type-interior libraryFileOrganizerLogPage pluginConfigurationPage fullWidthContent"
-    data-controller="__plugin/kinopoiskrujs">
-
-    <div class="content-primary padded-top">
-
-        <form>
-            <div class="inputContainer">
-                <input is="emby-input" type="text" class="txtToken" autocomplete="off" label="Token" />
-            </div>
-
-            <div data-role="controlgroup" data-type="horizontal" data-mini="true">
-                <input type="radio" name="radioAPI" class="radioTabButton" id="radioAPI_dev"
-                    value="kinopoisk.dev">
-                <label for="kinopoisk.dev">kinopoisk.dev. <a is="emby-linkbutton" class="button-link" target="_blank"
-                        href="https://kinopoisk.dev">Get token from here</a></label>
-                <br />
-                <input type="radio" name="radioAPI" class="radioTabButton" id="radioAPI_unoff"
-                    value="kinopoiskapiunofficial.tech">
-                <label for="kinopoiskapiunofficial.tech">kinopoiskapiunofficial.tech <a is="emby-linkbutton"
-                        class="button-link" target="_blank" 
-                        href="https://kinopoiskapiunofficial.tech">Get token from here</a></label>
-            </div>
-            <div class="checkboxContainer checkboxContainer-withDescription">
-                <label class="emby-checkbox-label">
-                    <input is="emby-checkbox" type="checkbox" class="createCollections emby-checkbox">
-                    <span class="checkboxLabel">Create collections (for kinopoisk.dev only)</span>
-                </label>
-            </div>
-
-            <div>
-                <button is="emby-button" type="submit" class="raised button-submit block"><span>${Save}</span></button>
-            </div>
-        </form>
-    </div>
+  data-controller="__plugin/kinopoiskrujs" data-title="${Kinopoisk.Ru}">
+  <div class="content-primary padded-top">
+    <form lass="kinopoiskRuConfigurationForm">
+      <div class="paperList checkboxList checkboxList-paperList">
+        <h3 class="checkboxListLabel">${Token configuration}</h3>
+        <div class="inputContainer">
+          <input is="emby-input" type="text" class="txtToken" autocomplete="off" label="${Token}" />
+        </div>
+        <div class="inputContainer">
+          <label>
+            <input is="emby-radio" type="radio" name="radioAPI" class="radioTabButton kinopoiskDev"
+              value="kinopoisk.dev">
+            <span class="radioButtonLabel">kinopoisk.dev. <a is="emby-linkbutton" class="button-link" target="_blank"
+                href="https://kinopoisk.dev">${Get Token From Here}</a></span>
+          </label>
+        </div>
+        <div class="inputContainer">
+          <label>
+            <input is="emby-radio" type="radio" name="radioAPI" class="radioTabButton kinopoiskUnofficial"
+              value="kinopoiskapiunofficial.tech">
+            <span class="radioButtonLabel">kinopoiskapiunofficial.tech <a is="emby-linkbutton" class="button-link"
+                target="_blank" href="https://kinopoiskapiunofficial.tech">${Get Token From Here}</a></span>
+          </label>
+        </div>
+      </div>
+      <div class="paperList checkboxList checkboxList-paperList kinopoiskDevOnly">
+        <h3 class="checkboxListLabel">${Collection creation configuration (for kinopoisk.dev only)}</h3>
+        <label class="checkboxContainer">
+          <input is="emby-checkbox" type="checkbox" class="chkCreateCollections">
+          <span class="checkboxButtonLabel">${Create collections}</span>
+        </label>
+        <div class="inputContainer">
+          <input is="emby-input" type="text" class="top250MovieName" autocomplete="off" label="${Top 250 Movie Collection Name}" />
+        </div>
+        <div class="inputContainer">
+          <input is="emby-input" type="text" class="top250SeriesName" autocomplete="off" label="${Top 250 Series Collection Name}" />
+        </div>      </div>
+      <div>
+        <button is="emby-button" type="submit" class="raised button-submit block"><span>${Save}</span></button>
+      </div>
+    </form>
+  </div>
 </div>

@@ -8,12 +8,18 @@ namespace EmbyKinopoiskRu.Configuration
     {
         private const string DefaultUnofficialToken = "0f162131-81c1-4979-b46c-3eea4263fb11";
         private const string DefaultDevToken = "8DA0EV2-KTP4A5Q-G67QP3K-S2VFBX7";
+        private const string DefaultTop250MovieCollectionName = "КинопоискТоп250";
+        private const string DefaultTop250SeriesCollectionName = "КинопоискТоп250 (Сериалы)";
         public const string KinopoiskDev = "kinopoisk.dev";
         public const string KinopoiskAPIUnofficialTech = "kinopoiskapiunofficial.tech";
+
 
         public string Token { get; set; } = string.Empty;
         public string ApiType { get; set; } = KinopoiskAPIUnofficialTech;
         public bool CreateCollections { get; set; } = true;
+        public string Top250MovieCollectionName { get; set; } = DefaultTop250MovieCollectionName;
+        public string Top250SeriesCollectionName { get; set; } = DefaultTop250SeriesCollectionName;
+
 
         public string GetCurrentToken()
         {
@@ -27,6 +33,17 @@ namespace EmbyKinopoiskRu.Configuration
         {
             return KinopoiskDev.Equals(ApiType, StringComparison.Ordinal) && CreateCollections;
         }
-
+        public string GetCurrentTop250MovieCollectionName()
+        {
+            return !string.IsNullOrWhiteSpace(Top250MovieCollectionName)
+                ? Top250MovieCollectionName
+                : DefaultTop250MovieCollectionName;
+        }
+        public string GetCurrentTop250SeriesCollectionName()
+        {
+            return !string.IsNullOrWhiteSpace(Top250SeriesCollectionName)
+                ? Top250SeriesCollectionName
+                : DefaultTop250SeriesCollectionName;
+        }
     }
 }

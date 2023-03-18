@@ -11,10 +11,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
         public List<KpNamed>? Countries { get; init; }
         public string? Description { get; set; }
         public KpExternalId? ExternalId { get; set; }
-        
-        /// <summary>
-        /// todo: use facts in film description
-        /// </summary>
         public List<KpFact>? Facts { get; init; }
         public List<KpNamed>? Genres { get; init; }
         public long Id { get; set; }
