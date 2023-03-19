@@ -1,3 +1,6 @@
+v.1.8.0
+- Append facts to movie/series description
+
 v.1.7.0
 - During metadata update if found several movies will choose the one with highest rating
 - Add search by English name of the person

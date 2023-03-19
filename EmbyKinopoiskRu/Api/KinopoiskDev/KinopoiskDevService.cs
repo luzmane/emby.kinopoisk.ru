@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -144,7 +145,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                             ImageUrl = imageUrl,
                             SearchProviderName = Plugin.PluginName,
                             ProductionYear = movie.Year,
-                            Overview = movie.Description,
+                            Overview = PrepareOverview(movie),
                         };
                         item.SetProviderId(Plugin.PluginName, movieId);
                         result.Add(item);
@@ -165,7 +166,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                     ImageUrl = imageUrl,
                     SearchProviderName = Plugin.PluginName,
                     ProductionYear = movie.Year,
-                    Overview = movie.Description,
+                    Overview = PrepareOverview(movie),
                 };
                 item.SetProviderId(Plugin.PluginName, movie.Id.ToString(CultureInfo.InvariantCulture));
                 result.Add(item);
@@ -186,7 +187,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 Name = movie.Name,
                 OfficialRating = movie.RatingMpaa,
                 OriginalTitle = movie.AlternativeName,
-                Overview = movie.Description,
+                Overview = PrepareOverview(movie),
                 PremiereDate = KpHelper.GetPremierDate(movie.Premiere),
                 ProductionLocations = movie.Countries?.Select(i => i.Name).ToArray(),
                 ProductionYear = movie.Year,
@@ -321,7 +322,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                             ImageUrl = imageUrl,
                             SearchProviderName = Plugin.PluginName,
                             ProductionYear = series.Year,
-                            Overview = series.Description,
+                            Overview = PrepareOverview(series),
                         };
                         item.SetProviderId(Plugin.PluginName, seriesId);
                         result.Add(item);
@@ -342,7 +343,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                     ImageUrl = imageUrl,
                     SearchProviderName = Plugin.PluginName,
                     ProductionYear = series.Year,
-                    Overview = series.Description,
+                    Overview = PrepareOverview(series),
                 };
                 item.SetProviderId(Plugin.PluginName, series.Id.ToString(CultureInfo.InvariantCulture));
                 result.Add(item);
@@ -364,7 +365,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 Name = series.Name,
                 OfficialRating = series.RatingMpaa,
                 OriginalTitle = series.AlternativeName,
-                Overview = series.Description,
+                Overview = PrepareOverview(series),
                 PremiereDate = KpHelper.GetPremierDate(series.Premiere),
                 ProductionLocations = series.Countries?.Select(i => i.Name).ToArray(),
                 ProductionYear = series.Year,
@@ -829,6 +830,20 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             _log.Info("Finished adding to collection");
+        }
+        private static string? PrepareOverview(KpMovie movie)
+        {
+            var subj = $"<br/><br/><b>Интересное:</b><ul>";
+            StringBuilder sb = new(subj);
+            movie.Facts?
+                .Where(f => !f.Spoiler && "FACT".Equals(f.Type, StringComparison.OrdinalIgnoreCase))
+                .ToList()
+                .ForEach(f => sb.Append("<li>").Append(f.Value).Append("</li>"));
+            _ = sb.Append("</ul>");
+
+            return (sb.Length == (subj.Length + "</ul>".Length))
+                ? movie.Description
+                : sb.Insert(0, movie.Description).ToString();
         }
 
         #endregion

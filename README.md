@@ -2,7 +2,7 @@
 
 Fetches metadata from [kinopoisk.ru](https://www.kinopoisk.ru). This site is popular in the Russian-speaking community and contains almost no English-language information, so further description will be in Russian.
 
-Плагин для Emby для загрузки метаданных фильмов, сериалов с сайта [kinopoisk.ru](https://www.kinopoisk.ru) использую сторонние API:
+Плагин для Emby для загрузки метаданных фильмов, сериалов с сайта [kinopoisk.ru](https://www.kinopoisk.ru) используя сторонние API:
 - [kinopoiskapiunofficial.tech](https://kinopoiskapiunofficial.tech)
 - [kinopoisk.dev](https://kinopoisk.dev)
 
@@ -59,6 +59,4 @@ Fetches metadata from [kinopoisk.ru](https://www.kinopoisk.ru). This site is pop
 
 ## TODO
 
-* Add stopwatch to all API calls
-* Use facts in film description
 * Add user filtering in all tasks
