@@ -27,6 +27,7 @@ using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Providers;
 using MediaBrowser.Model.Serialization;
 
+
 namespace EmbyKinopoiskRu.Api.KinopoiskDev
 {
     public class KinopoiskDevService : IKinopoiskRuService
@@ -790,18 +791,23 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             // Get internalIds of each object in sequence
-            var itemsToAdd = movie.SequelsAndPrequels.Select(seq => seq.Id).ToList();
+            var itemsToAdd = movie.SequelsAndPrequels
+                .Select(seq => seq.Id)
+                .ToList();
             List<BaseItem> internalCollectionItems = await EmbyHelper.GetInternalIds(itemsToAdd, _libraryManager, _log, _api, cancellationToken);
-            var internalIdArray = internalCollectionItems.Select(item => item.InternalId).ToList();
+            var internalIdArray = internalCollectionItems
+                .Select(item => item.InternalId)
+                .ToList();
 
             BoxSet? collection = EmbyHelper.SearchExistingCollection(internalIdArray, _libraryManager, _log);
             if (collection == null && internalCollectionItems.Count > 0)
             {
-                _log.Info($"Creating collection with name '{movie.Name}' contains items with ids: '{string.Join(", ", internalIdArray)}'");
+                var newCollectionName = GetNewCollectionName(movie);
+                _log.Info($"Creating collection with name '{newCollectionName}' contains items with ids: '{string.Join(", ", GetProviderIdsFromInternalIds(internalCollectionItems))}'");
                 collection = await _collectionManager.CreateCollection(new CollectionCreationOptions()
                 {
                     IsLocked = false,
-                    Name = movie.Name,
+                    Name = newCollectionName,
                     ParentId = rootCollectionFolder.InternalId,
                     ItemIdList = internalIdArray.ToArray()
                 });
@@ -809,7 +815,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
             else if (collection != null && internalCollectionItems.Count > 0)
             {
-                _log.Info($"Updating collection with name '{movie.Name}' with following ids: '{string.Join(", ", internalIdArray)}'");
+                _log.Info($"Updating collection with name '{collection.Name}' with following ids: '{string.Join(", ", internalIdArray)}'");
                 foreach (BaseItem item in internalCollectionItems)
                 {
                     if (item.AddCollection(collection))
@@ -830,6 +836,38 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             _log.Info("Finished adding to collection");
+        }
+        private static IEnumerable<string> GetProviderIdsFromInternalIds(List<BaseItem> internalCollectionItems)
+        {
+            return internalCollectionItems
+                .Select(i =>
+                {
+                    if (i.HasProviderId(Plugin.PluginName))
+                    {
+                        return $"KpId: {i.GetProviderId(Plugin.PluginName)}";
+                    }
+                    if (i.HasProviderId(MetadataProviders.Imdb.ToString()))
+                    {
+                        return $"IMDB: {i.GetProviderId(MetadataProviders.Imdb.ToString())}";
+                    }
+                    if (i.HasProviderId(MetadataProviders.Tmdb.ToString()))
+                    {
+                        return $"TMDB: {i.GetProviderId(MetadataProviders.Tmdb.ToString())}";
+                    }
+                    return string.Empty;
+                });
+        }
+        private static string GetNewCollectionName(KpMovie movie)
+        {
+            var itemsList = movie.SequelsAndPrequels
+                .Select(s => (s.Id, s.Name))
+                .ToList();
+            itemsList.Add((movie.Id, movie.Name));
+            (var id, var name) = itemsList
+                .Where(m => !string.IsNullOrWhiteSpace(m.Name))
+                .OrderBy(m => m.Id)
+                .FirstOrDefault();
+            return name!;
         }
         private static string? PrepareOverview(KpMovie movie)
         {

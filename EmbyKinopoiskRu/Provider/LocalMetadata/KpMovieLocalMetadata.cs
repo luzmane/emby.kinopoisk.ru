@@ -4,7 +4,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-using EmbyKinopoiskRu.Api;
 using EmbyKinopoiskRu.Helper;
 
 using MediaBrowser.Controller.Entities.Movies;

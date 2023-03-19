@@ -126,6 +126,8 @@ csharp_using_directive_placement = outside_namespace:silent
 
 # IDE0160: Convert to block-scoped namespace: file_scoped\block_scoped
 csharp_style_namespace_declarations = block_scoped:warning
+# IDE0005: Remove unnecessary using directives
+dotnet_diagnostic.IDE0005.severity = warning
 
 #### C# Formatting Rules ####
 
