@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
+using EmbyKinopoiskRu.Api;
+
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.Entities;
@@ -19,6 +21,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         private readonly ILogger _log;
         private static bool _isScanRunning;
         private static readonly object ScanLock = new();
+        private const int CHUNK_SIZE = 150;
 
         private readonly ILibraryManager _libraryManager;
         private Plugin Plugin { get; set; }
@@ -68,6 +71,9 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 _log.Info("Searching for movies/series without KP id, but with IMDB or TMDB");
                 QueryResult<BaseItem> itemsToUpdateResult = _libraryManager.QueryItems(new InternalItemsQuery()
                 {
+                    IncludeItemTypes = new[] { "movie", "tvshow" },
+                    Recursive = false,
+                    IsVirtualItem = false,
                     MissingAnyProviderId = new[] { Plugin.PluginName },
                     HasAnyProviderId = new[] { MetadataProviders.Imdb.ToString(), MetadataProviders.Tmdb.ToString() },
                 });
@@ -82,49 +88,57 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 {
                     var imdbList = itemsToUpdateResult.Items
                         .Where(m => m.HasProviderId(MetadataProviders.Imdb.ToString()))
-                        .Select(m => m.GetProviderId(MetadataProviders.Imdb.ToString()))
+                        .Where(m => !string.IsNullOrWhiteSpace(m.GetProviderId(MetadataProviders.Imdb.ToString())))
                         .ToList();
-                    _log.Info($"Requesting KP ID for {imdbList.Count} items by IMDB ID");
-                    Dictionary<string, long> imdbMovieIds = await Plugin.GetKinopoiskService().GetKpIdByAnotherId(MetadataProviders.Imdb.ToString(), imdbList, cancellationToken);
-                    _log.Info($"Found {imdbMovieIds.Count} KP IDs by IMDB IDs");
-                    itemsToUpdateResult.Items
-                        .Where(m => m.HasProviderId(MetadataProviders.Imdb.ToString()))
-                        .Where(m => imdbMovieIds.ContainsKey(m.GetProviderId(MetadataProviders.Imdb.ToString())))
-                        .ToList()
-                        .ForEach(m =>
-                        {
-                            m.SetProviderId(Plugin.PluginName, imdbMovieIds[m.GetProviderId(MetadataProviders.Imdb.ToString())].ToString(CultureInfo.InvariantCulture));
-                            m.UpdateToRepository(ItemUpdateType.MetadataEdit);
-                        });
-                    progress.Report(55d);
-                    _log.Info("KP by IMDB updated");
+                    await UpdateItemsByProviderId(imdbList, MetadataProviders.Imdb.ToString(), cancellationToken);
+                    _log.Info("Updated Imdb provider id");
+                    progress.Report(50d);
 
                     var tmdbList = itemsToUpdateResult.Items
                         .Where(m => !m.HasProviderId(MetadataProviders.Imdb.ToString()))
                         .Where(m => m.HasProviderId(MetadataProviders.Tmdb.ToString()))
-                        .Select(m => m.GetProviderId(MetadataProviders.Tmdb.ToString()))
+                        .Where(m => !string.IsNullOrWhiteSpace(m.GetProviderId(MetadataProviders.Tmdb.ToString())))
                         .ToList();
-                    _log.Info($"Requesting KP ID for {tmdbList.Count} items by TMDB ID without IMDB ID");
-                    Dictionary<string, long> tmdbMovieIds = await Plugin.GetKinopoiskService().GetKpIdByAnotherId(MetadataProviders.Tmdb.ToString(), tmdbList, cancellationToken);
-                    _log.Info($"Found {tmdbMovieIds.Count} KP IDs by TMDB IDs");
-                    itemsToUpdateResult.Items
-                        .Where(m => !m.HasProviderId(MetadataProviders.Imdb.ToString()))
-                        .Where(m => m.HasProviderId(MetadataProviders.Tmdb.ToString()))
-                        .Where(m => tmdbMovieIds.ContainsKey(m.GetProviderId(MetadataProviders.Tmdb.ToString())))
-                        .ToList()
-                        .ForEach(m =>
-                        {
-                            m.SetProviderId(Plugin.PluginName, tmdbMovieIds[m.GetProviderId(MetadataProviders.Tmdb.ToString())].ToString(CultureInfo.InvariantCulture));
-                            m.UpdateToRepository(ItemUpdateType.MetadataEdit);
-                        });
+                    await UpdateItemsByProviderId(tmdbList, MetadataProviders.Tmdb.ToString(), cancellationToken);
+                    _log.Info("Updated Tmdb provider id");
                     progress.Report(100d);
-                    _log.Info("KP by TMDB updated");
                 }
             }
             finally
             {
                 _isScanRunning = false;
                 _log.Info("Task finished");
+            }
+        }
+
+        private async Task UpdateItemsByProviderId(List<BaseItem> itemsToUpdate, string providerId, CancellationToken cancellationToken)
+        {
+            _log.Info($"Requesting KP ID for {itemsToUpdate.Count} items by {providerId} ID from API");
+            var count = (int)Math.Ceiling((double)itemsToUpdate.Count / CHUNK_SIZE);
+            for (var i = 0; i < count; i++)
+            {
+                IEnumerable<BaseItem> workingList = itemsToUpdate.Skip(CHUNK_SIZE * i).Take(CHUNK_SIZE);
+                ApiResult<Dictionary<string, long>> fetchedIds = await Plugin.GetKinopoiskService()
+                    .GetKpIdByAnotherId(providerId, workingList.Select(m => m.GetProviderId(providerId)), cancellationToken);
+                if (fetchedIds.HasError)
+                {
+                    var processed = i == 0 ? workingList.Count() : (CHUNK_SIZE * (i - 1)) + workingList.Count();
+                    _log.Warn($"Unable to fetch data from API. Processed {processed} of {itemsToUpdate.Count}");
+                    break;
+                }
+                foreach (BaseItem item in workingList)
+                {
+                    var id = item.GetProviderId(providerId);
+                    if (fetchedIds.Item.ContainsKey(id))
+                    {
+                        item.SetProviderId(Plugin.PluginName, fetchedIds.Item[id].ToString(CultureInfo.InvariantCulture));
+                        item.UpdateToRepository(ItemUpdateType.MetadataEdit);
+                    }
+                    else
+                    {
+                        _log.Info($"Unable to find Kp id for {item.Name} ({providerId}:{id})");
+                    }
+                }
             }
         }
     }

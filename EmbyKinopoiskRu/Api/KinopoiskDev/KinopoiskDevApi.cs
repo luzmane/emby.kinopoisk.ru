@@ -184,35 +184,22 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             return _jsonSerializer.DeserializeFromString<KpSearchResult<KpSeason>>(json);
         }
 
-        internal async Task<KpSearchResult<KpMovie>> GetKpIdByAnotherId(string externalIdType, List<string> idList, CancellationToken cancellationToken)
+        internal async Task<KpSearchResult<KpMovie>> GetKpIdByAnotherId(string externalIdType, IEnumerable<string> idList, CancellationToken cancellationToken)
         {
-            var toReturn = new KpSearchResult<KpMovie>();
             if (!idList.Any())
             {
                 _log.Info("Received ids list is empty");
-                return toReturn;
+                return new KpSearchResult<KpMovie>();
             }
-            var chunkSize = 7;
             var request = $"https://api.kinopoisk.dev/v1/movie?";
             request += $"selectFields=externalId.{externalIdType.ToLowerInvariant()} id&limit=1000";
-
             var delimeter = $"&externalId.{externalIdType.ToLowerInvariant()}=";
-            var count = (int)Math.Ceiling((double)idList.Count / chunkSize);
-            _log.Info($"Splitted on {count} groups of ids");
-            for (var i = 0; i < count; i++)
-            {
-                var tmpRequest = request + $"{delimeter}{string.Join(delimeter, idList.Skip(chunkSize * i).Take(chunkSize))}";
-                var json = await SendRequest(tmpRequest, cancellationToken);
-                if (string.IsNullOrEmpty(json))
-                {
-                    _log.Error($"Received empty response. There is a problem with API, check above logs. Stopping on group #{count + 1}");
-                    break;
-                }
-                KpSearchResult<KpMovie> tmp = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
-                tmp.Docs.ForEach(m => toReturn.Docs.Add(m));
-            }
-            _log.Info("Fetched all groups");
-            return toReturn;
+            request += $"{delimeter}{string.Join(delimeter, idList)}";
+            var json = await SendRequest(request, cancellationToken);
+            var hasError = json.Length == 0;
+            return hasError
+                ? new KpSearchResult<KpMovie>() { HasError = true }
+                : _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
         }
 
         private async Task<string> SendRequest(string url, CancellationToken cancellationToken)

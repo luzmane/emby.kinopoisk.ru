@@ -736,10 +736,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             _log.Info("KinopoiskUnofficial doesn't have information about Top250");
             return Task.FromResult(new List<Series>());
         }
-        public Task<Dictionary<string, long>> GetKpIdByAnotherId(string externalIdType, List<string> idList, CancellationToken cancellationToken)
+        public Task<ApiResult<Dictionary<string, long>>> GetKpIdByAnotherId(string externalIdType, IEnumerable<string> idList, CancellationToken cancellationToken)
         {
             _log.Info("KinopoiskUnofficial unable to search by IMDB nor by TMDB");
-            return Task.FromResult(new Dictionary<string, long>());
+            return Task.FromResult(new ApiResult<Dictionary<string, long>>(new Dictionary<string, long>()));
         }
 
         #endregion

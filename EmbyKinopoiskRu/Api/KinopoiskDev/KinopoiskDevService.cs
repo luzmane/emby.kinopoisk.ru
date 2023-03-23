@@ -803,7 +803,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             if (collection == null && internalCollectionItems.Count > 0)
             {
                 var newCollectionName = GetNewCollectionName(movie);
-                _log.Info($"Creating collection with name '{newCollectionName}' contains items with ids: '{string.Join(", ", GetProviderIdsFromInternalIds(internalCollectionItems))}'");
+                _log.Info($"Creating '{newCollectionName}' collection with following items: '{string.Join("', '", internalCollectionItems.Select(m => m.Name))}'");
                 collection = await _collectionManager.CreateCollection(new CollectionCreationOptions()
                 {
                     IsLocked = false,
@@ -815,7 +815,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
             else if (collection != null && internalCollectionItems.Count > 0)
             {
-                _log.Info($"Updating collection with name '{collection.Name}' with following ids: '{string.Join(", ", internalIdArray)}'");
+                _log.Info($"Updating '{collection.Name}' collection with following items: '{string.Join("', '", internalCollectionItems.Select(m => m.Name))}'");
                 foreach (BaseItem item in internalCollectionItems)
                 {
                     if (item.AddCollection(collection))
@@ -825,7 +825,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                     }
                     else
                     {
-                        _log.Warn($"Unable to add '{item.Name}' to collection '{collection.Name}'");
+                        _log.Info($"'{item.Name}' already in the collection '{collection.Name}'");
                     }
                 }
                 _ = toReturn.AddCollection(collection);
@@ -836,26 +836,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             _log.Info("Finished adding to collection");
-        }
-        private static IEnumerable<string> GetProviderIdsFromInternalIds(List<BaseItem> internalCollectionItems)
-        {
-            return internalCollectionItems
-                .Select(i =>
-                {
-                    if (i.HasProviderId(Plugin.PluginName))
-                    {
-                        return $"KpId: {i.GetProviderId(Plugin.PluginName)}";
-                    }
-                    if (i.HasProviderId(MetadataProviders.Imdb.ToString()))
-                    {
-                        return $"IMDB: {i.GetProviderId(MetadataProviders.Imdb.ToString())}";
-                    }
-                    if (i.HasProviderId(MetadataProviders.Tmdb.ToString()))
-                    {
-                        return $"TMDB: {i.GetProviderId(MetadataProviders.Tmdb.ToString())}";
-                    }
-                    return string.Empty;
-                });
         }
         private static string GetNewCollectionName(KpMovie movie)
         {
@@ -943,28 +923,38 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 });
             return toReturn;
         }
-        public async Task<Dictionary<string, long>> GetKpIdByAnotherId(string externalIdType, List<string> idList, CancellationToken cancellationToken)
+        public async Task<ApiResult<Dictionary<string, long>>> GetKpIdByAnotherId(string externalIdType, IEnumerable<string> idList, CancellationToken cancellationToken)
         {
             KpSearchResult<KpMovie> movies = await _api.GetKpIdByAnotherId(externalIdType, idList, cancellationToken);
+            if (movies.HasError)
+            {
+                return new(new Dictionary<string, long>())
+                {
+                    HasError = true
+                };
+            }
             if (MetadataProviders.Imdb.ToString() == externalIdType)
             {
-                return movies.Docs
+                return new(movies.Docs
                     .Where(m => !string.IsNullOrWhiteSpace(m.ExternalId?.Imdb))
                     .ToDictionary(
                         m => m.ExternalId!.Imdb!,
                         m => m.Id
-                    );
+                    ));
             }
             if (MetadataProviders.Tmdb.ToString() == externalIdType)
             {
-                return movies.Docs
+                return new(movies.Docs
                     .Where(m => m.ExternalId?.Tmdb != null && m.ExternalId.Tmdb > 0)
                     .ToDictionary(
                         m => ((long)m.ExternalId!.Tmdb!).ToString(CultureInfo.InvariantCulture),
                         m => m.Id
-                    );
+                    ));
             }
-            return new Dictionary<string, long>();
+            return new(new Dictionary<string, long>())
+            {
+                HasError = true
+            };
         }
 
         #endregion

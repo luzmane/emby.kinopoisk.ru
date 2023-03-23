@@ -29,6 +29,6 @@ namespace EmbyKinopoiskRu.Api
 
         Task<List<Movie>> GetTop250MovieCollection(CancellationToken cancellationToken);
         Task<List<Series>> GetTop250SeriesCollection(CancellationToken cancellationToken);
-        Task<Dictionary<string, long>> GetKpIdByAnotherId(string externalIdType, List<string> idList, CancellationToken cancellationToken);
+        Task<ApiResult<Dictionary<string, long>>> GetKpIdByAnotherId(string externalIdType, IEnumerable<string> idList, CancellationToken cancellationToken);
     }
 }
