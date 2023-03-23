@@ -1,5 +1,8 @@
 v.1.8.0
 - Append facts to movie/series description
+- New created by plugin collection will have name of the first video in sequels
+- Fix Create Top250 collections task: fix incorrect item detection
+- Fix Update Kp Id by IMDB/TMDB id task: fix incorrect item detection
 
 v.1.7.0
 - During metadata update if found several movies will choose the one with highest rating
