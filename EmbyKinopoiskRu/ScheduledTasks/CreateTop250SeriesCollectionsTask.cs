@@ -127,7 +127,6 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             var seriesInLibrary = seriesInLibraryQueryResult.Items
                             .Where(i => i.LocationType == LocationType.FileSystem && i.MediaType == "Video")
                             .Where(i => i.Path != null && !i.IsVirtualItem)
-                            .Where(i => i.GetTopParent() != null && i.Parent.GetParent() is not BoxSet)
                             .ToList();
             Log.Info($"Found {seriesInLibrary.Count} series in '{library.Name}' library");
 

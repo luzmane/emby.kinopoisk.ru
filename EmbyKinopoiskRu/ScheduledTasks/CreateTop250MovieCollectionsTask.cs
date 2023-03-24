@@ -127,7 +127,6 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             var moviesInLibrary = moviesInLibraryQueryResult.Items
                             .Where(i => i.LocationType == LocationType.FileSystem && i.MediaType == "Video")
                             .Where(i => i.Path != null && !i.IsVirtualItem)
-                            .Where(i => i.GetTopParent() != null && i.Parent.GetParent() is not BoxSet)
                             .ToList();
             Log.Info($"Found {moviesInLibrary.Count} movies in '{library.Name}' library");
 
