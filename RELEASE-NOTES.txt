@@ -1,3 +1,9 @@
+v.1.8.2
+- Fix incorrect items querying
+
+v.1.8.1
+- Suit plugin to be used with 4.8.*-beta versions
+
 v.1.8.0
 - Append facts to movie/series description
 - New created by plugin collection will have name of the first video in sequels
