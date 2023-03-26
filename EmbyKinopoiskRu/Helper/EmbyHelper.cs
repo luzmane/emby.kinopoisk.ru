@@ -56,8 +56,16 @@ namespace EmbyKinopoiskRu.Helper
             CancellationToken cancellationToken)
         {
             logger.Info($"Get internalIds of each object in sequence");
+            if (!choosenItems.Any())
+            {
+                logger.Info("Provided list is empty");
+                return new();
+            }
             QueryResult<BaseItem> collectionItems = libraryManager.QueryItems(new InternalItemsQuery()
             {
+                IncludeItemTypes = new[] { "movie", "tvshow" },
+                Recursive = false,
+                IsVirtualItem = false,
                 AnyProviderIdEquals = choosenItems.Select(id => new KeyValuePair<string, string>(Plugin.PluginName, id.ToString(CultureInfo.InvariantCulture))).ToList()
             });
             var toReturn = collectionItems.Items.ToList();
@@ -85,13 +93,18 @@ namespace EmbyKinopoiskRu.Helper
                     .Select(e => e.Imdb)
                     .Cast<string>()
                     .ToList();
-                logger.Info($"Have {imdbList.Count} IMDB ids");
-                QueryResult<BaseItem> imdbCollectionItems = libraryManager.QueryItems(new InternalItemsQuery()
-                {
-                    AnyProviderIdEquals = imdbList
-                        .Select(id => new KeyValuePair<string, string>(MetadataProviders.Imdb.ToString(), id))
-                        .ToList()
-                });
+                logger.Info($"Found {imdbList.Count} IMDB ids");
+                QueryResult<BaseItem> imdbCollectionItems = imdbList.Any()
+                    ? libraryManager.QueryItems(new InternalItemsQuery()
+                    {
+                        IncludeItemTypes = new[] { "movie", "tvshow" },
+                        Recursive = false,
+                        IsVirtualItem = false,
+                        AnyProviderIdEquals = imdbList
+                            .Select(id => new KeyValuePair<string, string>(MetadataProviders.Imdb.ToString(), id))
+                            .ToList()
+                    })
+                    : (QueryResult<BaseItem>)(new());
                 logger.Info($"Found {imdbCollectionItems.Items.Length} internal IMDB objects");
 
                 var tmdbList = kpExternalIdist
@@ -99,13 +112,18 @@ namespace EmbyKinopoiskRu.Helper
                     .Select(e => e.Tmdb.ToString())
                     .Cast<string>()
                     .ToList();
-                logger.Info($"Have {tmdbList.Count} TMDB ids");
-                QueryResult<BaseItem> tmdbCollectionItems = libraryManager.QueryItems(new InternalItemsQuery()
-                {
-                    AnyProviderIdEquals = tmdbList
-                        .Select(id => new KeyValuePair<string, string>(MetadataProviders.Tmdb.ToString(), id))
-                        .ToList()
-                });
+                logger.Info($"Found {tmdbList.Count} TMDB ids");
+                QueryResult<BaseItem> tmdbCollectionItems = tmdbList.Any()
+                    ? libraryManager.QueryItems(new InternalItemsQuery()
+                    {
+                        IncludeItemTypes = new[] { "movie", "tvshow" },
+                        Recursive = false,
+                        IsVirtualItem = false,
+                        AnyProviderIdEquals = tmdbList
+                            .Select(id => new KeyValuePair<string, string>(MetadataProviders.Tmdb.ToString(), id))
+                            .ToList()
+                    })
+                    : (QueryResult<BaseItem>)(new());
                 logger.Info($"Found {tmdbCollectionItems.Items.Length} internal TMDB objects");
 
                 List<BaseItem> list = new(imdbCollectionItems.Items);
@@ -116,7 +134,6 @@ namespace EmbyKinopoiskRu.Helper
                         list.Add(item);
                     }
                 }
-
                 logger.Info($"Adding {list.Count} additional internal objects");
                 toReturn.AddRange(list);
             }
@@ -128,15 +145,18 @@ namespace EmbyKinopoiskRu.Helper
         {
             logger.Info($"Search existing collections for item with ids: '{string.Join(" ,", internalIds)}'");
             List<KeyValuePair<BoxSet, int>> boxsetList = new();
-            QueryResult<BaseItem> collections = libraryManager.QueryItems(new InternalItemsQuery
+            QueryResult<BaseItem> collections = libraryManager.QueryItems(new InternalItemsQuery()
             {
                 IncludeItemTypes = new[] { "boxset" },
                 ListItemIds = internalIds.ToArray()
             });
             foreach (BoxSet collection in collections.Items.Cast<BoxSet>())
             {
-                QueryResult<BaseItem> collectionItems = libraryManager.QueryItems(new InternalItemsQuery
+                QueryResult<BaseItem> collectionItems = libraryManager.QueryItems(new InternalItemsQuery()
                 {
+                    IncludeItemTypes = new[] { "movie", "tvshow" },
+                    Recursive = false,
+                    IsVirtualItem = false,
                     CollectionIds = new long[] { collection.InternalId }
                 });
                 var count = collectionItems.Items.Select(i => internalIds.Contains(i.InternalId)).Count();

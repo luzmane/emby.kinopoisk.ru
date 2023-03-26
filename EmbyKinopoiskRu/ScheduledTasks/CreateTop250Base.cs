@@ -46,7 +46,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 return;
             }
             Log.Info($"Check if '{collectionName}' already exists");
-            QueryResult<BaseItem> existingCollectionResult = LibraryManager.QueryItems(new InternalItemsQuery
+            QueryResult<BaseItem> existingCollectionResult = LibraryManager.QueryItems(new InternalItemsQuery()
             {
                 IncludeItemTypes = new[] { "BoxSet" },
                 Recursive = false,

@@ -65,7 +65,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 Log.Info($"Received {series.Count} items from API");
 
                 Log.Info("Get all libraries");
-                QueryResult<BaseItem> librariesResult = LibraryManager.QueryItems(new InternalItemsQuery
+                QueryResult<BaseItem> librariesResult = LibraryManager.QueryItems(new InternalItemsQuery()
                 {
                     IncludeItemTypes = new[] { "CollectionFolder" },
                     Recursive = false,
@@ -116,14 +116,16 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                     return toReturn;
                 })
                 .ToList();
-            QueryResult<BaseItem> seriesInLibraryQueryResult = LibraryManager.QueryItems(new InternalItemsQuery
-            {
-                IncludeItemTypes = new[] { "series" },
-                AnyProviderIdEquals = anyProviderIdEquals,
-                Recursive = false,
-                IsVirtualItem = false,
-                ParentIds = new long[] { library.InternalId },
-            });
+            QueryResult<BaseItem> seriesInLibraryQueryResult = anyProviderIdEquals.Any()
+                ? LibraryManager.QueryItems(new InternalItemsQuery()
+                {
+                    IncludeItemTypes = new[] { "series" },
+                    AnyProviderIdEquals = anyProviderIdEquals,
+                    Recursive = false,
+                    IsVirtualItem = false,
+                    ParentIds = new long[] { library.InternalId },
+                })
+                : new();
             var seriesInLibrary = seriesInLibraryQueryResult.Items
                             .Where(i => i.LocationType == LocationType.FileSystem && i.MediaType == "Video")
                             .Where(i => i.Path != null && !i.IsVirtualItem)
