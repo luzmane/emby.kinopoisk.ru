@@ -78,7 +78,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             }
 
             _log.Info($"Searching movies by name {info.Name}");
-            KpSearchResult<KpFilm> movies = await _api.GetFilmsByName(info.Name, cancellationToken);
+            KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(info.Name, info.Year, cancellationToken);
             if (movies.Items.Count != 1)
             {
                 _log.Error($"Found {movies.Items.Count} movies, skipping movie update");
@@ -125,7 +125,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             }
 
             _log.Info($"Searching movies by name {searchInfo.Name}");
-            KpSearchResult<KpFilm> movies = await _api.GetFilmsByName(searchInfo.Name, cancellationToken);
+            KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(searchInfo.Name, searchInfo.Year, cancellationToken);
             foreach (KpFilm movie in movies.Items)
             {
                 var imageUrl = (movie.PosterUrlPreview ?? movie.PosterUrl) ?? string.Empty;
@@ -153,7 +153,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 return result;
             }
 
-            KpSearchResult<KpFilm> movies = await _api.GetFilmsByName(name, cancellationToken);
+            KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(name, year, cancellationToken);
             foreach (KpFilm movie in movies.Items)
             {
                 result.Add(CreateMovieFromKpFilm(movie));
@@ -268,7 +268,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             }
 
             _log.Info($"Searching movies by name {item.Name}");
-            KpSearchResult<KpFilm> movies = await _api.GetFilmsByName(item.Name, cancellationToken);
+            KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(item.Name, item.ProductionYear, cancellationToken);
             if (movies.Items.Count != 1)
             {
                 _log.Error($"Found {movies.Items.Count} movies, skipping image update");
@@ -349,7 +349,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             }
 
             _log.Info($"Searching series by name {info.Name}");
-            KpSearchResult<KpFilm> series = await _api.GetFilmsByName(info.Name, cancellationToken);
+            KpSearchResult<KpFilm> series = await _api.GetFilmsByNameAndYear(info.Name, info.Year, cancellationToken);
             if (series.Items.Count != 1)
             {
                 _log.Error($"Found {series.Items.Count} series, skipping series update");
@@ -396,7 +396,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             }
 
             _log.Info($"Searching series by name {searchInfo.Name}");
-            KpSearchResult<KpFilm> seriesResult = await _api.GetFilmsByName(searchInfo.Name, cancellationToken);
+            KpSearchResult<KpFilm> seriesResult = await _api.GetFilmsByNameAndYear(searchInfo.Name, searchInfo.Year, cancellationToken);
             foreach (KpFilm series in seriesResult.Items)
             {
                 var imageUrl = (series.PosterUrlPreview ?? series.PosterUrl) ?? string.Empty;

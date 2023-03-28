@@ -154,6 +154,30 @@ namespace EmbyKinopoiskRu.Tests
         }
 
         [Test]
+        public async Task SearchFilmByNameAndYear()
+        {
+            var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films?keyword=100 шагов&yearFrom=2014&yearTo=2014";
+            using HttpResponseMessage responseMessage = await HttpClient.GetAsync(new Uri(request)).ConfigureAwait(false);
+            _ = responseMessage.EnsureSuccessStatusCode();
+            var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+            KpSearchResult<KpFilm>? filmSearchResult = JsonSerializer.Deserialize<KpSearchResult<KpFilm>>(response, JsonOptions);
+            Assert.NotNull(filmSearchResult);
+            Assert.AreEqual(1, filmSearchResult!.Items.Count);
+            KpFilm film = filmSearchResult.Items.First(f => f.KinopoiskId == 933277);
+            Assert.NotNull(film);
+            Assert.AreEqual(933277, film!.KinopoiskId);
+            Assert.AreEqual("tt3904078", film.ImdbId);
+            Assert.AreEqual("100 Things to Do Before High School", film.NameOriginal);
+            Assert.AreEqual("100 шагов: Успеть до старших классов", film.NameRu);
+            Assert.AreEqual(1, film.Countries?.Count);
+            Assert.AreEqual(2, film.Genres?.Count);
+            Assert.Less(0, film.RatingKinopoisk);
+            Assert.AreEqual(2014, film.Year);
+            Assert.AreEqual("https://kinopoiskapiunofficial.tech/images/posters/kp/933277.jpg", film.PosterUrl);
+            Assert.AreEqual("https://kinopoiskapiunofficial.tech/images/posters/kp_small/933277.jpg", film.PosterUrlPreview);
+        }
+
+        [Test]
         public async Task SearchStaffByName()
         {
             var request = $"https://kinopoiskapiunofficial.tech/api/v1/persons?name=Тим Роббинс";

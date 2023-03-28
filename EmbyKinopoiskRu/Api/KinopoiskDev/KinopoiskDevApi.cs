@@ -67,9 +67,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 .Append($"limit=50")
                 .Append("&selectFields=alternativeName backdrop countries description enName externalId genres id logo movieLength name persons poster premiere productionCompanies rating ratingMpaa slogan videos year sequelsAndPrequels top250 facts releaseYears seasonsInfo")
                 .ToString();
-            var namePart = hasName ? $"&name={name}" : string.Empty;
-            var alternativeNamePart = hasAlternativeName ? $"&alternativeName={alternativeName}" : string.Empty;
-            var yearPart = hasYear ? $"&year={year}" : string.Empty;
+            var namePart = $"&name={name}";
+            var alternativeNamePart = $"&alternativeName={alternativeName}";
+            var yearPart = $"&year={year}";
 
             if (hasName && hasYear)
             {
@@ -118,7 +118,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                     return toReturn;
                 }
             }
-            return new KpSearchResult<KpMovie>();
+            return new();
         }
         internal async Task<KpSearchResult<KpMovie>> GetTop250Collection(CancellationToken cancellationToken)
         {
