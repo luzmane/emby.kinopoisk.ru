@@ -15,7 +15,7 @@ namespace EmbyKinopoiskRu.Configuration
 
 
         public string Token { get; set; } = string.Empty;
-        public string ApiType { get; set; } = KinopoiskAPIUnofficialTech;
+        public string ApiType { get; set; } = KinopoiskDev;
         public bool CreateCollections { get; set; } = true;
         public string Top250MovieCollectionName { get; set; } = DefaultTop250MovieCollectionName;
         public string Top250SeriesCollectionName { get; set; } = DefaultTop250SeriesCollectionName;

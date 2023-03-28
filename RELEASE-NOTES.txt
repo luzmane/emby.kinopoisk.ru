@@ -1,5 +1,6 @@
 v.1.9.0
 - Search for kinopoiskapiunofficial.tech include year
+- Change default API
 
 v.1.8.2
 - Fix incorrect items querying
