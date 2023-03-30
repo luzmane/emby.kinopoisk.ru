@@ -1,3 +1,6 @@
+v.1.9.1
+- Tune movie/series search - filter API search result with name and year
+
 v.1.9.0
 - Search for kinopoiskapiunofficial.tech include year
 - Change default API
