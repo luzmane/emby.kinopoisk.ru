@@ -39,9 +39,8 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
             _log.Info($"info.Name - {movieName}");
             movieName = MultiSpaces.Replace(NotAlphaNumeric.Replace(movieName, " "), " ");
             var year = KpHelper.DetectYearFromMoviePath(info.Path, info.Name);
-            _log.Info($"Searching movie by name - {movieName} and year - {year}");
+            _log.Info($"Searching movie by name - '{movieName}' and year - {year}");
             List<Movie> movies = await Plugin.Instance!.GetKinopoiskService().GetMoviesByOriginalNameAndYear(movieName, year, cancellationToken);
-
             if (movies.Count == 0)
             {
                 _log.Info($"Nothing found for movie name '{movieName}");
@@ -60,13 +59,13 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
                     .FirstOrDefault();
                 if (movieWithHighestRating != null)
                 {
-                    _log.Info($"Found {movies.Count} movies. Taking the first one with highest rating in KP. For movie name '{movieName}' found movie with KP id = '{movies[0].GetProviderId(Plugin.PluginName)}'");
                     result.Item = movieWithHighestRating;
+                    _log.Info($"Found {movies.Count} movies. Taking the first one with highest rating in KP. Choose movie with KP id = '{result.Item.GetProviderId(Plugin.PluginName)}' for '{movieName}'");
                 }
                 else
-                {
-                    _log.Info($"Found {movies.Count} movies. Taking the first one. For movie name '{movieName}' found movie with KP id = '{movies[0].GetProviderId(Plugin.PluginName)}'");
+                { // all films without KP rating
                     result.Item = movies[0];
+                    _log.Info($"Found {movies.Count} movies. Taking the first one. Choose movie with KP id = '{result.Item.GetProviderId(Plugin.PluginName)}' for '{movieName}'");
                 }
                 result.HasMetadata = true;
             }

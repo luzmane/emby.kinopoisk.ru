@@ -61,21 +61,21 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         #region MovieProvider
         public async Task<List<Movie>> GetMoviesByOriginalNameAndYear(string name, int? year, CancellationToken cancellationToken)
         {
-            List<Movie> result = new();
-
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
-                return result;
+                return new();
             }
 
             KpSearchResult<KpMovie> movies = await _api.GetMoviesByMovieDetails(name, year, cancellationToken);
-            foreach (KpMovie movie in movies.Docs)
+            List<KpMovie> relevantMovies = FilterRelevantItems(movies.Docs, name, year);
+            List<Movie> toReturn = new();
+            foreach (KpMovie movie in relevantMovies)
             {
-                result.Add(await CreateMovieFromKpMovie(movie, cancellationToken));
+                toReturn.Add(await CreateMovieFromKpMovie(movie, cancellationToken));
             }
-            _log.Info($"By alternative name '{name}' found {result.Count} movies");
-            return result;
+            _log.Info($"By alternative name '{name}' found {toReturn.Count} movies");
+            return toReturn;
         }
         public async Task<MetadataResult<Movie>> GetMetadata(MovieInfo info, CancellationToken cancellationToken)
         {
@@ -108,15 +108,16 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 }
             }
 
-            _log.Info($"Searching movie by name {info.Name}");
+            _log.Info($"Searching movie by name '{info.Name}' and year '{info.Year}'");
             KpSearchResult<KpMovie> movies = await _api.GetMoviesByMovieDetails(info.Name, info.Year, cancellationToken);
-            if (movies.Docs.Count != 1)
+            List<KpMovie> relevantMovies = FilterRelevantItems(movies.Docs, info.Name, info.Year);
+            if (relevantMovies.Count != 1)
             {
-                _log.Error($"Found {movies.Docs.Count} movies, skipping movie update");
+                _log.Error($"Found {relevantMovies.Count} movies, skipping movie update");
                 return result;
             }
-            result.Item = await CreateMovieFromKpMovie(movies.Docs[0], cancellationToken);
-            await UpdatePersonsList(result, movies.Docs[0].Persons, cancellationToken);
+            result.Item = await CreateMovieFromKpMovie(relevantMovies[0], cancellationToken);
+            await UpdatePersonsList(result, relevantMovies[0].Persons, cancellationToken);
             result.HasMetadata = true;
             return result;
         }
@@ -285,15 +286,16 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 }
             }
 
-            _log.Info($"Searching series by name {info.Name}");
+            _log.Info($"Searching series by name '{info.Name}' and year '{info.Year}'");
             KpSearchResult<KpMovie> series = await _api.GetMoviesByMovieDetails(info.Name, info.Year, cancellationToken);
-            if (series.Docs.Count != 1)
+            List<KpMovie> relevantSeries = FilterRelevantItems(series.Docs, info.Name, info.Year);
+            if (relevantSeries.Count != 1)
             {
-                _log.Error($"Found {series.Docs.Count} series, skipping series update");
+                _log.Error($"Found {relevantSeries.Count} series, skipping series update");
                 return result;
             }
-            result.Item = await CreateSeriesFromKpMovie(series.Docs[0], cancellationToken);
-            await UpdatePersonsList(result, series.Docs[0].Persons, cancellationToken);
+            result.Item = await CreateSeriesFromKpMovie(relevantSeries[0], cancellationToken);
+            await UpdatePersonsList(result, relevantSeries[0].Persons, cancellationToken);
             result.HasMetadata = true;
             return result;
         }
@@ -651,12 +653,13 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             _log.Info($"Searching images by available metadata");
             KpSearchResult<KpMovie> movies = await _api.GetMoviesByMovieDetails(item.Name, item.OriginalTitle, item.ProductionYear, cancellationToken);
-            if (movies.Docs.Count != 1)
+            List<KpMovie> relevantSeries = FilterRelevantItems(movies.Docs, item.Name, item.ProductionYear);
+            if (relevantSeries.Count != 1)
             {
-                _log.Error($"Found {movies.Docs.Count} movies, skipping image update");
+                _log.Error($"Found {relevantSeries.Count} movies, skipping image update");
                 return result;
             }
-            UpdateRemoteImageInfoList(movies.Docs[0], result);
+            UpdateRemoteImageInfoList(relevantSeries[0], result);
             return result;
         }
         private void UpdateRemoteImageInfoList(KpMovie movie, List<RemoteImageInfo> toReturn)
@@ -863,7 +866,17 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 ? movie.Description
                 : sb.Insert(0, movie.Description).ToString();
         }
-
+        private static List<KpMovie> FilterRelevantItems(List<KpMovie> list, string name, int? year)
+        {
+            return list.Count switch
+            {
+                <= 1 => list,
+                _ => list
+                    .Where(m => m.Name == name || m.AlternativeName == name)
+                    .Where(m => year == null || m.Year == year)
+                    .ToList()
+            };
+        }
         #endregion
 
         #region Scheduled Tasks

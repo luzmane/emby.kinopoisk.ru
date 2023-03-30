@@ -77,14 +77,15 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 }
             }
 
-            _log.Info($"Searching movies by name {info.Name}");
+            _log.Info($"Searching movies by name '{info.Name}' and year '{info.Year}'");
             KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(info.Name, info.Year, cancellationToken);
-            if (movies.Items.Count != 1)
+            List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, info.Name, info.Year);
+            if (relevantMovies.Count != 1)
             {
-                _log.Error($"Found {movies.Items.Count} movies, skipping movie update");
+                _log.Error($"Found {relevantMovies.Count} movies, skipping movie update");
                 return result;
             }
-            await CreateMovie(result, movies.Items[0], cancellationToken);
+            await CreateMovie(result, relevantMovies[0], cancellationToken);
             return result;
         }
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(MovieInfo searchInfo, CancellationToken cancellationToken)
@@ -154,7 +155,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             }
 
             KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(name, year, cancellationToken);
-            foreach (KpFilm movie in movies.Items)
+            List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, name, year);
+            foreach (KpFilm movie in relevantMovies)
             {
                 result.Add(CreateMovieFromKpFilm(movie));
             }
@@ -267,14 +269,15 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 }
             }
 
-            _log.Info($"Searching movies by name {item.Name}");
+            _log.Info($"Searching movies by name '{item.Name}' and year '{item.ProductionYear}'");
             KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(item.Name, item.ProductionYear, cancellationToken);
-            if (movies.Items.Count != 1)
+            List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, item.Name, item.ProductionYear);
+            if (relevantMovies.Count != 1)
             {
-                _log.Error($"Found {movies.Items.Count} movies, skipping image update");
+                _log.Error($"Found {relevantMovies.Count} movies, skipping image update");
                 return result;
             }
-            UpdateRemoteImageInfoList(movies.Items[0], result);
+            UpdateRemoteImageInfoList(relevantMovies[0], result);
             return result;
         }
 
@@ -348,14 +351,15 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 }
             }
 
-            _log.Info($"Searching series by name {info.Name}");
+            _log.Info($"Searching series by name '{info.Name}' and year '{info.Year}'");
             KpSearchResult<KpFilm> series = await _api.GetFilmsByNameAndYear(info.Name, info.Year, cancellationToken);
-            if (series.Items.Count != 1)
+            List<KpFilm> relevantSeries = FilterRelevantItems(series.Items, info.Name, info.Year);
+            if (relevantSeries.Count != 1)
             {
-                _log.Error($"Found {series.Items.Count} series, skipping series update");
+                _log.Error($"Found {relevantSeries.Count} series, skipping series update");
                 return result;
             }
-            await CreateSeries(result, series.Items[0], cancellationToken);
+            await CreateSeries(result, relevantSeries[0], cancellationToken);
             return result;
         }
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(SeriesInfo searchInfo, CancellationToken cancellationToken)
@@ -721,6 +725,17 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 }
             }
             _log.Info($"Added {result.People.Count} persons to the movie with id '{result.Item.GetProviderId(Plugin.PluginName)}'");
+        }
+        private static List<KpFilm> FilterRelevantItems(List<KpFilm> list, string name, int? year)
+        {
+            return list.Count switch
+            {
+                <= 1 => list,
+                _ => list
+                    .Where(m => m.NameRu == name || m.NameOriginal == name)
+                    .Where(m => year == null || m.Year == year)
+                    .ToList()
+            };
         }
 
         #endregion
