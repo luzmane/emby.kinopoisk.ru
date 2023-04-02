@@ -28,7 +28,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         public string Name => "Add KinopoiskId based on IMDB, TMDB";
         public string Key => "KinopoiskFromOther";
         public string Description => "Add KinopoiskId searching them by IMDB and TMDB ids. Support kinopoisk.dev only";
-        public string Category => "KinopoiskRu Plugin";
+        public string Category => Plugin.PluginTaskCategory;
         public bool IsHidden => false;
         public bool IsEnabled => false;
         public bool IsLogged => true;

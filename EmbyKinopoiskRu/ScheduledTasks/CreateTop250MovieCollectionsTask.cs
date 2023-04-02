@@ -24,7 +24,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         public string Name => "Create Top250 Movie collection from Kinopoisk";
         public string Key => "KinopoiskTop250Movie";
         public string Description => "Create movie collection based on top 250 list from Kinopoisk.ru. Support kinopoisk.dev only";
-        public string Category => "KinopoiskRu Plugin";
+        public string Category => Plugin.PluginTaskCategory;
         public bool IsHidden => false;
         public bool IsEnabled => false;
         public bool IsLogged => true;

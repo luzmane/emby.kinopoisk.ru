@@ -24,6 +24,7 @@ namespace EmbyKinopoiskRu
     public class Plugin : BasePlugin<PluginConfiguration>, IHasThumbImage, IHasWebPages, IHasTranslations
     {
         public const string PluginName = "KinopoiskRu";
+        public const string PluginTaskCategory = "KinopoiskRu Plugin";
 
         public static Plugin? Instance { get; private set; }
 
