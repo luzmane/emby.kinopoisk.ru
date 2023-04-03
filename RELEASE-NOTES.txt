@@ -1,3 +1,6 @@
+v.1.10.0
+- Add Update Plugin task which will update the DLL of the plugin from GitHub
+
 v.1.9.1
 - Tune movie/series search - filter API search result with name and year
 
