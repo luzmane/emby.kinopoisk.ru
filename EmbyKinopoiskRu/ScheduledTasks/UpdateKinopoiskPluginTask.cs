@@ -57,8 +57,8 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 new TaskTriggerInfo
                 {
                     Type = TaskTriggerInfo.TriggerWeekly,
-                    DayOfWeek = DayOfWeek.Sunday,
-                    TimeOfDayTicks = 180000000000,
+                    DayOfWeek = (DayOfWeek)new Random().Next(7),
+                    TimeOfDayTicks = new Random().Next(96) * 9000000000,
                     MaxRuntimeTicks = 36000000000
                 }
             };
