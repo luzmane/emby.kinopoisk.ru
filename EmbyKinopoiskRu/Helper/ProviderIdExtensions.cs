@@ -11,7 +11,7 @@ namespace EmbyKinopoiskRu.Helper
             return !string.IsNullOrEmpty(instance.GetSeriesProviderId(provider));
         }
 
-        public static string? GetSeriesProviderId(this EpisodeInfo instance, string name)
+        public static string GetSeriesProviderId(this EpisodeInfo instance, string name)
         {
             if (instance.SeriesProviderIds == null)
             {

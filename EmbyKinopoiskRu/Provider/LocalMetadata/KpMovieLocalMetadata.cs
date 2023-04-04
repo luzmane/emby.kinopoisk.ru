@@ -16,14 +16,14 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
 {
     public class KpMovieLocalMetadata : KpBaseLocalMetadata<Movie>
     {
-        private static readonly Regex NotAlphaNumeric = new(@"[^0-9ЁA-ZА-Я-]", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-        private static readonly Regex MultiSpaces = new(@" {2,}", RegexOptions.Compiled);
+        private static readonly Regex NotAlphaNumeric = new Regex(@"[^0-9ЁA-ZА-Я-]", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex MultiSpaces = new Regex(@" {2,}", RegexOptions.Compiled);
 
         private readonly ILogger _log;
 
         public KpMovieLocalMetadata(ILogManager logManager) : base(logManager)
         {
-            _log = logManager.GetLogger(GetType().FullName);
+            _log = logManager.GetLogger(GetType().Name);
         }
 
         public override async Task<MetadataResult<Movie>> GetMetadata(ItemInfo info, LibraryOptions libraryOptions, IDirectoryService directoryService, CancellationToken cancellationToken)
@@ -40,7 +40,7 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
             movieName = MultiSpaces.Replace(NotAlphaNumeric.Replace(movieName, " "), " ");
             var year = KpHelper.DetectYearFromMoviePath(info.Path, info.Name);
             _log.Info($"Searching movie by name - '{movieName}' and year - {year}");
-            List<Movie> movies = await Plugin.Instance!.GetKinopoiskService().GetMoviesByOriginalNameAndYear(movieName, year, cancellationToken);
+            List<Movie> movies = await Plugin.Instance.GetKinopoiskService().GetMoviesByOriginalNameAndYear(movieName, year, cancellationToken);
             if (movies.Count == 0)
             {
                 _log.Info($"Nothing found for movie name '{movieName}");
@@ -53,7 +53,7 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
             }
             else
             {
-                Movie? movieWithHighestRating = movies
+                Movie movieWithHighestRating = movies
                     .Where(m => m.CommunityRating != null)
                     .OrderByDescending(m => m.CommunityRating)
                     .FirstOrDefault();

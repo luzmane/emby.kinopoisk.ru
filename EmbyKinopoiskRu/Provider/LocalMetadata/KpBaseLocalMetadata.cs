@@ -13,21 +13,21 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
     public abstract class KpBaseLocalMetadata<T> : ILocalMetadataProvider<T>
         where T : BaseItem, IHasProviderIds, new()
     {
-        private static readonly Regex KinopoiskIdRegex = new(@"kp-?(?<kinopoiskId>\d+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private static readonly Regex KinopoiskIdRegex = new Regex(@"kp-?(?<kinopoiskId>\d+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private readonly ILogger _log;
 
         public string Name => Plugin.PluginName;
 
         protected KpBaseLocalMetadata(ILogManager logManager)
         {
-            _log = logManager.GetLogger(GetType().FullName);
+            _log = logManager.GetLogger(GetType().Name);
         }
 
         public virtual Task<MetadataResult<T>> GetMetadata(ItemInfo info, LibraryOptions libraryOptions, IDirectoryService directoryService, CancellationToken cancellationToken)
         {
             _log.Info("GetMetadata");
             _log.Info($"info.Path - {info.Path}");
-            MetadataResult<T> result = new();
+            var result = new MetadataResult<T>();
 
             if (!string.IsNullOrEmpty(info.Path))
             {
@@ -35,7 +35,7 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
                 if (match.Success && int.TryParse(match.Groups["kinopoiskId"].Value, out var kinopoiskId))
                 {
                     _log.Info($"Detected kinopoisk id '{kinopoiskId}' for file '{info.Path}'");
-                    T item = new();
+                    var item = new T();
                     item.SetProviderId(Plugin.PluginName, match.Groups["kinopoiskId"].Value);
 
                     result.Item = item;

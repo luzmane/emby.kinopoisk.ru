@@ -37,7 +37,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         private readonly ILibraryManager _libraryManager;
         private readonly ICollectionManager _collectionManager;
         private PluginConfiguration PluginConfig { get; set; }
-        private readonly List<KpMovieType?> _movieTypes = new() { KpMovieType.Anime, KpMovieType.Movie, KpMovieType.Cartoon };
+        private readonly List<KpMovieType?> _movieTypes = new List<KpMovieType?>() { KpMovieType.Anime, KpMovieType.Movie, KpMovieType.Cartoon };
 
         internal KinopoiskDevService(
             ILogManager logManager
@@ -64,12 +64,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
                 _log.Warn($"The Token for {Plugin.PluginName} is empty");
-                return new();
+                return new List<Movie>();
             }
 
             KpSearchResult<KpMovie> movies = await _api.GetMoviesByMovieDetails(name, year, cancellationToken);
             List<KpMovie> relevantMovies = FilterRelevantItems(movies.Docs, name, year);
-            List<Movie> toReturn = new();
+            var toReturn = new List<Movie>();
             foreach (KpMovie movie in relevantMovies)
             {
                 toReturn.Add(await CreateMovieFromKpMovie(movie, cancellationToken));
@@ -79,7 +79,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         }
         public async Task<MetadataResult<Movie>> GetMetadata(MovieInfo info, CancellationToken cancellationToken)
         {
-            MetadataResult<Movie> result = new()
+            var result = new MetadataResult<Movie>()
             {
                 ResultLanguage = "ru"
             };
@@ -96,7 +96,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 if (!string.IsNullOrWhiteSpace(movieId))
                 {
                     _log.Info($"Searching movie by movie id '{movieId}'");
-                    KpMovie? movie = await _api.GetMovieById(movieId, cancellationToken);
+                    KpMovie movie = await _api.GetMovieById(movieId, cancellationToken);
                     if (movie != null)
                     {
                         result.Item = await CreateMovieFromKpMovie(movie, cancellationToken);
@@ -123,7 +123,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         }
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(MovieInfo searchInfo, CancellationToken cancellationToken)
         {
-            List<RemoteSearchResult> result = new();
+            var result = new List<RemoteSearchResult>();
 
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
@@ -137,11 +137,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 if (!string.IsNullOrWhiteSpace(movieId))
                 {
                     _log.Info($"Searching movie by id '{movieId}'");
-                    KpMovie? movie = await _api.GetMovieById(movieId, cancellationToken);
+                    KpMovie movie = await _api.GetMovieById(movieId, cancellationToken);
                     if (movie != null)
                     {
                         var imageUrl = (movie.Poster?.PreviewUrl ?? movie.Poster?.Url) ?? string.Empty;
-                        RemoteSearchResult item = new()
+                        var item = new RemoteSearchResult()
                         {
                             Name = movie.Name,
                             ImageUrl = imageUrl,
@@ -162,7 +162,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             foreach (KpMovie movie in movies.Docs)
             {
                 var imageUrl = (movie.Poster?.PreviewUrl ?? movie.Poster?.Url) ?? string.Empty;
-                RemoteSearchResult item = new()
+                var item = new RemoteSearchResult()
                 {
                     Name = movie.Name,
                     ImageUrl = imageUrl,
@@ -181,7 +181,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             _log.Info($"Movie '{movie.Name}' with {Plugin.PluginName} id '{movie.Id}' found");
 
             var movieId = movie.Id.ToString(CultureInfo.InvariantCulture);
-            Movie toReturn = new()
+            var toReturn = new Movie()
             {
                 CommunityRating = movie.Rating?.Kp,
                 CriticRating = movie.Rating?.FilmCritics * 10,
@@ -215,31 +215,31 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 toReturn.ProviderIds.Add(MetadataProviders.Tmdb.ToString(), movie.ExternalId.Tmdb.ToString());
             }
 
-            IEnumerable<string?>? genres = movie.Genres?.Select(i => i.Name).AsEnumerable();
+            IEnumerable<string> genres = movie.Genres?.Select(i => i.Name).AsEnumerable();
             if (genres != null)
             {
                 toReturn.SetGenres(genres);
             }
 
-            IEnumerable<string?>? studios = movie.ProductionCompanies?.Select(i => i.Name).AsEnumerable();
+            IEnumerable<string> studios = movie.ProductionCompanies?.Select(i => i.Name).AsEnumerable();
             if (studios != null)
             {
                 toReturn.SetStudios(studios);
             }
 
             movie.Videos?.Teasers?
-                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube", StringComparison.OrdinalIgnoreCase))
-                .Select(i => i.Url!
-                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase)
-                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase))
+                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube"))
+                .Select(i => i.Url
+                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
+                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
                 .Reverse()
                 .ToList()
                 .ForEach(j => toReturn.AddTrailerUrl(j));
             movie.Videos?.Trailers?
-                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube", StringComparison.OrdinalIgnoreCase))
-                .Select(i => i.Url!
-                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase)
-                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase))
+                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube"))
+                .Select(i => i.Url
+                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
+                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
                 .Reverse()
                 .ToList()
                 .ForEach(j => toReturn.AddTrailerUrl(j));
@@ -257,7 +257,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         #region SeriesProvider
         public async Task<MetadataResult<Series>> GetMetadata(SeriesInfo info, CancellationToken cancellationToken)
         {
-            MetadataResult<Series> result = new()
+            var result = new MetadataResult<Series>()
             {
                 ResultLanguage = "ru"
             };
@@ -274,7 +274,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 if (!string.IsNullOrWhiteSpace(seriesId))
                 {
                     _log.Info($"Fetching series by series id '{seriesId}'");
-                    KpMovie? item = await _api.GetMovieById(seriesId, cancellationToken);
+                    KpMovie item = await _api.GetMovieById(seriesId, cancellationToken);
                     if (item != null)
                     {
                         result.Item = await CreateSeriesFromKpMovie(item, cancellationToken);
@@ -301,7 +301,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         }
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(SeriesInfo searchInfo, CancellationToken cancellationToken)
         {
-            List<RemoteSearchResult> result = new();
+            var result = new List<RemoteSearchResult>();
 
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
@@ -315,11 +315,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 if (!string.IsNullOrWhiteSpace(seriesId))
                 {
                     _log.Info($"Searching series by id '{seriesId}'");
-                    KpMovie? series = await _api.GetMovieById(seriesId, cancellationToken);
+                    KpMovie series = await _api.GetMovieById(seriesId, cancellationToken);
                     if (series != null)
                     {
                         var imageUrl = (series.Poster?.PreviewUrl ?? series.Poster?.Url) ?? string.Empty;
-                        RemoteSearchResult item = new()
+                        var item = new RemoteSearchResult()
                         {
                             Name = series.Name,
                             ImageUrl = imageUrl,
@@ -340,7 +340,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             foreach (KpMovie series in seriesResult.Docs)
             {
                 var imageUrl = (series.Poster?.PreviewUrl ?? series.Poster?.Url) ?? string.Empty;
-                RemoteSearchResult item = new()
+                var item = new RemoteSearchResult()
                 {
                     Name = series.Name,
                     ImageUrl = imageUrl,
@@ -359,7 +359,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             _log.Info($"Series '{series.Name}' with KinopoiskId '{series.Id}' found");
 
             var seriesId = series.Id.ToString(CultureInfo.InvariantCulture);
-            Series toReturn = new()
+            var toReturn = new Series()
             {
                 CommunityRating = series.Rating?.Kp,
                 CriticRating = series.Rating?.FilmCritics * 10,
@@ -394,31 +394,31 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 toReturn.ProviderIds.Add(MetadataProviders.Tmdb.ToString(), series.ExternalId.Tmdb.ToString());
             }
 
-            IEnumerable<string?>? genres = series.Genres?.Select(i => i.Name).AsEnumerable();
+            IEnumerable<string> genres = series.Genres?.Select(i => i.Name).AsEnumerable();
             if (genres != null)
             {
                 toReturn.SetGenres(genres);
             }
 
-            IEnumerable<string?>? studios = series.ProductionCompanies?.Select(i => i.Name).AsEnumerable();
+            IEnumerable<string> studios = series.ProductionCompanies?.Select(i => i.Name).AsEnumerable();
             if (studios != null)
             {
                 toReturn.SetStudios(studios);
             }
 
             series.Videos?.Teasers?
-                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube", StringComparison.OrdinalIgnoreCase))
-                .Select(i => i.Url!
-                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase)
-                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase))
+                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube"))
+                .Select(i => i.Url
+                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
+                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
                 .Reverse()
                 .ToList()
                 .ForEach(j => toReturn.AddTrailerUrl(j));
             series.Videos?.Trailers?
-                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube", StringComparison.OrdinalIgnoreCase))
-                .Select(i => i.Url!
-                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase)
-                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase))
+                .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube"))
+                .Select(i => i.Url
+                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
+                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
                 .Reverse()
                 .ToList()
                 .ForEach(j => toReturn.AddTrailerUrl(j));
@@ -435,7 +435,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         #region EpisodeProvider
         public async Task<MetadataResult<Episode>> GetMetadata(EpisodeInfo info, CancellationToken cancellationToken)
         {
-            MetadataResult<Episode> result = new()
+            var result = new MetadataResult<Episode>()
             {
                 ResultLanguage = "ru"
             };
@@ -464,19 +464,19 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             _log.Info($"Searching episode by series id '{seriesId}', season index '{info.ParentIndexNumber}' and episode index '{info.IndexNumber}'");
-            KpSearchResult<KpSeason>? item = await _api.GetEpisodesBySeriesId(seriesId, cancellationToken);
+            KpSearchResult<KpSeason> item = await _api.GetEpisodesBySeriesId(seriesId, cancellationToken);
             if (item == null)
             {
                 _log.Info($"Episodes by series id '{seriesId}' not found");
                 return result;
             }
-            KpSeason? kpSeason = item.Docs.FirstOrDefault(s => s.Number == info.ParentIndexNumber);
+            KpSeason kpSeason = item.Docs.FirstOrDefault(s => s.Number == info.ParentIndexNumber);
             if (kpSeason == null)
             {
                 _log.Info($"Season with index '{info.ParentIndexNumber}' not found");
                 return result;
             }
-            KpEpisode? kpEpisode = kpSeason.Episodes?.FirstOrDefault(e => e.Number == info.IndexNumber);
+            KpEpisode kpEpisode = kpSeason.Episodes?.FirstOrDefault(e => e.Number == info.IndexNumber);
             if (kpEpisode == null)
             {
                 _log.Info($"Episode with index '{info.IndexNumber}' not found");
@@ -488,7 +488,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.None,
                 out DateTimeOffset premiereDate);
-            result.Item = new()
+            result.Item = new Episode()
             {
                 Name = kpEpisode.Name,
                 OriginalTitle = kpEpisode.EnName,
@@ -506,7 +506,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         #region PersonProvider
         public async Task<MetadataResult<Person>> GetMetadata(PersonLookupInfo info, CancellationToken cancellationToken)
         {
-            MetadataResult<Person> result = new()
+            var result = new MetadataResult<Person>()
             {
                 ResultLanguage = "ru"
             };
@@ -523,7 +523,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 if (!string.IsNullOrWhiteSpace(personId))
                 {
                     _log.Info($"Fetching person by person id '{personId}'");
-                    KpPerson? person = await _api.GetPersonById(personId, cancellationToken);
+                    KpPerson person = await _api.GetPersonById(personId, cancellationToken);
                     if (person != null)
                     {
                         result.Item = CreatePersonFromKpPerson(person);
@@ -547,7 +547,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         }
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(PersonLookupInfo searchInfo, CancellationToken cancellationToken)
         {
-            List<RemoteSearchResult> result = new();
+            var result = new List<RemoteSearchResult>();
 
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
@@ -561,10 +561,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 if (!string.IsNullOrWhiteSpace(personId))
                 {
                     _log.Info($"Searching person by id '{personId}'");
-                    KpPerson? person = await _api.GetPersonById(personId, cancellationToken);
+                    KpPerson person = await _api.GetPersonById(personId, cancellationToken);
                     if (person != null)
                     {
-                        RemoteSearchResult item = new()
+                        var item = new RemoteSearchResult()
                         {
                             Name = person.Name,
                             ImageUrl = person.Photo,
@@ -581,7 +581,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             KpSearchResult<KpPerson> persons = await _api.GetPersonsByName(searchInfo.Name, cancellationToken);
             foreach (KpPerson person in persons.Docs)
             {
-                RemoteSearchResult item = new()
+                var item = new RemoteSearchResult()
                 {
                     Name = person.Name,
                     ImageUrl = person.Photo,
@@ -597,7 +597,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             _log.Info($"Person '{person.Name}' with KinopoiskId '{person.Id}' found");
 
-            Person toReturn = new()
+            var toReturn = new Person()
             {
                 Name = person.Name,
                 SortName = person.Name,
@@ -610,15 +610,15 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             {
                 toReturn.EndDate = deathDay;
             }
-            string?[]? birthPlace = person.BirthPlace?.Select(i => i.Value).ToArray();
+            var birthPlace = person.BirthPlace?.Select(i => i.Value).ToArray();
             if (birthPlace != null && birthPlace.Length > 0 && !string.IsNullOrWhiteSpace(birthPlace[0]))
             {
                 toReturn.ProductionLocations = new string[] { string.Join(", ", birthPlace) };
             }
-            string?[]? facts = person.Facts?.Select(i => i.Value).ToArray();
+            var facts = person.Facts?.Select(i => i.Value).ToArray();
             if (facts != null && facts.Length > 0 && !string.IsNullOrWhiteSpace(facts[0]))
             {
-                toReturn.Overview = string.Join('\n', facts);
+                toReturn.Overview = string.Join("\n", facts);
             }
             return toReturn;
         }
@@ -627,7 +627,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         #region MovieImageProvider
         public async Task<IEnumerable<RemoteImageInfo>> GetImages(BaseItem item, LibraryOptions libraryOptions, CancellationToken cancellationToken)
         {
-            List<RemoteImageInfo> result = new();
+            var result = new List<RemoteImageInfo>();
 
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
@@ -641,7 +641,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 if (!string.IsNullOrWhiteSpace(movieId))
                 {
                     _log.Info($"Searching images by movie id '{movieId}'");
-                    KpMovie? movie = await _api.GetMovieById(movieId, cancellationToken);
+                    KpMovie movie = await _api.GetMovieById(movieId, cancellationToken);
                     if (movie != null)
                     {
                         UpdateRemoteImageInfoList(movie, result);
@@ -705,7 +705,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         #endregion
 
         #region Common
-        private static DateTimeOffset? GetEndDate(List<KpYearRange>? releaseYears)
+        private static DateTimeOffset? GetEndDate(List<KpYearRange> releaseYears)
         {
             if (releaseYears == null || releaseYears.Count == 0)
             {
@@ -715,7 +715,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             releaseYears
                 .Where(i => i.End != null)
                 .ToList()
-                .ForEach(i => max = Math.Max((int)max, (int)i.End!));
+                .ForEach(i => max = Math.Max((int)max, (int)i.End));
 
             return DateTimeOffset.TryParseExact(
                             max.ToString(CultureInfo.InvariantCulture),
@@ -724,9 +724,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                             DateTimeStyles.None,
                             out DateTimeOffset result)
                 ? result
-                : null;
+                : (DateTimeOffset?)null;
         }
-        private async Task UpdatePersonsList<T>(MetadataResult<T> result, List<KpPersonMovie>? persons, CancellationToken cancellationToken)
+        private async Task UpdatePersonsList<T>(MetadataResult<T> result, List<KpPersonMovie> persons, CancellationToken cancellationToken)
             where T : BaseItem
         {
             if (persons == null)
@@ -768,7 +768,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 {
                     _log.Debug($"Adding {name} as '{personType}' to {seriesName}");
                     _ = idRoleDictionary.TryGetValue(kpPerson.Id, out var role);
-                    PersonInfo person = new()
+                    var person = new PersonInfo()
                     {
                         Name = name,
                         ImageUrl = kpPerson.Photo,
@@ -786,7 +786,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             _log.Info($"Adding '{toReturn.Name}' to collection");
 
-            CollectionFolder? rootCollectionFolder = await EmbyHelper.InsureCollectionLibraryFolder(_libraryManager, _log);
+            CollectionFolder rootCollectionFolder = await EmbyHelper.InsureCollectionLibraryFolder(_libraryManager, _log);
             if (rootCollectionFolder == null)
             {
                 _log.Info($"The virtual folder 'Collections' was not found nor created");
@@ -802,7 +802,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 .Select(item => item.InternalId)
                 .ToList();
 
-            BoxSet? collection = EmbyHelper.SearchExistingCollection(internalIdArray, _libraryManager, _log);
+            BoxSet collection = EmbyHelper.SearchExistingCollection(internalIdArray, _libraryManager, _log);
             if (collection == null && internalCollectionItems.Count > 0)
             {
                 var newCollectionName = GetNewCollectionName(movie);
@@ -850,12 +850,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 .Where(m => !string.IsNullOrWhiteSpace(m.Name))
                 .OrderBy(m => m.Id)
                 .FirstOrDefault();
-            return name!;
+            return name;
         }
-        private static string? PrepareOverview(KpMovie movie)
+        private static string PrepareOverview(KpMovie movie)
         {
             var subj = $"<br/><br/><b>Интересное:</b><ul>";
-            StringBuilder sb = new(subj);
+            var sb = new StringBuilder(subj);
             movie.Facts?
                 .Where(f => !f.Spoiler && "FACT".Equals(f.Type, StringComparison.OrdinalIgnoreCase))
                 .ToList()
@@ -868,21 +868,24 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         }
         private static List<KpMovie> FilterRelevantItems(List<KpMovie> list, string name, int? year)
         {
-            return list.Count switch
+            if (list.Count > 1)
             {
-                <= 1 => list,
-                _ => list
+                return list
                     .Where(m => m.Name == name || m.AlternativeName == name)
                     .Where(m => year == null || m.Year == year)
-                    .ToList()
-            };
+                    .ToList();
+            }
+            else
+            {
+                return list;
+            }
         }
         #endregion
 
         #region Scheduled Tasks
         public async Task<List<Movie>> GetTop250MovieCollection(CancellationToken cancellationToken)
         {
-            List<Movie> toReturn = new();
+            var toReturn = new List<Movie>();
             KpSearchResult<KpMovie> movies = await _api.GetTop250Collection(cancellationToken);
             movies.Docs
                 .Where(m => _movieTypes.Contains(m.TypeNumber))
@@ -910,7 +913,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         }
         public async Task<List<Series>> GetTop250SeriesCollection(CancellationToken cancellationToken)
         {
-            List<Series> toReturn = new();
+            var toReturn = new List<Series>();
             KpSearchResult<KpMovie> movies = await _api.GetTop250Collection(cancellationToken);
             movies.Docs
                 .Where(m => !_movieTypes.Contains(m.TypeNumber))
@@ -941,30 +944,30 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             KpSearchResult<KpMovie> movies = await _api.GetKpIdByAnotherId(externalIdType, idList, cancellationToken);
             if (movies.HasError)
             {
-                return new(new Dictionary<string, long>())
+                return new ApiResult<Dictionary<string, long>>(new Dictionary<string, long>())
                 {
                     HasError = true
                 };
             }
             if (MetadataProviders.Imdb.ToString() == externalIdType)
             {
-                return new(movies.Docs
+                return new ApiResult<Dictionary<string, long>>(movies.Docs
                     .Where(m => !string.IsNullOrWhiteSpace(m.ExternalId?.Imdb))
                     .ToDictionary(
-                        m => m.ExternalId!.Imdb!,
+                        m => m.ExternalId.Imdb,
                         m => m.Id
                     ));
             }
             if (MetadataProviders.Tmdb.ToString() == externalIdType)
             {
-                return new(movies.Docs
+                return new ApiResult<Dictionary<string, long>>(movies.Docs
                     .Where(m => m.ExternalId?.Tmdb != null && m.ExternalId.Tmdb > 0)
                     .ToDictionary(
-                        m => ((long)m.ExternalId!.Tmdb!).ToString(CultureInfo.InvariantCulture),
+                        m => ((long)m.ExternalId.Tmdb).ToString(CultureInfo.InvariantCulture),
                         m => m.Id
                     ));
             }
-            return new(new Dictionary<string, long>())
+            return new ApiResult<Dictionary<string, long>>(new Dictionary<string, long>())
             {
                 HasError = true
             };

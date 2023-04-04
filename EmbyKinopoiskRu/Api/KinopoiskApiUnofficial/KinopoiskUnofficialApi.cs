@@ -38,7 +38,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             _activityManager = activityManager;
         }
 
-        internal async Task<KpFilm?> GetFilmById(string movieId, CancellationToken cancellationToken)
+        internal async Task<KpFilm> GetFilmById(string movieId, CancellationToken cancellationToken)
         {
             var url = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/{movieId}";
             var response = await SendRequest(url, cancellationToken);
@@ -46,14 +46,14 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         }
         internal async Task<KpSearchResult<KpFilm>> GetFilmsByNameAndYear(string name, int? year, CancellationToken cancellationToken)
         {
-            var hasYear = year is not null and > 1000;
+            var hasYear = year != null && year > 1000;
             var url = $"https://kinopoiskapiunofficial.tech/api/v2.2/films?keyword={name}";
 
             if (hasYear)
             {
                 var request = url + $"&yearFrom={year}&yearTo={year}";
                 var json = await SendRequest(request, cancellationToken);
-                KpSearchResult<KpFilm>? toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpFilm>>(json);
+                KpSearchResult<KpFilm> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpFilm>>(json);
                 if (toReturn != null && toReturn.Items.Count > 0)
                 {
                     // remove films with incorrect year
@@ -80,7 +80,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             else
             {
                 var json = await SendRequest(url, cancellationToken);
-                KpSearchResult<KpFilm>? toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpFilm>>(json);
+                KpSearchResult<KpFilm> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpFilm>>(json);
                 if (toReturn != null && toReturn.Items.Count > 0)
                 {
                     // remove films with incorrect name
@@ -97,27 +97,27 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     return toReturn;
                 }
             }
-            return new();
+            return new KpSearchResult<KpFilm>();
         }
         internal async Task<List<KpFilmStaff>> GetStaffByFilmId(string movieId, CancellationToken cancellationToken)
         {
             var url = $"https://kinopoiskapiunofficial.tech/api/v1/staff?filmId={movieId}";
             var response = await SendRequest(url, cancellationToken);
-            return string.IsNullOrEmpty(response) ? new() : _jsonSerializer.DeserializeFromString<List<KpFilmStaff>>(response);
+            return string.IsNullOrEmpty(response) ? new List<KpFilmStaff>() : _jsonSerializer.DeserializeFromString<List<KpFilmStaff>>(response);
         }
         internal async Task<List<KpVideo>> GetVideosByFilmId(string movieId, CancellationToken cancellationToken)
         {
             var url = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/{movieId}/videos";
             var response = await SendRequest(url, cancellationToken);
-            return string.IsNullOrEmpty(response) ? new() : _jsonSerializer.DeserializeFromString<List<KpVideo>>(response);
+            return string.IsNullOrEmpty(response) ? new List<KpVideo>() : _jsonSerializer.DeserializeFromString<List<KpVideo>>(response);
         }
-        internal async Task<KpSearchResult<KpSeason>?> GetEpisodesBySeriesId(string seriesId, CancellationToken cancellationToken)
+        internal async Task<KpSearchResult<KpSeason>> GetEpisodesBySeriesId(string seriesId, CancellationToken cancellationToken)
         {
             var url = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/{seriesId}/seasons";
             var response = await SendRequest(url, cancellationToken);
             return string.IsNullOrEmpty(response) ? null : _jsonSerializer.DeserializeFromString<KpSearchResult<KpSeason>>(response);
         }
-        internal async Task<KpPerson?> GetPersonById(string personId, CancellationToken cancellationToken)
+        internal async Task<KpPerson> GetPersonById(string personId, CancellationToken cancellationToken)
         {
             var url = $"https://kinopoiskapiunofficial.tech/api/v1/staff/{personId}";
             var response = await SendRequest(url, cancellationToken);
@@ -127,7 +127,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         {
             var url = $"https://kinopoiskapiunofficial.tech/api/v1/persons?name={name}";
             var response = await SendRequest(url, cancellationToken);
-            return string.IsNullOrEmpty(response) ? new() : _jsonSerializer.DeserializeFromString<KpSearchResult<KpPerson>>(response);
+            return string.IsNullOrEmpty(response) ? new KpSearchResult<KpPerson>() : _jsonSerializer.DeserializeFromString<KpSearchResult<KpPerson>>(response);
         }
 
         private async Task<string> SendRequest(string url, CancellationToken cancellationToken)
@@ -180,7 +180,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         private async Task<string> SendRequest(string token, string url, CancellationToken cancellationToken)
         {
             _log.Debug($"Sending request to {url}");
-            HttpRequestOptions options = new()
+            var options = new HttpRequestOptions()
             {
                 CancellationToken = cancellationToken,
                 Url = url,
@@ -188,24 +188,31 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 CacheLength = TimeSpan.FromHours(12),
                 CacheMode = CacheMode.Unconditional,
                 TimeoutMs = 180000,
+                DecompressionMethod = CompressionMethod.Gzip,
+                EnableHttpCompression = true,
+                EnableDefaultUserAgent = true,
             };
             options.Sanitation.SanitizeDefaultParams = false;
             options.RequestHeaders.Add("X-API-KEY", token);
             try
             {
-                using HttpResponseInfo response = await _httpClient.SendAsync(options, "GET");
-                var statusCode = (int)response.StatusCode;
-                if ((int)response.StatusCode is >= 200 and < 300)
+                using (HttpResponseInfo response = await _httpClient.SendAsync(options, "GET"))
                 {
-                    using StreamReader reader = new(response.Content);
-                    var result = await reader.ReadToEndAsync();
-                    _log.Info($"Received response: '{result}'");
-                    return result;
-                }
-                else
-                {
-                    _log.Error($"Received '{response.StatusCode}' from API");
-                    return response.StatusCode.ToString();
+                    var statusCode = (int)response.StatusCode;
+                    if (statusCode >= 200 && statusCode < 300)
+                    {
+                        using (var reader = new StreamReader(response.Content))
+                        {
+                            var result = await reader.ReadToEndAsync();
+                            _log.Info($"Received response: '{result}'");
+                            return result;
+                        }
+                    }
+                    else
+                    {
+                        _log.Error($"Received '{response.StatusCode}' from API");
+                        return response.StatusCode.ToString();
+                    }
                 }
             }
             catch (Exception ex)

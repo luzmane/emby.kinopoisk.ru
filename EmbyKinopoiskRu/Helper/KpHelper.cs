@@ -13,9 +13,9 @@ namespace EmbyKinopoiskRu.Helper
 {
     internal class KpHelper
     {
-        private static readonly Regex Year = new("(?<year>[0-9]{4})", RegexOptions.Compiled);
+        private static readonly Regex Year = new Regex("(?<year>[0-9]{4})", RegexOptions.Compiled);
 
-        internal static DateTimeOffset? GetPremierDate(KpPremiere? premiere)
+        internal static DateTimeOffset? GetPremierDate(KpPremiere premiere)
         {
             if (premiere == null)
             {
@@ -77,13 +77,13 @@ namespace EmbyKinopoiskRu.Helper
             }
             return null;
         }
-        internal static PersonType? GetPersonType(string? enProfesson)
+        internal static PersonType? GetPersonType(string enProfesson)
         {
-            return Enum.TryParse(enProfesson, true, out PersonType result) ? result : null;
+            return Enum.TryParse(enProfesson, true, out PersonType result) ? result : (PersonType?)null;
         }
         internal static void AddToActivityLog(IActivityManager activityManager, string overview, string shortOverview)
         {
-            activityManager.Create(new()
+            activityManager.Create(new ActivityLogEntry()
             {
                 Name = Plugin.PluginName,
                 Type = "PluginError",
@@ -95,7 +95,7 @@ namespace EmbyKinopoiskRu.Helper
         internal static int? DetectYearFromMoviePath(string filePath, string movieName)
         {
             var fileName = Path.GetFileNameWithoutExtension(filePath);
-            fileName = fileName.Replace(movieName, " ", StringComparison.OrdinalIgnoreCase);
+            fileName = fileName.Replace(movieName, " ");
             var yearSt = string.Empty;
             if (!string.IsNullOrWhiteSpace(fileName))
             {
@@ -104,7 +104,7 @@ namespace EmbyKinopoiskRu.Helper
             }
             _ = int.TryParse(yearSt, out var year);
             _ = int.TryParse(DateTime.Now.ToString("yyyy", CultureInfo.InvariantCulture), out var currentYear);
-            return (year > 1800 && year <= currentYear + 1) ? year : null;
+            return (year > 1800 && year <= currentYear + 1) ? year : (int?)null;
         }
     }
 }

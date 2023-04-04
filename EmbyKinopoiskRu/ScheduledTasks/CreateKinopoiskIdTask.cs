@@ -20,7 +20,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
     {
         private readonly ILogger _log;
         private static bool _isScanRunning;
-        private static readonly object ScanLock = new();
+        private static readonly object ScanLock = new object();
         private const int CHUNK_SIZE = 150;
 
         private readonly ILibraryManager _libraryManager;

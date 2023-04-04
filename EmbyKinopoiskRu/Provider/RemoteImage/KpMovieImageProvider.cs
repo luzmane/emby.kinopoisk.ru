@@ -25,7 +25,7 @@ namespace EmbyKinopoiskRu.Provider.RemoteImage
 
         public bool Supports(BaseItem item)
         {
-            return item is Movie or Series;
+            return item is Movie || item is Series;
         }
         public IEnumerable<ImageType> GetSupportedImages(BaseItem item)
         {
@@ -47,7 +47,7 @@ namespace EmbyKinopoiskRu.Provider.RemoteImage
         }
         public async Task<IEnumerable<RemoteImageInfo>> GetImages(BaseItem item, LibraryOptions libraryOptions, CancellationToken cancellationToken)
         {
-            return await Plugin.Instance!.GetKinopoiskService().GetImages(item, libraryOptions, cancellationToken);
+            return await Plugin.Instance.GetKinopoiskService().GetImages(item, libraryOptions, cancellationToken);
         }
     }
 }

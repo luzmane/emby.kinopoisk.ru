@@ -30,11 +30,11 @@ namespace EmbyKinopoiskRu.Provider.RemoteMetadata
         }
         public async Task<MetadataResult<Person>> GetMetadata(PersonLookupInfo info, CancellationToken cancellationToken)
         {
-            return await Plugin.Instance!.GetKinopoiskService().GetMetadata(info, cancellationToken);
+            return await Plugin.Instance.GetKinopoiskService().GetMetadata(info, cancellationToken);
         }
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(PersonLookupInfo searchInfo, CancellationToken cancellationToken)
         {
-            return await Plugin.Instance!.GetKinopoiskService().GetSearchResults(searchInfo, cancellationToken);
+            return await Plugin.Instance.GetKinopoiskService().GetSearchResults(searchInfo, cancellationToken);
         }
     }
 }

@@ -26,9 +26,9 @@ namespace EmbyKinopoiskRu
         public const string PluginName = "KinopoiskRu";
         public const string PluginTaskCategory = "KinopoiskRu Plugin";
 
-        public static Plugin? Instance { get; private set; }
+        public static Plugin Instance { get; private set; }
 
-        private readonly Dictionary<string, IKinopoiskRuService> _kinopoiskServiciesDictionary = new();
+        private readonly Dictionary<string, IKinopoiskRuService> _kinopoiskServiciesDictionary = new Dictionary<string, IKinopoiskRuService>();
         private readonly IHttpClient _httpClient;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly ILogManager _logManager;
@@ -66,7 +66,7 @@ namespace EmbyKinopoiskRu
         public Stream GetThumbImage()
         {
             Type type = GetType();
-            return type.Assembly.GetManifestResourceStream(type.Namespace + ".thumb.png")!;
+            return type.Assembly.GetManifestResourceStream(type.Namespace + ".thumb.png");
         }
         public IEnumerable<PluginPageInfo> GetPages()
         {
@@ -92,7 +92,7 @@ namespace EmbyKinopoiskRu
                 .Select(i =>
                     new TranslationInfo()
                     {
-                        Locale = Path.GetFileNameWithoutExtension(i[basePath.Length..]),
+                        Locale = Path.GetFileNameWithoutExtension(i.Substring(basePath.Length)),
                         EmbeddedResourcePath = i
                     })
                 .ToArray();
@@ -101,8 +101,8 @@ namespace EmbyKinopoiskRu
         {
             if (PluginConfiguration.KinopoiskDev.Equals(Configuration.ApiType, StringComparison.Ordinal))
             {
-                _log!.Info($"Fetching {PluginConfiguration.KinopoiskDev} service");
-                if (!_kinopoiskServiciesDictionary.TryGetValue("KinopoiskDev", out IKinopoiskRuService? result))
+                _log.Info($"Fetching {PluginConfiguration.KinopoiskDev} service");
+                if (!_kinopoiskServiciesDictionary.TryGetValue("KinopoiskDev", out IKinopoiskRuService result))
                 {
                     result = new KinopoiskDevService(_logManager, _httpClient, _jsonSerializer, _activityManager, _libraryManager, _collectionManager);
                     _kinopoiskServiciesDictionary.Add("KinopoiskDev", result);
@@ -111,8 +111,8 @@ namespace EmbyKinopoiskRu
             }
             if (PluginConfiguration.KinopoiskAPIUnofficialTech.Equals(Configuration.ApiType, StringComparison.Ordinal))
             {
-                _log!.Info($"Fetching {PluginConfiguration.KinopoiskAPIUnofficialTech} service");
-                if (!_kinopoiskServiciesDictionary.TryGetValue("KinopoiskUnofficial", out IKinopoiskRuService? result))
+                _log.Info($"Fetching {PluginConfiguration.KinopoiskAPIUnofficialTech} service");
+                if (!_kinopoiskServiciesDictionary.TryGetValue("KinopoiskUnofficial", out IKinopoiskRuService result))
                 {
                     result = new KinopoiskUnofficialService(_logManager, _httpClient, _jsonSerializer, _activityManager);
                     _kinopoiskServiciesDictionary.Add("KinopoiskUnofficial", result);

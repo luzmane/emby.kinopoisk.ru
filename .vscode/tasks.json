@@ -59,7 +59,7 @@
             "command": "mv",
             "type": "shell",
             "args": [
-                "${workspaceFolder}/EmbyKinopoiskRu/bin/Debug/net6.0/EmbyKinopoiskRu.dll",
+                "${workspaceFolder}/EmbyKinopoiskRu/bin/Debug/netstandard2.0/EmbyKinopoiskRu.dll",
                 "${workspaceFolder}/../emby/plugins/"
             ],
             "problemMatcher": {

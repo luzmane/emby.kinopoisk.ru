@@ -19,7 +19,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
     public class CreateTop250MovieCollectionsTask : CreateTop250Base, IScheduledTask, IConfigurableScheduledTask
     {
         private static bool _isScanRunning;
-        private static readonly object ScanLock = new();
+        private static readonly object ScanLock = new object();
 
         public string Name => "Create Top250 Movie collection from Kinopoisk";
         public string Key => "KinopoiskTop250Movie";
@@ -101,7 +101,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             var anyProviderIdEquals = movies
                 .SelectMany(m =>
                 {
-                    List<KeyValuePair<string, string>> toReturn = new()
+                    var toReturn = new List<KeyValuePair<string, string>>()
                     {
                         new KeyValuePair<string, string>(Plugin.PluginName, m.GetProviderId(Plugin.PluginName))
                     };
@@ -125,7 +125,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                     IsVirtualItem = false,
                     ParentIds = new long[] { library.InternalId },
                 })
-                : new();
+                : new QueryResult<BaseItem>();
             var moviesInLibrary = moviesInLibraryQueryResult.Items
                             .Where(i => i.LocationType == LocationType.FileSystem && i.MediaType == "Video")
                             .Where(i => i.Path != null && !i.IsVirtualItem)

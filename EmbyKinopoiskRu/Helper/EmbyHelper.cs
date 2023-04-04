@@ -30,16 +30,16 @@ namespace EmbyKinopoiskRu.Helper
                 .Where(i => MemoryExtensions.Equals(i.CollectionType.AsSpan(), CollectionType.BoxSets.Span, StringComparison.OrdinalIgnoreCase))
                 .ToList();
         }
-        internal static async Task<CollectionFolder?> InsureCollectionLibraryFolder(ILibraryManager libraryManager, ILogger logger)
+        internal static async Task<CollectionFolder> InsureCollectionLibraryFolder(ILibraryManager libraryManager, ILogger logger)
         {
             List<CollectionFolder> folders = FindCollectionFolders(libraryManager);
-            CollectionFolder? toReturn = folders.FirstOrDefault(f => "Collections".Equals(f.Name, StringComparison.Ordinal));
+            CollectionFolder toReturn = folders.FirstOrDefault(f => "Collections".Equals(f.Name, StringComparison.Ordinal));
             if (toReturn != null)
             {
                 return toReturn;
             }
             logger.Info($"Creating 'Collections' virtual folder");
-            LibraryOptions options = new()
+            var options = new LibraryOptions()
             {
                 EnableRealtimeMonitor = false,
                 SaveLocalMetadata = true,
@@ -59,7 +59,7 @@ namespace EmbyKinopoiskRu.Helper
             if (!choosenItems.Any())
             {
                 logger.Info("Provided list is empty");
-                return new();
+                return new List<BaseItem>();
             }
             QueryResult<BaseItem> collectionItems = libraryManager.QueryItems(new InternalItemsQuery()
             {
@@ -104,11 +104,11 @@ namespace EmbyKinopoiskRu.Helper
                             .Select(id => new KeyValuePair<string, string>(MetadataProviders.Imdb.ToString(), id))
                             .ToList()
                     })
-                    : (QueryResult<BaseItem>)(new());
+                    : new QueryResult<BaseItem>();
                 logger.Info($"Found {imdbCollectionItems.Items.Length} internal IMDB objects");
 
                 var tmdbList = kpExternalIdist
-                    .Where(e => e.Tmdb is not null and > 0)
+                    .Where(e => e.Tmdb != null && e.Tmdb > 0)
                     .Select(e => e.Tmdb.ToString())
                     .Cast<string>()
                     .ToList();
@@ -123,10 +123,10 @@ namespace EmbyKinopoiskRu.Helper
                             .Select(id => new KeyValuePair<string, string>(MetadataProviders.Tmdb.ToString(), id))
                             .ToList()
                     })
-                    : (QueryResult<BaseItem>)(new());
+                    : new QueryResult<BaseItem>();
                 logger.Info($"Found {tmdbCollectionItems.Items.Length} internal TMDB objects");
 
-                List<BaseItem> list = new(imdbCollectionItems.Items);
+                var list = new List<BaseItem>(imdbCollectionItems.Items);
                 foreach (BaseItem item in tmdbCollectionItems.Items)
                 {
                     if (list.All(i => i.InternalId != item.InternalId))
@@ -141,10 +141,10 @@ namespace EmbyKinopoiskRu.Helper
             logger.Info($"Found {toReturn.Count} internal Ids: {string.Join(", ", toReturn.Select(i => i.InternalId))}");
             return toReturn;
         }
-        internal static BoxSet? SearchExistingCollection(List<long> internalIds, ILibraryManager libraryManager, ILogger logger)
+        internal static BoxSet SearchExistingCollection(List<long> internalIds, ILibraryManager libraryManager, ILogger logger)
         {
             logger.Info($"Search existing collections for item with ids: '{string.Join(" ,", internalIds)}'");
-            List<KeyValuePair<BoxSet, int>> boxsetList = new();
+            var boxsetList = new List<KeyValuePair<BoxSet, int>>();
             QueryResult<BaseItem> collections = libraryManager.QueryItems(new InternalItemsQuery()
             {
                 IncludeItemTypes = new[] { "boxset" },
@@ -162,7 +162,7 @@ namespace EmbyKinopoiskRu.Helper
                 var count = collectionItems.Items.Select(i => internalIds.Contains(i.InternalId)).Count();
                 if (collectionItems.TotalRecordCount <= internalIds.Count && collectionItems.TotalRecordCount == count)
                 {
-                    boxsetList.Add(new(collection, count));
+                    boxsetList.Add(new KeyValuePair<BoxSet, int>(collection, count));
                 }
             }
             logger.Info($"Found {boxsetList.Count} potential collections with names: '{string.Join("', '", boxsetList.Select(p => p.Key.Name))}'");

@@ -16,10 +16,10 @@ namespace EmbyKinopoiskRu.ScheduledTasks
 {
     public abstract class CreateTop250Base
     {
-        protected ILogger Log { get; private init; }
-        protected ILibraryManager LibraryManager { get; private init; }
-        protected ICollectionManager CollectionManager { get; private init; }
-        protected Plugin Plugin { get; private init; }
+        protected ILogger Log { get; private set; }
+        protected ILibraryManager LibraryManager { get; private set; }
+        protected ICollectionManager CollectionManager { get; private set; }
+        protected Plugin Plugin { get; private set; }
 
 
         protected CreateTop250Base(ILibraryManager libraryManager, ICollectionManager collectionManager, ILogger log)
@@ -73,7 +73,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             else
             {
                 Log.Info($"Creating '{collectionName}' collection with following items: '{string.Join("', '", itemsList.Select(m => m.Name))}'");
-                CollectionFolder? rootCollectionFolder = await EmbyHelper.InsureCollectionLibraryFolder(LibraryManager, Log);
+                CollectionFolder rootCollectionFolder = await EmbyHelper.InsureCollectionLibraryFolder(LibraryManager, Log);
                 if (rootCollectionFolder == null)
                 {
                     Log.Info($"The virtual folder 'Collections' was not found nor created. {collectionName} will not be created");

@@ -50,7 +50,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         #region MovieProvider
         public async Task<MetadataResult<Movie>> GetMetadata(MovieInfo info, CancellationToken cancellationToken)
         {
-            MetadataResult<Movie> result = new()
+            var result = new MetadataResult<Movie>()
             {
                 ResultLanguage = "ru"
             };
@@ -67,7 +67,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 if (!string.IsNullOrWhiteSpace(movieId))
                 {
                     _log.Info($"Searching movie by movie id '{movieId}'");
-                    KpFilm? movie = await _api.GetFilmById(movieId, cancellationToken);
+                    KpFilm movie = await _api.GetFilmById(movieId, cancellationToken);
                     if (movie != null)
                     {
                         await CreateMovie(result, movie, cancellationToken);
@@ -90,7 +90,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         }
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(MovieInfo searchInfo, CancellationToken cancellationToken)
         {
-            List<RemoteSearchResult> result = new();
+            var result = new List<RemoteSearchResult>();
 
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
@@ -104,11 +104,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 if (!string.IsNullOrWhiteSpace(movieId))
                 {
                     _log.Info($"Searching movie by movie id '{movieId}'");
-                    KpFilm? movie = await _api.GetFilmById(movieId, cancellationToken);
+                    KpFilm movie = await _api.GetFilmById(movieId, cancellationToken);
                     if (movie != null)
                     {
                         var imageUrl = (movie.PosterUrlPreview ?? movie.PosterUrl) ?? string.Empty;
-                        RemoteSearchResult item = new()
+                        var item = new RemoteSearchResult()
                         {
                             Name = movie.NameRu,
                             ImageUrl = imageUrl,
@@ -130,7 +130,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             foreach (KpFilm movie in movies.Items)
             {
                 var imageUrl = (movie.PosterUrlPreview ?? movie.PosterUrl) ?? string.Empty;
-                RemoteSearchResult item = new()
+                var item = new RemoteSearchResult()
                 {
                     Name = movie.NameRu,
                     ImageUrl = imageUrl,
@@ -146,7 +146,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         }
         public async Task<List<Movie>> GetMoviesByOriginalNameAndYear(string name, int? year, CancellationToken cancellationToken)
         {
-            List<Movie> result = new();
+            var result = new List<Movie>();
 
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
@@ -181,10 +181,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             if (result.HasMetadata && videosList != null && videosList.Count > 0)
             {
                 videosList
-                    .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube", StringComparison.OrdinalIgnoreCase))
-                    .Select(i => i.Url!
-                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase)
-                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase))
+                    .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube"))
+                    .Select(i => i.Url
+                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
+                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
                     .Reverse()
                     .ToList()
                     .ForEach(v => result.Item.AddTrailerUrl(v));
@@ -196,7 +196,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             _log.Info($"Movie '{movie.NameRu}' with {Plugin.PluginName} id '{movie.KinopoiskId}' found");
 
             var movieId = movie.KinopoiskId.ToString(CultureInfo.InvariantCulture);
-            Movie toReturn = new()
+            var toReturn = new Movie()
             {
                 CommunityRating = movie.RatingKinopoisk,
                 CriticRating = movie.RatingFilmCritics * 10,
@@ -223,7 +223,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 toReturn.ProviderIds.Add(MetadataProviders.Imdb.ToString(), movie.ImdbId);
             }
 
-            IEnumerable<string?>? genres = movie.Genres?
+            IEnumerable<string> genres = movie.Genres?
                 .Select(i => i.Genre)
                 .Where(i => !string.IsNullOrWhiteSpace(i))
                 .AsEnumerable();
@@ -245,7 +245,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         #region MovieImagesProvider
         public async Task<IEnumerable<RemoteImageInfo>> GetImages(BaseItem item, LibraryOptions libraryOptions, CancellationToken cancellationToken)
         {
-            List<RemoteImageInfo> result = new();
+            var result = new List<RemoteImageInfo>();
 
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
@@ -259,7 +259,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 if (!string.IsNullOrWhiteSpace(movieId))
                 {
                     _log.Info($"Searching movie by movie id '{movieId}'");
-                    KpFilm? movie = await _api.GetFilmById(movieId, cancellationToken);
+                    KpFilm movie = await _api.GetFilmById(movieId, cancellationToken);
                     if (movie != null)
                     {
                         UpdateRemoteImageInfoList(movie, result);
@@ -324,7 +324,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         #region SeriesProvider
         public async Task<MetadataResult<Series>> GetMetadata(SeriesInfo info, CancellationToken cancellationToken)
         {
-            MetadataResult<Series> result = new()
+            var result = new MetadataResult<Series>()
             {
                 ResultLanguage = "ru"
             };
@@ -341,7 +341,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 if (!string.IsNullOrWhiteSpace(seriesId))
                 {
                     _log.Info($"Searching series by movie id '{seriesId}'");
-                    KpFilm? item = await _api.GetFilmById(seriesId, cancellationToken);
+                    KpFilm item = await _api.GetFilmById(seriesId, cancellationToken);
                     if (item != null)
                     {
                         await CreateSeries(result, item, cancellationToken);
@@ -364,7 +364,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         }
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(SeriesInfo searchInfo, CancellationToken cancellationToken)
         {
-            List<RemoteSearchResult> result = new();
+            var result = new List<RemoteSearchResult>();
 
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
@@ -378,11 +378,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 if (!string.IsNullOrWhiteSpace(seriesId))
                 {
                     _log.Info($"Searching series by series id '{seriesId}'");
-                    KpFilm? series = await _api.GetFilmById(seriesId, cancellationToken);
+                    KpFilm series = await _api.GetFilmById(seriesId, cancellationToken);
                     if (series != null)
                     {
                         var imageUrl = (series.PosterUrlPreview ?? series.PosterUrl) ?? string.Empty;
-                        RemoteSearchResult item = new()
+                        var item = new RemoteSearchResult()
                         {
                             Name = series.NameRu,
                             ImageUrl = imageUrl,
@@ -404,7 +404,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             foreach (KpFilm series in seriesResult.Items)
             {
                 var imageUrl = (series.PosterUrlPreview ?? series.PosterUrl) ?? string.Empty;
-                RemoteSearchResult item = new()
+                var item = new RemoteSearchResult()
                 {
                     Name = series.NameRu,
                     ImageUrl = imageUrl,
@@ -436,10 +436,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             if (result.HasMetadata && videosList != null && videosList.Count > 0)
             {
                 videosList
-                    .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube", StringComparison.OrdinalIgnoreCase))
-                    .Select(i => i.Url!
-                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase)
-                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v=", StringComparison.OrdinalIgnoreCase))
+                    .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube"))
+                    .Select(i => i.Url
+                        .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
+                        .Replace("https://www.youtube.com/v/", "https://www.youtube.com/watch?v="))
                     .Reverse()
                     .ToList()
                     .ForEach(v => result.Item.AddTrailerUrl(v));
@@ -450,7 +450,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             _log.Info($"Series '{series.NameRu}' with {Plugin.PluginName} id '{series.KinopoiskId}' found");
 
             var seriesId = series.KinopoiskId.ToString(CultureInfo.InvariantCulture);
-            Series toReturn = new()
+            var toReturn = new Series()
             {
                 CommunityRating = series.RatingKinopoisk,
                 CriticRating = series.RatingFilmCritics * 10,
@@ -477,7 +477,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 toReturn.ProviderIds.Add(MetadataProviders.Imdb.ToString(), series.ImdbId);
             }
 
-            IEnumerable<string?>? genres = series.Genres?
+            IEnumerable<string> genres = series.Genres?
                 .Select(i => i.Genre)
                 .Where(i => !string.IsNullOrWhiteSpace(i))
                 .AsEnumerable();
@@ -499,7 +499,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         #region EpisodeProvider
         public async Task<MetadataResult<Episode>> GetMetadata(EpisodeInfo info, CancellationToken cancellationToken)
         {
-            MetadataResult<Episode> result = new()
+            var result = new MetadataResult<Episode>()
             {
                 ResultLanguage = "ru"
             };
@@ -528,19 +528,19 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             }
 
             _log.Info($"Searching episode by series id '{seriesId}', season index '{info.ParentIndexNumber}' and episode index '{info.IndexNumber}'");
-            KpSearchResult<KpSeason>? item = await _api.GetEpisodesBySeriesId(seriesId, cancellationToken);
+            KpSearchResult<KpSeason> item = await _api.GetEpisodesBySeriesId(seriesId, cancellationToken);
             if (item == null)
             {
                 _log.Info($"Episodes by series id '{seriesId}' not found");
                 return result;
             }
-            KpSeason? kpSeason = item.Items.FirstOrDefault(s => s.Number == info.ParentIndexNumber);
+            KpSeason kpSeason = item.Items.FirstOrDefault(s => s.Number == info.ParentIndexNumber);
             if (kpSeason == null)
             {
                 _log.Info($"Season with index '{info.ParentIndexNumber}' not found");
                 return result;
             }
-            KpEpisode? kpEpisode = kpSeason.Episodes.FirstOrDefault(e =>
+            KpEpisode kpEpisode = kpSeason.Episodes.FirstOrDefault(e =>
                 e.EpisodeNumber == info.IndexNumber
                     && e.SeasonNumber == info.ParentIndexNumber);
             if (kpEpisode == null)
@@ -554,7 +554,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.None,
                 out DateTimeOffset premiereDate);
-            result.Item = new()
+            result.Item = new Episode()
             {
                 Name = kpEpisode.NameRu,
                 OriginalTitle = kpEpisode.NameEn,
@@ -573,7 +573,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         #region PersonProvider
         public async Task<MetadataResult<Person>> GetMetadata(PersonLookupInfo info, CancellationToken cancellationToken)
         {
-            MetadataResult<Person> result = new()
+            var result = new MetadataResult<Person>()
             {
                 ResultLanguage = "ru"
             };
@@ -590,7 +590,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 if (!string.IsNullOrWhiteSpace(personId))
                 {
                     _log.Info($"Fetching person by person id '{personId}'");
-                    KpPerson? person = await _api.GetPersonById(personId, cancellationToken);
+                    KpPerson person = await _api.GetPersonById(personId, cancellationToken);
                     if (person != null)
                     {
                         result.Item = CreatePersonFromKpPerson(person);
@@ -614,7 +614,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         }
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(PersonLookupInfo searchInfo, CancellationToken cancellationToken)
         {
-            List<RemoteSearchResult> result = new();
+            var result = new List<RemoteSearchResult>();
 
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
@@ -628,10 +628,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 if (!string.IsNullOrWhiteSpace(personId))
                 {
                     _log.Info($"Searching person by id '{personId}'");
-                    KpPerson? person = await _api.GetPersonById(personId, cancellationToken);
+                    KpPerson person = await _api.GetPersonById(personId, cancellationToken);
                     if (person != null)
                     {
-                        RemoteSearchResult item = new()
+                        var item = new RemoteSearchResult()
                         {
                             Name = person.NameRu,
                             ImageUrl = person.PosterUrl,
@@ -648,7 +648,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             KpSearchResult<KpPerson> persons = await _api.GetPersonsByName(searchInfo.Name, cancellationToken);
             foreach (KpPerson person in persons.Items)
             {
-                RemoteSearchResult item = new()
+                var item = new RemoteSearchResult()
                 {
                     Name = person.NameRu,
                     ImageUrl = person.PosterUrl,
@@ -664,7 +664,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         {
             _log.Info($"Person '{person.NameRu}' with KinopoiskId '{person.PersonId}' found");
 
-            Person toReturn = new()
+            var toReturn = new Person()
             {
                 Name = person.NameRu,
                 SortName = person.NameRu,
@@ -686,7 +686,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             var facts = person.Facts?.ToArray();
             if (facts?.Length > 0)
             {
-                toReturn.Overview = string.Join('\n', facts);
+                toReturn.Overview = string.Join("\n", facts);
             }
             return toReturn;
         }
@@ -694,7 +694,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         #endregion
 
         #region Common
-        private void UpdatePersonsList<T>(MetadataResult<T> result, List<KpFilmStaff> staffList, string? movieName)
+        private void UpdatePersonsList<T>(MetadataResult<T> result, List<KpFilmStaff> staffList, string movieName)
             where T : BaseItem
         {
             foreach (KpFilmStaff staff in staffList)
@@ -712,7 +712,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 else
                 {
                     _log.Debug($"Adding '{name}' as '{personType}' to '{movieName}'");
-                    PersonInfo person = new()
+                    var person = new PersonInfo()
                     {
                         Name = name,
                         ImageUrl = staff.PosterUrl,
@@ -728,14 +728,17 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         }
         private static List<KpFilm> FilterRelevantItems(List<KpFilm> list, string name, int? year)
         {
-            return list.Count switch
+            if (list.Count > 1)
             {
-                <= 1 => list,
-                _ => list
+                return list
                     .Where(m => m.NameRu == name || m.NameOriginal == name)
                     .Where(m => year == null || m.Year == year)
-                    .ToList()
-            };
+                    .ToList();
+            }
+            else
+            {
+                return list;
+            }
         }
 
         #endregion
@@ -758,6 +761,5 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         }
 
         #endregion
-
     }
 }

@@ -87,7 +87,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 var checksum = await PrepareMd5Checksum(release.assets, cancellationToken);
                 _logger.Info($"Calculated md5 hash: '{checksum}'");
 
-                PackageVersionInfo package = new()
+                var package = new PackageVersionInfo()
                 {
                     name = Plugin.PluginName,
                     versionStr = release.tag_name,
@@ -132,7 +132,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         {
             var downloadUrl = assets
                     .Where(a => DLL_NAME.EqualsIgnoreCase(a.name) && !string.IsNullOrWhiteSpace(a.browser_download_url))
-                    .Select(a => a.browser_download_url!)
+                    .Select(a => a.browser_download_url)
                     .Single();
             var options = new HttpRequestOptions()
             {
@@ -145,18 +145,21 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             };
             options.Sanitation.SanitizeDefaultParams = false;
             var checksum = string.Empty;
-            using HttpResponseInfo response = await _httpClient.GetResponse(options);
-            using StreamReader reader = new(response.Content);
-            using var memstream = new MemoryStream();
-            var bytes = default(byte[]);
-            reader.BaseStream.CopyTo(memstream);
-            bytes = memstream.ToArray();
-            checksum = CalculateMd5(bytes);
-            return checksum;
+            using (var reader = new StreamReader((await _httpClient.GetResponse(options)).Content))
+            {
+                using (var memstream = new MemoryStream())
+                {
+                    var bytes = default(byte[]);
+                    reader.BaseStream.CopyTo(memstream);
+                    bytes = memstream.ToArray();
+                    checksum = CalculateMd5(bytes);
+                    return checksum;
+                }
+            }
         }
         private async Task<GitHubLatestReleaseResponse> GetGitHubLatestRelease(CancellationToken cancellationToken)
         {
-            HttpRequestOptions options = new()
+            var options = new HttpRequestOptions()
             {
                 CancellationToken = cancellationToken,
                 Url = "https://api.github.com/repos/luzmane/emby.kinopoisk.ru/releases/latest",
@@ -166,16 +169,19 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 TimeoutMs = 180000,
                 EnableDefaultUserAgent = true,
             };
-            using HttpResponseInfo response = await _httpClient.GetResponse(options);
-            using StreamReader reader = new(response.Content);
-            var latestVersionJson = await reader.ReadToEndAsync();
-            return _jsonSerializer.DeserializeFromString<GitHubLatestReleaseResponse>(latestVersionJson);
+            using (var reader = new StreamReader((await _httpClient.GetResponse(options)).Content))
+            {
+                var latestVersionJson = await reader.ReadToEndAsync();
+                return _jsonSerializer.DeserializeFromString<GitHubLatestReleaseResponse>(latestVersionJson);
+            }
         }
         private static string CalculateMd5(byte[] bytes)
         {
 #pragma warning disable CA5351
-            using var md5 = MD5.Create();
-            return Convert.ToHexString(md5.ComputeHash(bytes));
+            using (var md5 = MD5.Create())
+            {
+                return BitConverter.ToString(md5.ComputeHash(bytes)).Replace("-", "");
+            }
 #pragma warning restore CA5351
 
         }
