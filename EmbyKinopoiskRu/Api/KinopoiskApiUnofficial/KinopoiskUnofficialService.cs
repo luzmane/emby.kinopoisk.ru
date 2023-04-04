@@ -85,7 +85,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 _log.Error($"Found {relevantMovies.Count} movies, skipping movie update");
                 return result;
             }
-            await CreateMovie(result, relevantMovies[0], cancellationToken);
+            KpFilm film = await _api.GetFilmById(relevantMovies[0].KinopoiskId.ToString(), cancellationToken);
+            await CreateMovie(result, film, cancellationToken);
             return result;
         }
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(MovieInfo searchInfo, CancellationToken cancellationToken)
@@ -158,7 +159,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, name, year);
             foreach (KpFilm movie in relevantMovies)
             {
-                result.Add(CreateMovieFromKpFilm(movie));
+                KpFilm film = await _api.GetFilmById(movie.KinopoiskId.ToString(), cancellationToken);
+                result.Add(CreateMovieFromKpFilm(film));
             }
             _log.Info($"By keywords '{name}' found {result.Count} movies");
             return result;
@@ -277,7 +279,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 _log.Error($"Found {relevantMovies.Count} movies, skipping image update");
                 return result;
             }
-            UpdateRemoteImageInfoList(relevantMovies[0], result);
+            KpFilm film = await _api.GetFilmById(relevantMovies[0].KinopoiskId.ToString(), cancellationToken);
+            UpdateRemoteImageInfoList(film, result);
             return result;
         }
 
@@ -359,7 +362,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 _log.Error($"Found {relevantSeries.Count} series, skipping series update");
                 return result;
             }
-            await CreateSeries(result, relevantSeries[0], cancellationToken);
+            KpFilm s = await _api.GetFilmById(relevantSeries[0].KinopoiskId.ToString(), cancellationToken);
+            await CreateSeries(result, s, cancellationToken);
             return result;
         }
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(SeriesInfo searchInfo, CancellationToken cancellationToken)
@@ -608,7 +612,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 _log.Error($"Found {persons.Items.Count} persons, skipping person update");
                 return result;
             }
-            result.Item = CreatePersonFromKpPerson(persons.Items[0]);
+            KpPerson p = await _api.GetPersonById(persons.Items[0].PersonId.ToString(), cancellationToken);
+            result.Item = CreatePersonFromKpPerson(p);
             result.HasMetadata = true;
             return result;
         }
