@@ -12,6 +12,7 @@ Fetches metadata from [kinopoisk.ru](https://www.kinopoisk.ru). This site is pop
 
 * Положить dll в папку plugins
 * Настроить Медиатеку (Emby Library) использовать новый плагин (поставить галочки)
+* (Рекомендуется) Получить личный токен для API
 
 ## Настройка
 
@@ -26,6 +27,8 @@ Fetches metadata from [kinopoisk.ru](https://www.kinopoisk.ru). This site is pop
 Плагин умеет создавать коллекцию Кинопоиска Топ 250 из фильмов в медиатеке. Работает только для [kinopoisk.dev](https://kinopoisk.dev) - API предоставляет эти данные.
 
 Плагин умеет добавлять ID КиноПоиска по ID IMDB или TMDB (отдельная задача). Работает только для [kinopoisk.dev](https://kinopoisk.dev) - API предоставляет эти данные.
+
+Плагин умеет обновляться самостоятельно (отдельная задача).
 
 ## Использование
 
@@ -55,7 +58,8 @@ Fetches metadata from [kinopoisk.ru](https://www.kinopoisk.ru). This site is pop
 ## Требования
 
 * Плагин тестировался на версии 4.7.11
-* Собирался c .Net 6.0
+* Собирался c .Net 6.0 для .NetStandard 2.0
+* Поддерживает Emby соответствующих версий на Android устройствах (спасибо [Sanchous98](https://github.com/Sanchous98))
 
 ## TODO
 

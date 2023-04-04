@@ -1,3 +1,7 @@
+v.1.11.0
+- Support .NetStandard 2.0 in addition to .NetCore 6.0 (possibility to run on Android devices)
+- Fix kinopoiskapiunofficial.tech populated only partial information for films/series
+
 v.1.10.0
 - Add Update Plugin task which will update the DLL of the plugin from GitHub
 
