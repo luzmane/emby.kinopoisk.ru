@@ -46,9 +46,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         internal async Task<KpSearchResult<KpMovie>> GetMoviesByIds(List<string> movieIdList, CancellationToken cancellationToken)
         {
             var url = new StringBuilder($"https://api.kinopoisk.dev/v1/movie?")
-                .Append($"limit={movieIdList.Count}")
+                .Append($"id={string.Join("&id=", movieIdList)}")
+                .Append($"&limit={movieIdList.Count}")
                 .Append("&selectFields=alternativeName backdrop countries description enName externalId genres id logo movieLength name persons poster premiere productionCompanies rating ratingMpaa slogan videos year sequelsAndPrequels top250 facts releaseYears seasonsInfo")
-                .Append($"&id={string.Join("&id=", movieIdList)}")
                 .ToString();
             var json = await SendRequest(url, cancellationToken);
             return _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
@@ -62,17 +62,15 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             var hasName = !string.IsNullOrWhiteSpace(name);
             var hasYear = year != null && year > 1000;
             var hasAlternativeName = !string.IsNullOrWhiteSpace(alternativeName);
-            var url = new StringBuilder($"https://api.kinopoisk.dev/v1/movie?")
-                .Append($"limit=50")
-                .Append("&selectFields=alternativeName backdrop countries description enName externalId genres id logo movieLength name persons poster premiere productionCompanies rating ratingMpaa slogan videos year sequelsAndPrequels top250 facts releaseYears seasonsInfo")
-                .ToString();
+            var url = "https://api.kinopoisk.dev/v1/movie?limit=50";
+            var selectFields = "&selectFields=alternativeName backdrop countries description enName externalId genres id logo movieLength name persons poster premiere productionCompanies rating ratingMpaa slogan videos year sequelsAndPrequels top250 facts releaseYears seasonsInfo";
             var namePart = $"&name={name}";
             var alternativeNamePart = $"&alternativeName={alternativeName}";
             var yearPart = $"&year={year}";
 
             if (hasName && hasYear)
             {
-                var request = url + namePart + yearPart;
+                var request = url + namePart + yearPart + selectFields;
                 var json = await SendRequest(request, cancellationToken);
                 KpSearchResult<KpMovie> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
                 if (toReturn != null && toReturn.Docs.Count > 0)
@@ -84,7 +82,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             if (hasName)
             {
-                var request = url + namePart;
+                var request = url + namePart + selectFields;
                 var json = await SendRequest(request, cancellationToken);
                 KpSearchResult<KpMovie> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
                 if (toReturn != null && toReturn.Docs.Count > 0)
@@ -96,7 +94,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             if (hasAlternativeName && hasYear)
             {
-                var request = url + alternativeNamePart + yearPart;
+                var request = url + alternativeNamePart + yearPart + selectFields;
                 var json = await SendRequest(request, cancellationToken);
                 KpSearchResult<KpMovie> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
                 if (toReturn != null && toReturn.Docs.Count > 0)
@@ -108,7 +106,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             if (hasAlternativeName)
             {
-                var request = url + alternativeNamePart;
+                var request = url + alternativeNamePart + selectFields;
                 var json = await SendRequest(request, cancellationToken);
                 KpSearchResult<KpMovie> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
                 if (toReturn != null && toReturn.Docs.Count > 0)
@@ -122,8 +120,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         internal async Task<KpSearchResult<KpMovie>> GetTop250Collection(CancellationToken cancellationToken)
         {
             var request = $"https://api.kinopoisk.dev/v1/movie?";
-            request += "selectFields=alternativeName externalId id name top250 typeNumber";
-            request += "&limit=1000&top250=!null";
+            request += "limit=1000&top250=!null";
+            request += "&selectFields=alternativeName externalId id name top250 typeNumber";
             var json = await SendRequest(request, cancellationToken);
             return _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
         }
@@ -160,8 +158,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             var url = new StringBuilder("https://api.kinopoisk.dev/v1/person?")
                  .Append($"&movies.id={movieId}")
-                 .Append("&selectFields=id movies")
-                 .Append("&limit=1000")
+                 .Append("&selectFields=id movies&limit=1000")
                  .ToString();
             var json = await SendRequest(url, cancellationToken);
             KpSearchResult<KpPerson> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpPerson>>(json);
@@ -175,10 +172,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         internal async Task<KpSearchResult<KpSeason>> GetEpisodesBySeriesId(string seriesId, CancellationToken cancellationToken)
         {
-            var url = new StringBuilder("https://api.kinopoisk.dev/v1/season?")
-                .Append($"movieId={seriesId}")
-                .Append($"&limit=50")
-                .ToString();
+            var url = $"https://api.kinopoisk.dev/v1/season?movieId={seriesId}&limit=50";
             var json = await SendRequest(url, cancellationToken);
             return _jsonSerializer.DeserializeFromString<KpSearchResult<KpSeason>>(json);
         }
@@ -210,7 +204,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 _log.Error("The token is empty. Skip request");
                 return string.Empty;
             }
-            HttpRequestOptions options = new HttpRequestOptions()
+            var options = new HttpRequestOptions()
             {
                 CancellationToken = cancellationToken,
                 Url = url,
