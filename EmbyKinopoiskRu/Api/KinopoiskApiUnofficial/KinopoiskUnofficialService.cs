@@ -79,6 +79,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
 
             _log.Info($"Searching movies by name '{info.Name}' and year '{info.Year}'");
             KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(info.Name, info.Year, cancellationToken);
+            _log.Info("Filtering out irrelevant films");
             List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, info.Name, info.Year);
             if (relevantMovies.Count != 1)
             {
@@ -156,6 +157,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             }
 
             KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(name, year, cancellationToken);
+            _log.Info("Filtering out irrelevant films");
             List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, name, year);
             foreach (KpFilm movie in relevantMovies)
             {
@@ -273,6 +275,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
 
             _log.Info($"Searching movies by name '{item.Name}' and year '{item.ProductionYear}'");
             KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(item.Name, item.ProductionYear, cancellationToken);
+            _log.Info("Filtering out irrelevant films");
             List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, item.Name, item.ProductionYear);
             if (relevantMovies.Count != 1)
             {
@@ -356,6 +359,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
 
             _log.Info($"Searching series by name '{info.Name}' and year '{info.Year}'");
             KpSearchResult<KpFilm> series = await _api.GetFilmsByNameAndYear(info.Name, info.Year, cancellationToken);
+            _log.Info("Filtering out irrelevant series");
             List<KpFilm> relevantSeries = FilterRelevantItems(series.Items, info.Name, info.Year);
             if (relevantSeries.Count != 1)
             {
@@ -735,10 +739,13 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         {
             if (list.Count > 1)
             {
-                return list
-                    .Where(m => m.NameRu == name || m.NameOriginal == name)
+                var toReturn = list
+                    .Where(m =>
+                        KpHelper.CleanName(m.NameRu) == KpHelper.CleanName(name)
+                            || KpHelper.CleanName(m.NameOriginal) == KpHelper.CleanName(name))
                     .Where(m => year == null || m.Year == year)
                     .ToList();
+                return toReturn.Any() ? toReturn : list;
             }
             else
             {

@@ -68,13 +68,14 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             KpSearchResult<KpMovie> movies = await _api.GetMoviesByMovieDetails(name, year, cancellationToken);
+            _log.Info("Filtering out irrelevant films");
             List<KpMovie> relevantMovies = FilterRelevantItems(movies.Docs, name, year);
             var toReturn = new List<Movie>();
             foreach (KpMovie movie in relevantMovies)
             {
                 toReturn.Add(await CreateMovieFromKpMovie(movie, cancellationToken));
             }
-            _log.Info($"By alternative name '{name}' found {toReturn.Count} movies");
+            _log.Info($"By name '{name}' and year '{year}' found {toReturn.Count} movies");
             return toReturn;
         }
         public async Task<MetadataResult<Movie>> GetMetadata(MovieInfo info, CancellationToken cancellationToken)
@@ -110,6 +111,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             _log.Info($"Searching movie by name '{info.Name}' and year '{info.Year}'");
             KpSearchResult<KpMovie> movies = await _api.GetMoviesByMovieDetails(info.Name, info.Year, cancellationToken);
+            _log.Info("Filtering out irrelevant films");
             List<KpMovie> relevantMovies = FilterRelevantItems(movies.Docs, info.Name, info.Year);
             if (relevantMovies.Count != 1)
             {
@@ -288,6 +290,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             _log.Info($"Searching series by name '{info.Name}' and year '{info.Year}'");
             KpSearchResult<KpMovie> series = await _api.GetMoviesByMovieDetails(info.Name, info.Year, cancellationToken);
+            _log.Info("Filtering out irrelevant series");
             List<KpMovie> relevantSeries = FilterRelevantItems(series.Docs, info.Name, info.Year);
             if (relevantSeries.Count != 1)
             {
@@ -653,6 +656,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             _log.Info($"Searching images by available metadata");
             KpSearchResult<KpMovie> movies = await _api.GetMoviesByMovieDetails(item.Name, item.OriginalTitle, item.ProductionYear, cancellationToken);
+            _log.Info("Filtering out irrelevant films");
             List<KpMovie> relevantSeries = FilterRelevantItems(movies.Docs, item.Name, item.ProductionYear);
             if (relevantSeries.Count != 1)
             {
@@ -870,10 +874,13 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             if (list.Count > 1)
             {
-                return list
-                    .Where(m => m.Name == name || m.AlternativeName == name)
+                var toReturn = list
+                    .Where(m =>
+                        KpHelper.CleanName(m.Name) == KpHelper.CleanName(name)
+                            || KpHelper.CleanName(m.AlternativeName) == KpHelper.CleanName(name))
                     .Where(m => year == null || m.Year == year)
                     .ToList();
+                return toReturn.Any() ? toReturn : list;
             }
             else
             {

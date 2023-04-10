@@ -43,7 +43,7 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
             List<Movie> movies = await Plugin.Instance.GetKinopoiskService().GetMoviesByOriginalNameAndYear(movieName, year, cancellationToken);
             if (movies.Count == 0)
             {
-                _log.Info($"Nothing found for movie name '{movieName}");
+                _log.Info($"Nothing found for movie name '{movieName}'");
             }
             else if (movies.Count == 1)
             {

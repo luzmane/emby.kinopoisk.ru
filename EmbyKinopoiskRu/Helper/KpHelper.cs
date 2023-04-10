@@ -14,6 +14,7 @@ namespace EmbyKinopoiskRu.Helper
     internal class KpHelper
     {
         private static readonly Regex Year = new Regex("(?<year>[0-9]{4})", RegexOptions.Compiled);
+        private static readonly Regex NonAlphaNumeric = new Regex("[^а-яА-Яa-zA-Z0-9]", RegexOptions.Compiled);
 
         internal static DateTimeOffset? GetPremierDate(KpPremiere premiere)
         {
@@ -106,5 +107,10 @@ namespace EmbyKinopoiskRu.Helper
             _ = int.TryParse(DateTime.Now.ToString("yyyy", CultureInfo.InvariantCulture), out var currentYear);
             return (year > 1800 && year <= currentYear + 1) ? year : (int?)null;
         }
+        internal static string CleanName(string line)
+        {
+            return NonAlphaNumeric.Replace(line, string.Empty);
+        }
+
     }
 }

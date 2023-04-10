@@ -37,5 +37,13 @@ namespace EmbyKinopoiskRu.Tests
             var movieName = "Леди и бродяга";
             Assert.IsNull(KpHelper.DetectYearFromMoviePath(fileName, movieName));
         }
+
+        [Test]
+        public void ReplaceAlphaNumericCharacters()
+        {
+            Assert.AreEqual("Ледиибродяга3000", KpHelper.CleanName("Леди и бродяга_3000"));
+            Assert.AreEqual("Небойсяястобой", KpHelper.CleanName("Не бойся, я с тобой!"));
+            Assert.AreEqual("KoroliShutS012023WEBRip", KpHelper.CleanName("Korol.i.Shut.S01.2023.WEBRip."));
+        }
     }
 }
