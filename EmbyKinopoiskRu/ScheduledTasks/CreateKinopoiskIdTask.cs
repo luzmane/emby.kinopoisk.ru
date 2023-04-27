@@ -97,8 +97,6 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 QueryResult<BaseItem> itemsToUpdateResult = _libraryManager.QueryItems(new InternalItemsQuery()
                 {
                     IncludeItemTypes = new[] { "movie", "tvshow" },
-                    Recursive = false,
-                    IsVirtualItem = false,
                     MissingAnyProviderId = new[] { Plugin.PluginKey },
                     HasAnyProviderId = new[] { MetadataProviders.Imdb.ToString(), MetadataProviders.Tmdb.ToString() },
                 });
