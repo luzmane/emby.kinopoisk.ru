@@ -23,8 +23,8 @@ namespace EmbyKinopoiskRu
 {
     public class Plugin : BasePlugin<PluginConfiguration>, IHasThumbImage, IHasWebPages, IHasTranslations
     {
-        public const string PluginName = "KinopoiskRu";
-        public const string PluginTaskCategory = "KinopoiskRu Plugin";
+        public const string PluginKey = "KinopoiskRu";
+        public const string PluginName = "Кинопоиск";
 
         public static Plugin Instance { get; private set; }
 
@@ -59,7 +59,7 @@ namespace EmbyKinopoiskRu
             _jsonSerializer = jsonSerializer;
             _logManager = logManager;
             _activityManager = activityManager;
-            _log = _logManager.GetLogger(PluginName);
+            _log = _logManager.GetLogger(PluginKey);
             _libraryManager = libraryManager;
             _collectionManager = collectionManager;
         }
@@ -86,7 +86,7 @@ namespace EmbyKinopoiskRu
         }
         public TranslationInfo[] GetTranslations()
         {
-            var basePath = GetType().Namespace + ".Configuration.strings.";
+            var basePath = GetType().Namespace + ".i18n.Configuration.";
             return GetType().Assembly.GetManifestResourceNames()
                 .Where(i => i.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
                 .Select(i =>

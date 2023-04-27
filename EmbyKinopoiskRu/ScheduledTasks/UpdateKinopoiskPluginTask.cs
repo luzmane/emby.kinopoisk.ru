@@ -7,11 +7,13 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
+using EmbyKinopoiskRu.Helper;
 using EmbyKinopoiskRu.ScheduledTasks.Model;
 
 using MediaBrowser.Common.Net;
 using MediaBrowser.Common.Progress;
 using MediaBrowser.Common.Updates;
+using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Model.Extensions;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Net;
@@ -28,27 +30,33 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         public bool IsHidden => false;
         public bool IsEnabled => true;
         public bool IsLogged => true;
-        public string Name => "Update Kinopoisk Plugin";
+        public string Name => GetTranslation().Name;
         public string Key => "KinopoiskNewVersion";
-        public string Description => "Update Kinopoisk Plugin from GitHub";
-        public string Category => Plugin.PluginTaskCategory;
+        public string Description => GetTranslation().Description;
+        public string Category => GetTranslation().Category;
 
         private readonly IHttpClient _httpClient;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly ILogger _logger;
         private readonly IInstallationManager _installationManager;
+        private readonly IServerConfigurationManager _serverConfigurationManager;
+        private readonly Dictionary<string, TaskTranslation> _translations = new Dictionary<string, TaskTranslation>();
+        private readonly Dictionary<string, string> _availableTranslations = new Dictionary<string, string>();
 
         public UpdateKinopoiskPluginTask(
             IHttpClient httpClient,
             IJsonSerializer jsonSerializer,
             ILogManager logManager,
-            IInstallationManager installationManager
-            )
+            IInstallationManager installationManager,
+            IServerConfigurationManager serverConfigurationManager)
         {
             _httpClient = httpClient;
             _jsonSerializer = jsonSerializer;
             _logger = logManager.GetLogger("CheckNewPluginVersion");
             _installationManager = installationManager;
+            _serverConfigurationManager = serverConfigurationManager;
+
+            _availableTranslations = EmbyHelper.GetAvailableTransactionsForTasks(Key);
         }
         public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
         {
@@ -89,7 +97,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
 
                 var package = new PackageVersionInfo()
                 {
-                    name = Plugin.PluginName,
+                    name = Plugin.PluginKey,
                     versionStr = release.tag_name,
                     classification = PackageVersionClass.Release,
                     description = release.body,
@@ -184,6 +192,10 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             }
 #pragma warning restore CA5351
 
+        }
+        private TaskTranslation GetTranslation()
+        {
+            return EmbyHelper.GetTaskTranslation(_translations, _serverConfigurationManager, _jsonSerializer, _availableTranslations);
         }
     }
 }

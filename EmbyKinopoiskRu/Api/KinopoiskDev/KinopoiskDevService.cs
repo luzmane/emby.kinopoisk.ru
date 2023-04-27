@@ -91,9 +91,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return result;
             }
 
-            if (info.HasProviderId(Plugin.PluginName))
+            if (info.HasProviderId(Plugin.PluginKey))
             {
-                var movieId = info.GetProviderId(Plugin.PluginName);
+                var movieId = info.GetProviderId(Plugin.PluginKey);
                 if (!string.IsNullOrWhiteSpace(movieId))
                 {
                     _log.Info($"Searching movie by movie id '{movieId}'");
@@ -133,9 +133,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return result;
             }
 
-            if (searchInfo.HasProviderId(Plugin.PluginName))
+            if (searchInfo.HasProviderId(Plugin.PluginKey))
             {
-                var movieId = searchInfo.GetProviderId(Plugin.PluginName);
+                var movieId = searchInfo.GetProviderId(Plugin.PluginKey);
                 if (!string.IsNullOrWhiteSpace(movieId))
                 {
                     _log.Info($"Searching movie by id '{movieId}'");
@@ -147,11 +147,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                         {
                             Name = movie.Name,
                             ImageUrl = imageUrl,
-                            SearchProviderName = Plugin.PluginName,
+                            SearchProviderName = Plugin.PluginKey,
                             ProductionYear = movie.Year,
                             Overview = PrepareOverview(movie),
                         };
-                        item.SetProviderId(Plugin.PluginName, movieId);
+                        item.SetProviderId(Plugin.PluginKey, movieId);
                         result.Add(item);
                         return result;
                     }
@@ -168,11 +168,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 {
                     Name = movie.Name,
                     ImageUrl = imageUrl,
-                    SearchProviderName = Plugin.PluginName,
+                    SearchProviderName = Plugin.PluginKey,
                     ProductionYear = movie.Year,
                     Overview = PrepareOverview(movie),
                 };
-                item.SetProviderId(Plugin.PluginName, movie.Id.ToString(CultureInfo.InvariantCulture));
+                item.SetProviderId(Plugin.PluginKey, movie.Id.ToString(CultureInfo.InvariantCulture));
                 result.Add(item);
             }
             _log.Info($"By name '{searchInfo.Name}' found {result.Count} movies");
@@ -205,7 +205,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 Tagline = movie.Slogan
             };
 
-            toReturn.SetProviderId(Plugin.PluginName, movieId);
+            toReturn.SetProviderId(Plugin.PluginKey, movieId);
 
             if (!string.IsNullOrWhiteSpace(movie.ExternalId?.Imdb))
             {
@@ -270,9 +270,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return result;
             }
 
-            if (info.HasProviderId(Plugin.PluginName))
+            if (info.HasProviderId(Plugin.PluginKey))
             {
-                var seriesId = info.GetProviderId(Plugin.PluginName);
+                var seriesId = info.GetProviderId(Plugin.PluginKey);
                 if (!string.IsNullOrWhiteSpace(seriesId))
                 {
                     _log.Info($"Fetching series by series id '{seriesId}'");
@@ -312,9 +312,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return result;
             }
 
-            if (searchInfo.HasProviderId(Plugin.PluginName))
+            if (searchInfo.HasProviderId(Plugin.PluginKey))
             {
-                var seriesId = searchInfo.GetProviderId(Plugin.PluginName);
+                var seriesId = searchInfo.GetProviderId(Plugin.PluginKey);
                 if (!string.IsNullOrWhiteSpace(seriesId))
                 {
                     _log.Info($"Searching series by id '{seriesId}'");
@@ -326,11 +326,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                         {
                             Name = series.Name,
                             ImageUrl = imageUrl,
-                            SearchProviderName = Plugin.PluginName,
+                            SearchProviderName = Plugin.PluginKey,
                             ProductionYear = series.Year,
                             Overview = PrepareOverview(series),
                         };
-                        item.SetProviderId(Plugin.PluginName, seriesId);
+                        item.SetProviderId(Plugin.PluginKey, seriesId);
                         result.Add(item);
                         return result;
                     }
@@ -347,11 +347,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 {
                     Name = series.Name,
                     ImageUrl = imageUrl,
-                    SearchProviderName = Plugin.PluginName,
+                    SearchProviderName = Plugin.PluginKey,
                     ProductionYear = series.Year,
                     Overview = PrepareOverview(series),
                 };
-                item.SetProviderId(Plugin.PluginName, series.Id.ToString(CultureInfo.InvariantCulture));
+                item.SetProviderId(Plugin.PluginKey, series.Id.ToString(CultureInfo.InvariantCulture));
                 result.Add(item);
             }
             _log.Info($"By name '{searchInfo.Name}' found {result.Count} series");
@@ -385,7 +385,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 Tagline = series.Slogan
             };
 
-            toReturn.SetProviderId(Plugin.PluginName, seriesId);
+            toReturn.SetProviderId(Plugin.PluginKey, seriesId);
 
             if (!string.IsNullOrWhiteSpace(series.ExternalId?.Imdb))
             {
@@ -449,11 +449,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return result;
             }
 
-            var seriesId = info.GetSeriesProviderId(Plugin.PluginName);
+            var seriesId = info.GetSeriesProviderId(Plugin.PluginKey);
             if (string.IsNullOrWhiteSpace(seriesId))
             {
                 _log.Debug($"SeriesProviderId not exists for {Plugin.PluginName}, checking ProviderId");
-                seriesId = info.GetProviderId(Plugin.PluginName);
+                seriesId = info.GetProviderId(Plugin.PluginKey);
             }
             if (string.IsNullOrWhiteSpace(seriesId))
             {
@@ -520,9 +520,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return result;
             }
 
-            if (info.HasProviderId(Plugin.PluginName))
+            if (info.HasProviderId(Plugin.PluginKey))
             {
-                var personId = info.ProviderIds[Plugin.PluginName];
+                var personId = info.ProviderIds[Plugin.PluginKey];
                 if (!string.IsNullOrWhiteSpace(personId))
                 {
                     _log.Info($"Fetching person by person id '{personId}'");
@@ -558,9 +558,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return result;
             }
 
-            if (searchInfo.HasProviderId(Plugin.PluginName))
+            if (searchInfo.HasProviderId(Plugin.PluginKey))
             {
-                var personId = searchInfo.ProviderIds[Plugin.PluginName];
+                var personId = searchInfo.ProviderIds[Plugin.PluginKey];
                 if (!string.IsNullOrWhiteSpace(personId))
                 {
                     _log.Info($"Searching person by id '{personId}'");
@@ -572,7 +572,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                             Name = person.Name,
                             ImageUrl = person.Photo,
                         };
-                        item.SetProviderId(Plugin.PluginName, personId);
+                        item.SetProviderId(Plugin.PluginKey, personId);
                         result.Add(item);
                         return result;
                     }
@@ -589,7 +589,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                     Name = person.Name,
                     ImageUrl = person.Photo,
                 };
-                item.SetProviderId(Plugin.PluginName, person.Id.ToString(CultureInfo.InvariantCulture));
+                item.SetProviderId(Plugin.PluginKey, person.Id.ToString(CultureInfo.InvariantCulture));
                 result.Add(item);
             }
             _log.Info($"By name '{searchInfo.Name}' found {result.Count} persons");
@@ -638,9 +638,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return result;
             }
 
-            if (item.HasProviderId(Plugin.PluginName))
+            if (item.HasProviderId(Plugin.PluginKey))
             {
-                var movieId = item.ProviderIds[Plugin.PluginName];
+                var movieId = item.ProviderIds[Plugin.PluginKey];
                 if (!string.IsNullOrWhiteSpace(movieId))
                 {
                     _log.Info($"Searching images by movie id '{movieId}'");
@@ -672,7 +672,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             {
                 toReturn.Add(new RemoteImageInfo()
                 {
-                    ProviderName = Plugin.PluginName,
+                    ProviderName = Plugin.PluginKey,
                     Url = movie.Backdrop.Url,
                     ThumbnailUrl = movie.Backdrop.PreviewUrl,
                     Language = "ru",
@@ -684,7 +684,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             {
                 toReturn.Add(new RemoteImageInfo()
                 {
-                    ProviderName = Plugin.PluginName,
+                    ProviderName = Plugin.PluginKey,
                     Url = movie.Poster.Url,
                     ThumbnailUrl = movie.Poster.PreviewUrl,
                     Language = "ru",
@@ -696,7 +696,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             {
                 toReturn.Add(new RemoteImageInfo()
                 {
-                    ProviderName = Plugin.PluginName,
+                    ProviderName = Plugin.PluginKey,
                     Url = movie.Logo.Url,
                     ThumbnailUrl = movie.Logo.PreviewUrl,
                     Language = "ru",
@@ -735,12 +735,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             if (persons == null)
             {
-                _log.Warn($"Received persons list is null for series with id '{result.Item.GetProviderId(Plugin.PluginName)}'");
+                _log.Warn($"Received persons list is null for series with id '{result.Item.GetProviderId(Plugin.PluginKey)}'");
                 return;
             }
 
-            _log.Info($"Updating persons list of the series with id '{result.Item.GetProviderId(Plugin.PluginName)}'");
-            var seriesId = result.Item.GetProviderId(Plugin.PluginName);
+            _log.Info($"Updating persons list of the series with id '{result.Item.GetProviderId(Plugin.PluginKey)}'");
+            var seriesId = result.Item.GetProviderId(Plugin.PluginKey);
             var movieName = result.Item.Name;
             KpSearchResult<KpPerson> personsBySeriesId = await _api.GetPersonsByMovieId(seriesId, cancellationToken);
             personsBySeriesId.Docs
@@ -779,12 +779,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                         Type = (PersonType)personType,
                         Role = role,
                     };
-                    person.SetProviderId(Plugin.PluginName, kpPerson.Id.ToString(CultureInfo.InvariantCulture));
+                    person.SetProviderId(Plugin.PluginKey, kpPerson.Id.ToString(CultureInfo.InvariantCulture));
 
                     result.AddPerson(person);
                 }
             }
-            _log.Info($"Added {result.People.Count} persons to the series with id '{result.Item.GetProviderId(Plugin.PluginName)}'");
+            _log.Info($"Added {result.People.Count} persons to the series with id '{result.Item.GetProviderId(Plugin.PluginKey)}'");
         }
         private async Task AddMovieToCollection(BaseItem toReturn, KpMovie movie, CancellationToken cancellationToken)
         {
@@ -904,7 +904,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                         Name = m.Name,
                         OriginalTitle = m.AlternativeName
                     };
-                    movie.SetProviderId(Plugin.PluginName, m.Id.ToString(CultureInfo.InvariantCulture));
+                    movie.SetProviderId(Plugin.PluginKey, m.Id.ToString(CultureInfo.InvariantCulture));
                     if (!string.IsNullOrWhiteSpace(m.ExternalId?.Imdb))
                     {
                         movie.SetProviderId(MetadataProviders.Imdb.ToString(), m.ExternalId.Imdb);
@@ -932,7 +932,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                         Name = m.Name,
                         OriginalTitle = m.AlternativeName
                     };
-                    series.SetProviderId(Plugin.PluginName, m.Id.ToString(CultureInfo.InvariantCulture));
+                    series.SetProviderId(Plugin.PluginKey, m.Id.ToString(CultureInfo.InvariantCulture));
                     if (!string.IsNullOrWhiteSpace(m.ExternalId?.Imdb))
                     {
                         series.SetProviderId(MetadataProviders.Imdb.ToString(), m.ExternalId.Imdb);

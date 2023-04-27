@@ -36,7 +36,7 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
                 {
                     _log.Info($"Detected kinopoisk id '{kinopoiskId}' for file '{info.Path}'");
                     var item = new T();
-                    item.SetProviderId(Plugin.PluginName, match.Groups["kinopoiskId"].Value);
+                    item.SetProviderId(Plugin.PluginKey, match.Groups["kinopoiskId"].Value);
 
                     result.Item = item;
                     result.HasMetadata = true;

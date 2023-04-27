@@ -1,20 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
 using EmbyKinopoiskRu.Api.KinopoiskDev;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie;
+using EmbyKinopoiskRu.ScheduledTasks.Model;
 
+using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Logging;
+using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Querying;
+using MediaBrowser.Model.Serialization;
 
 namespace EmbyKinopoiskRu.Helper
 {
@@ -66,7 +72,7 @@ namespace EmbyKinopoiskRu.Helper
                 IncludeItemTypes = new[] { "movie", "tvshow" },
                 Recursive = false,
                 IsVirtualItem = false,
-                AnyProviderIdEquals = choosenItems.Select(id => new KeyValuePair<string, string>(Plugin.PluginName, id.ToString(CultureInfo.InvariantCulture))).ToList()
+                AnyProviderIdEquals = choosenItems.Select(id => new KeyValuePair<string, string>(Plugin.PluginKey, id.ToString(CultureInfo.InvariantCulture))).ToList()
             });
             var toReturn = collectionItems.Items.ToList();
             logger.Info($"Internal objects with Kinopoisk ids: {toReturn.Count}");
@@ -76,7 +82,7 @@ namespace EmbyKinopoiskRu.Helper
                 logger.Info("Searching for another objects with another metadata providers");
                 foreach (BaseItem item in collectionItems.Items)
                 {
-                    if (long.TryParse(item.GetProviderId(Plugin.PluginName), out var id))
+                    if (long.TryParse(item.GetProviderId(Plugin.PluginKey), out var id))
                     {
                         _ = choosenItems.Remove(id);
                     }
@@ -172,6 +178,44 @@ namespace EmbyKinopoiskRu.Helper
 
             return boxsetTmp.Value == 0 ? null : boxsetTmp.Key;
         }
-
+        internal static Dictionary<string, string> GetAvailableTransactionsForTasks(string key)
+        {
+            var basePath = Plugin.Instance.GetType().Namespace + $".i18n.ScheduledTasks.{key}.";
+            return Assembly.GetExecutingAssembly().GetManifestResourceNames()
+                .Where(i => i.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
+                .Select(i =>
+                    new TranslationInfo()
+                    {
+                        Locale = Path.GetFileNameWithoutExtension(i.Substring(basePath.Length)),
+                        EmbeddedResourcePath = i
+                    })
+                .ToDictionary(i => i.Locale, j => j.EmbeddedResourcePath);
+        }
+        internal static TaskTranslation GetTaskTranslation(
+            Dictionary<string, TaskTranslation> translations,
+            IServerConfigurationManager serverConfigurationManager,
+            IJsonSerializer jsonSerializer,
+            Dictionary<string, string> availableTranslations)
+        {
+            if (!translations.TryGetValue(serverConfigurationManager.Configuration.UICulture, out TaskTranslation translation))
+            {
+                if (!availableTranslations.TryGetValue(serverConfigurationManager.Configuration.UICulture, out var resourcePath))
+                {
+                    resourcePath = availableTranslations["en-US"];
+                }
+                using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath))
+                {
+                    translation = jsonSerializer.DeserializeFromStream<TaskTranslation>(stream);
+                }
+                if (translation != null)
+                {
+                    lock (translations)
+                    {
+                        translations.Add(serverConfigurationManager.Configuration.UICulture, translation);
+                    }
+                }
+            }
+            return translation;
+        }
     }
 }

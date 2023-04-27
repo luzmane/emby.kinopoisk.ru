@@ -86,7 +86,7 @@ namespace EmbyKinopoiskRu.Helper
         {
             activityManager.Create(new ActivityLogEntry()
             {
-                Name = Plugin.PluginName,
+                Name = Plugin.PluginKey,
                 Type = "PluginError",
                 Overview = overview,
                 ShortOverview = shortOverview,

@@ -1,0 +1,5 @@
+{
+    "Name": "Add KinopoiskId based on IMDB, TMDB",
+    "Description": "Add KinopoiskId searching them by IMDB and TMDB ids. Support kinopoisk.dev only",
+    "Category": "Kinopoisk Plugin"
+}

@@ -6,12 +6,17 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using EmbyKinopoiskRu.Api;
+using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial;
+using EmbyKinopoiskRu.Helper;
+using EmbyKinopoiskRu.ScheduledTasks.Model;
 
+using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Querying;
+using MediaBrowser.Model.Serialization;
 using MediaBrowser.Model.Tasks;
 
 namespace EmbyKinopoiskRu.ScheduledTasks
@@ -24,24 +29,37 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         private const int CHUNK_SIZE = 150;
 
         private readonly ILibraryManager _libraryManager;
+        private readonly IServerConfigurationManager _serverConfigurationManager;
+        private readonly IJsonSerializer _jsonSerializer;
+        private readonly Dictionary<string, TaskTranslation> _translations = new Dictionary<string, TaskTranslation>();
+        private readonly Dictionary<string, string> _availableTranslations = new Dictionary<string, string>();
         private Plugin Plugin { get; set; }
-        public string Name => "Add KinopoiskId based on IMDB, TMDB";
+        public string Name => GetTranslation().Name;
         public string Key => "KinopoiskFromOther";
-        public string Description => "Add KinopoiskId searching them by IMDB and TMDB ids. Support kinopoisk.dev only";
-        public string Category => Plugin.PluginTaskCategory;
+        public string Description => GetTranslation().Description;
+        public string Category => GetTranslation().Category;
         public bool IsHidden => false;
         public bool IsEnabled => false;
         public bool IsLogged => true;
 
-        public CreateKinopoiskIdTask(ILogManager logManager, ILibraryManager libraryManager)
+        public CreateKinopoiskIdTask(
+            ILogManager logManager,
+            ILibraryManager libraryManager,
+            IServerConfigurationManager serverConfigurationManager,
+            IJsonSerializer jsonSerializer)
         {
             _log = logManager.GetLogger(GetType().Name);
             _libraryManager = libraryManager;
+            _serverConfigurationManager = serverConfigurationManager;
+            _jsonSerializer = jsonSerializer;
+
             if (Plugin.Instance == null)
             {
                 throw new NullReferenceException($"Plugin '{Plugin.PluginName}' instance is null");
             }
             Plugin = Plugin.Instance;
+
+            _availableTranslations = EmbyHelper.GetAvailableTransactionsForTasks(Key);
         }
         public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
         {
@@ -68,16 +86,26 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             }
             try
             {
+                IKinopoiskRuService kinopoiskRuService = Plugin.GetKinopoiskService();
+                if (kinopoiskRuService is KinopoiskUnofficialService)
+                {
+                    _log.Error("KinopoiskUnofficial doesn't support this task. Exit");
+                    return;
+                }
+
                 _log.Info("Searching for movies/series without KP id, but with IMDB or TMDB");
                 QueryResult<BaseItem> itemsToUpdateResult = _libraryManager.QueryItems(new InternalItemsQuery()
                 {
                     IncludeItemTypes = new[] { "movie", "tvshow" },
                     Recursive = false,
                     IsVirtualItem = false,
-                    MissingAnyProviderId = new[] { Plugin.PluginName },
+                    MissingAnyProviderId = new[] { Plugin.PluginKey },
                     HasAnyProviderId = new[] { MetadataProviders.Imdb.ToString(), MetadataProviders.Tmdb.ToString() },
                 });
-                _log.Info($"Found {itemsToUpdateResult.TotalRecordCount} items");
+                var names = itemsToUpdateResult.TotalRecordCount > 0 ?
+                    ": '" + string.Join("','", itemsToUpdateResult.Items.Select(i => i.Name)) + "'"
+                    : string.Empty;
+                _log.Info($"Found {itemsToUpdateResult.TotalRecordCount} items{names}");
                 progress.Report(10d);
 
                 if (itemsToUpdateResult.TotalRecordCount == 0)
@@ -91,7 +119,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                         .Where(m => !string.IsNullOrWhiteSpace(m.GetProviderId(MetadataProviders.Imdb.ToString())))
                         .ToList();
                     await UpdateItemsByProviderId(imdbList, MetadataProviders.Imdb.ToString(), cancellationToken);
-                    _log.Info("Updated Imdb provider id");
+                    _log.Info("Finishing update Kinopoisk IDs by Imdb ID");
                     progress.Report(50d);
 
                     var tmdbList = itemsToUpdateResult.Items
@@ -100,7 +128,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                         .Where(m => !string.IsNullOrWhiteSpace(m.GetProviderId(MetadataProviders.Tmdb.ToString())))
                         .ToList();
                     await UpdateItemsByProviderId(tmdbList, MetadataProviders.Tmdb.ToString(), cancellationToken);
-                    _log.Info("Updated Tmdb provider id");
+                    _log.Info("Finishing update Kinopoisk IDs by Tmdb ID");
                     progress.Report(100d);
                 }
             }
@@ -131,7 +159,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                     var id = item.GetProviderId(providerId);
                     if (fetchedIds.Item.ContainsKey(id))
                     {
-                        item.SetProviderId(Plugin.PluginName, fetchedIds.Item[id].ToString(CultureInfo.InvariantCulture));
+                        item.SetProviderId(Plugin.PluginKey, fetchedIds.Item[id].ToString(CultureInfo.InvariantCulture));
                         item.UpdateToRepository(ItemUpdateType.MetadataEdit);
                     }
                     else
@@ -140,6 +168,10 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                     }
                 }
             }
+        }
+        private TaskTranslation GetTranslation()
+        {
+            return EmbyHelper.GetTaskTranslation(_translations, _serverConfigurationManager, _jsonSerializer, _availableTranslations);
         }
     }
 }

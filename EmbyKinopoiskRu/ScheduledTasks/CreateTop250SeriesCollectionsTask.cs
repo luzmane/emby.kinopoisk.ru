@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using MediaBrowser.Controller.Collections;
+using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Library;
@@ -12,6 +13,7 @@ using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Extensions;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Querying;
+using MediaBrowser.Model.Serialization;
 using MediaBrowser.Model.Tasks;
 
 namespace EmbyKinopoiskRu.ScheduledTasks
@@ -21,16 +23,26 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         private static bool _isScanRunning;
         private static readonly object ScanLock = new object();
 
-        public string Name => "Create Top250 Series collection from Kinopoisk";
-        public string Key => "KinopoiskTop250Series";
-        public string Description => "Create series collection based on top 250 list from Kinopoisk.ru. Support kinopoisk.dev only";
-        public string Category => Plugin.PluginTaskCategory;
+        public string Name => GetTranslation().Name;
+        public string Description => GetTranslation().Description;
+        public string Category => GetTranslation().Category;
         public bool IsHidden => false;
         public bool IsEnabled => false;
         public bool IsLogged => true;
 
-        public CreateTop250SeriesCollectionsTask(ILogManager logManager, ILibraryManager libraryManager, ICollectionManager collectionManager)
-                    : base(libraryManager, collectionManager, logManager.GetLogger("CreateTop250SeriesCollectionsTask"))
+        public CreateTop250SeriesCollectionsTask(
+            ILogManager logManager,
+            ILibraryManager libraryManager,
+            ICollectionManager collectionManager,
+            IJsonSerializer jsonSerializer,
+            IServerConfigurationManager serverConfigurationManager)
+            : base(
+                libraryManager,
+                collectionManager,
+                logManager.GetLogger("CreateTop250SeriesCollectionsTask"),
+                jsonSerializer,
+                serverConfigurationManager,
+                "KinopoiskTop250Series")
         {
         }
 
@@ -103,7 +115,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 {
                     var toReturn = new List<KeyValuePair<string, string>>()
                     {
-                        new KeyValuePair<string, string>(Plugin.PluginName, m.GetProviderId(Plugin.PluginName))
+                        new KeyValuePair<string, string>(Plugin.PluginKey, m.GetProviderId(Plugin.PluginKey))
                     };
                     if (m.HasProviderId(MetadataProviders.Imdb.ToString()))
                     {

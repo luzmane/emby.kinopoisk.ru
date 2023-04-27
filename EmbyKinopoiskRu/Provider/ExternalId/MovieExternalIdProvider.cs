@@ -11,7 +11,7 @@ namespace EmbyKinopoiskRu.Provider.ExternalId
     {
         public string Name => Plugin.PluginName;
 
-        public string Key => Plugin.PluginName;
+        public string Key => Plugin.PluginKey;
 
         /// <summary>
         /// Used on paget for link

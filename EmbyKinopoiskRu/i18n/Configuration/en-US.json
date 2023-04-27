@@ -6,5 +6,7 @@
     "Collection creation configuration (for kinopoisk.dev only)": "Collection creation configuration (for kinopoisk.dev only)",
     "Create collections": "Create collections",
     "Top 250 Movie Collection Name": "Top 250 Movie Collection Name",
-    "Top 250 Series Collection Name": "Top 250 Series Collection Name"
+    "Top 250 Series Collection Name": "Top 250 Series Collection Name",
+    "Name": "Add KinopoiskId based on IMDB, TMDB",
+    "Description": "Add KinopoiskId searching them by IMDB and TMDB ids. Support kinopoisk.dev only"
 }

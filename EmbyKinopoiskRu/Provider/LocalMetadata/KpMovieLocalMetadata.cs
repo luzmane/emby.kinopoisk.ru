@@ -31,7 +31,7 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
             MetadataResult<Movie> result = await base.GetMetadata(info, libraryOptions, directoryService, cancellationToken);
             if (result.HasMetadata)
             {
-                _log.Info($"Movie has kp id: {result.Item.ProviderIds[Plugin.PluginName]}");
+                _log.Info($"Movie has kp id: {result.Item.ProviderIds[Plugin.PluginKey]}");
                 return result;
             }
 
@@ -47,7 +47,7 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
             }
             else if (movies.Count == 1)
             {
-                _log.Info($"For movie name '{movieName}' found movie with KP id = '{movies[0].GetProviderId(Plugin.PluginName)}'");
+                _log.Info($"For movie name '{movieName}' found movie with KP id = '{movies[0].GetProviderId(Plugin.PluginKey)}'");
                 result.Item = movies[0];
                 result.HasMetadata = true;
             }
@@ -60,12 +60,12 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
                 if (movieWithHighestRating != null)
                 {
                     result.Item = movieWithHighestRating;
-                    _log.Info($"Found {movies.Count} movies. Taking the first one with highest rating in KP. Choose movie with KP id = '{result.Item.GetProviderId(Plugin.PluginName)}' for '{movieName}'");
+                    _log.Info($"Found {movies.Count} movies. Taking the first one with highest rating in KP. Choose movie with KP id = '{result.Item.GetProviderId(Plugin.PluginKey)}' for '{movieName}'");
                 }
                 else
                 { // all films without KP rating
                     result.Item = movies[0];
-                    _log.Info($"Found {movies.Count} movies. Taking the first one. Choose movie with KP id = '{result.Item.GetProviderId(Plugin.PluginName)}' for '{movieName}'");
+                    _log.Info($"Found {movies.Count} movies. Taking the first one. Choose movie with KP id = '{result.Item.GetProviderId(Plugin.PluginKey)}' for '{movieName}'");
                 }
                 result.HasMetadata = true;
             }

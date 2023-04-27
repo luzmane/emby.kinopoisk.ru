@@ -45,20 +45,54 @@
     <None Remove="thumb.png" />
     <None Remove="Configuration/kinopoiskru.html" />
     <None Remove="Configuration/kinopoiskru.js" />
-    <None Remove="Configuration/strings/ru.json" />
-    <None Remove="Configuration/strings/en-GB.json" />
-    <None Remove="Configuration/strings/en-US.json" />
-    <None Remove="Configuration/strings/uk.json" />
+
+    <None Remove="i18n/Configuration/ru.json" />
+    <None Remove="i18n/Configuration/en-US.json" />
+    <None Remove="i18n/Configuration/uk.json" />
+
+    <None Remove="i18n/ScheduledTasks/KinopoiskFromOther/ru.json" />
+    <None Remove="i18n/ScheduledTasks/KinopoiskFromOther/en-US.json" />
+    <None Remove="i18n/ScheduledTasks/KinopoiskFromOther/uk.json" />
+
+    <None Remove="i18n/ScheduledTasks/KinopoiskNewVersion/ru.json" />
+    <None Remove="i18n/ScheduledTasks/KinopoiskNewVersion/en-US.json" />
+    <None Remove="i18n/ScheduledTasks/KinopoiskNewVersion/uk.json" />
+
+    <None Remove="i18n/ScheduledTasks/KinopoiskTop250Movie/ru.json" />
+    <None Remove="i18n/ScheduledTasks/KinopoiskTop250Movie/en-US.json" />
+    <None Remove="i18n/ScheduledTasks/KinopoiskTop250Movie/uk.json" />
+
+    <None Remove="i18n/ScheduledTasks/KinopoiskTop250Series/ru.json" />
+    <None Remove="i18n/ScheduledTasks/KinopoiskTop250Series/en-US.json" />
+    <None Remove="i18n/ScheduledTasks/KinopoiskTop250Series/uk.json" />
+
   </ItemGroup>
 
   <ItemGroup>
     <EmbeddedResource Include="thumb.png" />
     <EmbeddedResource Include="Configuration/kinopoiskru.html" />
     <EmbeddedResource Include="Configuration/kinopoiskru.js" />
-    <EmbeddedResource Include="Configuration/strings/ru.json" />
-    <EmbeddedResource Include="Configuration/strings/en-GB.json" />
-    <EmbeddedResource Include="Configuration/strings/en-US.json" />
-    <EmbeddedResource Include="Configuration/strings/uk.json" />
+
+    <EmbeddedResource Include="i18n/Configuration/ru.json" />
+    <EmbeddedResource Include="i18n/Configuration/en-US.json" />
+    <EmbeddedResource Include="i18n/Configuration/uk.json" />
+
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskFromOther/ru.json" />
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskFromOther/en-US.json" />
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskFromOther/uk.json" />
+
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskNewVersion/ru.json" />
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskNewVersion/en-US.json" />
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskNewVersion/uk.json" />
+
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250Movie/ru.json" />
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250Movie/en-US.json" />
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250Movie/uk.json" />
+
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250Series/ru.json" />
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250Series/en-US.json" />
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250Series/uk.json" />
+
   </ItemGroup>
 
 </Project>
