@@ -69,7 +69,7 @@ namespace EmbyKinopoiskRu.Helper
             }
             QueryResult<BaseItem> collectionItems = libraryManager.QueryItems(new InternalItemsQuery()
             {
-                IncludeItemTypes = new[] { "movie", "tvshow" },
+                IncludeItemTypes = new[] { CollectionType.Movies.ToString(), CollectionType.TvShows.ToString() },
                 Recursive = false,
                 IsVirtualItem = false,
                 AnyProviderIdEquals = choosenItems.Select(id => new KeyValuePair<string, string>(Plugin.PluginKey, id.ToString(CultureInfo.InvariantCulture))).ToList()
@@ -103,7 +103,7 @@ namespace EmbyKinopoiskRu.Helper
                 QueryResult<BaseItem> imdbCollectionItems = imdbList.Any()
                     ? libraryManager.QueryItems(new InternalItemsQuery()
                     {
-                        IncludeItemTypes = new[] { "movie", "tvshow" },
+                        IncludeItemTypes = new[] { CollectionType.Movies.ToString(), CollectionType.TvShows.ToString() },
                         Recursive = false,
                         IsVirtualItem = false,
                         AnyProviderIdEquals = imdbList
@@ -122,7 +122,7 @@ namespace EmbyKinopoiskRu.Helper
                 QueryResult<BaseItem> tmdbCollectionItems = tmdbList.Any()
                     ? libraryManager.QueryItems(new InternalItemsQuery()
                     {
-                        IncludeItemTypes = new[] { "movie", "tvshow" },
+                        IncludeItemTypes = new[] { CollectionType.Movies.ToString(), CollectionType.TvShows.ToString() },
                         Recursive = false,
                         IsVirtualItem = false,
                         AnyProviderIdEquals = tmdbList
@@ -160,7 +160,7 @@ namespace EmbyKinopoiskRu.Helper
             {
                 QueryResult<BaseItem> collectionItems = libraryManager.QueryItems(new InternalItemsQuery()
                 {
-                    IncludeItemTypes = new[] { "movie", "tvshow" },
+                    IncludeItemTypes = new[] { CollectionType.Movies.ToString(), CollectionType.TvShows.ToString() },
                     Recursive = false,
                     IsVirtualItem = false,
                     CollectionIds = new long[] { collection.InternalId }

@@ -131,7 +131,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             QueryResult<BaseItem> moviesInLibraryQueryResult = anyProviderIdEquals.Any()
                 ? LibraryManager.QueryItems(new InternalItemsQuery()
                 {
-                    IncludeItemTypes = new[] { "movie" },
+                    IncludeItemTypes = new[] { CollectionType.Movies.ToString() },
                     AnyProviderIdEquals = anyProviderIdEquals,
                     Recursive = false,
                     IsVirtualItem = false,

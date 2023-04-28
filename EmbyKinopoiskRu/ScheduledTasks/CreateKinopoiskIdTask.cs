@@ -96,7 +96,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 _log.Info("Searching for movies/series without KP id, but with IMDB or TMDB");
                 QueryResult<BaseItem> itemsToUpdateResult = _libraryManager.QueryItems(new InternalItemsQuery()
                 {
-                    IncludeItemTypes = new[] { "movie", "tvshow" },
+                    IncludeItemTypes = new[] { CollectionType.Movies.ToString(), CollectionType.TvShows.ToString() },
                     MissingAnyProviderId = new[] { Plugin.PluginKey },
                     HasAnyProviderId = new[] { MetadataProviders.Imdb.ToString(), MetadataProviders.Tmdb.ToString() },
                 });
