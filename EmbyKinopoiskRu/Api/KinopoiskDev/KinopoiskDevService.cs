@@ -195,7 +195,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 PremiereDate = KpHelper.GetPremierDate(movie.Premiere),
                 ProductionLocations = movie.Countries?.Select(i => i.Name).ToArray(),
                 ProductionYear = movie.Year,
-                Size = movie.MovieLength,
+                Size = movie.MovieLength ?? 0,
                 SortName =
                     string.IsNullOrWhiteSpace(movie.Name) ?
                         string.IsNullOrWhiteSpace(movie.AlternativeName) ?
@@ -375,7 +375,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 PremiereDate = KpHelper.GetPremierDate(series.Premiere),
                 ProductionLocations = series.Countries?.Select(i => i.Name).ToArray(),
                 ProductionYear = series.Year,
-                Size = series.MovieLength,
+                Size = series.MovieLength ?? 0,
                 SortName =
                     string.IsNullOrWhiteSpace(series.Name) ?
                         string.IsNullOrWhiteSpace(series.AlternativeName) ?
