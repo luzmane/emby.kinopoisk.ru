@@ -41,9 +41,9 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public void ReplaceAlphaNumericCharacters()
         {
-            Assert.AreEqual("Ледиибродяга3000", KpHelper.CleanName("Леди и бродяга_3000"));
-            Assert.AreEqual("Небойсяястобой", KpHelper.CleanName("Не бойся, я с тобой!"));
-            Assert.AreEqual("KoroliShutS012023WEBRip", KpHelper.CleanName("Korol.i.Shut.S01.2023.WEBRip."));
+            Assert.AreEqual("Леди и бродяга 3000", KpHelper.CleanName("Леди и бродяга_3000"));
+            Assert.AreEqual("Не бойся я с тобой", KpHelper.CleanName("Не бойся, я с тобой!"));
+            Assert.AreEqual("Korol i Shut S01 2023 WEBRip", KpHelper.CleanName("Korol.i.Shut.S01.2023.WEBRip."));
         }
     }
 }

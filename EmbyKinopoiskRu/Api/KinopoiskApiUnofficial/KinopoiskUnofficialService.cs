@@ -39,7 +39,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             , IActivityManager activityManager)
         {
             _log = logManager.GetLogger(GetType().Name);
-            _api = new KinopoiskUnofficialApi(_log, httpClient, jsonSerializer, activityManager);
+            _api = new KinopoiskUnofficialApi(logManager, httpClient, jsonSerializer, activityManager);
             if (Plugin.Instance == null)
             {
                 throw new NullReferenceException($"Plugin '{Plugin.PluginName}' instance is null");
@@ -77,10 +77,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 }
             }
 
-            _log.Info($"Searching movies by name '{info.Name}' and year '{info.Year}'");
-            KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(info.Name, info.Year, cancellationToken);
-            _log.Info("Filtering out irrelevant films");
-            List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, info.Name, info.Year);
+            var name = KpHelper.CleanName(info.Name);
+            _log.Info($"Searching movies by name '{name}' and year '{info.Year}'");
+            KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(name, info.Year, cancellationToken);
+            List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, name, info.Year);
             if (relevantMovies.Count != 1)
             {
                 _log.Error($"Found {relevantMovies.Count} movies, skipping movie update");
@@ -127,8 +127,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 }
             }
 
-            _log.Info($"Searching movies by name {searchInfo.Name}");
-            KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(searchInfo.Name, searchInfo.Year, cancellationToken);
+            var name = KpHelper.CleanName(searchInfo.Name);
+            _log.Info($"Searching movies by name '{name}' and year '{searchInfo.Year}'");
+            KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(name, searchInfo.Year, cancellationToken);
             foreach (KpFilm movie in movies.Items)
             {
                 var imageUrl = (movie.PosterUrlPreview ?? movie.PosterUrl) ?? string.Empty;
@@ -143,7 +144,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 item.SetProviderId(Plugin.PluginKey, movie.KinopoiskId.ToString(CultureInfo.InvariantCulture));
                 result.Add(item);
             }
-            _log.Info($"By name '{searchInfo.Name}' found {result.Count} movies");
+            _log.Info($"By name '{name}' found {result.Count} movies");
             return result;
         }
         public async Task<List<Movie>> GetMoviesByOriginalNameAndYear(string name, int? year, CancellationToken cancellationToken)
@@ -156,8 +157,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 return result;
             }
 
+            name = KpHelper.CleanName(name);
+            _log.Info($"Searching movies by name '{name}' and year '{year}'");
             KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(name, year, cancellationToken);
-            _log.Info("Filtering out irrelevant films");
             List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, name, year);
             foreach (KpFilm movie in relevantMovies)
             {
@@ -273,10 +275,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 }
             }
 
-            _log.Info($"Searching movies by name '{item.Name}' and year '{item.ProductionYear}'");
-            KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(item.Name, item.ProductionYear, cancellationToken);
-            _log.Info("Filtering out irrelevant films");
-            List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, item.Name, item.ProductionYear);
+            var name = KpHelper.CleanName(item.Name);
+            _log.Info($"Searching movies by name '{name}' and year '{item.ProductionYear}'");
+            KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(name, item.ProductionYear, cancellationToken);
+            List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, name, item.ProductionYear);
             if (relevantMovies.Count != 1)
             {
                 _log.Error($"Found {relevantMovies.Count} movies, skipping image update");
@@ -357,10 +359,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 }
             }
 
-            _log.Info($"Searching series by name '{info.Name}' and year '{info.Year}'");
-            KpSearchResult<KpFilm> series = await _api.GetFilmsByNameAndYear(info.Name, info.Year, cancellationToken);
-            _log.Info("Filtering out irrelevant series");
-            List<KpFilm> relevantSeries = FilterRelevantItems(series.Items, info.Name, info.Year);
+            var name = KpHelper.CleanName(info.Name);
+            _log.Info($"Searching series by name '{name}' and year '{info.Year}'");
+            KpSearchResult<KpFilm> series = await _api.GetFilmsByNameAndYear(name, info.Year, cancellationToken);
+            List<KpFilm> relevantSeries = FilterRelevantItems(series.Items, name, info.Year);
             if (relevantSeries.Count != 1)
             {
                 _log.Error($"Found {relevantSeries.Count} series, skipping series update");
@@ -407,8 +409,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 }
             }
 
-            _log.Info($"Searching series by name {searchInfo.Name}");
-            KpSearchResult<KpFilm> seriesResult = await _api.GetFilmsByNameAndYear(searchInfo.Name, searchInfo.Year, cancellationToken);
+            var name = KpHelper.CleanName(searchInfo.Name);
+            _log.Info($"Searching series by name '{name}' and year '{searchInfo.Year}'");
+            KpSearchResult<KpFilm> seriesResult = await _api.GetFilmsByNameAndYear(name, searchInfo.Year, cancellationToken);
             foreach (KpFilm series in seriesResult.Items)
             {
                 var imageUrl = (series.PosterUrlPreview ?? series.PosterUrl) ?? string.Empty;
@@ -423,7 +426,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 item.SetProviderId(Plugin.PluginKey, series.KinopoiskId.ToString(CultureInfo.InvariantCulture));
                 result.Add(item);
             }
-            _log.Info($"By name '{searchInfo.Name}' found {result.Count} series");
+            _log.Info($"By name '{name}' found {result.Count} series");
             return result;
         }
 
@@ -653,7 +656,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 }
             }
 
-            _log.Info($"Searching persons by available metadata");
+            _log.Info($"Searching persons by name '{searchInfo.Name}'");
             KpSearchResult<KpPerson> persons = await _api.GetPersonsByName(searchInfo.Name, cancellationToken);
             foreach (KpPerson person in persons.Items)
             {
@@ -735,8 +738,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             }
             _log.Info($"Added {result.People.Count} persons to the movie with id '{result.Item.GetProviderId(Plugin.PluginKey)}'");
         }
-        private static List<KpFilm> FilterRelevantItems(List<KpFilm> list, string name, int? year)
+        private List<KpFilm> FilterRelevantItems(List<KpFilm> list, string name, int? year)
         {
+            _log.Info("Filtering out irrelevant items");
             if (list.Count > 1)
             {
                 var toReturn = list

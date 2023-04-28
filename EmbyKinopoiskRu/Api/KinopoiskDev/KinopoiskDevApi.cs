@@ -27,13 +27,13 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         private readonly IActivityManager _activityManager;
 
         internal KinopoiskDevApi(
-            ILogger log
+              ILogManager logManager
             , IHttpClient httpClient
             , IJsonSerializer jsonSerializer
             , IActivityManager activityManager)
         {
             _httpClient = httpClient;
-            _log = log;
+            _log = logManager.GetLogger(GetType().Name);
             _jsonSerializer = jsonSerializer;
             _activityManager = activityManager;
         }
@@ -75,7 +75,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 KpSearchResult<KpMovie> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
                 if (toReturn != null && toReturn.Docs.Count > 0)
                 {
-                    _log.Info($"Found {toReturn.Docs.Count} movies");
+                    _log.Info($"Found {toReturn.Docs.Count} items");
                     return toReturn;
                 }
             }
@@ -87,7 +87,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 KpSearchResult<KpMovie> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
                 if (toReturn != null && toReturn.Docs.Count > 0)
                 {
-                    _log.Info($"Found {toReturn.Docs.Count} movies");
+                    _log.Info($"Found {toReturn.Docs.Count} items");
                     return toReturn;
                 }
             }
@@ -99,7 +99,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 KpSearchResult<KpMovie> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
                 if (toReturn != null && toReturn.Docs.Count > 0)
                 {
-                    _log.Info($"Found {toReturn.Docs.Count} movies");
+                    _log.Info($"Found {toReturn.Docs.Count} items");
                     return toReturn;
                 }
             }
@@ -111,7 +111,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 KpSearchResult<KpMovie> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
                 if (toReturn != null && toReturn.Docs.Count > 0)
                 {
-                    _log.Info($"Found {toReturn.Docs.Count} movies");
+                    _log.Info($"Found {toReturn.Docs.Count} items");
                     return toReturn;
                 }
             }

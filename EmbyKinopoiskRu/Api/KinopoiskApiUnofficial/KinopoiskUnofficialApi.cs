@@ -27,13 +27,13 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         private readonly IActivityManager _activityManager;
 
         internal KinopoiskUnofficialApi(
-            ILogger log
+            ILogManager logManager
             , IHttpClient httpClient
             , IJsonSerializer jsonSerializer
             , IActivityManager activityManager)
         {
             _httpClient = httpClient;
-            _log = log;
+            _log = logManager.GetLogger(GetType().Name);
             _jsonSerializer = jsonSerializer;
             _activityManager = activityManager;
         }

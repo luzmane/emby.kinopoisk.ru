@@ -14,7 +14,8 @@ namespace EmbyKinopoiskRu.Helper
     internal class KpHelper
     {
         private static readonly Regex Year = new Regex("(?<year>[0-9]{4})", RegexOptions.Compiled);
-        private static readonly Regex NonAlphaNumeric = new Regex("[^а-яА-Яa-zA-Z0-9]", RegexOptions.Compiled);
+        private static readonly Regex NonAlphaNumeric = new Regex("[^а-яА-Яa-zA-Z0-9\\s]", RegexOptions.Compiled);
+        private static readonly Regex MultiWhitespace = new Regex("\\s\\s+", RegexOptions.Compiled);
 
         internal static DateTimeOffset? GetPremierDate(KpPremiere premiere)
         {
@@ -107,9 +108,11 @@ namespace EmbyKinopoiskRu.Helper
             _ = int.TryParse(DateTime.Now.ToString("yyyy", CultureInfo.InvariantCulture), out var currentYear);
             return (year > 1800 && year <= currentYear + 1) ? year : (int?)null;
         }
-        internal static string CleanName(string line)
+        internal static string CleanName(string name)
         {
-            return NonAlphaNumeric.Replace(line, string.Empty);
+            return string.IsNullOrEmpty(name)
+            ? name
+            : MultiWhitespace.Replace(NonAlphaNumeric.Replace(name, " ").Trim(), " ").ToLowerInvariant();
         }
 
     }
