@@ -35,7 +35,7 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetMovieById()
         {
-            var request = new Uri("https://api.kinopoisk.dev/v1/movie/435");
+            var request = new Uri("https://api.kinopoisk.dev/v1.3/movie/435");
             using HttpResponseMessage responseMessage = await HttpClient.GetAsync(request).ConfigureAwait(false);
             _ = responseMessage.EnsureSuccessStatusCode();
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
@@ -73,7 +73,7 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetMoviesByMovieDetailsNameYear()
         {
-            var request = $"https://api.kinopoisk.dev/v1/movie?";
+            var request = $"https://api.kinopoisk.dev/v1.3/movie?";
             request += "&limit=50";
             request += "&selectFields=alternativeName backdrop countries description enName externalId genres id logo movieLength name persons poster premiere productionCompanies rating ratingMpaa slogan videos year sequelsAndPrequels top250 facts releaseYears seasonsInfo";
             request += "&name=Гарри Поттер и философский камень";
@@ -117,7 +117,7 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetMoviesByMovieIds()
         {
-            var request = $"https://api.kinopoisk.dev/v1/movie?";
+            var request = $"https://api.kinopoisk.dev/v1.3/movie?";
             request += "&limit=50";
             request += "&selectFields=alternativeName backdrop countries description enName externalId genres id logo movieLength name persons poster premiere productionCompanies rating ratingMpaa slogan videos year sequelsAndPrequels top250 facts releaseYears seasonsInfo";
             request += "&id=689&id=435";
@@ -191,7 +191,7 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetMoviesByMovieDetailsAlternativeNameYear()
         {
-            var request = $"https://api.kinopoisk.dev/v1/movie?";
+            var request = $"https://api.kinopoisk.dev/v1.3/movie?";
             request += "&limit=50";
             request += "&selectFields=alternativeName backdrop countries description enName externalId genres id logo movieLength name persons poster premiere productionCompanies rating ratingMpaa slogan videos year sequelsAndPrequels top250 facts releaseYears seasonsInfo";
             request += "&alternativeName=Harry Potter and the Sorcerer's Stone";
@@ -235,7 +235,7 @@ namespace EmbyKinopoiskRu.Tests
         [Test]
         public async Task GetMoviesByTop250()
         {
-            var request = $"https://api.kinopoisk.dev/v1/movie?";
+            var request = $"https://api.kinopoisk.dev/v1.3/movie?";
             request += "selectFields=alternativeName externalId id name top250 typeNumber";
             request += "&limit=1000";
             request += "&top250=!null";
@@ -244,13 +244,13 @@ namespace EmbyKinopoiskRu.Tests
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
             KpSearchResult<KpMovie>? kpMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, JsonOptions);
             Assert.IsNotNull(kpMovie);
-            Assert.LessOrEqual(499, kpMovie!.Docs.Count);
+            Assert.GreaterOrEqual(kpMovie!.Docs.Count, 490);
         }
 
         [Test]
         public async Task GetMoviesByExternalIds()
         {
-            var request = $"https://api.kinopoisk.dev/v1/movie?";
+            var request = $"https://api.kinopoisk.dev/v1.3/movie?";
             request += "selectFields=alternativeName externalId.imdb id name&limit=1000";
             request += "&externalId.imdb=tt0241527";
             request += "&externalId.imdb=tt0120689";

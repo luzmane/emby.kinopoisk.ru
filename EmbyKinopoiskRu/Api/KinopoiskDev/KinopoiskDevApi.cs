@@ -40,12 +40,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         internal async Task<KpMovie> GetMovieById(string movieId, CancellationToken cancellationToken)
         {
-            var json = await SendRequest($"https://api.kinopoisk.dev/v1/movie/{movieId}", cancellationToken);
+            var json = await SendRequest($"https://api.kinopoisk.dev/v1.3/movie/{movieId}", cancellationToken);
             return _jsonSerializer.DeserializeFromString<KpMovie>(json);
         }
         internal async Task<KpSearchResult<KpMovie>> GetMoviesByIds(List<string> movieIdList, CancellationToken cancellationToken)
         {
-            var url = new StringBuilder($"https://api.kinopoisk.dev/v1/movie?")
+            var url = new StringBuilder($"https://api.kinopoisk.dev/v1.3/movie?")
                 .Append($"id={string.Join("&id=", movieIdList)}")
                 .Append($"&limit={movieIdList.Count}")
                 .Append("&selectFields=alternativeName backdrop countries description enName externalId genres id logo movieLength name persons poster premiere productionCompanies rating ratingMpaa slogan videos year sequelsAndPrequels top250 facts releaseYears seasonsInfo")
@@ -62,7 +62,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             var hasName = !string.IsNullOrWhiteSpace(name);
             var hasYear = year != null && year > 1000;
             var hasAlternativeName = !string.IsNullOrWhiteSpace(alternativeName);
-            var url = "https://api.kinopoisk.dev/v1/movie?limit=50";
+            var url = "https://api.kinopoisk.dev/v1.3/movie?limit=50";
             var selectFields = "&selectFields=alternativeName backdrop countries description enName externalId genres id logo movieLength name persons poster premiere productionCompanies rating ratingMpaa slogan videos year sequelsAndPrequels top250 facts releaseYears seasonsInfo";
             var namePart = $"&name={name}";
             var alternativeNamePart = $"&alternativeName={alternativeName}";
@@ -119,7 +119,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         }
         internal async Task<KpSearchResult<KpMovie>> GetTop250Collection(CancellationToken cancellationToken)
         {
-            var request = $"https://api.kinopoisk.dev/v1/movie?";
+            var request = $"https://api.kinopoisk.dev/v1.3/movie?";
             request += "limit=1000&top250=!null";
             request += "&selectFields=alternativeName externalId id name top250 typeNumber";
             var json = await SendRequest(request, cancellationToken);
@@ -184,7 +184,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 _log.Info("Received ids list is empty");
                 return new KpSearchResult<KpMovie>();
             }
-            var request = $"https://api.kinopoisk.dev/v1/movie?";
+            var request = $"https://api.kinopoisk.dev/v1.3/movie?";
             request += $"selectFields=externalId.{externalIdType.ToLowerInvariant()} id&limit=1000";
             var delimeter = $"&externalId.{externalIdType.ToLowerInvariant()}=";
             request += $"{delimeter}{string.Join(delimeter, idList)}";
@@ -256,7 +256,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             KpHelper.AddToActivityLog(_activityManager, overview, shortOverview);
         }
-
 
     }
 }

@@ -119,7 +119,7 @@ namespace EmbyKinopoiskRu.Tests
             var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
             List<KpFilmStaff>? filmStaffList = JsonSerializer.Deserialize<List<KpFilmStaff>>(response, JsonOptions);
             Assert.NotNull(filmStaffList);
-            Assert.AreEqual(89, filmStaffList!.Count);
+            Assert.AreEqual(90, filmStaffList!.Count);
             KpFilmStaff filmStaff = filmStaffList[1];
             Assert.AreEqual("Andy Dufresne", filmStaff.Description);
             Assert.AreEqual("Tim Robbins", filmStaff.NameEn);
