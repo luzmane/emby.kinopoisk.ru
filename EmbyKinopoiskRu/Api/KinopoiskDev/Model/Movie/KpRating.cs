@@ -1,5 +1,8 @@
+using System.Diagnostics;
+
 namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
 {
+    [DebuggerDisplay("{DebuggerDisplay,nq}")]
     public class KpRating
     {
         /// <summary>
@@ -11,5 +14,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
         /// Film critics rating
         /// </summary>
         public float? FilmCritics { get; set; }
+
+
+        private string DebuggerDisplay => $"Kp: {Kp}, FilmCritics: {FilmCritics}";
     }
 }
