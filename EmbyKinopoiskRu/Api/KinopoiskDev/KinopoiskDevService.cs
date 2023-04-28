@@ -948,7 +948,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         }
         public async Task<ApiResult<Dictionary<string, long>>> GetKpIdByAnotherId(string externalIdType, IEnumerable<string> idList, CancellationToken cancellationToken)
         {
+            _log.Info($"Search Kinopoisk ID for {idList.Count()} items by {externalIdType} provider");
             KpSearchResult<KpMovie> movies = await _api.GetKpIdByAnotherId(externalIdType, idList, cancellationToken);
+            _log.Info($"Found {movies.Docs.Count} Kinopoisk IDs for {idList.Count()} items by {externalIdType} provider");
             if (movies.HasError)
             {
                 return new ApiResult<Dictionary<string, long>>(new Dictionary<string, long>())
@@ -960,18 +962,22 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             {
                 return new ApiResult<Dictionary<string, long>>(movies.Docs
                     .Where(m => !string.IsNullOrWhiteSpace(m.ExternalId?.Imdb))
+                    .Select(m => new KeyValuePair<string, long>(m.ExternalId.Imdb, m.Id))
+                    .Distinct(new KeyValuePairComparer())
                     .ToDictionary(
-                        m => m.ExternalId.Imdb,
-                        m => m.Id
+                        m => m.Key,
+                        m => m.Value
                     ));
             }
             if (MetadataProviders.Tmdb.ToString() == externalIdType)
             {
                 return new ApiResult<Dictionary<string, long>>(movies.Docs
                     .Where(m => m.ExternalId?.Tmdb != null && m.ExternalId.Tmdb > 0)
+                    .Select(m => new KeyValuePair<string, long>(((long)m.ExternalId.Tmdb).ToString(CultureInfo.InvariantCulture), m.Id))
+                    .Distinct(new KeyValuePairComparer())
                     .ToDictionary(
-                        m => ((long)m.ExternalId.Tmdb).ToString(CultureInfo.InvariantCulture),
-                        m => m.Id
+                        m => m.Key,
+                        m => m.Value
                     ));
             }
             return new ApiResult<Dictionary<string, long>>(new Dictionary<string, long>())
