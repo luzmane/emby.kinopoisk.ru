@@ -91,23 +91,16 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return result;
             }
 
-            if (info.HasProviderId(Plugin.PluginKey))
+            KpMovie movie = await GetKpMovieByProviderId(info, cancellationToken);
+            if (movie != null)
             {
-                var movieId = info.GetProviderId(Plugin.PluginKey);
-                if (!string.IsNullOrWhiteSpace(movieId))
-                {
-                    _log.Info($"Searching movie by movie id '{movieId}'");
-                    KpMovie movie = await _api.GetMovieById(movieId, cancellationToken);
-                    if (movie != null)
-                    {
-                        result.Item = await CreateMovieFromKpMovie(movie, cancellationToken);
-                        await UpdatePersonsList(result, movie.Persons, cancellationToken);
-                        result.HasMetadata = true;
-                        return result;
-                    }
-                    _log.Info($"Movie by movie id '{movieId}' not found");
-                }
+                _log.Info($"Movie found by provider ID, Kinopoisk ID: '{movie.Id}'");
+                result.Item = await CreateMovieFromKpMovie(movie, cancellationToken);
+                await UpdatePersonsList(result, movie.Persons, cancellationToken);
+                result.HasMetadata = true;
+                return result;
             }
+            _log.Info($"Movie was not found by provider ID");
 
             var name = KpHelper.CleanName(info.Name);
             _log.Info($"Searching movie by name '{name}' and year '{info.Year}'");
@@ -179,6 +172,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             _log.Info($"By name '{name}' found {result.Count} movies");
             return result;
         }
+        
         private async Task<Movie> CreateMovieFromKpMovie(KpMovie movie, CancellationToken cancellationToken)
         {
             _log.Info($"Movie '{movie.Name}' with {Plugin.PluginName} id '{movie.Id}' found");
@@ -271,23 +265,16 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return result;
             }
 
-            if (info.HasProviderId(Plugin.PluginKey))
+            KpMovie item = await GetKpMovieByProviderId(info, cancellationToken);
+            if (item != null)
             {
-                var seriesId = info.GetProviderId(Plugin.PluginKey);
-                if (!string.IsNullOrWhiteSpace(seriesId))
-                {
-                    _log.Info($"Fetching series by series id '{seriesId}'");
-                    KpMovie item = await _api.GetMovieById(seriesId, cancellationToken);
-                    if (item != null)
-                    {
-                        result.Item = await CreateSeriesFromKpMovie(item, cancellationToken);
-                        await UpdatePersonsList(result, item.Persons, cancellationToken);
-                        result.HasMetadata = true;
-                        return result;
-                    }
-                    _log.Info($"Series by series id '{seriesId}' not found");
-                }
+                _log.Info($"Series found by provider ID, Kinopoisk ID: '{item.Id}'");
+                result.Item = await CreateSeriesFromKpMovie(item, cancellationToken);
+                await UpdatePersonsList(result, item.Persons, cancellationToken);
+                result.HasMetadata = true;
+                return result;
             }
+            _log.Info($"Series was not found by provider ID");
 
             var name = KpHelper.CleanName(info.Name);
             _log.Info($"Searching series by name '{name}' and year '{info.Year}'");
@@ -359,6 +346,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             _log.Info($"By name '{name}' found {result.Count} series");
             return result;
         }
+        
         private async Task<Series> CreateSeriesFromKpMovie(KpMovie series, CancellationToken cancellationToken)
         {
             _log.Info($"Series '{series.Name}' with KinopoiskId '{series.Id}' found");
@@ -435,6 +423,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             return toReturn;
         }
+
         #endregion
 
         #region EpisodeProvider
@@ -892,6 +881,51 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return list;
             }
         }
+        private async Task<KpMovie> GetKpMovieByProviderId(ItemLookupInfo info, CancellationToken cancellationToken)
+        {
+            if (info.HasProviderId(Plugin.PluginKey) && !string.IsNullOrWhiteSpace(info.GetProviderId(Plugin.PluginKey)))
+            {
+                var movieId = info.GetProviderId(Plugin.PluginKey);
+                _log.Info($"Searching movie by movie id '{movieId}'");
+                return await _api.GetMovieById(movieId, cancellationToken);
+            }
+
+            if (info.HasProviderId(MetadataProviders.Imdb) && !string.IsNullOrWhiteSpace(info.GetProviderId(MetadataProviders.Imdb)))
+            {
+                var imdbMovieId = info.GetProviderId(MetadataProviders.Imdb);
+                _log.Info($"Searching movie by movie {MetadataProviders.Imdb} id '{imdbMovieId}'");
+                ApiResult<Dictionary<string, long>> apiResult = await GetKpIdByAnotherId(MetadataProviders.Imdb.ToString(), new List<string>() { imdbMovieId }, cancellationToken);
+                if (apiResult.HasError || apiResult.Item.Count != 1)
+                {
+                    _log.Info($"Failed to get Kinopoisk ID by {MetadataProviders.Imdb} ID '{imdbMovieId}'");
+                }
+                else
+                {
+                    var movieId = apiResult.Item[imdbMovieId].ToString();
+                    _log.Info($"Kinopoisk ID is '{movieId}' for {MetadataProviders.Imdb} ID '{imdbMovieId}'");
+                    return await _api.GetMovieById(movieId, cancellationToken);
+                }
+            }
+
+            if (info.HasProviderId(MetadataProviders.Tmdb) && !string.IsNullOrWhiteSpace(info.GetProviderId(MetadataProviders.Tmdb)))
+            {
+                var tmdbMovieId = info.GetProviderId(MetadataProviders.Tmdb);
+                _log.Info($"Searching movie by movie {MetadataProviders.Tmdb} id '{tmdbMovieId}'");
+                ApiResult<Dictionary<string, long>> apiResult = await GetKpIdByAnotherId(MetadataProviders.Tmdb.ToString(), new List<string>() { tmdbMovieId }, cancellationToken);
+                if (apiResult.HasError || apiResult.Item.Count != 1)
+                {
+                    _log.Info($"Failed to get Kinopoisk ID by {MetadataProviders.Tmdb} ID '{tmdbMovieId}'");
+                }
+                else
+                {
+                    var movieId = apiResult.Item[tmdbMovieId].ToString();
+                    _log.Info($"Kinopoisk ID is '{movieId}' for {MetadataProviders.Tmdb} ID '{tmdbMovieId}'");
+                    return await _api.GetMovieById(movieId, cancellationToken);
+                }
+            }
+            return null;
+        }
+
         #endregion
 
         #region Scheduled Tasks
