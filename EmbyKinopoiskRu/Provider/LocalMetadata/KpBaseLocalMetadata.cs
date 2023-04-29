@@ -25,8 +25,7 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
 
         public virtual Task<MetadataResult<T>> GetMetadata(ItemInfo info, LibraryOptions libraryOptions, IDirectoryService directoryService, CancellationToken cancellationToken)
         {
-            _log.Info("GetMetadata");
-            _log.Info($"info.Path - {info.Path}");
+            _log.Info($"GetMetadata by ItemInfo: '{info.Path}'");
             var result = new MetadataResult<T>();
 
             if (!string.IsNullOrEmpty(info.Path))

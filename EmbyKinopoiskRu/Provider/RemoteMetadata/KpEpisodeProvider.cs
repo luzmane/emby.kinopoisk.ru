@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Providers;
+using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Providers;
 
 namespace EmbyKinopoiskRu.Provider.RemoteMetadata
@@ -13,11 +14,13 @@ namespace EmbyKinopoiskRu.Provider.RemoteMetadata
     public class KpEpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>
     {
         private readonly IHttpClient _httpClient;
+        private readonly ILogger _log;
         public string Name => Plugin.PluginName;
 
-        public KpEpisodeProvider(IHttpClient httpClient)
+        public KpEpisodeProvider(IHttpClient httpClient, ILogManager logManager)
         {
             _httpClient = httpClient;
+            _log = logManager.GetLogger(GetType().Name);
         }
 
         public Task<HttpResponseInfo> GetImageResponse(string url, CancellationToken cancellationToken)
@@ -31,10 +34,12 @@ namespace EmbyKinopoiskRu.Provider.RemoteMetadata
         }
         public async Task<MetadataResult<Episode>> GetMetadata(EpisodeInfo info, CancellationToken cancellationToken)
         {
+            _log.Info($"GetMetadata by EpisodeInfo:'{info.Name}', '{info.Year}'");
             return await Plugin.Instance.GetKinopoiskService().GetMetadata(info, cancellationToken);
         }
-        public Task<IEnumerable<RemoteSearchResult>> GetSearchResults(EpisodeInfo searchInfo, CancellationToken cancellationToken)
+        public Task<IEnumerable<RemoteSearchResult>> GetSearchResults(EpisodeInfo info, CancellationToken cancellationToken)
         {
+            _log.Info($"GetSearchResults by EpisodeInfo:'{info.Name}', '{info.Year}'");
             throw new NotImplementedException();
         }
     }
