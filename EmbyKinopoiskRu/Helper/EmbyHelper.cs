@@ -27,6 +27,8 @@ namespace EmbyKinopoiskRu.Helper
 
     internal class EmbyHelper
     {
+        private static readonly object Locker = new Object();
+
         internal static List<CollectionFolder> FindCollectionFolders(ILibraryManager libraryManager)
         {
             return libraryManager
@@ -199,19 +201,26 @@ namespace EmbyKinopoiskRu.Helper
         {
             if (!translations.TryGetValue(serverConfigurationManager.Configuration.UICulture, out TaskTranslation translation))
             {
-                if (!availableTranslations.TryGetValue(serverConfigurationManager.Configuration.UICulture, out var resourcePath))
+                lock (Locker)
                 {
-                    resourcePath = availableTranslations["en-US"];
-                }
-                using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath))
-                {
-                    translation = jsonSerializer.DeserializeFromStream<TaskTranslation>(stream);
-                }
-                if (translation != null)
-                {
-                    lock (translations)
+                    if (!translations.TryGetValue(serverConfigurationManager.Configuration.UICulture, out TaskTranslation tmp))
                     {
-                        translations.Add(serverConfigurationManager.Configuration.UICulture, translation);
+                        if (!availableTranslations.TryGetValue(serverConfigurationManager.Configuration.UICulture, out var resourcePath))
+                        {
+                            resourcePath = availableTranslations["en-US"];
+                        }
+                        using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath))
+                        {
+                            translation = jsonSerializer.DeserializeFromStream<TaskTranslation>(stream);
+                        }
+                        if (translation != null)
+                        {
+                            translations.Add(serverConfigurationManager.Configuration.UICulture, translation);
+                        }
+                    }
+                    else
+                    {
+                        translation = tmp;
                     }
                 }
             }
