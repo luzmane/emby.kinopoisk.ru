@@ -12,6 +12,8 @@ using EmbyKinopoiskRu.ScheduledTasks.Model;
 
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Entities;
+using MediaBrowser.Controller.Entities.Movies;
+using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Logging;
@@ -96,14 +98,11 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 _log.Info("Searching for movies/series without KP id, but with IMDB or TMDB");
                 QueryResult<BaseItem> itemsToUpdateResult = _libraryManager.QueryItems(new InternalItemsQuery()
                 {
-                    IncludeItemTypes = new[] { CollectionType.Movies.ToString(), CollectionType.TvShows.ToString() },
+                    IncludeItemTypes = new[] { nameof(Movie), nameof(Series) },
                     MissingAnyProviderId = new[] { Plugin.PluginKey },
                     HasAnyProviderId = new[] { MetadataProviders.Imdb.ToString(), MetadataProviders.Tmdb.ToString() },
                 });
-                var names = itemsToUpdateResult.TotalRecordCount > 0 ?
-                    ": '" + string.Join("','", itemsToUpdateResult.Items.Select(i => i.Name)) + "'"
-                    : string.Empty;
-                _log.Info($"Found {itemsToUpdateResult.TotalRecordCount} items{names}");
+                _log.Info($"Found {itemsToUpdateResult.TotalRecordCount} items");
                 progress.Report(10d);
 
                 if (itemsToUpdateResult.TotalRecordCount == 0)

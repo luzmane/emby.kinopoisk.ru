@@ -131,7 +131,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             QueryResult<BaseItem> seriesInLibraryQueryResult = anyProviderIdEquals.Any()
                 ? LibraryManager.QueryItems(new InternalItemsQuery()
                 {
-                    IncludeItemTypes = new[] { "series" },
+                    IncludeItemTypes = new[] { nameof(Series) },
                     AnyProviderIdEquals = anyProviderIdEquals,
                     Recursive = false,
                     IsVirtualItem = false,
