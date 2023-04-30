@@ -1,3 +1,6 @@
+v.1.14.1
+- Fix in "Add KinopoiskId based on IMDB, TMDB" series search
+
 v.1.14.0
 - Fix KeyDuplication exception during Kp Id search based on IMDB, TMDB
 - Normalize name before search
