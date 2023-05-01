@@ -728,11 +728,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             if (persons == null)
             {
-                _log.Warn($"Received persons list is null for series with id '{result.Item.GetProviderId(Plugin.PluginKey)}'");
+                _log.Warn($"Received persons list is null for video with id '{result.Item.GetProviderId(Plugin.PluginKey)}'");
                 return;
             }
 
-            _log.Info($"Updating persons list of the series with id '{result.Item.GetProviderId(Plugin.PluginKey)}'");
+            _log.Info($"Updating persons list of the video with id '{result.Item.GetProviderId(Plugin.PluginKey)}'");
             var seriesId = result.Item.GetProviderId(Plugin.PluginKey);
             var movieName = result.Item.Name;
             KpSearchResult<KpPerson> personsBySeriesId = await _api.GetPersonsByMovieId(seriesId, cancellationToken);
@@ -777,7 +777,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                     result.AddPerson(person);
                 }
             }
-            _log.Info($"Added {result.People.Count} persons to the series with id '{result.Item.GetProviderId(Plugin.PluginKey)}'");
+            _log.Info($"Added {result.People.Count} persons to the video with id '{result.Item.GetProviderId(Plugin.PluginKey)}'");
         }
         private async Task AddMovieToCollection(BaseItem toReturn, KpMovie movie, CancellationToken cancellationToken)
         {
