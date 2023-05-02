@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -14,7 +12,6 @@ using MediaBrowser.Common.Net;
 using MediaBrowser.Common.Progress;
 using MediaBrowser.Common.Updates;
 using MediaBrowser.Controller.Configuration;
-using MediaBrowser.Model.Extensions;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Net;
 using MediaBrowser.Model.Serialization;
@@ -91,21 +88,17 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             else
             {
                 _logger.Info($"Update plugin from version {currentVersion} to version {release.tag_name}");
-
-                var checksum = await PrepareMd5Checksum(release.assets, cancellationToken);
-                _logger.Info($"Calculated md5 hash: '{checksum}'");
-
                 var package = new PackageVersionInfo()
                 {
-                    name = Plugin.PluginKey,
+                    guid = Plugin.PluginGuid,
+                    name = Plugin.PluginName,
                     versionStr = release.tag_name,
                     classification = PackageVersionClass.Release,
                     description = release.body,
                     requiredVersionStr = "4.7.9",
                     sourceUrl = release.assets[0].browser_download_url,
-                    checksum = checksum,
                     targetFilename = DLL_NAME,
-                    infoUrl = null,
+                    infoUrl = release.html_url,
                     runtimes = "netcore"
                 };
                 try
@@ -136,35 +129,6 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             }
         }
 
-        private async Task<string> PrepareMd5Checksum(List<GitHubLatestReleaseAsset> assets, CancellationToken cancellationToken)
-        {
-            var downloadUrl = assets
-                    .Where(a => DLL_NAME.EqualsIgnoreCase(a.name) && !string.IsNullOrWhiteSpace(a.browser_download_url))
-                    .Select(a => a.browser_download_url)
-                    .Single();
-            var options = new HttpRequestOptions()
-            {
-                CancellationToken = cancellationToken,
-                Url = downloadUrl,
-                CacheLength = TimeSpan.FromHours(12),
-                CacheMode = CacheMode.Unconditional,
-                TimeoutMs = 180000,
-                EnableDefaultUserAgent = true
-            };
-            options.Sanitation.SanitizeDefaultParams = false;
-            var checksum = string.Empty;
-            using (var reader = new StreamReader((await _httpClient.GetResponse(options)).Content))
-            {
-                using (var memstream = new MemoryStream())
-                {
-                    var bytes = default(byte[]);
-                    reader.BaseStream.CopyTo(memstream);
-                    bytes = memstream.ToArray();
-                    checksum = CalculateMd5(bytes);
-                    return checksum;
-                }
-            }
-        }
         private async Task<GitHubLatestReleaseResponse> GetGitHubLatestRelease(CancellationToken cancellationToken)
         {
             var options = new HttpRequestOptions()
@@ -182,16 +146,6 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 var latestVersionJson = await reader.ReadToEndAsync();
                 return _jsonSerializer.DeserializeFromString<GitHubLatestReleaseResponse>(latestVersionJson);
             }
-        }
-        private static string CalculateMd5(byte[] bytes)
-        {
-#pragma warning disable CA5351
-            using (var md5 = MD5.Create())
-            {
-                return BitConverter.ToString(md5.ComputeHash(bytes)).Replace("-", "");
-            }
-#pragma warning restore CA5351
-
         }
         private TaskTranslation GetTranslation()
         {

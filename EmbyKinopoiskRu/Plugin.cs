@@ -25,6 +25,7 @@ namespace EmbyKinopoiskRu
     {
         public const string PluginKey = "KinopoiskRu";
         public const string PluginName = "Кинопоиск";
+        public const string PluginGuid = "0417364b-5a93-4ad0-a5f0-b8756957cf80";
 
         public static Plugin Instance { get; private set; }
 
@@ -53,7 +54,7 @@ namespace EmbyKinopoiskRu
             : base(applicationPaths, xmlSerializer)
         {
             Instance = this;
-            SetId(new Guid("0417364b-5a93-4ad0-a5f0-b8756957cf80"));
+            SetId(new Guid(PluginGuid));
 
             _httpClient = httpClient;
             _jsonSerializer = jsonSerializer;
