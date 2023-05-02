@@ -10,9 +10,9 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
 
     <!-- nuget setup -->
-    <AssemblyVersion>1.14.1</AssemblyVersion>
-    <Version>1.14.1</Version>
-    <FileVersion>1.14.1</FileVersion>
+    <AssemblyVersion>1.14.2</AssemblyVersion>
+    <Version>1.14.2</Version>
+    <FileVersion>1.14.2</FileVersion>
     <Authors>Evgeniy Luzman</Authors>
     <Copyright>Copyright (c) 2023 Evgeniy Luzman</Copyright>
     <Description>Emby plugin to update metadata from Kinopoisk.ru</Description>

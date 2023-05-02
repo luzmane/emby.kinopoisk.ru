@@ -1,3 +1,6 @@
+v.1.14.2
+- Fix "Plugin update task": instead of updating the plugin installed itself
+
 v.1.14.1
 - Fix in "Add KinopoiskId based on IMDB, TMDB" series search
 
