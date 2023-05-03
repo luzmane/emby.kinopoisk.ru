@@ -13,6 +13,7 @@ using MediaBrowser.Common.Net;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Controller.Collections;
 using MediaBrowser.Controller.Library;
+using MediaBrowser.Controller.Notifications;
 using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Drawing;
 using MediaBrowser.Model.Logging;
@@ -37,6 +38,7 @@ namespace EmbyKinopoiskRu
         private readonly IActivityManager _activityManager;
         private readonly ILibraryManager _libraryManager;
         private readonly ICollectionManager _collectionManager;
+        private readonly INotificationManager _notificationManager;
 
         public override string Name => PluginName;
         public override string Description => "Fetch metadata from Kinopoisk.ru";
@@ -50,6 +52,7 @@ namespace EmbyKinopoiskRu
             IJsonSerializer jsonSerializer,
             IActivityManager activityManager,
             ILibraryManager libraryManager,
+            INotificationManager notificationManager,
             ICollectionManager collectionManager)
             : base(applicationPaths, xmlSerializer)
         {
@@ -63,6 +66,7 @@ namespace EmbyKinopoiskRu
             _log = _logManager.GetLogger(PluginKey);
             _libraryManager = libraryManager;
             _collectionManager = collectionManager;
+            _notificationManager = notificationManager;
         }
         public Stream GetThumbImage()
         {
@@ -105,7 +109,14 @@ namespace EmbyKinopoiskRu
                 _log.Info($"Fetching {PluginConfiguration.KinopoiskDev} service");
                 if (!_kinopoiskServiciesDictionary.TryGetValue("KinopoiskDev", out IKinopoiskRuService result))
                 {
-                    result = new KinopoiskDevService(_logManager, _httpClient, _jsonSerializer, _activityManager, _libraryManager, _collectionManager);
+                    result = new KinopoiskDevService(
+                        _logManager,
+                        _httpClient,
+                        _jsonSerializer,
+                        _activityManager,
+                        _libraryManager,
+                        _notificationManager,
+                        _collectionManager);
                     _kinopoiskServiciesDictionary.Add("KinopoiskDev", result);
                 }
                 return result;
@@ -115,7 +126,12 @@ namespace EmbyKinopoiskRu
                 _log.Info($"Fetching {PluginConfiguration.KinopoiskAPIUnofficialTech} service");
                 if (!_kinopoiskServiciesDictionary.TryGetValue("KinopoiskUnofficial", out IKinopoiskRuService result))
                 {
-                    result = new KinopoiskUnofficialService(_logManager, _httpClient, _jsonSerializer, _activityManager);
+                    result = new KinopoiskUnofficialService(
+                        _logManager,
+                        _httpClient,
+                        _jsonSerializer,
+                        _notificationManager,
+                        _activityManager);
                     _kinopoiskServiciesDictionary.Add("KinopoiskUnofficial", result);
                 }
                 return result;

@@ -13,8 +13,10 @@ using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Season;
 using EmbyKinopoiskRu.Helper;
 
 using MediaBrowser.Common.Net;
+using MediaBrowser.Controller.Notifications;
 using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Logging;
+using MediaBrowser.Model.Net;
 using MediaBrowser.Model.Serialization;
 
 namespace EmbyKinopoiskRu.Api.KinopoiskDev
@@ -25,17 +27,20 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         private readonly ILogger _log;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IActivityManager _activityManager;
+        private readonly INotificationManager _notificationManager;
 
         internal KinopoiskDevApi(
               ILogManager logManager
             , IHttpClient httpClient
             , IJsonSerializer jsonSerializer
+            , INotificationManager notificationManager
             , IActivityManager activityManager)
         {
             _httpClient = httpClient;
             _log = logManager.GetLogger(GetType().Name);
             _jsonSerializer = jsonSerializer;
             _activityManager = activityManager;
+            _notificationManager = notificationManager;
         }
 
         internal async Task<KpMovie> GetMovieById(string movieId, CancellationToken cancellationToken)
@@ -236,12 +241,16 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                                 _log.Info($"Received response: '{result}'");
                                 return result;
                             case 401:
-                                _log.Error($"Token is invalid: '{token}'");
-                                AddToActivityLog($"Token '{token}' is invalid", "Token is invalid");
+                                var msg = $"Token is invalid: '{token}'";
+                                _log.Error(msg);
+                                AddToActivityLog(msg, "Token is invalid");
+                                await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
                                 return string.Empty;
                             case 403:
-                                _log.Warn("Request limit exceeded (either daily or total)");
-                                AddToActivityLog("Request limit exceeded (either daily or total)", "Request limit exceeded");
+                                msg = "Request limit exceeded (either daily or total) for current token";
+                                _log.Warn(msg);
+                                AddToActivityLog(msg, "Request limit exceeded");
+                                await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
                                 return string.Empty;
                             default:
                                 KpErrorResponse error = _jsonSerializer.DeserializeFromString<KpErrorResponse>(result);
@@ -250,6 +259,28 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                         }
                     }
                 }
+            }
+            catch (HttpException ex)
+            {
+                switch ((int)ex.StatusCode)
+                {
+                    case 401:
+                        var msg = $"Token is invalid: '{token}'";
+                        _log.Error(msg);
+                        AddToActivityLog(msg, "Token is invalid");
+                        await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
+                        break;
+                    case 403:
+                        msg = "Request limit exceeded (either daily or total) for current token";
+                        _log.Warn(msg);
+                        AddToActivityLog(msg, "Request limit exceeded");
+                        await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
+                        break;
+                    default:
+                        _log.Error($"Received '{ex.StatusCode}' from API: Message-'{ex.Message}'", ex);
+                        break;
+                }
+                return string.Empty;
             }
             catch (Exception ex)
             {

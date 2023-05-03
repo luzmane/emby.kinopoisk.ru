@@ -16,6 +16,7 @@ using MediaBrowser.Common.Net;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
+using MediaBrowser.Controller.Notifications;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Configuration;
@@ -36,10 +37,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             ILogManager logManager
             , IHttpClient httpClient
             , IJsonSerializer jsonSerializer
+            , INotificationManager notificationManager
             , IActivityManager activityManager)
         {
             _log = logManager.GetLogger(GetType().Name);
-            _api = new KinopoiskUnofficialApi(logManager, httpClient, jsonSerializer, activityManager);
+            _api = new KinopoiskUnofficialApi(logManager, httpClient, jsonSerializer, notificationManager, activityManager);
             if (Plugin.Instance == null)
             {
                 throw new NullReferenceException($"Plugin '{Plugin.PluginName}' instance is null");

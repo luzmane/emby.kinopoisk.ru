@@ -12,9 +12,11 @@ using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Season;
 using EmbyKinopoiskRu.Helper;
 
 using MediaBrowser.Common.Net;
+using MediaBrowser.Controller.Notifications;
 using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Extensions;
 using MediaBrowser.Model.Logging;
+using MediaBrowser.Model.Net;
 using MediaBrowser.Model.Serialization;
 
 namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
@@ -25,17 +27,20 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         private readonly ILogger _log;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IActivityManager _activityManager;
+        private readonly INotificationManager _notificationManager;
 
         internal KinopoiskUnofficialApi(
             ILogManager logManager
             , IHttpClient httpClient
             , IJsonSerializer jsonSerializer
+            , INotificationManager notificationManager
             , IActivityManager activityManager)
         {
             _httpClient = httpClient;
             _log = logManager.GetLogger(GetType().Name);
             _jsonSerializer = jsonSerializer;
             _activityManager = activityManager;
+            _notificationManager = notificationManager;
         }
 
         internal async Task<KpFilm> GetFilmById(string movieId, CancellationToken cancellationToken)
@@ -132,54 +137,13 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
 
         private async Task<string> SendRequest(string url, CancellationToken cancellationToken)
         {
+            _log.Info($"Sending request to {url}");
             var token = Plugin.Instance?.Configuration.GetCurrentToken();
-            if (string.IsNullOrEmpty(token))
+            if (string.IsNullOrWhiteSpace(token))
             {
-                _log.Error($"The plugin {Plugin.PluginName} failed to start. Skip request");
+                _log.Error("The token is empty. Skip request");
                 return string.Empty;
             }
-
-            var response = await SendRequest(token, url, cancellationToken);
-            if (string.IsNullOrEmpty(response))
-            {
-                return response;
-            }
-            if (response.Length == 3)
-            {
-                if (int.TryParse(response, out var statusCode))
-                {
-                    _log.Info($"Unable to parse response status code '{response}'");
-                    return string.Empty;
-                }
-                else
-                {
-                    switch (statusCode)
-                    {
-                        case 401:
-                            _log.Error($"Token is invalid: '{token}'");
-                            AddToActivityLog($"Token '{token}' is invalid", "Token is invalid");
-                            return string.Empty;
-                        case 402:
-                            _log.Warn("Request limit exceeded (either daily or total). Currently daily limit is 500 requests");
-                            AddToActivityLog("Request limit exceeded (either daily or total). Currently daily limit is 500 requests", "Request limit exceeded");
-                            return string.Empty;
-                        case 404:
-                            _log.Info($"Data not found for URL: {url}");
-                            return string.Empty;
-                        case 429:
-                            _log.Info("Too many requests per second. Waiting 2 sec");
-                            await Task.Delay(2000, cancellationToken);
-                            return await SendRequest(token, url, cancellationToken);
-                        default:
-                            return string.Empty;
-                    }
-                }
-            }
-            return response;
-        }
-        private async Task<string> SendRequest(string token, string url, CancellationToken cancellationToken)
-        {
-            _log.Debug($"Sending request to {url}");
             var options = new HttpRequestOptions()
             {
                 CancellationToken = cancellationToken,
@@ -192,28 +156,67 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 EnableHttpCompression = true,
                 EnableDefaultUserAgent = true,
             };
-            options.Sanitation.SanitizeDefaultParams = false;
             options.RequestHeaders.Add("X-API-KEY", token);
+            options.Sanitation.SanitizeDefaultParams = false;
             try
             {
-                using (HttpResponseInfo response = await _httpClient.SendAsync(options, "GET"))
+                using (HttpResponseInfo response = await _httpClient.GetResponse(options))
                 {
-                    var statusCode = (int)response.StatusCode;
-                    if (statusCode >= 200 && statusCode < 300)
+                    using (var reader = new StreamReader(response.Content))
                     {
-                        using (var reader = new StreamReader(response.Content))
+                        var result = await reader.ReadToEndAsync();
+                        switch ((int)response.StatusCode)
                         {
-                            var result = await reader.ReadToEndAsync();
-                            _log.Info($"Received response: '{result}'");
-                            return result;
+                            case int n when n >= 200 && n < 300:
+                                _log.Info($"Received response: '{result}'");
+                                return result;
+                            case 401:
+                                var msg = $"Token is invalid: '{token}'";
+                                _log.Error(msg);
+                                AddToActivityLog(msg, "Token is invalid");
+                                await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
+                                return string.Empty;
+                            case 402:
+                                msg = "Request limit exceeded (either daily or total) for current token";
+                                _log.Warn(msg);
+                                AddToActivityLog(msg, "Request limit exceeded");
+                                await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
+                                return string.Empty;
+                            case 404:
+                                _log.Info($"Data not found for URL: {url}");
+                                return string.Empty;
+                            case 429:
+                                _log.Info("Too many requests per second. Waiting 2 sec");
+                                await Task.Delay(2000, cancellationToken);
+                                return await SendRequest(url, cancellationToken);
+                            default:
+                                _log.Error($"Received '{response.StatusCode}' from API: {result}");
+                                return string.Empty;
                         }
                     }
-                    else
-                    {
-                        _log.Error($"Received '{response.StatusCode}' from API");
-                        return response.StatusCode.ToString();
-                    }
                 }
+            }
+            catch (HttpException ex)
+            {
+                switch ((int)ex.StatusCode)
+                {
+                    case 401:
+                        var msg = $"Token is invalid: '{token}'";
+                        _log.Error(msg);
+                        AddToActivityLog(msg, "Token is invalid");
+                        await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
+                        break;
+                    case 402:
+                        msg = "Request limit exceeded (either daily or total) for current token";
+                        _log.Warn(msg);
+                        AddToActivityLog(msg, "Request limit exceeded");
+                        await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
+                        break;
+                    default:
+                        _log.Error($"Received '{ex.StatusCode}' from API: Message-'{ex.Message}'", ex);
+                        break;
+                }
+                return string.Empty;
             }
             catch (Exception ex)
             {
@@ -221,9 +224,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 return string.Empty;
             }
         }
+
         private void AddToActivityLog(string overview, string shortOverview)
         {
             KpHelper.AddToActivityLog(_activityManager, overview, shortOverview);
         }
+
     }
 }

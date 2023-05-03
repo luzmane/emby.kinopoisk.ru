@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using EmbyKinopoiskRu.Api.KinopoiskDev;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie;
+using EmbyKinopoiskRu.Notification;
 using EmbyKinopoiskRu.ScheduledTasks.Model;
 
 using MediaBrowser.Controller.Configuration;
@@ -17,9 +18,11 @@ using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Library;
+using MediaBrowser.Controller.Notifications;
 using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Logging;
+using MediaBrowser.Model.Notifications;
 using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Querying;
 using MediaBrowser.Model.Serialization;
@@ -30,6 +33,9 @@ namespace EmbyKinopoiskRu.Helper
     internal class EmbyHelper
     {
         private static readonly object Locker = new Object();
+        private static DateTime _notificationSentTimestamp = DateTime.UtcNow;
+        // notification will be sent no more ofter than that time
+        private const int SILENCE_INTERVAL = 5;
 
         internal static List<CollectionFolder> FindCollectionFolders(ILibraryManager libraryManager)
         {
@@ -227,6 +233,23 @@ namespace EmbyKinopoiskRu.Helper
                 }
             }
             return translation;
+        }
+        internal static async Task SendNotification(INotificationManager notificationManager, string message, CancellationToken cancellationToken)
+        {
+            if ((DateTime.UtcNow - _notificationSentTimestamp).Minutes > SILENCE_INTERVAL)
+            {
+                _notificationSentTimestamp = DateTime.UtcNow;
+
+                await notificationManager.SendNotification(
+                    new NotificationRequest()
+                    {
+                        NotificationType = NotificationsTypeFactory.TokenIssueType,
+                        Date = DateTime.UtcNow,
+                        Name = "Kinopoisk Token Notification",
+                        Description = message
+                    }
+                    , cancellationToken);
+            }
         }
     }
 }

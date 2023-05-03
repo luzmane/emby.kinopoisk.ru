@@ -19,6 +19,7 @@ using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Library;
+using MediaBrowser.Controller.Notifications;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Configuration;
@@ -45,10 +46,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             , IJsonSerializer jsonSerializer
             , IActivityManager activityManager
             , ILibraryManager libraryManager
+            , INotificationManager notificationManager
             , ICollectionManager collectionManager)
         {
             _log = logManager.GetLogger(GetType().Name);
-            _api = new KinopoiskDevApi(logManager, httpClient, jsonSerializer, activityManager);
+            _api = new KinopoiskDevApi(logManager, httpClient, jsonSerializer, notificationManager, activityManager);
             _libraryManager = libraryManager;
             _collectionManager = collectionManager;
             if (Plugin.Instance == null)
@@ -172,7 +174,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             _log.Info($"By name '{name}' found {result.Count} movies");
             return result;
         }
-        
+
         private async Task<Movie> CreateMovieFromKpMovie(KpMovie movie, CancellationToken cancellationToken)
         {
             _log.Info($"Movie '{movie.Name}' with {Plugin.PluginName} id '{movie.Id}' found");
@@ -346,7 +348,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             _log.Info($"By name '{name}' found {result.Count} series");
             return result;
         }
-        
+
         private async Task<Series> CreateSeriesFromKpMovie(KpMovie series, CancellationToken cancellationToken)
         {
             _log.Info($"Series '{series.Name}' with KinopoiskId '{series.Id}' found");
