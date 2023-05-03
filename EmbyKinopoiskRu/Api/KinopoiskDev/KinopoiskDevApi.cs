@@ -45,6 +45,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         }
         internal async Task<KpSearchResult<KpMovie>> GetMoviesByIds(List<string> movieIdList, CancellationToken cancellationToken)
         {
+            if (!movieIdList.Any())
+            {
+                _log.Info("GetMoviesByIds - received empty id's list");
+                return new KpSearchResult<KpMovie>();
+            }
             var url = new StringBuilder($"https://api.kinopoisk.dev/v1.3/movie?")
                 .Append($"id={string.Join("&id=", movieIdList)}")
                 .Append($"&limit={movieIdList.Count}")
@@ -133,9 +138,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         }
         internal async Task<KpSearchResult<KpPerson>> GetPersonsByName(string name, CancellationToken cancellationToken)
         {
-            var url = $"https://api.kinopoisk.dev/v1/person";
-            var namePart = $"&name={name}";
-            var enNamePart = $"&enName={name}";
+            var url = $"https://api.kinopoisk.dev/v1/person?";
+            var namePart = $"name={name}";
+            var enNamePart = $"enName={name}";
 
             var json = await SendRequest(url + namePart, cancellationToken);
             KpSearchResult<KpPerson> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpPerson>>(json);
@@ -157,7 +162,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         internal async Task<KpSearchResult<KpPerson>> GetPersonsByMovieId(string movieId, CancellationToken cancellationToken)
         {
             var url = new StringBuilder("https://api.kinopoisk.dev/v1/person?")
-                 .Append($"&movies.id={movieId}")
+                 .Append($"movies.id={movieId}")
                  .Append("&selectFields=id movies&limit=1000")
                  .ToString();
             var json = await SendRequest(url, cancellationToken);
