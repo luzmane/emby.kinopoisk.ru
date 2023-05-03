@@ -1,3 +1,7 @@
+v.1.15.0
+- Fix person search using kinopoisk.dev
+- Add notification in case of token issues
+
 v.1.14.2
 - Fix "Plugin update task": instead of updating the plugin installed itself
 
