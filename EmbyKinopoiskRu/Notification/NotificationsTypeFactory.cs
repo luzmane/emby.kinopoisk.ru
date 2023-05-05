@@ -22,7 +22,7 @@ namespace EmbyKinopoiskRu.Notification
                      Type = NotificationsTypeFactory.TokenIssueType,
                      Name = "Problems With a Token",
                      Category = "Kinopoisk Notification",
-                     Enabled = false,
+                     Enabled = true,
                      IsBasedOnUserEvent = false
                 }
             };
