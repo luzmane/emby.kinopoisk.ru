@@ -53,7 +53,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             _installationManager = installationManager;
             _serverConfigurationManager = serverConfigurationManager;
 
-            _availableTranslations = EmbyHelper.GetAvailableTransactionsForTasks(Key);
+            _availableTranslations = EmbyHelper.GetAvailableTransactions($"ScheduledTasks.{Key}");
         }
         public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
         {

@@ -12,7 +12,6 @@ using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Season;
 using EmbyKinopoiskRu.Helper;
 
 using MediaBrowser.Common.Net;
-using MediaBrowser.Controller.Notifications;
 using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Extensions;
 using MediaBrowser.Model.Logging;
@@ -27,20 +26,17 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         private readonly ILogger _log;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IActivityManager _activityManager;
-        private readonly INotificationManager _notificationManager;
 
         internal KinopoiskUnofficialApi(
             ILogManager logManager
             , IHttpClient httpClient
             , IJsonSerializer jsonSerializer
-            , INotificationManager notificationManager
             , IActivityManager activityManager)
         {
             _httpClient = httpClient;
             _log = logManager.GetLogger(GetType().Name);
             _jsonSerializer = jsonSerializer;
             _activityManager = activityManager;
-            _notificationManager = notificationManager;
         }
 
         internal async Task<KpFilm> GetFilmById(string movieId, CancellationToken cancellationToken)
@@ -174,13 +170,13 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                                 var msg = $"Token is invalid: '{token}'";
                                 _log.Error(msg);
                                 AddToActivityLog(msg, "Token is invalid");
-                                await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
+                                // await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
                                 return string.Empty;
                             case 402:
                                 msg = "Request limit exceeded (either daily or total) for current token";
                                 _log.Warn(msg);
                                 AddToActivityLog(msg, "Request limit exceeded");
-                                await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
+                                // await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
                                 return string.Empty;
                             case 404:
                                 _log.Info($"Data not found for URL: {url}");
@@ -204,13 +200,13 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                         var msg = $"Token is invalid: '{token}'";
                         _log.Error(msg);
                         AddToActivityLog(msg, "Token is invalid");
-                        await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
+                        // await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
                         break;
                     case 402:
                         msg = "Request limit exceeded (either daily or total) for current token";
                         _log.Warn(msg);
                         AddToActivityLog(msg, "Request limit exceeded");
-                        await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
+                        // await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
                         break;
                     default:
                         _log.Error($"Received '{ex.StatusCode}' from API: Message-'{ex.Message}'", ex);

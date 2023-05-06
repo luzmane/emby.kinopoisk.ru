@@ -50,7 +50,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             }
             Plugin = Plugin.Instance;
 
-            _availableTranslations = EmbyHelper.GetAvailableTransactionsForTasks(Key);
+            _availableTranslations = EmbyHelper.GetAvailableTransactions($"ScheduledTasks.{Key}");
         }
 
         public virtual IEnumerable<TaskTriggerInfo> GetDefaultTriggers()

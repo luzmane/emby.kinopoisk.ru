@@ -19,7 +19,6 @@ using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Library;
-using MediaBrowser.Controller.Notifications;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Configuration;
@@ -46,11 +45,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             , IJsonSerializer jsonSerializer
             , IActivityManager activityManager
             , ILibraryManager libraryManager
-            , INotificationManager notificationManager
             , ICollectionManager collectionManager)
         {
             _log = logManager.GetLogger(GetType().Name);
-            _api = new KinopoiskDevApi(logManager, httpClient, jsonSerializer, notificationManager, activityManager);
+            _api = new KinopoiskDevApi(logManager, httpClient, jsonSerializer, activityManager);
             _libraryManager = libraryManager;
             _collectionManager = collectionManager;
             if (Plugin.Instance == null)
@@ -853,6 +851,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         }
         private static string PrepareOverview(KpMovie movie)
         {
+            // https://stackoverflow.com/questions/32689686/overlapping-css-flexbox-items-in-safari
             var subj = $"<br/><br/><b>Интересное:</b><ul>";
             var sb = new StringBuilder(subj);
             movie.Facts?
