@@ -1,3 +1,6 @@
+v.1.16.1
+- Fix Movie's Facts overlapping in Safari browser
+
 v.1.16.0
 - Remove notifications, since interface in 4.7 (stable) and 4.8 (beta) is not compatible
 
