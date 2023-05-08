@@ -851,16 +851,14 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         }
         private static string PrepareOverview(KpMovie movie)
         {
-            // https://stackoverflow.com/questions/32689686/overlapping-css-flexbox-items-in-safari
-            var subj = $"<br/><br/><b>Интересное:</b><ul>";
+            var subj = $"<br/><br/><b>Интересное:</b><br/>";
             var sb = new StringBuilder(subj);
             movie.Facts?
                 .Where(f => !f.Spoiler && "FACT".Equals(f.Type, StringComparison.OrdinalIgnoreCase))
                 .ToList()
-                .ForEach(f => sb.Append("<li>").Append(f.Value).Append("</li>"));
-            _ = sb.Append("</ul>");
+                .ForEach(f => sb.Append("&nbsp;&nbsp;&nbsp;&nbsp;* ").Append(f.Value).Append("<br/>"));
 
-            return (sb.Length == (subj.Length + "</ul>".Length))
+            return (sb.Length == subj.Length)
                 ? movie.Description
                 : sb.Insert(0, movie.Description).ToString();
         }
