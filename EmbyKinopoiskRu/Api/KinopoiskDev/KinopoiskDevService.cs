@@ -69,7 +69,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             name = KpHelper.CleanName(name);
             KpSearchResult<KpMovie> movies = await _api.GetMoviesByMovieDetails(name, year, cancellationToken);
-            List<KpMovie> relevantMovies = FilterRelevantItems(movies.Docs, name, year);
+            List<KpMovie> relevantMovies = FilterRelevantItems(movies.Docs, name, year, name);
             var toReturn = new List<Movie>();
             foreach (KpMovie movie in relevantMovies)
             {
@@ -105,7 +105,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             var name = KpHelper.CleanName(info.Name);
             _log.Info($"Searching movie by name '{name}' and year '{info.Year}'");
             KpSearchResult<KpMovie> movies = await _api.GetMoviesByMovieDetails(name, info.Year, cancellationToken);
-            List<KpMovie> relevantMovies = FilterRelevantItems(movies.Docs, name, info.Year);
+            List<KpMovie> relevantMovies = FilterRelevantItems(movies.Docs, name, info.Year, name);
             if (relevantMovies.Count != 1)
             {
                 _log.Error($"Found {relevantMovies.Count} movies, skipping movie update");
@@ -278,7 +278,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             var name = KpHelper.CleanName(info.Name);
             _log.Info($"Searching series by name '{name}' and year '{info.Year}'");
             KpSearchResult<KpMovie> series = await _api.GetMoviesByMovieDetails(name, info.Year, cancellationToken);
-            List<KpMovie> relevantSeries = FilterRelevantItems(series.Docs, name, info.Year);
+            List<KpMovie> relevantSeries = FilterRelevantItems(series.Docs, name, info.Year, name);
             if (relevantSeries.Count != 1)
             {
                 _log.Error($"Found {relevantSeries.Count} series, skipping series update");
@@ -648,7 +648,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             _log.Info($"Searching images by name: '{name}', originalTitle: '{originalTitle}', productionYear: '{item.ProductionYear}'");
             KpSearchResult<KpMovie> movies = await _api.GetMoviesByMovieDetails(name, originalTitle, item.ProductionYear, cancellationToken);
             _log.Info("Filtering out irrelevant films");
-            List<KpMovie> relevantSeries = FilterRelevantItems(movies.Docs, name, item.ProductionYear);
+            List<KpMovie> relevantSeries = FilterRelevantItems(movies.Docs, name, item.ProductionYear, originalTitle);
             if (relevantSeries.Count != 1)
             {
                 _log.Error($"Found {relevantSeries.Count} movies, skipping image update");
@@ -860,15 +860,17 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 ? movie.Description
                 : sb.Insert(0, movie.Description).ToString();
         }
-        private List<KpMovie> FilterRelevantItems(List<KpMovie> list, string name, int? year)
+        private List<KpMovie> FilterRelevantItems(List<KpMovie> list, string name, int? year, string alternativeName)
         {
             _log.Info("Filtering out irrelevant items");
             if (list.Count > 1)
             {
                 var toReturn = list
                     .Where(m =>
-                        KpHelper.CleanName(m.Name) == KpHelper.CleanName(name)
-                            || KpHelper.CleanName(m.AlternativeName) == KpHelper.CleanName(name))
+                           KpHelper.CleanName(m.Name) == KpHelper.CleanName(name)
+                        || KpHelper.CleanName(m.Name) == KpHelper.CleanName(alternativeName)
+                        || KpHelper.CleanName(m.AlternativeName) == KpHelper.CleanName(name)
+                        || KpHelper.CleanName(m.AlternativeName) == KpHelper.CleanName(alternativeName))
                     .Where(m => year == null || m.Year == year)
                     .ToList();
                 return toReturn.Any() ? toReturn : list;
