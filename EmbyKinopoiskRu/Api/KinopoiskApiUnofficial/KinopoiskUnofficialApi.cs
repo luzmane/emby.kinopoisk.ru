@@ -106,6 +106,24 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             var response = await SendRequest(url, cancellationToken);
             return string.IsNullOrEmpty(response) ? new KpSearchResult<KpStaff>() : _jsonSerializer.DeserializeFromString<KpSearchResult<KpStaff>>(response);
         }
+        internal async Task<KpSearchResult<KpFilm>> GetFilmByImdbId(string imdbMovieId, CancellationToken cancellationToken)
+        {
+            var hasImdb = !string.IsNullOrWhiteSpace(imdbMovieId);
+            var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films?imdbId={imdbMovieId}";
+
+            if (hasImdb)
+            {
+                var response = await SendRequest(request, cancellationToken);
+                KpSearchResult<KpFilm> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpFilm>>(response);
+                if (toReturn != null && toReturn.Items.Count > 0)
+                {
+                    _log.Info($"Found {toReturn.Items.Count} items");
+                    return toReturn;
+                }
+            }
+
+            return new KpSearchResult<KpFilm>();
+        }
 
         private async Task<string> SendRequest(string url, CancellationToken cancellationToken)
         {
