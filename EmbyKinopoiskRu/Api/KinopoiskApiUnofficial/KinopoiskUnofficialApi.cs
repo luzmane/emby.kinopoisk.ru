@@ -45,53 +45,31 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         }
         internal async Task<KpSearchResult<KpFilm>> GetFilmsByNameAndYear(string name, int? year, CancellationToken cancellationToken)
         {
+            var hasName = !string.IsNullOrWhiteSpace(name);
             var hasYear = year != null && year > 1000;
-            var url = $"https://kinopoiskapiunofficial.tech/api/v2.2/films?keyword={name}";
+            var url = "https://kinopoiskapiunofficial.tech/api/v2.2/films";
+            var namePart = $"?keyword={name}";
+            var yearPart = $"&yearFrom={year}&yearTo={year}";
 
-            if (hasYear)
+            if (hasYear && hasName)
             {
-                var request = url + $"&yearFrom={year}&yearTo={year}";
-                var json = await SendRequest(request, cancellationToken);
-                KpSearchResult<KpFilm> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpFilm>>(json);
+                var request = url + namePart + yearPart;
+                var response = await SendRequest(request, cancellationToken);
+                KpSearchResult<KpFilm> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpFilm>>(response);
                 if (toReturn != null && toReturn.Items.Count > 0)
                 {
-                    // remove films with incorrect year
-                    var removeList = toReturn.Items
-                        .Where(i => i.Year == null || i.Year != year)
-                        .Select(i => i.KinopoiskId)
-                        .ToList();
-                    _ = toReturn.Items.RemoveAll(f => removeList.Contains(f.KinopoiskId));
-
-                    // remove films with incorrect name
-                    removeList = toReturn.Items
-                        .Where(i => !name.EqualsIgnoreCase(i.NameRu))
-                        .Select(i => i.KinopoiskId)
-                        .ToList();
-                    if (removeList.Count < toReturn.Items.Count)
-                    {
-                        _ = toReturn.Items.RemoveAll(f => removeList.Contains(f.KinopoiskId));
-                    }
-
                     _log.Info($"Found {toReturn.Items.Count} movies");
                     return toReturn;
                 }
             }
-            else
+
+            if (hasName)
             {
-                var json = await SendRequest(url, cancellationToken);
-                KpSearchResult<KpFilm> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpFilm>>(json);
+                var request = url + namePart;
+                var response = await SendRequest(request, cancellationToken);
+                KpSearchResult<KpFilm> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpFilm>>(response);
                 if (toReturn != null && toReturn.Items.Count > 0)
                 {
-                    // remove films with incorrect name
-                    var removeList = toReturn.Items
-                        .Where(i => !name.EqualsIgnoreCase(i.NameRu))
-                        .Select(i => i.KinopoiskId)
-                        .ToList();
-                    if (removeList.Count < toReturn.Items.Count)
-                    {
-                        _ = toReturn.Items.RemoveAll(f => removeList.Contains(f.KinopoiskId));
-                    }
-
                     _log.Info($"Found {toReturn.Items.Count} movies");
                     return toReturn;
                 }
