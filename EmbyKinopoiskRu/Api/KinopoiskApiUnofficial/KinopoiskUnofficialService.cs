@@ -761,16 +761,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 var imdbMovieId = info.GetProviderId(MetadataProviders.Imdb);
                 _log.Info($"Searching Kp movie by IMDB '{imdbMovieId}'");
                 KpSearchResult<KpFilm> kpSearchResult = await _api.GetFilmByImdbId(imdbMovieId, cancellationToken);
-                if (kpSearchResult.Items.Count > 0)
+                if (kpSearchResult.Items.Count != 1)
                 {
-                    kpSearchResult.Items = FilterRelevantItems(kpSearchResult.Items, info.Name, info.Year);
-                    if (kpSearchResult.Items.Count != 1)
-                    {
-                        _log.Info($"Other than 1 item ({kpSearchResult.Items.Count}) was found by IMDB '{imdbMovieId}'. Skip search by IMDB ID");
-                        return null;
-                    }
-                    return kpSearchResult.Items[0];
+                    _log.Info($"Nothing was found by IMDB '{imdbMovieId}'. Skip search by IMDB ID");
+                    return null;
                 }
+                return await _api.GetFilmById(kpSearchResult.Items[0].KinopoiskId.ToString(), cancellationToken);
             }
 
             return null;
