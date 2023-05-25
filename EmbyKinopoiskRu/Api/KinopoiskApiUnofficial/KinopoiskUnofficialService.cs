@@ -119,6 +119,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                             Overview = movie.Description,
                         };
                         item.SetProviderId(Plugin.PluginKey, movieId);
+                        if (!string.IsNullOrWhiteSpace(movie.ImdbId))
+                        {
+                            item.SetProviderId(MetadataProviders.Imdb, movie.ImdbId);
+                        }
                         result.Add(item);
                         _log.Info($"Found a movie with name {movie.NameRu} and id {movie.KinopoiskId}");
                         return result;
@@ -142,6 +146,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     Overview = movie.Description,
                 };
                 item.SetProviderId(Plugin.PluginKey, movie.KinopoiskId.ToString(CultureInfo.InvariantCulture));
+                if (!string.IsNullOrWhiteSpace(movie.ImdbId))
+                {
+                    item.SetProviderId(MetadataProviders.Imdb, movie.ImdbId);
+                }
                 result.Add(item);
             }
             _log.Info($"By name '{searchInfo.Name}' found {result.Count} movies");
@@ -217,15 +225,14 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             };
 
             toReturn.SetProviderId(Plugin.PluginKey, movieId);
+            if (!string.IsNullOrWhiteSpace(movie.ImdbId))
+            {
+                toReturn.SetProviderId(MetadataProviders.Imdb, movie.ImdbId);
+            }
 
             if (long.TryParse(movie.FilmLength?.ToString(CultureInfo.InvariantCulture), out var size))
             {
                 toReturn.Size = size;
-            }
-
-            if (!string.IsNullOrWhiteSpace(movie.ImdbId))
-            {
-                toReturn.ProviderIds.Add(MetadataProviders.Imdb.ToString(), movie.ImdbId);
             }
 
             IEnumerable<string> genres = movie.Genres?
@@ -394,6 +401,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                             Overview = series.Description,
                         };
                         item.SetProviderId(Plugin.PluginKey, seriesId);
+                        if (!string.IsNullOrWhiteSpace(series.ImdbId))
+                        {
+                            item.SetProviderId(MetadataProviders.Imdb, series.ImdbId);
+                        }
                         result.Add(item);
                         _log.Info($"Found a series with name {series.NameRu} and id {series.KinopoiskId}");
                         return result;
@@ -417,6 +428,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     Overview = series.Description,
                 };
                 item.SetProviderId(Plugin.PluginKey, series.KinopoiskId.ToString(CultureInfo.InvariantCulture));
+                if (!string.IsNullOrWhiteSpace(series.ImdbId))
+                {
+                    item.SetProviderId(MetadataProviders.Imdb, series.ImdbId);
+                }
                 result.Add(item);
             }
             _log.Info($"By name '{searchInfo.Name}' found {result.Count} series");
@@ -469,15 +484,14 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             };
 
             toReturn.SetProviderId(Plugin.PluginKey, seriesId);
+            if (!string.IsNullOrWhiteSpace(series.ImdbId))
+            {
+                toReturn.SetProviderId(MetadataProviders.Imdb, series.ImdbId);
+            }
 
             if (long.TryParse(series.FilmLength?.ToString(CultureInfo.InvariantCulture), out var size))
             {
                 toReturn.Size = size;
-            }
-
-            if (!string.IsNullOrWhiteSpace(series.ImdbId))
-            {
-                toReturn.ProviderIds.Add(MetadataProviders.Imdb.ToString(), series.ImdbId);
             }
 
             IEnumerable<string> genres = series.Genres?
@@ -488,12 +502,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             {
                 toReturn.SetGenres(genres);
             }
-
-            // IEnumerable<string?>? studios = series.ProductionCompanies?.Select(i => i.Name).AsEnumerable();
-            // if (studios != null)
-            // {
-            //     toReturn.SetStudios(studios);
-            // }
 
             return toReturn;
         }
@@ -639,6 +647,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                         {
                             Name = person.NameRu,
                             ImageUrl = person.PosterUrl,
+                            SearchProviderName = Plugin.PluginKey
                         };
                         item.SetProviderId(Plugin.PluginKey, personId);
                         result.Add(item);
@@ -656,6 +665,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 {
                     Name = person.NameRu,
                     ImageUrl = person.PosterUrl,
+                    SearchProviderName = Plugin.PluginKey
                 };
                 item.SetProviderId(Plugin.PluginKey, person.PersonId.ToString(CultureInfo.InvariantCulture));
                 result.Add(item);
@@ -673,7 +683,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 Name = person.NameRu,
                 SortName = person.NameRu,
                 OriginalTitle = person.NameEn,
-
+                ProviderIds = new ProviderIdDictionary(
+                    new Dictionary<string, string>() { { Plugin.PluginKey, person.PersonId.ToString() } })
             };
             if (DateTimeOffset.TryParse(person.Birthday, out DateTimeOffset birthDay))
             {
