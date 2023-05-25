@@ -10,12 +10,14 @@ using MediaBrowser.Common.Updates;
 using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Updates;
 
-namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
+using NLog;
+
+namespace EmbyKinopoiskRu.Tests.Common;
 
 [Collection("Sequential")]
 public class UpdateKinopoiskPluginTaskTest : BaseTest
 {
-    private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpEpisodeProviderTest));
+    private static readonly ILogger Logger = LogManager.GetLogger(nameof(UpdateKinopoiskPluginTaskTest));
 
     private readonly UpdateKinopoiskPluginTask _updateKinopoiskPluginTask;
     private readonly Mock<IInstallationManager> _installationManager = new();
@@ -24,12 +26,6 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
     #region Test configs
     public UpdateKinopoiskPluginTaskTest() : base(Logger)
     {
-        _pluginConfiguration.Token = KINOPOISK_DEV_TOKEN;
-
-        ConfigLibraryManager();
-
-        ConfigXmlSerializer();
-
         _updateKinopoiskPluginTask = new(
             _httpClient,
             _jsonSerializer,
@@ -37,15 +33,6 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
             _installationManager.Object,
             _serverConfigurationManager.Object);
     }
-    protected override void ConfigLibraryManager()
-    {
-        base.ConfigLibraryManager();
-    }
-    protected override void ConfigXmlSerializer()
-    {
-        base.ConfigXmlSerializer();
-    }
-
     #endregion
 
     [Fact]

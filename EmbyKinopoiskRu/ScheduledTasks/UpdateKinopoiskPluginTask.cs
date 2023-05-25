@@ -111,16 +111,13 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {
+                        _logger.Info("Cancelation was requested");
                         throw;
                     }
                 }
                 catch (HttpException exception2)
                 {
                     _logger.ErrorException("Error downloading {0}", exception2, package.name);
-                }
-                catch (IOException exception3)
-                {
-                    _logger.ErrorException("Error updating {0}", exception3, package.name);
                 }
                 catch (Exception ex)
                 {
