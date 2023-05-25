@@ -926,10 +926,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         #endregion
 
         #region Scheduled Tasks
-        public async Task<List<Movie>> GetTop250MovieCollection(CancellationToken cancellationToken)
+        public async Task<List<BaseItem>> GetTop250MovieCollection(CancellationToken cancellationToken)
         {
             _log.Info("Get Top250 Movies Collection");
-            var toReturn = new List<Movie>();
+            var toReturn = new List<BaseItem>();
             KpSearchResult<KpMovie> movies = await _api.GetTop250Collection(cancellationToken);
             movies.Docs
                 .Where(m => _movieTypes.Contains(m.TypeNumber))
@@ -955,10 +955,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 });
             return toReturn;
         }
-        public async Task<List<Series>> GetTop250SeriesCollection(CancellationToken cancellationToken)
+        public async Task<List<BaseItem>> GetTop250SeriesCollection(CancellationToken cancellationToken)
         {
             _log.Info("Get Top250 Series Collection");
-            var toReturn = new List<Series>();
+            var toReturn = new List<BaseItem>();
             KpSearchResult<KpMovie> movies = await _api.GetTop250Collection(cancellationToken);
             movies.Docs
                 .Where(m => !_movieTypes.Contains(m.TypeNumber))

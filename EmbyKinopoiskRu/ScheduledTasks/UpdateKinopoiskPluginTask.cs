@@ -49,7 +49,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         {
             _httpClient = httpClient;
             _jsonSerializer = jsonSerializer;
-            _logger = logManager.GetLogger("CheckNewPluginVersion");
+            _logger = logManager.GetLogger(GetType().Name);
             _installationManager = installationManager;
             _serverConfigurationManager = serverConfigurationManager;
 
