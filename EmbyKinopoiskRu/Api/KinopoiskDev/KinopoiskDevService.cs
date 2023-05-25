@@ -126,47 +126,55 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return result;
             }
 
-            if (searchInfo.HasProviderId(Plugin.PluginKey))
+            KpMovie movie = await GetKpMovieByProviderId(searchInfo, cancellationToken);
+            if (movie != null)
             {
-                var movieId = searchInfo.GetProviderId(Plugin.PluginKey);
-                if (!string.IsNullOrWhiteSpace(movieId))
-                {
-                    _log.Info($"Searching movie by id '{movieId}'");
-                    KpMovie movie = await _api.GetMovieById(movieId, cancellationToken);
-                    if (movie != null)
-                    {
-                        var imageUrl = (movie.Poster?.PreviewUrl ?? movie.Poster?.Url) ?? string.Empty;
-                        var item = new RemoteSearchResult()
-                        {
-                            Name = movie.Name,
-                            ImageUrl = imageUrl,
-                            SearchProviderName = Plugin.PluginKey,
-                            ProductionYear = movie.Year,
-                            Overview = PrepareOverview(movie),
-                        };
-                        item.SetProviderId(Plugin.PluginKey, movieId);
-                        result.Add(item);
-                        return result;
-                    }
-                    _log.Info($"Movie by id '{movieId}' not found");
-                }
-            }
-
-            var name = KpHelper.CleanName(searchInfo.Name);
-            _log.Info($"Searching movie by name '{name}' and year '{searchInfo.Year}'");
-            KpSearchResult<KpMovie> movies = await _api.GetMoviesByMovieDetails(name, searchInfo.Year, cancellationToken);
-            foreach (KpMovie movie in movies.Docs)
-            {
-                var imageUrl = (movie.Poster?.PreviewUrl ?? movie.Poster?.Url) ?? string.Empty;
+                _log.Info($"Movie found by provider ID, Kinopoisk ID: '{movie.Id}'");
                 var item = new RemoteSearchResult()
                 {
                     Name = movie.Name,
-                    ImageUrl = imageUrl,
+                    ImageUrl = (movie.Poster?.PreviewUrl ?? movie.Poster?.Url) ?? string.Empty,
                     SearchProviderName = Plugin.PluginKey,
                     ProductionYear = movie.Year,
                     Overview = PrepareOverview(movie),
                 };
-                item.SetProviderId(Plugin.PluginKey, movie.Id.ToString(CultureInfo.InvariantCulture));
+                item.SetProviderId(Plugin.PluginKey, movie.Id.ToString());
+                if (!string.IsNullOrWhiteSpace(movie.ExternalId?.Imdb))
+                {
+                    item.ProviderIds.Add(MetadataProviders.Imdb.ToString(), movie.ExternalId.Imdb);
+                }
+                if (movie.ExternalId?.Tmdb != null)
+                {
+                    item.ProviderIds.Add(MetadataProviders.Tmdb.ToString(), movie.ExternalId.Tmdb.ToString());
+                }
+                result.Add(item);
+                return result;
+            }
+            _log.Info($"Movie was not found by provider ID");
+
+            var name = KpHelper.CleanName(searchInfo.Name);
+            _log.Info($"Searching movie by name '{name}' and year '{searchInfo.Year}'");
+            KpSearchResult<KpMovie> movies = await _api.GetMoviesByMovieDetails(name, searchInfo.Year, cancellationToken);
+            foreach (KpMovie m in movies.Docs)
+            {
+                var imageUrl = (m.Poster?.PreviewUrl ?? m.Poster?.Url) ?? string.Empty;
+                var item = new RemoteSearchResult()
+                {
+                    Name = m.Name,
+                    ImageUrl = imageUrl,
+                    SearchProviderName = Plugin.PluginKey,
+                    ProductionYear = m.Year,
+                    Overview = PrepareOverview(m),
+                };
+                item.SetProviderId(Plugin.PluginKey, m.Id.ToString(CultureInfo.InvariantCulture));
+                if (!string.IsNullOrWhiteSpace(m.ExternalId?.Imdb))
+                {
+                    item.ProviderIds.Add(MetadataProviders.Imdb.ToString(), m.ExternalId.Imdb);
+                }
+                if (m.ExternalId?.Tmdb != null)
+                {
+                    item.ProviderIds.Add(MetadataProviders.Tmdb.ToString(), m.ExternalId.Tmdb.ToString());
+                }
                 result.Add(item);
             }
             _log.Info($"By name '{name}' found {result.Count} movies");
@@ -299,47 +307,55 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return result;
             }
 
-            if (searchInfo.HasProviderId(Plugin.PluginKey))
+            KpMovie series = await GetKpMovieByProviderId(searchInfo, cancellationToken);
+            if (series != null)
             {
-                var seriesId = searchInfo.GetProviderId(Plugin.PluginKey);
-                if (!string.IsNullOrWhiteSpace(seriesId))
-                {
-                    _log.Info($"Searching series by id '{seriesId}'");
-                    KpMovie series = await _api.GetMovieById(seriesId, cancellationToken);
-                    if (series != null)
-                    {
-                        var imageUrl = (series.Poster?.PreviewUrl ?? series.Poster?.Url) ?? string.Empty;
-                        var item = new RemoteSearchResult()
-                        {
-                            Name = series.Name,
-                            ImageUrl = imageUrl,
-                            SearchProviderName = Plugin.PluginKey,
-                            ProductionYear = series.Year,
-                            Overview = PrepareOverview(series),
-                        };
-                        item.SetProviderId(Plugin.PluginKey, seriesId);
-                        result.Add(item);
-                        return result;
-                    }
-                    _log.Info($"Series by id '{seriesId}' not found");
-                }
-            }
-
-            var name = KpHelper.CleanName(searchInfo.Name);
-            _log.Info($"Searching series by name '{name}' and year '{searchInfo.Year}'");
-            KpSearchResult<KpMovie> seriesResult = await _api.GetMoviesByMovieDetails(name, searchInfo.Year, cancellationToken);
-            foreach (KpMovie series in seriesResult.Docs)
-            {
-                var imageUrl = (series.Poster?.PreviewUrl ?? series.Poster?.Url) ?? string.Empty;
+                _log.Info($"Series found by provider ID, Kinopoisk ID: '{series.Id}'");
                 var item = new RemoteSearchResult()
                 {
                     Name = series.Name,
-                    ImageUrl = imageUrl,
+                    ImageUrl = (series.Poster?.PreviewUrl ?? series.Poster?.Url) ?? string.Empty,
                     SearchProviderName = Plugin.PluginKey,
                     ProductionYear = series.Year,
                     Overview = PrepareOverview(series),
                 };
-                item.SetProviderId(Plugin.PluginKey, series.Id.ToString(CultureInfo.InvariantCulture));
+                item.SetProviderId(Plugin.PluginKey, series.Id.ToString());
+                if (!string.IsNullOrWhiteSpace(series.ExternalId?.Imdb))
+                {
+                    item.ProviderIds.Add(MetadataProviders.Imdb.ToString(), series.ExternalId.Imdb);
+                }
+                if (series.ExternalId?.Tmdb != null)
+                {
+                    item.ProviderIds.Add(MetadataProviders.Tmdb.ToString(), series.ExternalId.Tmdb.ToString());
+                }
+                result.Add(item);
+                return result;
+            }
+            _log.Info($"Series was not found by provider ID");
+
+            var name = KpHelper.CleanName(searchInfo.Name);
+            _log.Info($"Searching series by name '{name}' and year '{searchInfo.Year}'");
+            KpSearchResult<KpMovie> seriesResult = await _api.GetMoviesByMovieDetails(name, searchInfo.Year, cancellationToken);
+            foreach (KpMovie s in seriesResult.Docs)
+            {
+                var imageUrl = (s.Poster?.PreviewUrl ?? s.Poster?.Url) ?? string.Empty;
+                var item = new RemoteSearchResult()
+                {
+                    Name = s.Name,
+                    ImageUrl = imageUrl,
+                    SearchProviderName = Plugin.PluginKey,
+                    ProductionYear = s.Year,
+                    Overview = PrepareOverview(s),
+                };
+                item.SetProviderId(Plugin.PluginKey, s.Id.ToString(CultureInfo.InvariantCulture));
+                if (!string.IsNullOrWhiteSpace(s.ExternalId?.Imdb))
+                {
+                    item.ProviderIds.Add(MetadataProviders.Imdb.ToString(), s.ExternalId.Imdb);
+                }
+                if (s.ExternalId?.Tmdb != null)
+                {
+                    item.ProviderIds.Add(MetadataProviders.Tmdb.ToString(), s.ExternalId.Tmdb.ToString());
+                }
                 result.Add(item);
             }
             _log.Info($"By name '{name}' found {result.Count} series");
