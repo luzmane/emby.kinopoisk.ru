@@ -1,3 +1,9 @@
+v.1.17.0
+- Remove CriticRating as not relevant for Kinopoisk
+- KinopoiskApiUnOfficial. Remove video name normalization as breaking search
+- KinopoiskApiUnOfficial. Add search by IMDB
+- Improve filtering video by relevant data
+
 v.1.16.1
 - Fix Movie's Facts overlapping in Safari browser
 
