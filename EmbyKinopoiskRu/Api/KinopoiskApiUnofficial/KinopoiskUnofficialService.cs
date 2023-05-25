@@ -77,10 +77,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 }
             }
 
-            var name = KpHelper.CleanName(info.Name);
-            _log.Info($"Searching movies by name '{name}' and year '{info.Year}'");
-            KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(name, info.Year, cancellationToken);
-            List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, name, info.Year);
+            // no name cleanup - search 'as is', otherwise doesn't work
+            _log.Info($"Searching movies by name '{info.Name}' and year '{info.Year}'");
+            KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(info.Name, info.Year, cancellationToken);
+            List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, info.Name, info.Year);
             if (relevantMovies.Count != 1)
             {
                 _log.Error($"Found {relevantMovies.Count} movies, skipping movie update");
@@ -127,9 +127,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 }
             }
 
-            var name = KpHelper.CleanName(searchInfo.Name);
-            _log.Info($"Searching movies by name '{name}' and year '{searchInfo.Year}'");
-            KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(name, searchInfo.Year, cancellationToken);
+            // no name cleanup - search 'as is', otherwise doesn't work
+            _log.Info($"Searching movies by name '{searchInfo.Name}' and year '{searchInfo.Year}'");
+            KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(searchInfo.Name, searchInfo.Year, cancellationToken);
             foreach (KpFilm movie in movies.Items)
             {
                 var imageUrl = (movie.PosterUrlPreview ?? movie.PosterUrl) ?? string.Empty;
@@ -144,7 +144,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 item.SetProviderId(Plugin.PluginKey, movie.KinopoiskId.ToString(CultureInfo.InvariantCulture));
                 result.Add(item);
             }
-            _log.Info($"By name '{name}' found {result.Count} movies");
+            _log.Info($"By name '{searchInfo.Name}' found {result.Count} movies");
             return result;
         }
         public async Task<List<Movie>> GetMoviesByOriginalNameAndYear(string name, int? year, CancellationToken cancellationToken)
@@ -157,7 +157,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 return result;
             }
 
-            name = KpHelper.CleanName(name);
+            // no name cleanup - search 'as is', otherwise doesn't work
             _log.Info($"Searching movies by name '{name}' and year '{year}'");
             KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(name, year, cancellationToken);
             List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, name, year);
@@ -237,12 +237,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 toReturn.SetGenres(genres);
             }
 
-            // IEnumerable<string?>? studios = movie.ProductionCompanies?.Select(i => i.Name).AsEnumerable();
-            // if (studios != null)
-            // {
-            //     toReturn.SetStudios(studios);
-            // }
-
             return toReturn;
         }
         #endregion
@@ -274,10 +268,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 }
             }
 
-            var name = KpHelper.CleanName(item.Name);
-            _log.Info($"Searching movies by name '{name}' and year '{item.ProductionYear}'");
-            KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(name, item.ProductionYear, cancellationToken);
-            List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, name, item.ProductionYear);
+            // no name cleanup - search 'as is', otherwise doesn't work
+            _log.Info($"Searching movies by name '{item.Name}' and year '{item.ProductionYear}'");
+            KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYear(item.Name, item.ProductionYear, cancellationToken);
+            List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, item.Name, item.ProductionYear);
             if (relevantMovies.Count != 1)
             {
                 _log.Error($"Found {relevantMovies.Count} movies, skipping image update");
@@ -358,10 +352,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 }
             }
 
-            var name = KpHelper.CleanName(info.Name);
-            _log.Info($"Searching series by name '{name}' and year '{info.Year}'");
-            KpSearchResult<KpFilm> series = await _api.GetFilmsByNameAndYear(name, info.Year, cancellationToken);
-            List<KpFilm> relevantSeries = FilterRelevantItems(series.Items, name, info.Year);
+            // no name cleanup - search 'as is', otherwise doesn't work
+            _log.Info($"Searching series by name '{info.Name}' and year '{info.Year}'");
+            KpSearchResult<KpFilm> series = await _api.GetFilmsByNameAndYear(info.Name, info.Year, cancellationToken);
+            List<KpFilm> relevantSeries = FilterRelevantItems(series.Items, info.Name, info.Year);
             if (relevantSeries.Count != 1)
             {
                 _log.Error($"Found {relevantSeries.Count} series, skipping series update");
@@ -408,9 +402,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 }
             }
 
-            var name = KpHelper.CleanName(searchInfo.Name);
-            _log.Info($"Searching series by name '{name}' and year '{searchInfo.Year}'");
-            KpSearchResult<KpFilm> seriesResult = await _api.GetFilmsByNameAndYear(name, searchInfo.Year, cancellationToken);
+            // no name cleanup - search 'as is', otherwise doesn't work
+            _log.Info($"Searching series by name '{searchInfo.Name}' and year '{searchInfo.Year}'");
+            KpSearchResult<KpFilm> seriesResult = await _api.GetFilmsByNameAndYear(searchInfo.Name, searchInfo.Year, cancellationToken);
             foreach (KpFilm series in seriesResult.Items)
             {
                 var imageUrl = (series.PosterUrlPreview ?? series.PosterUrl) ?? string.Empty;
@@ -425,7 +419,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 item.SetProviderId(Plugin.PluginKey, series.KinopoiskId.ToString(CultureInfo.InvariantCulture));
                 result.Add(item);
             }
-            _log.Info($"By name '{name}' found {result.Count} series");
+            _log.Info($"By name '{searchInfo.Name}' found {result.Count} series");
             return result;
         }
 
