@@ -191,10 +191,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 UpdatePersonsList(result, staffList, movie.NameRu);
             }
 
-            List<KpVideo> videosList = await _api.GetVideosByFilmId(movieId, cancellationToken);
-            if (result.HasMetadata && videosList != null && videosList.Count > 0)
+            KpSearchResult<KpVideo> videosList = await _api.GetVideosByFilmId(movieId, cancellationToken);
+            if (result.HasMetadata && videosList != null && videosList.Items.Count > 0)
             {
-                videosList
+                videosList.Items
                     .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube"))
                     .Select(i => i.Url
                         .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")
@@ -451,10 +451,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 UpdatePersonsList(result, staffList, film.NameRu);
             }
 
-            List<KpVideo> videosList = await _api.GetVideosByFilmId(seriesId, cancellationToken);
-            if (result.HasMetadata && videosList != null && videosList.Count > 0)
+            KpSearchResult<KpVideo> videosList = await _api.GetVideosByFilmId(seriesId, cancellationToken);
+            if (result.HasMetadata && videosList != null && videosList.Items.Count > 0)
             {
-                videosList
+                videosList.Items
                     .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains("youtube"))
                     .Select(i => i.Url
                         .Replace("https://www.youtube.com/embed/", "https://www.youtube.com/watch?v=")

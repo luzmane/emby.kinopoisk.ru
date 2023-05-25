@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -13,7 +12,6 @@ using EmbyKinopoiskRu.Helper;
 
 using MediaBrowser.Common.Net;
 using MediaBrowser.Model.Activity;
-using MediaBrowser.Model.Extensions;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Net;
 using MediaBrowser.Model.Serialization;
@@ -106,11 +104,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             var response = await SendRequest(url, cancellationToken);
             return string.IsNullOrEmpty(response) ? new List<KpFilmStaff>() : _jsonSerializer.DeserializeFromString<List<KpFilmStaff>>(response);
         }
-        internal async Task<List<KpVideo>> GetVideosByFilmId(string movieId, CancellationToken cancellationToken)
+        internal async Task<KpSearchResult<KpVideo>> GetVideosByFilmId(string movieId, CancellationToken cancellationToken)
         {
             var url = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/{movieId}/videos";
             var response = await SendRequest(url, cancellationToken);
-            return string.IsNullOrEmpty(response) ? new List<KpVideo>() : _jsonSerializer.DeserializeFromString<List<KpVideo>>(response);
+            return string.IsNullOrEmpty(response) ? new KpSearchResult<KpVideo>() : _jsonSerializer.DeserializeFromString<KpSearchResult<KpVideo>>(response);
         }
         internal async Task<KpSearchResult<KpSeason>> GetEpisodesBySeriesId(string seriesId, CancellationToken cancellationToken)
         {
