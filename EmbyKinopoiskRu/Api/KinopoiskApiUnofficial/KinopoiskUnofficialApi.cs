@@ -100,11 +100,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             var response = await SendRequest(url, cancellationToken);
             return string.IsNullOrEmpty(response) ? null : _jsonSerializer.DeserializeFromString<KpPerson>(response);
         }
-        internal async Task<KpSearchResult<KpPerson>> GetPersonsByName(string name, CancellationToken cancellationToken)
+        internal async Task<KpSearchResult<KpStaff>> GetPersonsByName(string name, CancellationToken cancellationToken)
         {
             var url = $"https://kinopoiskapiunofficial.tech/api/v1/persons?name={name}";
             var response = await SendRequest(url, cancellationToken);
-            return string.IsNullOrEmpty(response) ? new KpSearchResult<KpPerson>() : _jsonSerializer.DeserializeFromString<KpSearchResult<KpPerson>>(response);
+            return string.IsNullOrEmpty(response) ? new KpSearchResult<KpStaff>() : _jsonSerializer.DeserializeFromString<KpSearchResult<KpStaff>>(response);
         }
 
         private async Task<string> SendRequest(string url, CancellationToken cancellationToken)

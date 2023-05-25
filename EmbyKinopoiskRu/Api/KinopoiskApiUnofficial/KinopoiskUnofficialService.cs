@@ -612,14 +612,15 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 }
             }
 
-            _log.Info($"Searching person by name {info.Name}");
-            KpSearchResult<KpPerson> persons = await _api.GetPersonsByName(info.Name, cancellationToken);
+            _log.Info($"Searching person by name '{info.Name}'");
+            KpSearchResult<KpStaff> persons = await _api.GetPersonsByName(info.Name, cancellationToken);
+            persons.Items = FilterPersonsByName(info.Name, persons.Items);
             if (persons.Items.Count != 1)
             {
                 _log.Error($"Found {persons.Items.Count} persons, skipping person update");
                 return result;
             }
-            KpPerson p = await _api.GetPersonById(persons.Items[0].PersonId.ToString(), cancellationToken);
+            KpPerson p = await _api.GetPersonById(persons.Items[0].KinopoiskId.ToString(), cancellationToken);
             result.Item = CreatePersonFromKpPerson(p);
             result.HasMetadata = true;
             return result;
@@ -658,8 +659,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             }
 
             _log.Info($"Searching persons by name '{searchInfo.Name}'");
-            KpSearchResult<KpPerson> persons = await _api.GetPersonsByName(searchInfo.Name, cancellationToken);
-            foreach (KpPerson person in persons.Items)
+            KpSearchResult<KpStaff> persons = await _api.GetPersonsByName(searchInfo.Name, cancellationToken);
+            foreach (KpStaff person in persons.Items)
             {
                 var item = new RemoteSearchResult()
                 {
@@ -667,7 +668,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     ImageUrl = person.PosterUrl,
                     SearchProviderName = Plugin.PluginKey
                 };
-                item.SetProviderId(Plugin.PluginKey, person.PersonId.ToString(CultureInfo.InvariantCulture));
+                item.SetProviderId(Plugin.PluginKey, person.KinopoiskId.ToString(CultureInfo.InvariantCulture));
                 result.Add(item);
             }
             _log.Info($"By name '{searchInfo.Name}' found {result.Count} persons");
@@ -747,10 +748,27 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             if (list.Count > 1)
             {
                 var toReturn = list
-                    .Where(m =>
-                        KpHelper.CleanName(m.NameRu) == KpHelper.CleanName(name)
+                    .Where(m => (!string.IsNullOrWhiteSpace(name)
+                        && (KpHelper.CleanName(m.NameRu) == KpHelper.CleanName(name)))
                             || KpHelper.CleanName(m.NameOriginal) == KpHelper.CleanName(name))
                     .Where(m => year == null || m.Year == year)
+                    .ToList();
+                return toReturn.Any() ? toReturn : list;
+            }
+            else
+            {
+                return list;
+            }
+        }
+        private List<KpStaff> FilterPersonsByName(string name, List<KpStaff> list)
+        {
+            _log.Info("Filtering out irrelevant persons");
+            if (list.Count > 1)
+            {
+                var toReturn = list
+                    .Where(m => (!string.IsNullOrWhiteSpace(name)
+                        && (KpHelper.CleanName(m.NameRu) == KpHelper.CleanName(name)))
+                            || KpHelper.CleanName(m.NameEn) == KpHelper.CleanName(name))
                     .ToList();
                 return toReturn.Any() ? toReturn : list;
             }
