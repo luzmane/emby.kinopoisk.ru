@@ -140,8 +140,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         internal async Task<KpSearchResult<KpPerson>> GetPersonsByName(string name, CancellationToken cancellationToken)
         {
             var url = $"https://api.kinopoisk.dev/v1/person?";
-            var namePart = $"name={name}";
-            var enNamePart = $"enName={name}";
+            url += "selectFields=id name enName photo birthday death birthPlace deathPlace facts";
+            var namePart = $"&name={name}";
+            var enNamePart = $"&enName={name}";
 
             var json = await SendRequest(url + namePart, cancellationToken);
             KpSearchResult<KpPerson> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpPerson>>(json);
