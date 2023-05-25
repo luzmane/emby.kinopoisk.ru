@@ -544,6 +544,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             _log.Info($"Searching person by name {info.Name}");
             KpSearchResult<KpPerson> persons = await _api.GetPersonsByName(info.Name, cancellationToken);
+            persons.Docs = FilterIrrelevantPersons(persons.Docs, info.Name);
             if (persons.Docs.Count != 1)
             {
                 _log.Error($"Found {persons.Docs.Count} persons, skipping person update");
@@ -576,6 +577,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                         {
                             Name = person.Name,
                             ImageUrl = person.Photo,
+                            SearchProviderName = Plugin.PluginKey
                         };
                         item.SetProviderId(Plugin.PluginKey, personId);
                         result.Add(item);
@@ -587,12 +589,14 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
             _log.Info($"Searching person by name {searchInfo.Name}");
             KpSearchResult<KpPerson> persons = await _api.GetPersonsByName(searchInfo.Name, cancellationToken);
+            persons.Docs = FilterIrrelevantPersons(persons.Docs, searchInfo.Name);
             foreach (KpPerson person in persons.Docs)
             {
                 var item = new RemoteSearchResult()
                 {
                     Name = person.Name,
                     ImageUrl = person.Photo,
+                    SearchProviderName = Plugin.PluginKey
                 };
                 item.SetProviderId(Plugin.PluginKey, person.Id.ToString(CultureInfo.InvariantCulture));
                 result.Add(item);
@@ -609,7 +613,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             {
                 Name = person.Name,
                 SortName = person.Name,
+                OriginalTitle = person.EnName
             };
+            toReturn.ProviderIds.Add(Plugin.PluginKey, person.Id.ToString());
             if (DateTimeOffset.TryParse(person.Birthday, out DateTimeOffset birthDay))
             {
                 toReturn.PremiereDate = birthDay;
@@ -630,6 +636,29 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
             return toReturn;
         }
+        private List<KpPerson> FilterIrrelevantPersons(List<KpPerson> list, string name)
+        {
+            _log.Info("Filtering out irrelevant persons");
+            if (list.Count > 1)
+            {
+                var toReturn = list
+                    .Where(m => KpHelper.CleanName(m.Name) == KpHelper.CleanName(name)
+                        || KpHelper.CleanName(m.EnName) == KpHelper.CleanName(name))
+                    .ToList();
+                if (toReturn.Count > 1)
+                {
+                    toReturn = toReturn
+                        .Where(m => !string.IsNullOrWhiteSpace(m.Photo))
+                        .ToList();
+                }
+                return toReturn.Any() ? toReturn : list;
+            }
+            else
+            {
+                return list;
+            }
+        }
+
         #endregion
 
         #region MovieImageProvider
@@ -749,15 +778,15 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             _log.Info($"Updating persons list of the video with id '{result.Item.GetProviderId(Plugin.PluginKey)}'");
             var seriesId = result.Item.GetProviderId(Plugin.PluginKey);
             var movieName = result.Item.Name;
-            KpSearchResult<KpPerson> personsBySeriesId = await _api.GetPersonsByMovieId(seriesId, cancellationToken);
-            personsBySeriesId.Docs
+            KpSearchResult<KpPerson> personsByVideoId = await _api.GetPersonsByMovieId(seriesId, cancellationToken);
+            personsByVideoId.Docs
                 .ForEach(a =>
                     a.Movies?.RemoveAll(b =>
                         b.Id.ToString(CultureInfo.InvariantCulture) != seriesId
                             || string.IsNullOrWhiteSpace(b.Description)
                         ));
 
-            var idRoleDictionary = personsBySeriesId.Docs
+            var idRoleDictionary = personsByVideoId.Docs
                 .ToDictionary(
                     c => c.Id,
                     c => c.Movies?.FirstOrDefault()?.Description);
@@ -901,14 +930,14 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             if (info.HasProviderId(Plugin.PluginKey) && !string.IsNullOrWhiteSpace(info.GetProviderId(Plugin.PluginKey)))
             {
                 var movieId = info.GetProviderId(Plugin.PluginKey);
-                _log.Info($"Searching movie by movie id '{movieId}'");
+                _log.Info($"Searching Kp movie by id '{movieId}'");
                 return await _api.GetMovieById(movieId, cancellationToken);
             }
 
             if (info.HasProviderId(MetadataProviders.Imdb) && !string.IsNullOrWhiteSpace(info.GetProviderId(MetadataProviders.Imdb)))
             {
                 var imdbMovieId = info.GetProviderId(MetadataProviders.Imdb);
-                _log.Info($"Searching movie by movie {MetadataProviders.Imdb} id '{imdbMovieId}'");
+                _log.Info($"Searching Kp movie by {MetadataProviders.Imdb} id '{imdbMovieId}'");
                 ApiResult<Dictionary<string, long>> apiResult = await GetKpIdByAnotherId(MetadataProviders.Imdb.ToString(), new List<string>() { imdbMovieId }, cancellationToken);
                 if (apiResult.HasError || apiResult.Item.Count != 1)
                 {
@@ -925,7 +954,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             if (info.HasProviderId(MetadataProviders.Tmdb) && !string.IsNullOrWhiteSpace(info.GetProviderId(MetadataProviders.Tmdb)))
             {
                 var tmdbMovieId = info.GetProviderId(MetadataProviders.Tmdb);
-                _log.Info($"Searching movie by movie {MetadataProviders.Tmdb} id '{tmdbMovieId}'");
+                _log.Info($"Searching Kp movie by {MetadataProviders.Tmdb} id '{tmdbMovieId}'");
                 ApiResult<Dictionary<string, long>> apiResult = await GetKpIdByAnotherId(MetadataProviders.Tmdb.ToString(), new List<string>() { tmdbMovieId }, cancellationToken);
                 if (apiResult.HasError || apiResult.Item.Count != 1)
                 {
