@@ -33,7 +33,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             : base(
                 libraryManager,
                 collectionManager,
-                logManager.GetLogger("CreateTop250MovieCollectionsTask"),
+                logManager.GetLogger(nameof(CreateTop250MovieCollectionsTask)),
                 jsonSerializer,
                 serverConfigurationManager,
                 "movies",

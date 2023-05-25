@@ -1,6 +1,6 @@
 using EmbyKinopoiskRu.Helper;
 
-namespace EmbyKinopoiskRu.Tests;
+namespace EmbyKinopoiskRu.Tests.Common;
 
 public class KpHelperTest
 {
