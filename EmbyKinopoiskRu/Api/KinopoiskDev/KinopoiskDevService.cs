@@ -792,7 +792,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             var itemsToAdd = movie.SequelsAndPrequels
                 .Select(seq => seq.Id)
                 .ToList();
-            List<BaseItem> internalCollectionItems = await EmbyHelper.GetInternalIds(itemsToAdd, _libraryManager, _log, _api, cancellationToken);
+            List<BaseItem> internalCollectionItems = await EmbyHelper.GetSequenceInternalIds(itemsToAdd, _libraryManager, _log, _api, cancellationToken);
             var internalIdArray = internalCollectionItems
                 .Select(item => item.InternalId)
                 .ToList();

@@ -38,7 +38,7 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
             var movieName = info.Name;
             _log.Info($"info.Name - {movieName}");
             movieName = MultiSpaces.Replace(NotAlphaNumeric.Replace(movieName, " "), " ");
-            var year = KpHelper.DetectYearFromMoviePath(info.Path, info.Name);
+            var year = string.IsNullOrWhiteSpace(info.Name) ? null : KpHelper.DetectYearFromMoviePath(info.Path, info.Name);
             _log.Info($"Searching movie by name - '{movieName}' and year - {year}");
             List<Movie> movies = await Plugin.Instance.GetKinopoiskService().GetMoviesByOriginalNameAndYear(movieName, year, cancellationToken);
             if (movies.Count == 0)

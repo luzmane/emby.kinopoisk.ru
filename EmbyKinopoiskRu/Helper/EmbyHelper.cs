@@ -58,7 +58,7 @@ namespace EmbyKinopoiskRu.Helper
             await libraryManager.AddVirtualFolder("Collections", options, true);
             return FindCollectionFolders(libraryManager).FirstOrDefault(f => "Collections".Equals(f.Name, StringComparison.Ordinal));
         }
-        internal static async Task<List<BaseItem>> GetInternalIds(
+        internal static async Task<List<BaseItem>> GetSequenceInternalIds(
             List<long> choosenItems,
             ILibraryManager libraryManager,
             ILogger logger,

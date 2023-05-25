@@ -6,11 +6,6 @@ namespace EmbyKinopoiskRu.Helper
 {
     public static class ProviderIdExtensions
     {
-        public static bool HasSeriesProviderId(this EpisodeInfo instance, string provider)
-        {
-            return !string.IsNullOrEmpty(instance.GetSeriesProviderId(provider));
-        }
-
         public static string GetSeriesProviderId(this EpisodeInfo instance, string name)
         {
             if (instance.SeriesProviderIds == null)
