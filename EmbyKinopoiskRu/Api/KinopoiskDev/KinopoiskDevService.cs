@@ -181,7 +181,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             var toReturn = new Movie()
             {
                 CommunityRating = movie.Rating?.Kp,
-                CriticRating = movie.Rating?.FilmCritics * 10,
                 ExternalId = movieId,
                 Name = movie.Name,
                 OfficialRating = movie.RatingMpaa,
@@ -355,7 +354,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             var toReturn = new Series()
             {
                 CommunityRating = series.Rating?.Kp,
-                CriticRating = series.Rating?.FilmCritics * 10,
                 EndDate = GetEndDate(series.ReleaseYears),
                 ExternalId = seriesId,
                 Name = series.Name,

@@ -10,12 +10,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
         /// </summary>
         public float? Kp { get; set; }
 
-        /// <summary>
-        /// Film critics rating
-        /// </summary>
-        public float? FilmCritics { get; set; }
 
-
-        private string DebuggerDisplay => $"Kp: {Kp}, FilmCritics: {FilmCritics}";
+        private string DebuggerDisplay => $"Kp: {Kp}";
     }
 }
