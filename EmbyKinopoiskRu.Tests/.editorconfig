@@ -1,3 +1,13 @@
 [*.cs]
 # CA1707: Identifiers should not contain underscores
 dotnet_diagnostic.CA1707.severity = none
+# CA2007: Do not directly await a Task
+dotnet_diagnostic.CA2007.severity = none
+# CS8618: Nonnullable reference not initialized
+dotnet_diagnostic.CS8618.severity = none
+# CA1051: Do not declare visible instance fields
+dotnet_diagnostic.CA1051.severity = none
+# xUnit1004: Test methods should not be skipped
+dotnet_diagnostic.xUnit1004.severity = none
+# IDE0160: Convert to block-scoped namespace: file_scoped\block_scoped
+csharp_style_namespace_declarations = file_scoped:warning

@@ -8,8 +8,8 @@ namespace EmbyKinopoiskRu.Configuration
     {
         private const string DefaultUnofficialToken = "0f162131-81c1-4979-b46c-3eea4263fb11";
         private const string DefaultDevToken = "8DA0EV2-KTP4A5Q-G67QP3K-S2VFBX7";
-        private const string DefaultTop250MovieCollectionName = "КинопоискТоп250";
-        private const string DefaultTop250SeriesCollectionName = "КинопоискТоп250 (Сериалы)";
+        public const string DefaultTop250MovieCollectionName = "Кинопоиск Топ 250";
+        public const string DefaultTop250SeriesCollectionName = "Кинопоиск Топ 250 (Сериалы)";
         public const string KinopoiskDev = "kinopoisk.dev";
         public const string KinopoiskAPIUnofficialTech = "kinopoiskapiunofficial.tech";
 
