@@ -1,0 +1,11 @@
+{
+    "dotnet.defaultSolution": "EmbyKinopoiskRu.sln",
+    "csharp.inlayHints.enableInlayHintsForImplicitObjectCreation": true,
+    "csharp.inlayHints.enableInlayHintsForTypes": true,
+    "dotnet.inlayHints.enableInlayHintsForIndexerParameters": true,
+    "dotnet.inlayHints.enableInlayHintsForLiteralParameters": true,
+    "dotnet.inlayHints.enableInlayHintsForObjectCreationParameters": true,
+    "dotnet.inlayHints.enableInlayHintsForOtherParameters": true,
+    "dotnetAcquisitionExtension.enableTelemetry": false,
+    "gitlens.telemetry.enabled": false
+}
