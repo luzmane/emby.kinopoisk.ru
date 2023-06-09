@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Net;
 
 using EmbyKinopoiskRu.Configuration;
@@ -86,7 +85,8 @@ public class KpEpisodeProviderTest : BaseTest
         Assert.Equal("А я сказал — оседлаю!", episode.Name);
         Assert.Equal("I Said I'm Gonna Pilot That Thing!!", episode.OriginalTitle);
         Assert.Equal(1, episode.ParentIndexNumber);
-        Assert.Equal(DateTime.Parse("2007-04-08T00:00:00.0000000+00:00", DateTimeFormatInfo.InvariantInfo), episode.PremiereDate);
+        Assert.NotNull(episode.PremiereDate);
+        Assert.Equal(new DateTime(2007, 04, 08), episode.PremiereDate.Value.DateTime, new DateTimeEqualityComparer());
         Assert.Equal(episode.Name, episode.SortName);
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
@@ -126,7 +126,8 @@ public class KpEpisodeProviderTest : BaseTest
         Assert.Equal("А я сказал — оседлаю!", episode.Name);
         Assert.Equal("I Said I'm Gonna Pilot That Thing!!", episode.OriginalTitle);
         Assert.Equal(1, episode.ParentIndexNumber);
-        Assert.Equal(DateTime.Parse("2007-04-08T00:00:00.0000000+00:00", DateTimeFormatInfo.InvariantInfo), episode.PremiereDate);
+        Assert.NotNull(episode.PremiereDate);
+        Assert.Equal(new DateTime(2007, 04, 08), episode.PremiereDate.Value.DateTime, new DateTimeEqualityComparer());
         Assert.Equal(episode.Name, episode.SortName);
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));

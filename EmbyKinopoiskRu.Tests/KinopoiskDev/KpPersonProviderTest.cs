@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Net;
 
 using EmbyKinopoiskRu.Configuration;
@@ -81,7 +80,8 @@ public class KpPersonProviderTest : BaseTest
         Assert.NotNull(person);
         Assert.Equal("Джеки Чан", person.Name);
         Assert.Equal("Настоящее имя — Чань Кунсан (Chan Kongsang), что означает &#171;Чан, рожденный в Гонконге&#187;.\nЧан делает самостоятельно большую часть трюков, а также иногда дублирует других актёров; он неоднократно получал травмы (во время финальных титров в его фильмах обычно демонстрируются неудавшиеся дубли), поэтому Чан внесён в чёрные списки страховых компаний по всему миру.\nУ Чана есть дочь Этта Нг (род. 19 ноября 1999) от внебрачной связи с актрисой Элейн Нг.\nЕго родители — Чарльз Чан и Ли-Ли Чан — бежали в Гонконг с континента во время гражданской войны, а в 1960 году перебрались в Австралию.\nВ возрасте 6 лет Чан был отдан в школу пекинской оперы в Гонконге.\nДважды попадал в Книгу рекордов Гиннесса за «наибольшее число трюков в карьере» и «самое большое число упоминаний в титрах одного фильма». Так, в фильме «<a href=\"/film/654749/\" class=\"all\">Доспехи Бога 3: Миссия Зодиак</a>» Джеки был задействован на 15 должностях (актёр, режиссёр, сценарист, продюсер, оператор, осветитель, постановщик трюков, исполнитель песни, ответственный за питание съёмочной группы и др.), тем самым побив рекорд <a href=\"/name/30966/\" class=\"all\">Роберта Родригеса</a>.", person.Overview);
-        Assert.Equal(DateTime.Parse("1954-04-07T00:00:00.0000000+00:00", DateTimeFormatInfo.InvariantInfo), person.PremiereDate);
+        Assert.NotNull(person.PremiereDate);
+        Assert.Equal(new DateTime(1954, 04, 07), person.PremiereDate.Value.DateTime, new DateTimeEqualityComparer());
         var place = Assert.Single(person.ProductionLocations);
         Assert.Equal("29855", person.GetProviderId(Plugin.PluginKey));
         Assert.Equal(person.Name, person.SortName);
@@ -117,7 +117,8 @@ public class KpPersonProviderTest : BaseTest
         Assert.Equal("Джеки Чан", person.Name);
         Assert.Equal("Jackie Chan", person.OriginalTitle);
         Assert.Equal("Настоящее имя — Чань Кунсан (Chan Kongsang), что означает &#171;Чан, рожденный в Гонконге&#187;.\nЧан делает самостоятельно большую часть трюков, а также иногда дублирует других актёров; он неоднократно получал травмы (во время финальных титров в его фильмах обычно демонстрируются неудавшиеся дубли), поэтому Чан внесён в чёрные списки страховых компаний по всему миру.\nУ Чана есть дочь Этта Нг (род. 19 ноября 1999) от внебрачной связи с актрисой Элейн Нг.\nЕго родители — Чарльз Чан и Ли-Ли Чан — бежали в Гонконг с континента во время гражданской войны, а в 1960 году перебрались в Австралию.\nВ возрасте 6 лет Чан был отдан в школу пекинской оперы в Гонконге.\nДважды попадал в Книгу рекордов Гиннесса за «наибольшее число трюков в карьере» и «самое большое число упоминаний в титрах одного фильма». Так, в фильме «<a href=\"/film/654749/\" class=\"all\">Доспехи Бога 3: Миссия Зодиак</a>» Джеки был задействован на 15 должностях (актёр, режиссёр, сценарист, продюсер, оператор, осветитель, постановщик трюков, исполнитель песни, ответственный за питание съёмочной группы и др.), тем самым побив рекорд <a href=\"/name/30966/\" class=\"all\">Роберта Родригеса</a>.", person.Overview);
-        Assert.Equal(DateTime.Parse("1954-04-07T00:00:00.0000000+00:00", DateTimeFormatInfo.InvariantInfo), person.PremiereDate);
+        Assert.NotNull(person.PremiereDate);
+        Assert.Equal(new DateTime(1954, 04, 07), person.PremiereDate.Value.DateTime, new DateTimeEqualityComparer());
         var place = Assert.Single(person.ProductionLocations);
         Assert.Equal("29855", person.GetProviderId(Plugin.PluginKey));
         Assert.Equal(person.Name, person.SortName);
@@ -153,7 +154,8 @@ public class KpPersonProviderTest : BaseTest
         Assert.Equal("Джеки Чан", person.Name);
         Assert.Equal("Jackie Chan", person.OriginalTitle);
         Assert.Equal("Настоящее имя — Чань Кунсан (Chan Kongsang), что означает &#171;Чан, рожденный в Гонконге&#187;.\nЧан делает самостоятельно большую часть трюков, а также иногда дублирует других актёров; он неоднократно получал травмы (во время финальных титров в его фильмах обычно демонстрируются неудавшиеся дубли), поэтому Чан внесён в чёрные списки страховых компаний по всему миру.\nУ Чана есть дочь Этта Нг (род. 19 ноября 1999) от внебрачной связи с актрисой Элейн Нг.\nЕго родители — Чарльз Чан и Ли-Ли Чан — бежали в Гонконг с континента во время гражданской войны, а в 1960 году перебрались в Австралию.\nВ возрасте 6 лет Чан был отдан в школу пекинской оперы в Гонконге.\nДважды попадал в Книгу рекордов Гиннесса за «наибольшее число трюков в карьере» и «самое большое число упоминаний в титрах одного фильма». Так, в фильме «<a href=\"/film/654749/\" class=\"all\">Доспехи Бога 3: Миссия Зодиак</a>» Джеки был задействован на 15 должностях (актёр, режиссёр, сценарист, продюсер, оператор, осветитель, постановщик трюков, исполнитель песни, ответственный за питание съёмочной группы и др.), тем самым побив рекорд <a href=\"/name/30966/\" class=\"all\">Роберта Родригеса</a>.", person.Overview);
-        Assert.Equal(DateTime.Parse("1954-04-07T00:00:00.0000000+00:00", DateTimeFormatInfo.InvariantInfo), person.PremiereDate);
+        Assert.NotNull(person.PremiereDate);
+        Assert.Equal(new DateTime(1954, 04, 07), person.PremiereDate.Value.DateTime, new DateTimeEqualityComparer());
         var place = Assert.Single(person.ProductionLocations);
         Assert.Equal("29855", person.GetProviderId(Plugin.PluginKey));
         Assert.Equal(person.Name, person.SortName);

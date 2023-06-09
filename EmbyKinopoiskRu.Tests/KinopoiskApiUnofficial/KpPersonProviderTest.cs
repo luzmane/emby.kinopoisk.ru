@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Net;
 
 using EmbyKinopoiskRu.Configuration;
@@ -82,7 +81,8 @@ public class KpPersonProviderTest : BaseTest
         Assert.NotNull(person);
         Assert.Equal("Джеки Чан", person.Name);
         Assert.Equal("В возрасте 6 лет Чан был отдан в школу пекинской оперы в Гонконге.\nДважды попадал в Книгу рекордов Гиннесса за «наибольшее число трюков в карьере» и «самое большое число упоминаний в титрах одного фильма». Так, в фильме «Доспехи Бога 3: Миссия Зодиак» Джеки был задействован на 15 должностях (актёр, режиссёр, сценарист, продюсер, оператор, осветитель, постановщик трюков, исполнитель песни, ответственный за питание съёмочной группы и др.), тем самым побив рекорд Роберта Родригеса.\nНастоящее имя - Чань Кунсан (Chan Kongsang), что означает «Чан, рожденный в Гонконге».\nЕго родители — Чарльз Чан и Ли-Ли Чан — бежали в Гонконг с континента во время гражданской войны, а в 1960 году перебрались в Австралию.\nЧан делает самостоятельно большую часть трюков, а также иногда дублирует других актёров; он неоднократно получал травмы (во время финальных титров в его фильмах обычно демонстрируются неудавшиеся дубли), поэтому Чан внесён в чёрные списки страховых компаний по всему миру.\nУ Чана есть дочь Этта Нг (род. 19 ноября 1999) от внебрачной связи с актрисой Элейн Нг.", person.Overview);
-        Assert.Equal(DateTime.Parse("1954-04-07", DateTimeFormatInfo.InvariantInfo), person.PremiereDate);
+        Assert.NotNull(person.PremiereDate);
+        Assert.Equal(new DateTime(1954, 04, 07), person.PremiereDate.Value.DateTime, new DateTimeEqualityComparer());
         var place = Assert.Single(person.ProductionLocations);
         Assert.Equal("29855", person.GetProviderId(Plugin.PluginKey));
         Assert.Equal(person.Name, person.SortName);
@@ -118,7 +118,8 @@ public class KpPersonProviderTest : BaseTest
         Assert.Equal("Милла Йовович", person.Name);
         Assert.Equal("Milla Jovovich", person.OriginalTitle);
         Assert.Equal("В своём твиттере Йовович рассказала, что по рождению она является православной христианкой, но может ходить «в любую церковь, где будут присутствовать любовь и одухотворение».\nХотя наиболее распространенным в мире вариантом произношения имени и фамилии актрисы является «Mil-ah Jo-vo-vich» (Мил-а Джо-во-вич), правильный вариант - «Mee-lah Yoh-ve-vich» (Ми-ла Йо-вэ-вич).\nПервый брак Миллы с актёром Шоном Эндрюсом был аннулирован матерью актрисы, поскольку Милле было на тот момент всего 16 лет. Брачный союз, заключенный в Лас-Вегасе, продлился с октября по ноябрь 1992 года.\nВ 1994 году Милла выпустила музыкальный компакт-диск «Божественная комедия» (The Divine Comedy).\nСвободно говорит на русском, сербском и французском языках.\nОтец Миллы - сербский врач-педиатр, который переехал из Белграда в СССР и там женился на ее матери.\nМилла - левша.\nМама Миллы - советская актриса Галина Логинова, снимавшаяся вместе с Константином Райкиным и Татьяной Веденеевой.", person.Overview);
-        Assert.Equal(DateTime.Parse("1975-12-17", DateTimeFormatInfo.InvariantInfo), person.PremiereDate);
+        Assert.NotNull(person.PremiereDate);
+        Assert.Equal(new DateTime(1975, 12, 17), person.PremiereDate.Value.DateTime, new DateTimeEqualityComparer());
         var place = Assert.Single(person.ProductionLocations);
         Assert.Equal("24507", person.GetProviderId(Plugin.PluginKey));
         Assert.Equal(person.Name, person.SortName);
@@ -154,7 +155,8 @@ public class KpPersonProviderTest : BaseTest
         Assert.Equal("Милла Йовович", person.Name);
         Assert.Equal("Milla Jovovich", person.OriginalTitle);
         Assert.Equal("В своём твиттере Йовович рассказала, что по рождению она является православной христианкой, но может ходить «в любую церковь, где будут присутствовать любовь и одухотворение».\nХотя наиболее распространенным в мире вариантом произношения имени и фамилии актрисы является «Mil-ah Jo-vo-vich» (Мил-а Джо-во-вич), правильный вариант - «Mee-lah Yoh-ve-vich» (Ми-ла Йо-вэ-вич).\nПервый брак Миллы с актёром Шоном Эндрюсом был аннулирован матерью актрисы, поскольку Милле было на тот момент всего 16 лет. Брачный союз, заключенный в Лас-Вегасе, продлился с октября по ноябрь 1992 года.\nВ 1994 году Милла выпустила музыкальный компакт-диск «Божественная комедия» (The Divine Comedy).\nСвободно говорит на русском, сербском и французском языках.\nОтец Миллы - сербский врач-педиатр, который переехал из Белграда в СССР и там женился на ее матери.\nМилла - левша.\nМама Миллы - советская актриса Галина Логинова, снимавшаяся вместе с Константином Райкиным и Татьяной Веденеевой.", person.Overview);
-        Assert.Equal(DateTime.Parse("1975-12-17", DateTimeFormatInfo.InvariantInfo), person.PremiereDate);
+        Assert.NotNull(person.PremiereDate);
+        Assert.Equal(new DateTime(1975, 12, 17), person.PremiereDate.Value.DateTime, new DateTimeEqualityComparer());
         var place = Assert.Single(person.ProductionLocations);
         Assert.Equal("24507", person.GetProviderId(Plugin.PluginKey));
         Assert.Equal(person.Name, person.SortName);
