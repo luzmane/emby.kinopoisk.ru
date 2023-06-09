@@ -34,6 +34,9 @@ jobs:
       run: dotnet build
     
     - name: Run tests
+      env:
+        KINOPOISK_DEV_TOKEN: ${{ secrets.KINOPOISK_DEV_TOKEN }}
+        KINOPOISK_UNOFFICIAL_TOKEN: ${{ secrets.KINOPOISK_UNOFFICIAL_TOKEN }}
       run: dotnet test --logger "trx;LogFileName=test-results.trx"
     
     - name: Test Report
