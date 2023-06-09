@@ -1,0 +1,45 @@
+name: "Test Report"
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    # The branches below must be a subset of the branches above
+    branches: [ "master" ]
+
+jobs:
+  test:
+    name: Test Report
+    runs-on: ubuntu-latest
+    permissions:
+      actions: read
+      contents: read
+      checks: write
+
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ 'csharp' ]
+
+    steps:
+    - name: Setup .NET Core SDK
+      uses: actions/setup-dotnet@v3.0.3
+      with:
+        dotnet-version: 6.x
+
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Build projects
+      run: dotnet build
+    
+    - name: Run tests
+      run: dotnet test --logger "trx;LogFileName=test-results.trx"
+    
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      if: success() || failure()
+      with: 
+        name: 'Test report'
+        path: 'EmbyKinopoiskRu.Tests/TestResults/test-results.trx'
+        reporter: 'dotnet-trx'

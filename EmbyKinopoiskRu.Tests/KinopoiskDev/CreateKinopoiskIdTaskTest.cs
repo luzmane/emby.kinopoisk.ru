@@ -23,7 +23,7 @@ public class CreateKinopoiskIdTaskTest : BaseTest
     #region Test configs
     public CreateKinopoiskIdTaskTest() : base(Logger)
     {
-        _pluginConfiguration.Token = KINOPOISK_DEV_TOKEN;
+        _pluginConfiguration.Token = GetKinopoiskDevToken();
 
         ConfigLibraryManager();
 

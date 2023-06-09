@@ -23,8 +23,8 @@ reportgenerator -reports:"coverage.cobertura.xml" -targetdir:"coveragereport" -r
 */
 public abstract class BaseTest
 {
-    protected const string KINOPOISK_DEV_TOKEN = "8DA0EV2-KTP4A5Q-G67QP3K-S2VFBX7";
-    protected const string KINOPOISK_UNOFFICIAL_TOKEN = "0f162131-81c1-4979-b46c-3eea4263fb11";
+    private const string KINOPOISK_DEV_TOKEN = "8DA0EV2-KTP4A5Q-G67QP3K-S2VFBX7";
+    private const string KINOPOISK_UNOFFICIAL_TOKEN = "0f162131-81c1-4979-b46c-3eea4263fb11";
 
     private readonly NLog.ILogger _logger;
 
@@ -188,4 +188,16 @@ public abstract class BaseTest
         PrintMockInvocations(_serverApplicationHost);
     }
 
+    protected string GetKinopoiskDevToken()
+    {
+        var token = Environment.GetEnvironmentVariable("KINOPOISK_DEV_TOKEN");
+        _logger.Info($"Env token length is: {(token != null ? token.Length : 0)}");
+        return string.IsNullOrWhiteSpace(token) ? KINOPOISK_DEV_TOKEN : token;
+    }
+    protected string GetKinopoiskUnofficialToken()
+    {
+        var token = Environment.GetEnvironmentVariable("KINOPOISK_UNOFFICIAL_TOKEN");
+        _logger.Info($"Env token length is: {(token != null ? token.Length : 0)}");
+        return string.IsNullOrWhiteSpace(token) ? KINOPOISK_UNOFFICIAL_TOKEN : token;
+    }
 }

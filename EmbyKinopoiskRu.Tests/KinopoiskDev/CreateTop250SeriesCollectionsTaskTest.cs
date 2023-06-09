@@ -23,7 +23,7 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
     #region Test configs
     public CreateTop250SeriesCollectionsTaskTest() : base(Logger)
     {
-        _pluginConfiguration.Token = KINOPOISK_DEV_TOKEN;
+        _pluginConfiguration.Token = GetKinopoiskDevToken();
 
         ConfigLibraryManager();
 

@@ -22,7 +22,7 @@ public class KpImageProviderTest : BaseTest
 
     public KpImageProviderTest() : base(Logger)
     {
-        _pluginConfiguration.Token = KINOPOISK_DEV_TOKEN;
+        _pluginConfiguration.Token = GetKinopoiskDevToken();
 
         ConfigLibraryManager();
 

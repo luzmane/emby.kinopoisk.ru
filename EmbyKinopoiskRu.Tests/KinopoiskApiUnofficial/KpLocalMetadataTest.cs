@@ -26,7 +26,7 @@ public class KpLocalMetadataTest : BaseTest
     #region Test configs
     public KpLocalMetadataTest() : base(Logger)
     {
-        _pluginConfiguration.Token = KINOPOISK_UNOFFICIAL_TOKEN;
+        _pluginConfiguration.Token = GetKinopoiskUnofficialToken();
         _pluginConfiguration.ApiType = PluginConfiguration.KinopoiskAPIUnofficialTech;
 
         ConfigLibraryManager();

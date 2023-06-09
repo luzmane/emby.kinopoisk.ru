@@ -23,7 +23,7 @@ public class KpPersonProviderTest : BaseTest
     #region Test configs
     public KpPersonProviderTest() : base(Logger)
     {
-        _pluginConfiguration.Token = KINOPOISK_DEV_TOKEN;
+        _pluginConfiguration.Token = GetKinopoiskDevToken();
 
         ConfigLibraryManager();
 
