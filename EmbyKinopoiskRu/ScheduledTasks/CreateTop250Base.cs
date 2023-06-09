@@ -31,8 +31,8 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         private readonly IJsonSerializer _jsonSerializer;
         private readonly Dictionary<string, TaskTranslation> _translations = new Dictionary<string, TaskTranslation>();
         private readonly Dictionary<string, string> _availableTranslations = new Dictionary<string, string>();
-        protected readonly string _libraryType;
-        protected readonly string _itemType;
+        private readonly string _libraryType;
+        private readonly string _itemType;
 
 
         protected CreateTop250Base(

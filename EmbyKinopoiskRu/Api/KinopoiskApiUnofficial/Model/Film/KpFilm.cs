@@ -12,7 +12,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Film
         public string NameOriginal { get; set; }
         public string PosterUrl { get; set; }
         public string PosterUrlPreview { get; set; }
-        public string CoverUrl { get; set; } // backdrop
+        /// <summary>
+        /// Used as backdrop
+        /// </summary>
+        public string CoverUrl { get; set; }
         public string LogoUrl { get; set; }
         public float? RatingKinopoisk { get; set; }
         public int? Year { get; set; }
@@ -20,8 +23,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Film
         public string Slogan { get; set; }
         public string Description { get; set; }
         public string RatingMpaa { get; set; }
-        public List<KpCountry> Countries { get; set; } = new List<KpCountry>();
-        public List<KpGenre> Genres { get; set; } = new List<KpGenre>();
+        public List<KpCountry> Countries { get; } = new List<KpCountry>();
+        public List<KpGenre> Genres { get; } = new List<KpGenre>();
 
 
         private string DebuggerDisplay => $"#{KinopoiskId}, {NameRu}";
