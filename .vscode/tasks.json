@@ -129,37 +129,35 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "run tests",
+            "label": "run tests with coverage",
             "type": "process",
             "command": "dotnet",
             "args": [
                 "test",
-                "${workspaceFolder}/EmbyKinopoiskRu.Tests"
-            ],
-            "group": "test"
-        },
-        {
-            "label": "test with debugger",
-            "type": "process",
-            "isBackground": true,
-            "command": "dotnet",
-            "args": [
-                "test"
+                "--collect:\"XPlat Code Coverage\""
             ],
             "options": {
                 "cwd": "${workspaceFolder}/EmbyKinopoiskRu.Tests",
-                "env": {
-                    "VSTEST_HOST_DEBUG": "1"
-                }
             },
             "group": "test",
             "presentation": {
-                "echo": true,
-                "reveal": "always",
-                "focus": false,
-                "panel": "shared"
+                "panel": "new"
+            }
+        },
+        {
+            "label": "generate HTML coverage",
+            "type": "shell",
+            "dependsOn": [
+                "run tests with coverage"
+            ],
+            "command": "for i in $(ls); do echo $i; reportgenerator -reports:\"${i}/coverage.cobertura.xml\" -targetdir:\"${i}/coveragereport\" -reporttypes:Html; done",
+            "options": {
+                "cwd": "${workspaceFolder}/EmbyKinopoiskRu.Tests/TestResults",
             },
-            "problemMatcher": []
+            "group": "test",
+            "presentation": {
+                "panel": "new"
+            }
         }
     ]
 }
