@@ -6,6 +6,7 @@
 kinopoisk.dev.token
 nohup.out
 EmbyDlls/*
+Examples/*
 
 # User-specific files
 *.rsuser
