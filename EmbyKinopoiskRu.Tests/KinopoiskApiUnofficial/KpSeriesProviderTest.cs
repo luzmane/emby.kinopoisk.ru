@@ -3,6 +3,8 @@ using System.Net;
 using EmbyKinopoiskRu.Configuration;
 using EmbyKinopoiskRu.Provider.RemoteMetadata;
 
+using FluentAssertions;
+
 using MediaBrowser.Common.Net;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.TV;
@@ -48,10 +50,10 @@ public class KpSeriesProviderTest : BaseTest
     {
         Logger.Info($"Start '{nameof(KpSeriesProvider_ForCodeCoverage)}'");
 
-        Assert.NotNull(_kpSeriesProvider.Name);
+        _kpSeriesProvider.Name.Should().NotBeNull("name is hardcoded");
 
         HttpResponseInfo response = await _kpSeriesProvider.GetImageResponse("https://www.google.com", CancellationToken.None);
-        Assert.True(response.StatusCode == HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.OK, "this is status code of the response to google.com");
 
         _logManager.Verify(lm => lm.GetLogger("KpSeriesProvider"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
@@ -76,32 +78,32 @@ public class KpSeriesProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Series> result = await _kpSeriesProvider.GetMetadata(seriesInfo, cancellationTokenSource.Token);
 
+        result.HasMetadata.Should().BeTrue("that mean the item was found");
         Series series = result.Item;
-        Assert.NotNull(series);
-        Assert.True(result.HasMetadata);
-        Assert.True(8 < series.CommunityRating);
-        Assert.Equal("452973", series.ExternalId);
-        Assert.Equal(6, series.Genres.Length);
-        Assert.True(series.IsFolder);
-        Assert.Equal("Гуррен-Лаганн", series.Name);
-        Assert.Equal("Tengen toppa gurren lagann", series.OriginalTitle);
-        Assert.Equal("Сотни лет люди живут в глубоких пещерах, в постоянном страхе перед землетрясениями и обвалами. В одной из таких подземных деревень живет мальчик Симон и его духовный наставник — парень Камина. Камина верит, что наверху есть другой мир, без стен и потолков, его мечта — попасть туда.\n\nНо мечты остаются пустыми фантазиями, пока в один прекрасный день Симон случайно не находит сверло, оказавшееся ключом от странного железного лица в толще земли. В этот же день потолок пещеры рушится. Так начинается приключение Симона, Камины и их компаньонов в новом мире под открытым небом огромной вселенной.", series.Overview);
-        _ = Assert.Single(series.ProductionLocations);
-        Assert.Equal(2007, series.ProductionYear);
-        Assert.Equal("452973", series.GetProviderId(Plugin.PluginKey));
-        Assert.Equal("tt0948103", series.GetProviderId(MetadataProviders.Imdb));
-        Assert.Equal(2, series.RemoteTrailers.Length);
-        Assert.Equal(series.Name, series.SortName);
-        Assert.Empty(series.Studios);
-        Assert.Equal("Pierce through tragedy and fight toward victory, Gurren Lagann!", series.Tagline);
+        series.Should().NotBeNull("that mean the series was found");
+        series.CommunityRating.Should().BeGreaterThan(8, "such value received from API");
+        series.ExternalId.Should().Be("452973", "KP id of requested item");
+        series.Genres.Should().HaveCount(6);
+        series.IsFolder.Should().BeTrue("series organized as a folder");
+        series.Name.Should().Be("Гуррен-Лаганн", "this is the series's name");
+        series.OriginalTitle.Should().Be("Tengen toppa gurren lagann", "this is the original name of the series");
+        series.Overview.Should().Be("Сотни лет люди живут в глубоких пещерах, в постоянном страхе перед землетрясениями и обвалами. В одной из таких подземных деревень живет мальчик Симон и его духовный наставник — парень Камина. Камина верит, что наверху есть другой мир, без стен и потолков, его мечта — попасть туда.\n\nНо мечты остаются пустыми фантазиями, пока в один прекрасный день Симон случайно не находит сверло, оказавшееся ключом от странного железного лица в толще земли. В этот же день потолок пещеры рушится. Так начинается приключение Симона, Камины и их компаньонов в новом мире под открытым небом огромной вселенной.", "this is series's Overview");
+        series.ProductionLocations.Should().ContainSingle();
+        series.ProductionYear.Should().Be(2007, "this is series ProductionYear");
+        series.GetProviderId(Plugin.PluginKey).Should().Be("452973", "id of the requested item");
+        series.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0948103", "IMDB id of the requested item");
+        series.RemoteTrailers.Length.Should().Be(2, "the series has RemoteTrailers");
+        series.SortName.Should().Be(series.Name, "SortName should be equal to Name");
+        series.Studios.Should().BeEmpty("the series doesn't have Studios");
+        series.Tagline.Should().Be("Pierce through tragedy and fight toward victory, Gurren Lagann!", "this is a Tagline of the series");
 
-        Assert.Equal(71, result.People.Count);
+        result.People.Should().HaveCount(71);
         PersonInfo? person = result.People.FirstOrDefault(p => "Марина Иноуэ".Equals(p.Name, StringComparison.Ordinal));
-        Assert.NotNull(person);
-        Assert.Equal("1202776", person.GetProviderId(Plugin.PluginKey));
-        Assert.Equal("Yoko Littner, озвучка", person.Role);
-        Assert.Equal("Марина Иноуэ", person.Name);
-        Assert.True(!string.IsNullOrWhiteSpace(person.ImageUrl));
+        person.Should().NotBeNull("that mean the person was found");
+        person.GetProviderId(Plugin.PluginKey).Should().Be("1202776", "id of the requested item");
+        person!.Role.Should().Be("Yoko Littner, озвучка", "this is person's Role");
+        person.Name.Should().Be("Марина Иноуэ", "this is the person's name");
+        person.ImageUrl.Should().NotBeNullOrWhiteSpace("person image exists");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -129,32 +131,32 @@ public class KpSeriesProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Series> result = await _kpSeriesProvider.GetMetadata(seriesInfo, cancellationTokenSource.Token);
 
+        result.HasMetadata.Should().BeTrue("that mean the item was found");
         Series series = result.Item;
-        Assert.NotNull(series);
-        Assert.True(result.HasMetadata);
-        Assert.True(8 < series.CommunityRating);
-        Assert.Equal("452973", series.ExternalId);
-        Assert.Equal(6, series.Genres.Length);
-        Assert.True(series.IsFolder);
-        Assert.Equal("Гуррен-Лаганн", series.Name);
-        Assert.Equal("Tengen toppa gurren lagann", series.OriginalTitle);
-        Assert.Equal("Сотни лет люди живут в глубоких пещерах, в постоянном страхе перед землетрясениями и обвалами. В одной из таких подземных деревень живет мальчик Симон и его духовный наставник — парень Камина. Камина верит, что наверху есть другой мир, без стен и потолков, его мечта — попасть туда.\n\nНо мечты остаются пустыми фантазиями, пока в один прекрасный день Симон случайно не находит сверло, оказавшееся ключом от странного железного лица в толще земли. В этот же день потолок пещеры рушится. Так начинается приключение Симона, Камины и их компаньонов в новом мире под открытым небом огромной вселенной.", series.Overview);
-        _ = Assert.Single(series.ProductionLocations);
-        Assert.Equal(2007, series.ProductionYear);
-        Assert.Equal("452973", series.GetProviderId(Plugin.PluginKey));
-        Assert.Equal("tt0948103", series.GetProviderId(MetadataProviders.Imdb));
-        Assert.Equal(2, series.RemoteTrailers.Length);
-        Assert.Equal(series.Name, series.SortName);
-        Assert.Empty(series.Studios);
-        Assert.Equal("Pierce through tragedy and fight toward victory, Gurren Lagann!", series.Tagline);
+        series.Should().NotBeNull("that mean the series was found");
+        series.CommunityRating.Should().BeGreaterThan(8, "such value received from API");
+        series.ExternalId.Should().Be("452973", "KP id of requested item");
+        series.Genres.Should().HaveCount(6);
+        series.IsFolder.Should().BeTrue("series organized as a folder");
+        series.Name.Should().Be("Гуррен-Лаганн", "this is the series's name");
+        series.OriginalTitle.Should().Be("Tengen toppa gurren lagann", "this is the original name of the series");
+        series.Overview.Should().Be("Сотни лет люди живут в глубоких пещерах, в постоянном страхе перед землетрясениями и обвалами. В одной из таких подземных деревень живет мальчик Симон и его духовный наставник — парень Камина. Камина верит, что наверху есть другой мир, без стен и потолков, его мечта — попасть туда.\n\nНо мечты остаются пустыми фантазиями, пока в один прекрасный день Симон случайно не находит сверло, оказавшееся ключом от странного железного лица в толще земли. В этот же день потолок пещеры рушится. Так начинается приключение Симона, Камины и их компаньонов в новом мире под открытым небом огромной вселенной.", "this is series's Overview");
+        series.ProductionLocations.Should().ContainSingle();
+        series.ProductionYear.Should().Be(2007, "this is series ProductionYear");
+        series.GetProviderId(Plugin.PluginKey).Should().Be("452973", "id of the requested item");
+        series.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0948103", "IMDB id of the requested item");
+        series.RemoteTrailers.Length.Should().Be(2, "the series has RemoteTrailers");
+        series.SortName.Should().Be(series.Name, "SortName should be equal to Name");
+        series.Studios.Should().BeEmpty("the series doesn't have Studios");
+        series.Tagline.Should().Be("Pierce through tragedy and fight toward victory, Gurren Lagann!", "this is a Tagline of the series");
 
-        Assert.Equal(71, result.People.Count);
+        result.People.Should().HaveCount(71);
         PersonInfo? person = result.People.FirstOrDefault(p => "Марина Иноуэ".Equals(p.Name, StringComparison.Ordinal));
-        Assert.NotNull(person);
-        Assert.Equal("1202776", person.GetProviderId(Plugin.PluginKey));
-        Assert.Equal("Yoko Littner, озвучка", person.Role);
-        Assert.Equal("Марина Иноуэ", person.Name);
-        Assert.True(!string.IsNullOrWhiteSpace(person.ImageUrl));
+        person.Should().NotBeNull("that mean the person was found");
+        person.GetProviderId(Plugin.PluginKey).Should().Be("1202776", "id of the requested item");
+        person!.Role.Should().Be("Yoko Littner, озвучка", "this is person's Role");
+        person.Name.Should().Be("Марина Иноуэ", "this is the person's name");
+        person.ImageUrl.Should().NotBeNullOrWhiteSpace("person image exists");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -180,16 +182,16 @@ public class KpSeriesProviderTest : BaseTest
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         IEnumerable<RemoteSearchResult> result = await _kpSeriesProvider.GetSearchResults(seriesInfo, cancellationTokenSource.Token);
-
-        RemoteSearchResult searchResult = Assert.Single(result);
-        Assert.NotNull(searchResult);
-        Assert.Equal("452973", searchResult.GetProviderId(Plugin.PluginKey));
-        Assert.Equal("tt0948103", searchResult.GetProviderId(MetadataProviders.Imdb));
-        Assert.Equal("Гуррен-Лаганн", searchResult.Name);
-        Assert.True(!string.IsNullOrWhiteSpace(searchResult.ImageUrl));
-        Assert.Equal(2007, searchResult.ProductionYear);
-        Assert.Equal(Plugin.PluginKey, searchResult.SearchProviderName);
-        Assert.Equal("Сотни лет люди живут в глубоких пещерах, в постоянном страхе перед землетрясениями и обвалами. В одной из таких подземных деревень живет мальчик Симон и его духовный наставник — парень Камина. Камина верит, что наверху есть другой мир, без стен и потолков, его мечта — попасть туда.\n\nНо мечты остаются пустыми фантазиями, пока в один прекрасный день Симон случайно не находит сверло, оказавшееся ключом от странного железного лица в толще земли. В этот же день потолок пещеры рушится. Так начинается приключение Симона, Камины и их компаньонов в новом мире под открытым небом огромной вселенной.", searchResult.Overview);
+        result.Should().ContainSingle();
+        RemoteSearchResult series = result.First();
+        series.Should().NotBeNull("that mean the series was found");
+        series.GetProviderId(Plugin.PluginKey).Should().Be("452973", "id of the requested item");
+        series.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0948103", "IMDB id of the requested item");
+        series.Name.Should().Be("Гуррен-Лаганн", "this is the name of the person");
+        series.ImageUrl.Should().NotBeNullOrWhiteSpace("series image exists");
+        series.ProductionYear.Should().Be(2007, "this is series ProductionYear");
+        series.SearchProviderName.Should().Be(Plugin.PluginKey, "this is series's SearchProviderName");
+        series.Overview.Should().Be("Сотни лет люди живут в глубоких пещерах, в постоянном страхе перед землетрясениями и обвалами. В одной из таких подземных деревень живет мальчик Симон и его духовный наставник — парень Камина. Камина верит, что наверху есть другой мир, без стен и потолков, его мечта — попасть туда.\n\nНо мечты остаются пустыми фантазиями, пока в один прекрасный день Симон случайно не находит сверло, оказавшееся ключом от странного железного лица в толще земли. В этот же день потолок пещеры рушится. Так начинается приключение Симона, Камины и их компаньонов в новом мире под открытым небом огромной вселенной.", "this is series's Overview");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -215,15 +217,15 @@ public class KpSeriesProviderTest : BaseTest
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         IEnumerable<RemoteSearchResult> result = await _kpSeriesProvider.GetSearchResults(seriesInfo, cancellationTokenSource.Token);
-
-        RemoteSearchResult searchResult = Assert.Single(result);
-        Assert.NotNull(searchResult);
-        Assert.Equal("452973", searchResult.GetProviderId(Plugin.PluginKey));
-        Assert.Equal("tt0948103", searchResult.GetProviderId(MetadataProviders.Imdb));
-        Assert.Equal("Гуррен-Лаганн", searchResult.Name);
-        Assert.True(!string.IsNullOrWhiteSpace(searchResult.ImageUrl));
-        Assert.Equal(2007, searchResult.ProductionYear);
-        Assert.Equal(Plugin.PluginKey, searchResult.SearchProviderName);
+        result.Should().ContainSingle();
+        RemoteSearchResult series = result.First();
+        series.Should().NotBeNull("that mean the series was found");
+        series.GetProviderId(Plugin.PluginKey).Should().Be("452973", "id of the requested item");
+        series.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0948103", "IMDB id of the requested item");
+        series.Name.Should().Be("Гуррен-Лаганн", "this is the name of the person");
+        series.ImageUrl.Should().NotBeNullOrWhiteSpace("series image exists");
+        series.ProductionYear.Should().Be(2007, "this is series ProductionYear");
+        series.SearchProviderName.Should().Be(Plugin.PluginKey, "this is series's SearchProviderName");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());

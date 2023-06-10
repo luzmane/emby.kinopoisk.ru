@@ -4,6 +4,8 @@ using System.Text;
 using EmbyKinopoiskRu.ScheduledTasks;
 using EmbyKinopoiskRu.Tests.EmbyMock;
 
+using FluentAssertions;
+
 using MediaBrowser.Common.Net;
 using MediaBrowser.Common.Progress;
 using MediaBrowser.Common.Updates;
@@ -40,12 +42,11 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
     {
         Logger.Info($"Start '{nameof(UpdateKinopoiskPluginTask_ForCodeCoverage)}'");
 
-        Assert.False(_updateKinopoiskPluginTask.IsHidden);
-        Assert.True(_updateKinopoiskPluginTask.IsEnabled);
-        Assert.True(_updateKinopoiskPluginTask.IsLogged);
-        Assert.NotNull(_updateKinopoiskPluginTask.Key);
-
-        _ = Assert.Single(_updateKinopoiskPluginTask.GetDefaultTriggers());
+        _updateKinopoiskPluginTask.IsHidden.Should().BeFalse("this is default task config");
+        _updateKinopoiskPluginTask.IsEnabled.Should().BeTrue("this is default task config");
+        _updateKinopoiskPluginTask.IsLogged.Should().BeTrue("this is default task config");
+        _updateKinopoiskPluginTask.Key.Should().NotBeNull("this is key of the task");
+        _updateKinopoiskPluginTask.GetDefaultTriggers().Should().NotBeEmpty("it should have one trigger");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("UpdateKinopoiskPluginTask"), Times.Once());
@@ -64,9 +65,9 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration() { UICulture = "ru" });
 
-        Assert.Equal("Обновить плагин Кинопоиска", _updateKinopoiskPluginTask.Name);
-        Assert.Equal("Скачать и установить новую версию плагина Кинопоиска с GitHub", _updateKinopoiskPluginTask.Description);
-        Assert.Equal("Плагин Кинопоиска", _updateKinopoiskPluginTask.Category);
+        _updateKinopoiskPluginTask.Name.Should().Be("Обновить плагин Кинопоиска", "this is name of the task on Russian");
+        _updateKinopoiskPluginTask.Description.Should().Be("Скачать и установить новую версию плагина Кинопоиска с GitHub", "this is description of the task on Russian");
+        _updateKinopoiskPluginTask.Category.Should().Be("Плагин Кинопоиска", "this is category of the task on Russian");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("UpdateKinopoiskPluginTask"), Times.Once());
@@ -85,9 +86,9 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration() { UICulture = "en-us" });
 
-        Assert.Equal("Update Kinopoisk Plugin", _updateKinopoiskPluginTask.Name);
-        Assert.Equal("Update Kinopoisk Plugin from GitHub", _updateKinopoiskPluginTask.Description);
-        Assert.Equal("Kinopoisk Plugin", _updateKinopoiskPluginTask.Category);
+        _updateKinopoiskPluginTask.Name.Should().Be("Update Kinopoisk Plugin", "this is name of the task on English");
+        _updateKinopoiskPluginTask.Description.Should().Be("Update Kinopoisk Plugin from GitHub", "this is description of the task on English");
+        _updateKinopoiskPluginTask.Category.Should().Be("Kinopoisk Plugin", "this is category of the task on English");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("UpdateKinopoiskPluginTask"), Times.Once());
@@ -106,9 +107,9 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration() { UICulture = "uk" });
 
-        Assert.Equal("Оновити плагін Кінопошуку", _updateKinopoiskPluginTask.Name);
-        Assert.Equal("Завантажити та встановити нову версію плагіна Кінопошуку з GitHub", _updateKinopoiskPluginTask.Description);
-        Assert.Equal("Плагін Кінопошуку", _updateKinopoiskPluginTask.Category);
+        _updateKinopoiskPluginTask.Name.Should().Be("Оновити плагін Кінопошуку", "this is name of the task on Ukranian");
+        _updateKinopoiskPluginTask.Description.Should().Be("Завантажити та встановити нову версію плагіна Кінопошуку з GitHub", "this is description of the task on Ukranian");
+        _updateKinopoiskPluginTask.Category.Should().Be("Плагін Кінопошуку", "this is category of the task on Ukranian");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("UpdateKinopoiskPluginTask"), Times.Once());
@@ -127,9 +128,9 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration() { UICulture = "bg" });
 
-        Assert.Equal("Update Kinopoisk Plugin", _updateKinopoiskPluginTask.Name);
-        Assert.Equal("Update Kinopoisk Plugin from GitHub", _updateKinopoiskPluginTask.Description);
-        Assert.Equal("Kinopoisk Plugin", _updateKinopoiskPluginTask.Category);
+        _updateKinopoiskPluginTask.Name.Should().Be("Update Kinopoisk Plugin", "this is name of the task on not available language");
+        _updateKinopoiskPluginTask.Description.Should().Be("Update Kinopoisk Plugin from GitHub", "this is description of the task on not available language");
+        _updateKinopoiskPluginTask.Category.Should().Be("Kinopoisk Plugin", "this is category of the task on not available language");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("UpdateKinopoiskPluginTask"), Times.Once());

@@ -3,6 +3,8 @@ using System.Net;
 using EmbyKinopoiskRu.Configuration;
 using EmbyKinopoiskRu.Provider.RemoteImage;
 
+using FluentAssertions;
+
 using MediaBrowser.Common.Net;
 using MediaBrowser.Controller.Entities.Audio;
 using MediaBrowser.Controller.Entities.Movies;
@@ -53,30 +55,30 @@ public class KpImageProviderTest : BaseTest
 
         IEnumerable<RemoteImageInfo> imageInfos = await _kpImageProvider.GetImages(item, options, cancellationTokenSource.Token);
 
-        Assert.True(3 == imageInfos.Count());
+        imageInfos.Should().HaveCount(3);
 
         RemoteImageInfo? primary = imageInfos.FirstOrDefault(i => i.Type == ImageType.Primary);
-        Assert.NotNull(primary);
-        Assert.Equal("RU", primary.DisplayLanguage);
-        Assert.Equal("ru", primary.Language);
-        Assert.Equal("KinopoiskRu", primary.ProviderName);
-        Assert.False(string.IsNullOrWhiteSpace(primary.Url));
-        Assert.False(string.IsNullOrWhiteSpace(primary.ThumbnailUrl));
+        primary.Should().NotBeNull("that mean the primary image was found");
+        primary!.DisplayLanguage.Should().Be("RU", "config of the library");
+        primary.Language.Should().Be("ru", "config of the library");
+        primary.ProviderName.Should().Be("KinopoiskRu", "this is used provider");
+        primary.Url.Should().NotBeNullOrWhiteSpace("Url should not be empty");
+        primary.ThumbnailUrl.Should().NotBeNullOrWhiteSpace("ThumbnailUrl should not be empty");
 
         RemoteImageInfo? backdrop = imageInfos.FirstOrDefault(i => i.Type == ImageType.Backdrop);
-        Assert.NotNull(backdrop);
-        Assert.Equal("RU", backdrop.DisplayLanguage);
-        Assert.Equal("ru", backdrop.Language);
-        Assert.Equal("KinopoiskRu", backdrop.ProviderName);
-        Assert.False(string.IsNullOrWhiteSpace(backdrop.Url));
-        Assert.True(string.IsNullOrWhiteSpace(backdrop.ThumbnailUrl));
+        backdrop.Should().NotBeNull("that mean the backdrop image was found");
+        backdrop!.DisplayLanguage.Should().Be("RU", "config of the library");
+        backdrop.Language.Should().Be("ru", "config of the library");
+        backdrop.ProviderName.Should().Be("KinopoiskRu", "this is used provider");
+        backdrop.Url.Should().NotBeNullOrWhiteSpace("Url should not be empty");
+        backdrop.ThumbnailUrl.Should().BeNullOrWhiteSpace("ThumbnailUrl should be empty in that case");
 
         RemoteImageInfo? logo = imageInfos.FirstOrDefault(i => i.Type == ImageType.Logo);
-        Assert.NotNull(logo);
-        Assert.Equal("RU", logo.DisplayLanguage);
-        Assert.Equal("ru", logo.Language);
-        Assert.Equal("KinopoiskRu", logo.ProviderName);
-        Assert.False(string.IsNullOrWhiteSpace(logo.Url));
+        logo.Should().NotBeNull("that mean the logo was found");
+        logo!.DisplayLanguage.Should().Be("RU", "config of the library");
+        logo.Language.Should().Be("ru", "config of the library");
+        logo.ProviderName.Should().Be("KinopoiskRu", "this is used provider");
+        logo.Url.Should().NotBeNullOrWhiteSpace("Url should not be empty");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(3));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -104,30 +106,30 @@ public class KpImageProviderTest : BaseTest
 
         IEnumerable<RemoteImageInfo> imageInfos = await _kpImageProvider.GetImages(item, options, cancellationTokenSource.Token);
 
-        Assert.True(3 == imageInfos.Count());
+        imageInfos.Should().HaveCount(3);
 
         RemoteImageInfo? primary = imageInfos.FirstOrDefault(i => i.Type == ImageType.Primary);
-        Assert.NotNull(primary);
-        Assert.Equal("RU", primary.DisplayLanguage);
-        Assert.Equal("ru", primary.Language);
-        Assert.Equal("KinopoiskRu", primary.ProviderName);
-        Assert.False(string.IsNullOrWhiteSpace(primary.Url));
-        Assert.False(string.IsNullOrWhiteSpace(primary.ThumbnailUrl));
+        primary.Should().NotBeNull("that mean the primary image was found");
+        primary!.DisplayLanguage.Should().Be("RU", "config of the library");
+        primary.Language.Should().Be("ru", "config of the library");
+        primary.ProviderName.Should().Be("KinopoiskRu", "this is used provider");
+        primary.Url.Should().NotBeNullOrWhiteSpace("Url should not be empty");
+        primary.ThumbnailUrl.Should().NotBeNullOrWhiteSpace("ThumbnailUrl should not be empty");
 
         RemoteImageInfo? backdrop = imageInfos.FirstOrDefault(i => i.Type == ImageType.Backdrop);
-        Assert.NotNull(backdrop);
-        Assert.Equal("RU", backdrop.DisplayLanguage);
-        Assert.Equal("ru", backdrop.Language);
-        Assert.Equal("KinopoiskRu", backdrop.ProviderName);
-        Assert.False(string.IsNullOrWhiteSpace(backdrop.Url));
-        Assert.True(string.IsNullOrWhiteSpace(backdrop.ThumbnailUrl));
+        backdrop.Should().NotBeNull("that mean the backdrop image was found");
+        backdrop!.DisplayLanguage.Should().Be("RU", "config of the library");
+        backdrop.Language.Should().Be("ru", "config of the library");
+        backdrop.ProviderName.Should().Be("KinopoiskRu", "this is used provider");
+        backdrop.Url.Should().NotBeNullOrWhiteSpace("Url should not be empty");
+        backdrop.ThumbnailUrl.Should().BeNullOrWhiteSpace("ThumbnailUrl should be empty in that case");
 
         RemoteImageInfo? logo = imageInfos.FirstOrDefault(i => i.Type == ImageType.Logo);
-        Assert.NotNull(logo);
-        Assert.Equal("RU", logo.DisplayLanguage);
-        Assert.Equal("ru", logo.Language);
-        Assert.Equal("KinopoiskRu", logo.ProviderName);
-        Assert.False(string.IsNullOrWhiteSpace(logo.Url));
+        logo.Should().NotBeNull("that mean the logo was found");
+        logo!.DisplayLanguage.Should().Be("RU", "config of the library");
+        logo.Language.Should().Be("ru", "config of the library");
+        logo.ProviderName.Should().Be("KinopoiskRu", "this is used provider");
+        logo.Url.Should().NotBeNullOrWhiteSpace("Url should not be empty");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(3));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -156,30 +158,30 @@ public class KpImageProviderTest : BaseTest
 
         IEnumerable<RemoteImageInfo> imageInfos = await _kpImageProvider.GetImages(item, options, cancellationTokenSource.Token);
 
-        Assert.True(3 == imageInfos.Count());
+        imageInfos.Should().HaveCount(3);
 
         RemoteImageInfo? primary = imageInfos.FirstOrDefault(i => i.Type == ImageType.Primary);
-        Assert.NotNull(primary);
-        Assert.Equal("RU", primary.DisplayLanguage);
-        Assert.Equal("ru", primary.Language);
-        Assert.Equal("KinopoiskRu", primary.ProviderName);
-        Assert.False(string.IsNullOrWhiteSpace(primary.Url));
-        Assert.False(string.IsNullOrWhiteSpace(primary.ThumbnailUrl));
+        primary.Should().NotBeNull("that mean the primary image was found");
+        primary!.DisplayLanguage.Should().Be("RU", "config of the library");
+        primary.Language.Should().Be("ru", "config of the library");
+        primary.ProviderName.Should().Be("KinopoiskRu", "this is used provider");
+        primary.Url.Should().NotBeNullOrWhiteSpace("Url should not be empty");
+        primary.ThumbnailUrl.Should().NotBeNullOrWhiteSpace("ThumbnailUrl should not be empty");
 
         RemoteImageInfo? backdrop = imageInfos.FirstOrDefault(i => i.Type == ImageType.Backdrop);
-        Assert.NotNull(backdrop);
-        Assert.Equal("RU", backdrop.DisplayLanguage);
-        Assert.Equal("ru", backdrop.Language);
-        Assert.Equal("KinopoiskRu", backdrop.ProviderName);
-        Assert.False(string.IsNullOrWhiteSpace(backdrop.Url));
-        Assert.True(string.IsNullOrWhiteSpace(backdrop.ThumbnailUrl));
+        backdrop.Should().NotBeNull("that mean the backdrop image was found");
+        backdrop!.DisplayLanguage.Should().Be("RU", "config of the library");
+        backdrop.Language.Should().Be("ru", "config of the library");
+        backdrop.ProviderName.Should().Be("KinopoiskRu", "this is used provider");
+        backdrop.Url.Should().NotBeNullOrWhiteSpace("Url should not be empty");
+        backdrop.ThumbnailUrl.Should().BeNullOrWhiteSpace("ThumbnailUrl should be empty in that case");
 
         RemoteImageInfo? logo = imageInfos.FirstOrDefault(i => i.Type == ImageType.Logo);
-        Assert.NotNull(logo);
-        Assert.Equal("RU", logo.DisplayLanguage);
-        Assert.Equal("ru", logo.Language);
-        Assert.Equal("KinopoiskRu", logo.ProviderName);
-        Assert.False(string.IsNullOrWhiteSpace(logo.Url));
+        logo.Should().NotBeNull("that mean the logo was found");
+        logo!.DisplayLanguage.Should().Be("RU", "config of the library");
+        logo.Language.Should().Be("ru", "config of the library");
+        logo.ProviderName.Should().Be("KinopoiskRu", "this is used provider");
+        logo.Url.Should().NotBeNullOrWhiteSpace("Url should not be empty");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(3));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -207,7 +209,7 @@ public class KpImageProviderTest : BaseTest
 
         IEnumerable<RemoteImageInfo> imageInfos = await _kpImageProvider.GetImages(item, options, cancellationTokenSource.Token);
 
-        Assert.Empty(imageInfos);
+        imageInfos.Should().BeEmpty("expecting no image will be found");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(3));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -222,17 +224,16 @@ public class KpImageProviderTest : BaseTest
     {
         Logger.Info($"Started '{nameof(KpImageProviderTest_ForCodeCoverage)}'");
 
-        Assert.True(_kpImageProvider.Supports(new Movie()));
-        Assert.True(_kpImageProvider.Supports(new Series()));
-        Assert.False(_kpImageProvider.Supports(new Audio()));
+        _kpImageProvider.Supports(new Movie()).Should().BeTrue("this provider supports only Movie or Series");
+        _kpImageProvider.Supports(new Series()).Should().BeTrue("this provider supports only Movie or Series");
+        _kpImageProvider.Supports(new Audio()).Should().BeFalse("this provider supports only Movie or Series");
 
-        IEnumerable<ImageType> supportedImages = _kpImageProvider.GetSupportedImages(new Movie());
-        Assert.True(supportedImages.Count() == 3);
+        _kpImageProvider.GetSupportedImages(new Movie()).Should().HaveCount(3, "that plugin config");
 
         HttpResponseInfo response = await _kpImageProvider.GetImageResponse("https://www.google.com", CancellationToken.None);
-        Assert.True(response.StatusCode == HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.OK, "this is status code of the response to google.com");
 
-        Assert.NotNull(_kpImageProvider.Name);
+        _kpImageProvider.Name.Should().Be(Plugin.PluginName, "provider config");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         VerifyNoOtherCalls();

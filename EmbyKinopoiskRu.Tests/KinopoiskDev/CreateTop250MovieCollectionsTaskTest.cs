@@ -2,6 +2,8 @@ using EmbyKinopoiskRu.Configuration;
 using EmbyKinopoiskRu.ScheduledTasks;
 using EmbyKinopoiskRu.Tests.EmbyMock;
 
+using FluentAssertions;
+
 using MediaBrowser.Controller.Collections;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
@@ -52,12 +54,12 @@ public class CreateTop250MovieCollectionsTaskTest : BaseTest
     {
         Logger.Info($"Start '{nameof(CreateTop250MovieCollectionsTask_ForCodeCoverage)}'");
 
-        Assert.False(_createTop250MovieCollectionsTask.IsHidden);
-        Assert.False(_createTop250MovieCollectionsTask.IsEnabled);
-        Assert.True(_createTop250MovieCollectionsTask.IsLogged);
-        Assert.NotNull(_createTop250MovieCollectionsTask.Key);
+        _createTop250MovieCollectionsTask.IsHidden.Should().BeFalse("this is default task config");
+        _createTop250MovieCollectionsTask.IsEnabled.Should().BeFalse("this is default task config");
+        _createTop250MovieCollectionsTask.IsLogged.Should().BeTrue("this is default task config");
+        _createTop250MovieCollectionsTask.Key.Should().NotBeNull("key is hardcoded");
 
-        Assert.Empty(_createTop250MovieCollectionsTask.GetDefaultTriggers());
+        _createTop250MovieCollectionsTask.GetDefaultTriggers().Should().BeEmpty("there is no triggers defined");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("CreateTop250MovieCollectionsTask"), Times.Once());
@@ -76,9 +78,9 @@ public class CreateTop250MovieCollectionsTaskTest : BaseTest
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration() { UICulture = "ru" });
 
-        Assert.Equal("Создать коллекцию фильмов топ 250 Кинопоиска", _createTop250MovieCollectionsTask.Name);
-        Assert.Equal("Создать коллекцию фильмов основываясь на топ 250 Кинопоиска. Поддерживает только kinopoisk.dev", _createTop250MovieCollectionsTask.Description);
-        Assert.Equal("Плагин Кинопоиска", _createTop250MovieCollectionsTask.Category);
+        _createTop250MovieCollectionsTask.Name.Should().Be("Создать коллекцию фильмов топ 250 Кинопоиска", "this is the name of the task");
+        _createTop250MovieCollectionsTask.Description.Should().Be("Создать коллекцию фильмов основываясь на топ 250 Кинопоиска. Поддерживает только kinopoisk.dev", "this is the description of the task");
+        _createTop250MovieCollectionsTask.Category.Should().Be("Плагин Кинопоиска", "this is the category of the task");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("CreateTop250MovieCollectionsTask"), Times.Once());
@@ -97,9 +99,9 @@ public class CreateTop250MovieCollectionsTaskTest : BaseTest
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration() { UICulture = "en-us" });
 
-        Assert.Equal("Create Top250 Movie collection from Kinopoisk", _createTop250MovieCollectionsTask.Name);
-        Assert.Equal("Create a movie collection based on the top 250 list from Kinopoisk.ru. Support kinopoisk.dev only", _createTop250MovieCollectionsTask.Description);
-        Assert.Equal("Kinopoisk Plugin", _createTop250MovieCollectionsTask.Category);
+        _createTop250MovieCollectionsTask.Name.Should().Be("Create Top250 Movie collection from Kinopoisk", "this is the name of the task");
+        _createTop250MovieCollectionsTask.Description.Should().Be("Create a movie collection based on the top 250 list from Kinopoisk.ru. Support kinopoisk.dev only", "this is the description of the task");
+        _createTop250MovieCollectionsTask.Category.Should().Be("Kinopoisk Plugin", "this is the category of the task");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("CreateTop250MovieCollectionsTask"), Times.Once());
@@ -118,9 +120,9 @@ public class CreateTop250MovieCollectionsTaskTest : BaseTest
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration() { UICulture = "uk" });
 
-        Assert.Equal("Створити колекцію фільмів топ 250 Кінопошуку", _createTop250MovieCollectionsTask.Name);
-        Assert.Equal("Створити колекцію фільмів ґрунтуючись на топ 250 Кінопошуку. Підтримує лише kinopoisk.dev", _createTop250MovieCollectionsTask.Description);
-        Assert.Equal("Плагін Кінопошуку", _createTop250MovieCollectionsTask.Category);
+        _createTop250MovieCollectionsTask.Name.Should().Be("Створити колекцію фільмів топ 250 Кінопошуку", "this is the name of the task");
+        _createTop250MovieCollectionsTask.Description.Should().Be("Створити колекцію фільмів ґрунтуючись на топ 250 Кінопошуку. Підтримує лише kinopoisk.dev", "this is the description of the task");
+        _createTop250MovieCollectionsTask.Category.Should().Be("Плагін Кінопошуку", "this is the category of the task");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("CreateTop250MovieCollectionsTask"), Times.Once());
@@ -139,9 +141,9 @@ public class CreateTop250MovieCollectionsTaskTest : BaseTest
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration() { UICulture = "bg" });
 
-        Assert.Equal("Create Top250 Movie collection from Kinopoisk", _createTop250MovieCollectionsTask.Name);
-        Assert.Equal("Create a movie collection based on the top 250 list from Kinopoisk.ru. Support kinopoisk.dev only", _createTop250MovieCollectionsTask.Description);
-        Assert.Equal("Kinopoisk Plugin", _createTop250MovieCollectionsTask.Category);
+        _createTop250MovieCollectionsTask.Name.Should().Be("Create Top250 Movie collection from Kinopoisk", "this is the name of the task");
+        _createTop250MovieCollectionsTask.Description.Should().Be("Create a movie collection based on the top 250 list from Kinopoisk.ru. Support kinopoisk.dev only", "this is the description of the task");
+        _createTop250MovieCollectionsTask.Category.Should().Be("Kinopoisk Plugin", "this is the category of the task");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("CreateTop250MovieCollectionsTask"), Times.Once());

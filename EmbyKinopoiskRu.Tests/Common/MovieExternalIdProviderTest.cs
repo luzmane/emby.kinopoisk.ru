@@ -1,5 +1,7 @@
 using EmbyKinopoiskRu.Provider.ExternalId;
 
+using FluentAssertions;
+
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
 
@@ -18,12 +20,12 @@ public class MovieExternalIdProviderTest
 
         MovieExternalIdProvider movieExternalIdProvider = new();
 
-        Assert.Equal(Plugin.PluginName, movieExternalIdProvider.Name);
-        Assert.Equal(Plugin.PluginKey, movieExternalIdProvider.Key);
-        Assert.Equal("https://www.kinopoisk.ru/film/{0}/", movieExternalIdProvider.UrlFormatString);
+        movieExternalIdProvider.Name.Should().Be(Plugin.PluginName, "has value of Plugin.PluginName");
+        movieExternalIdProvider.Key.Should().Be(Plugin.PluginKey, "has value of Plugin.PluginKey");
+        movieExternalIdProvider.UrlFormatString.Should().Be("https://www.kinopoisk.ru/film/{0}/", "this is constant");
 
-        Assert.True(movieExternalIdProvider.Supports(new Movie()));
-        Assert.False(movieExternalIdProvider.Supports(new Series()));
+        movieExternalIdProvider.Supports(new Movie()).Should().BeTrue("this provider supports only Movie");
+        movieExternalIdProvider.Supports(new Series()).Should().BeFalse("this provider supports only Movie");
 
         _logger.Info($"Finished '{nameof(MovieExternalIdProvider_ForCodeCoverage)}'");
     }

@@ -3,6 +3,8 @@ using System.Net;
 using EmbyKinopoiskRu.Configuration;
 using EmbyKinopoiskRu.Provider.RemoteMetadata;
 
+using FluentAssertions;
+
 using MediaBrowser.Common.Net;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Providers;
@@ -47,10 +49,10 @@ public class KpPersonProviderTest : BaseTest
     {
         Logger.Info($"Start '{nameof(KpPersonProvider_ForCodeCoverage)}'");
 
-        Assert.NotNull(_kpPersonProvider.Name);
+        _kpPersonProvider.Name.Should().NotBeNull("name is hardcoded");
 
         HttpResponseInfo response = await _kpPersonProvider.GetImageResponse("https://www.google.com", CancellationToken.None);
-        Assert.True(response.StatusCode == HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.OK, "this is status code of the response to google.com");
 
         _logManager.Verify(lm => lm.GetLogger("KpPersonProvider"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
@@ -76,16 +78,17 @@ public class KpPersonProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Person> result = await _kpPersonProvider.GetMetadata(personInfo, cancellationTokenSource.Token);
 
-        Assert.True(result.HasMetadata);
+        result.HasMetadata.Should().BeTrue("that mean the item was found");
         Person person = result.Item;
-        Assert.NotNull(person);
-        Assert.Equal("Джеки Чан", person.Name);
-        Assert.Equal("В возрасте 6 лет Чан был отдан в школу пекинской оперы в Гонконге.\nДважды попадал в Книгу рекордов Гиннесса за «наибольшее число трюков в карьере» и «самое большое число упоминаний в титрах одного фильма». Так, в фильме «Доспехи Бога 3: Миссия Зодиак» Джеки был задействован на 15 должностях (актёр, режиссёр, сценарист, продюсер, оператор, осветитель, постановщик трюков, исполнитель песни, ответственный за питание съёмочной группы и др.), тем самым побив рекорд Роберта Родригеса.\nНастоящее имя - Чань Кунсан (Chan Kongsang), что означает «Чан, рожденный в Гонконге».\nЕго родители — Чарльз Чан и Ли-Ли Чан — бежали в Гонконг с континента во время гражданской войны, а в 1960 году перебрались в Австралию.\nЧан делает самостоятельно большую часть трюков, а также иногда дублирует других актёров; он неоднократно получал травмы (во время финальных титров в его фильмах обычно демонстрируются неудавшиеся дубли), поэтому Чан внесён в чёрные списки страховых компаний по всему миру.\nУ Чана есть дочь Этта Нг (род. 19 ноября 1999) от внебрачной связи с актрисой Элейн Нг.", person.Overview);
-        Assert.NotNull(person.PremiereDate);
-        Assert.Equal(new DateTime(1954, 04, 07), person.PremiereDate.Value.DateTime, new DateTimeEqualityComparer());
-        var place = Assert.Single(person.ProductionLocations);
-        Assert.Equal("29855", person.GetProviderId(Plugin.PluginKey));
-        Assert.Equal(person.Name, person.SortName);
+        person.Should().NotBeNull("that mean the person was found");
+        person.Name.Should().Be("Джеки Чан", "this is the person's name");
+        person.Overview.Should().Be("В возрасте 6 лет Чан был отдан в школу пекинской оперы в Гонконге.\nДважды попадал в Книгу рекордов Гиннесса за «наибольшее число трюков в карьере» и «самое большое число упоминаний в титрах одного фильма». Так, в фильме «Доспехи Бога 3: Миссия Зодиак» Джеки был задействован на 15 должностях (актёр, режиссёр, сценарист, продюсер, оператор, осветитель, постановщик трюков, исполнитель песни, ответственный за питание съёмочной группы и др.), тем самым побив рекорд Роберта Родригеса.\nНастоящее имя - Чань Кунсан (Chan Kongsang), что означает «Чан, рожденный в Гонконге».\nЕго родители — Чарльз Чан и Ли-Ли Чан — бежали в Гонконг с континента во время гражданской войны, а в 1960 году перебрались в Австралию.\nЧан делает самостоятельно большую часть трюков, а также иногда дублирует других актёров; он неоднократно получал травмы (во время финальных титров в его фильмах обычно демонстрируются неудавшиеся дубли), поэтому Чан внесён в чёрные списки страховых компаний по всему миру.\nУ Чана есть дочь Этта Нг (род. 19 ноября 1999) от внебрачной связи с актрисой Элейн Нг.", "this is person's Overview");
+        person.PremiereDate.Should().NotBeNull("person should have a birthday date");
+        person.PremiereDate!.Value.DateTime.Should().HaveYear(1954).And.HaveMonth(04).And.HaveDay(07);
+        person.ProductionLocations.Should().ContainSingle();
+        var place = person.ProductionLocations.First();
+        person.GetProviderId(Plugin.PluginKey).Should().Be("29855", "id of the requested item");
+        person.SortName.Should().Be(person.Name, "SortName should be equal to Name");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -112,17 +115,18 @@ public class KpPersonProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Person> result = await _kpPersonProvider.GetMetadata(personInfo, cancellationTokenSource.Token);
 
-        Assert.True(result.HasMetadata);
+        result.HasMetadata.Should().BeTrue("that mean the item was found");
         Person person = result.Item;
-        Assert.NotNull(person);
-        Assert.Equal("Милла Йовович", person.Name);
-        Assert.Equal("Milla Jovovich", person.OriginalTitle);
-        Assert.Equal("В своём твиттере Йовович рассказала, что по рождению она является православной христианкой, но может ходить «в любую церковь, где будут присутствовать любовь и одухотворение».\nХотя наиболее распространенным в мире вариантом произношения имени и фамилии актрисы является «Mil-ah Jo-vo-vich» (Мил-а Джо-во-вич), правильный вариант - «Mee-lah Yoh-ve-vich» (Ми-ла Йо-вэ-вич).\nПервый брак Миллы с актёром Шоном Эндрюсом был аннулирован матерью актрисы, поскольку Милле было на тот момент всего 16 лет. Брачный союз, заключенный в Лас-Вегасе, продлился с октября по ноябрь 1992 года.\nВ 1994 году Милла выпустила музыкальный компакт-диск «Божественная комедия» (The Divine Comedy).\nСвободно говорит на русском, сербском и французском языках.\nОтец Миллы - сербский врач-педиатр, который переехал из Белграда в СССР и там женился на ее матери.\nМилла - левша.\nМама Миллы - советская актриса Галина Логинова, снимавшаяся вместе с Константином Райкиным и Татьяной Веденеевой.", person.Overview);
-        Assert.NotNull(person.PremiereDate);
-        Assert.Equal(new DateTime(1975, 12, 17), person.PremiereDate.Value.DateTime, new DateTimeEqualityComparer());
-        var place = Assert.Single(person.ProductionLocations);
-        Assert.Equal("24507", person.GetProviderId(Plugin.PluginKey));
-        Assert.Equal(person.Name, person.SortName);
+        person.Should().NotBeNull("that mean the person was found");
+        person.Name.Should().Be("Милла Йовович", "this is the person's name");
+        person.OriginalTitle.Should().Be("Milla Jovovich", "this is the original name of the person");
+        person.Overview.Should().Be("В своём твиттере Йовович рассказала, что по рождению она является православной христианкой, но может ходить «в любую церковь, где будут присутствовать любовь и одухотворение».\nХотя наиболее распространенным в мире вариантом произношения имени и фамилии актрисы является «Mil-ah Jo-vo-vich» (Мил-а Джо-во-вич), правильный вариант - «Mee-lah Yoh-ve-vich» (Ми-ла Йо-вэ-вич).\nПервый брак Миллы с актёром Шоном Эндрюсом был аннулирован матерью актрисы, поскольку Милле было на тот момент всего 16 лет. Брачный союз, заключенный в Лас-Вегасе, продлился с октября по ноябрь 1992 года.\nВ 1994 году Милла выпустила музыкальный компакт-диск «Божественная комедия» (The Divine Comedy).\nСвободно говорит на русском, сербском и французском языках.\nОтец Миллы - сербский врач-педиатр, который переехал из Белграда в СССР и там женился на ее матери.\nМилла - левша.\nМама Миллы - советская актриса Галина Логинова, снимавшаяся вместе с Константином Райкиным и Татьяной Веденеевой.", "this is person's Overview");
+        person.PremiereDate.Should().NotBeNull("person should have a birthday date");
+        person.PremiereDate!.Value.DateTime.Should().HaveYear(1975).And.HaveMonth(12).And.HaveDay(17);
+        person.ProductionLocations.Should().ContainSingle();
+        var place = person.ProductionLocations.First();
+        person.GetProviderId(Plugin.PluginKey).Should().Be("24507", "id of the requested item");
+        person.SortName.Should().Be(person.Name, "SortName should be equal to Name");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -149,17 +153,18 @@ public class KpPersonProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Person> result = await _kpPersonProvider.GetMetadata(personInfo, cancellationTokenSource.Token);
 
-        Assert.True(result.HasMetadata);
+        result.HasMetadata.Should().BeTrue("that mean the item was found");
         Person person = result.Item;
-        Assert.NotNull(person);
-        Assert.Equal("Милла Йовович", person.Name);
-        Assert.Equal("Milla Jovovich", person.OriginalTitle);
-        Assert.Equal("В своём твиттере Йовович рассказала, что по рождению она является православной христианкой, но может ходить «в любую церковь, где будут присутствовать любовь и одухотворение».\nХотя наиболее распространенным в мире вариантом произношения имени и фамилии актрисы является «Mil-ah Jo-vo-vich» (Мил-а Джо-во-вич), правильный вариант - «Mee-lah Yoh-ve-vich» (Ми-ла Йо-вэ-вич).\nПервый брак Миллы с актёром Шоном Эндрюсом был аннулирован матерью актрисы, поскольку Милле было на тот момент всего 16 лет. Брачный союз, заключенный в Лас-Вегасе, продлился с октября по ноябрь 1992 года.\nВ 1994 году Милла выпустила музыкальный компакт-диск «Божественная комедия» (The Divine Comedy).\nСвободно говорит на русском, сербском и французском языках.\nОтец Миллы - сербский врач-педиатр, который переехал из Белграда в СССР и там женился на ее матери.\nМилла - левша.\nМама Миллы - советская актриса Галина Логинова, снимавшаяся вместе с Константином Райкиным и Татьяной Веденеевой.", person.Overview);
-        Assert.NotNull(person.PremiereDate);
-        Assert.Equal(new DateTime(1975, 12, 17), person.PremiereDate.Value.DateTime, new DateTimeEqualityComparer());
-        var place = Assert.Single(person.ProductionLocations);
-        Assert.Equal("24507", person.GetProviderId(Plugin.PluginKey));
-        Assert.Equal(person.Name, person.SortName);
+        person.Should().NotBeNull("that mean the person was found");
+        person.Name.Should().Be("Милла Йовович", "this is the person's name");
+        person.OriginalTitle.Should().Be("Milla Jovovich", "this is the original name of the person");
+        person.Overview.Should().Be("В своём твиттере Йовович рассказала, что по рождению она является православной христианкой, но может ходить «в любую церковь, где будут присутствовать любовь и одухотворение».\nХотя наиболее распространенным в мире вариантом произношения имени и фамилии актрисы является «Mil-ah Jo-vo-vich» (Мил-а Джо-во-вич), правильный вариант - «Mee-lah Yoh-ve-vich» (Ми-ла Йо-вэ-вич).\nПервый брак Миллы с актёром Шоном Эндрюсом был аннулирован матерью актрисы, поскольку Милле было на тот момент всего 16 лет. Брачный союз, заключенный в Лас-Вегасе, продлился с октября по ноябрь 1992 года.\nВ 1994 году Милла выпустила музыкальный компакт-диск «Божественная комедия» (The Divine Comedy).\nСвободно говорит на русском, сербском и французском языках.\nОтец Миллы - сербский врач-педиатр, который переехал из Белграда в СССР и там женился на ее матери.\nМилла - левша.\nМама Миллы - советская актриса Галина Логинова, снимавшаяся вместе с Константином Райкиным и Татьяной Веденеевой.", "this is person's Overview");
+        person.PremiereDate.Should().NotBeNull("person should have a birthday date");
+        person.PremiereDate!.Value.DateTime.Should().HaveYear(1975).And.HaveMonth(12).And.HaveDay(17);
+        person.ProductionLocations.Should().ContainSingle();
+        var place = person.ProductionLocations.First();
+        person.GetProviderId(Plugin.PluginKey).Should().Be("24507", "id of the requested item");
+        person.SortName.Should().Be(person.Name, "SortName should be equal to Name");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -185,13 +190,13 @@ public class KpPersonProviderTest : BaseTest
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         IEnumerable<RemoteSearchResult> result = await _kpPersonProvider.GetSearchResults(personInfo, cancellationTokenSource.Token);
-
-        RemoteSearchResult searchResult = Assert.Single(result);
-        Assert.NotNull(searchResult);
-        Assert.Equal("29855", searchResult.GetProviderId(Plugin.PluginKey));
-        Assert.Equal("Джеки Чан", searchResult.Name);
-        Assert.True(!string.IsNullOrWhiteSpace(searchResult.ImageUrl));
-        Assert.Equal(Plugin.PluginKey, searchResult.SearchProviderName);
+        result.Should().ContainSingle();
+        RemoteSearchResult person = result.First();
+        person.Should().NotBeNull("that mean the person was found");
+        person.GetProviderId(Plugin.PluginKey).Should().Be("29855", "id of the requested item");
+        person.Name.Should().Be("Джеки Чан", "this is the name of the person");
+        person.ImageUrl.Should().NotBeNullOrWhiteSpace("person image exists");
+        person.SearchProviderName.Should().Be(Plugin.PluginKey, "this is person's SearchProviderName");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -216,16 +221,15 @@ public class KpPersonProviderTest : BaseTest
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         IEnumerable<RemoteSearchResult> result = await _kpPersonProvider.GetSearchResults(personInfo, cancellationTokenSource.Token);
-
-        Assert.NotEmpty(result);
-        RemoteSearchResult? searchResult = result
+        result.Should().NotBeEmpty();
+        RemoteSearchResult? person = result
             .FirstOrDefault(
                 r => "29855".Equals(r.ProviderIds[Plugin.PluginKey], StringComparison.Ordinal));
-        Assert.NotNull(searchResult);
-        Assert.Equal("29855", searchResult.GetProviderId(Plugin.PluginKey));
-        Assert.Equal("Джеки Чан", searchResult.Name);
-        Assert.True(!string.IsNullOrWhiteSpace(searchResult.ImageUrl));
-        Assert.Equal(Plugin.PluginKey, searchResult.SearchProviderName);
+        person.Should().NotBeNull("that mean the person was found");
+        person.GetProviderId(Plugin.PluginKey).Should().Be("29855", "id of the requested item");
+        person!.Name.Should().Be("Джеки Чан", "this is the name of the person");
+        person.ImageUrl.Should().NotBeNullOrWhiteSpace("person image exists");
+        person.SearchProviderName.Should().Be(Plugin.PluginKey, "this is person's SearchProviderName");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -250,16 +254,15 @@ public class KpPersonProviderTest : BaseTest
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         IEnumerable<RemoteSearchResult> result = await _kpPersonProvider.GetSearchResults(personInfo, cancellationTokenSource.Token);
-
-        Assert.NotEmpty(result);
-        RemoteSearchResult? searchResult = result
+        result.Should().NotBeEmpty();
+        RemoteSearchResult? person = result
             .FirstOrDefault(
                 r => "29855".Equals(r.ProviderIds[Plugin.PluginKey], StringComparison.Ordinal));
-        Assert.NotNull(searchResult);
-        Assert.Equal("29855", searchResult.GetProviderId(Plugin.PluginKey));
-        Assert.Equal("Джеки Чан", searchResult.Name);
-        Assert.True(!string.IsNullOrWhiteSpace(searchResult.ImageUrl));
-        Assert.Equal(Plugin.PluginKey, searchResult.SearchProviderName);
+        person.Should().NotBeNull("that mean the person was found");
+        person.GetProviderId(Plugin.PluginKey).Should().Be("29855", "id of the requested item");
+        person!.Name.Should().Be("Джеки Чан", "this is the name of the person");
+        person.ImageUrl.Should().NotBeNullOrWhiteSpace("person image exists");
+        person.SearchProviderName.Should().Be(Plugin.PluginKey, "this is person's SearchProviderName");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());

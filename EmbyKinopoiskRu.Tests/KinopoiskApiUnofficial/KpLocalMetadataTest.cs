@@ -3,6 +3,8 @@ using System.Globalization;
 using EmbyKinopoiskRu.Configuration;
 using EmbyKinopoiskRu.Provider.LocalMetadata;
 
+using FluentAssertions;
+
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
@@ -229,10 +231,10 @@ public class KpLocalMetadataTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Movie> result = await _kpMovieLocalMetadata.GetMetadata(itemInfo, _movieLibraryOptions, _directoryService.Object, cancellationTokenSource.Token);
 
-        Assert.NotNull(result.Item);
-        Assert.True(result.HasMetadata);
-        Assert.Equal("326", result.Item.GetProviderId(Plugin.PluginKey));
-        Assert.Equal("Video", result.Item.MediaType);
+        result.HasMetadata.Should().BeTrue("that mean the item was found");
+        result.Item.Should().NotBeNull("that mean the item was found");
+        result.Item.GetProviderId(Plugin.PluginKey).Should().Be("326", "id of the requested item");
+        result.Item.MediaType.Should().Be("Video", "this is video");
 
         _logManager.Verify(lm => lm.GetLogger("KpMovieLocalMetadata"), Times.Exactly(2));
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Exactly(1));
@@ -262,26 +264,26 @@ public class KpLocalMetadataTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Movie> result = await _kpMovieLocalMetadata.GetMetadata(itemInfo, _movieLibraryOptions, _directoryService.Object, cancellationTokenSource.Token);
 
+        result.HasMetadata.Should().BeTrue("that mean the item was found");
         Movie movie = result.Item;
-        Assert.NotNull(movie);
-        Assert.True(result.HasMetadata);
-        Assert.Equal("326", movie.GetProviderId(Plugin.PluginKey));
-        Assert.Equal("tt0111161", movie.GetProviderId(MetadataProviders.Imdb));
-        Assert.Equal("Video", movie.MediaType);
-        Assert.True(5 < movie.CommunityRating);
-        Assert.Equal("326", movie.ExternalId);
-        _ = Assert.Single(movie.Genres);
-        Assert.Equal("драма", movie.Genres[0]);
-        Assert.Equal("Побег из Шоушенка", movie.Name);
-        Assert.Equal("r", movie.OfficialRating);
-        Assert.Equal("The Shawshank Redemption", movie.OriginalTitle);
-        Assert.Equal("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.", movie.Overview);
-        Assert.Equal(1994, movie.ProductionYear);
-        Assert.Empty(movie.RemoteTrailers);
-        Assert.Equal(142, movie.Size);
-        Assert.Equal(movie.Name, movie.SortName);
-        Assert.Empty(movie.Studios);
-        Assert.Equal("Страх - это кандалы. Надежда - это свобода", movie.Tagline);
+        movie.Should().NotBeNull("that mean the movie was found");
+        movie.GetProviderId(Plugin.PluginKey).Should().Be("326", "id of the requested item");
+        movie.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0111161", "IMDB id of the requested item");
+        movie.MediaType.Should().Be("Video", "this is video");
+        movie.CommunityRating.Should().BeGreaterThan(5, "such value received from API");
+        movie.ExternalId.Should().Be("326", "KP id of requested item");
+        movie.Genres.Should().ContainSingle();
+        movie.Genres[0].Should().Be("драма", "the film has only this genre");
+        movie.Name.Should().Be("Побег из Шоушенка", "this is the name of the movie");
+        movie.OfficialRating.Should().Be("r", "this is film's OfficialRating");
+        movie.OriginalTitle.Should().Be("The Shawshank Redemption", "this is the original name of the movie");
+        movie.Overview.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.", "this is film's Overview");
+        movie.ProductionYear.Should().Be(1994, "this is movie ProductionYear");
+        movie.RemoteTrailers.Should().BeEmpty("the film doesn't have RemoteTrailers");
+        movie.Size.Should().Be(142, "this is movie Size");
+        movie.SortName.Should().Be(movie.Name, "SortName should be equal to Name");
+        movie.Studios.Should().BeEmpty("the movie doesn't have Studios");
+        movie.Tagline.Should().Be("Страх - это кандалы. Надежда - это свобода", "this is a Tagline of the movie");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(5));
         _fileSystem.Verify(fs => fs.GetDirectoryName("/emby/movie_library/Побег из Шоушенка.mkv"), Times.Once());
@@ -313,25 +315,25 @@ public class KpLocalMetadataTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Movie> result = await _kpMovieLocalMetadata.GetMetadata(itemInfo, _movieLibraryOptions, _directoryService.Object, cancellationTokenSource.Token);
 
+        result.HasMetadata.Should().BeTrue("that mean the item was found");
         Movie movie = result.Item;
-        Assert.NotNull(movie);
-        Assert.True(result.HasMetadata);
-        Assert.True(8 < movie.CommunityRating);
-        Assert.Equal("17579", movie.ExternalId);
-        Assert.Equal(6, movie.Genres.Length);
-        Assert.Equal("Video", movie.MediaType);
-        Assert.Equal("Робин Гуд", movie.Name);
-        Assert.Equal("g", movie.OfficialRating);
-        Assert.Equal("Robin Hood", movie.OriginalTitle);
-        Assert.Equal("Добро пожаловать в дремучий Шервудский лес, где ты встретишь храброго и забавного лисенка по имени Робин Гуд и его лучшего друга Крошку Джона - большого добродушного медведя.\n\nЭту веселую компанию давно разыскивает шериф Нотингема. Он готовит друзьям ловушку: на турнире лучников Робин Гуда будет ждать засада. Но отважный лисенок все равно собирается участвовать в состязании: ведь только там у него есть шанс увидеть красавицу Мариан.\n\nИ вот турнир начался, однако шериф никак не может узнать среди участников переодетого Робин Гуда. Правда, один точный выстрел способен сразу выдать самого лучшего стрелка в королевстве.", movie.Overview);
-        Assert.Equal(1973, movie.ProductionYear);
-        Assert.Equal("17579", movie.GetProviderId(Plugin.PluginKey));
-        Assert.Equal("tt0070608", movie.GetProviderId(MetadataProviders.Imdb));
-        Assert.Empty(movie.RemoteTrailers);
-        Assert.Equal(83, movie.Size);
-        Assert.Equal(movie.Name, movie.SortName);
-        Assert.Empty(movie.Studios);
-        Assert.Equal("The way it REALLY happened...", movie.Tagline);
+        movie.Should().NotBeNull("that mean the movie was found");
+        movie.CommunityRating.Should().BeGreaterThan(8, "such value received from API");
+        movie.ExternalId.Should().Be("17579", "KP id of requested item");
+        movie.Genres.Should().HaveCount(6);
+        movie.MediaType.Should().Be("Video", "this is video");
+        movie.Name.Should().Be("Робин Гуд", "this is the name of the movie");
+        movie.OfficialRating.Should().Be("g", "this is film's OfficialRating");
+        movie.OriginalTitle.Should().Be("Robin Hood", "this is the original name of the movie");
+        movie.Overview.Should().Be("Добро пожаловать в дремучий Шервудский лес, где ты встретишь храброго и забавного лисенка по имени Робин Гуд и его лучшего друга Крошку Джона - большого добродушного медведя.\n\nЭту веселую компанию давно разыскивает шериф Нотингема. Он готовит друзьям ловушку: на турнире лучников Робин Гуда будет ждать засада. Но отважный лисенок все равно собирается участвовать в состязании: ведь только там у него есть шанс увидеть красавицу Мариан.\n\nИ вот турнир начался, однако шериф никак не может узнать среди участников переодетого Робин Гуда. Правда, один точный выстрел способен сразу выдать самого лучшего стрелка в королевстве.", "this is film's Overview");
+        movie.ProductionYear.Should().Be(1973, "this is movie ProductionYear");
+        movie.GetProviderId(Plugin.PluginKey).Should().Be("17579", "id of the requested item");
+        movie.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0070608", "IMDB id of the requested item");
+        movie.RemoteTrailers.Should().BeEmpty("the film doesn't have RemoteTrailers");
+        movie.Size.Should().Be(83, "this is movie Size");
+        movie.SortName.Should().Be(movie.Name, "SortName should be equal to Name");
+        movie.Studios.Should().BeEmpty("the movie doesn't have Studios");
+        movie.Tagline.Should().Be("The way it REALLY happened...", "this is a Tagline of the movie");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(5));
         _fileSystem.Verify(fs => fs.GetDirectoryName("/emby/movie_library/Робин Гуд.mkv"), Times.Once());
@@ -469,25 +471,25 @@ public class KpLocalMetadataTest : BaseTest
         MetadataResult<Movie> result = await _kpMovieLocalMetadata.GetMetadata(itemInfo, _movieLibraryOptions, _directoryService.Object, cancellationTokenSource.Token);
 
 
+        result.HasMetadata.Should().BeTrue("that mean the item was found");
         Movie movie = result.Item;
-        Assert.NotNull(movie);
-        Assert.True(result.HasMetadata);
-        Assert.True(8 < movie.CommunityRating);
-        Assert.Equal("689", movie.ExternalId);
-        Assert.Equal(3, movie.Genres.Length);
-        Assert.Equal("Video", movie.MediaType);
-        Assert.Equal("Гарри Поттер и философский камень", movie.Name);
-        Assert.Equal("pg", movie.OfficialRating);
-        Assert.Equal("Harry Potter and the Sorcerer's Stone", movie.OriginalTitle);
-        Assert.Equal("Жизнь десятилетнего Гарри Поттера нельзя назвать сладкой: родители умерли, едва ему исполнился год, а от дяди и тёти, взявших сироту на воспитание, достаются лишь тычки да подзатыльники. Но в одиннадцатый день рождения Гарри всё меняется. Странный гость, неожиданно появившийся на пороге, приносит письмо, из которого мальчик узнаёт, что на самом деле он - волшебник и зачислен в школу магии под названием Хогвартс. А уже через пару недель Гарри будет мчаться в поезде Хогвартс-экспресс навстречу новой жизни, где его ждут невероятные приключения, верные друзья и самое главное — ключ к разгадке тайны смерти его родителей.", movie.Overview);
-        Assert.Equal(2001, movie.ProductionYear);
-        Assert.Equal("689", movie.GetProviderId(Plugin.PluginKey));
-        Assert.Equal("tt0241527", movie.GetProviderId(MetadataProviders.Imdb));
-        Assert.Empty(movie.RemoteTrailers);
-        Assert.Equal(152, movie.Size);
-        Assert.Equal(movie.Name, movie.SortName);
-        Assert.Empty(movie.Studios);
-        Assert.Equal("Путешествие в твою мечту", movie.Tagline);
+        movie.Should().NotBeNull("that mean the movie was found");
+        movie.CommunityRating.Should().BeGreaterThan(8, "such value received from API");
+        movie.ExternalId.Should().Be("689", "KP id of requested item");
+        movie.Genres.Should().HaveCount(3);
+        movie.MediaType.Should().Be("Video", "this is video");
+        movie.Name.Should().Be("Гарри Поттер и философский камень", "this is the name of the movie");
+        movie.OfficialRating.Should().Be("pg", "this is film's OfficialRating");
+        movie.OriginalTitle.Should().Be("Harry Potter and the Sorcerer's Stone", "this is the original name of the movie");
+        movie.Overview.Should().Be("Жизнь десятилетнего Гарри Поттера нельзя назвать сладкой: родители умерли, едва ему исполнился год, а от дяди и тёти, взявших сироту на воспитание, достаются лишь тычки да подзатыльники. Но в одиннадцатый день рождения Гарри всё меняется. Странный гость, неожиданно появившийся на пороге, приносит письмо, из которого мальчик узнаёт, что на самом деле он - волшебник и зачислен в школу магии под названием Хогвартс. А уже через пару недель Гарри будет мчаться в поезде Хогвартс-экспресс навстречу новой жизни, где его ждут невероятные приключения, верные друзья и самое главное — ключ к разгадке тайны смерти его родителей.", "this is film's Overview");
+        movie.ProductionYear.Should().Be(2001, "this is movie ProductionYear");
+        movie.GetProviderId(Plugin.PluginKey).Should().Be("689", "id of the requested item");
+        movie.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0241527", "IMDB id of the requested item");
+        movie.RemoteTrailers.Should().BeEmpty("the film doesn't have RemoteTrailers");
+        movie.Size.Should().Be(152, "this is movie Size");
+        movie.SortName.Should().Be(movie.Name, "SortName should be equal to Name");
+        movie.Studios.Should().BeEmpty("the movie doesn't have Studios");
+        movie.Tagline.Should().Be("Путешествие в твою мечту", "this is a Tagline of the movie");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(5));
         _fileSystem.Verify(fs => fs.GetDirectoryName("/emby/movie_library/Гарри Поттер и философский камень (2001).mkv"), Times.Once());
@@ -504,7 +506,7 @@ public class KpLocalMetadataTest : BaseTest
     {
         Logger.Info($"Start '{nameof(KpLocalMetadata_ForCodeCoverage)}'");
 
-        Assert.NotNull(_kpMovieLocalMetadata.Name);
+        _kpMovieLocalMetadata.Name.Should().NotBeNull("name is hardcoded");
         _ = new KpSeriesLocalMetadata(_logManager.Object);
 
         Logger.Info($"Finish '{nameof(KpLocalMetadata_ForCodeCoverage)}'");

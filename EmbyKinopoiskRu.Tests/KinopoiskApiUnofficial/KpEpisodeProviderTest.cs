@@ -3,6 +3,8 @@ using System.Net;
 using EmbyKinopoiskRu.Configuration;
 using EmbyKinopoiskRu.Provider.RemoteMetadata;
 
+using FluentAssertions;
+
 using MediaBrowser.Common.Net;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Providers;
@@ -45,10 +47,10 @@ public class KpEpisodeProviderTest : BaseTest
     {
         Logger.Info($"Start '{nameof(KpEpisodeProvider_ForCodeCoverage)}'");
 
-        Assert.NotNull(_kpEpisodeProvider.Name);
+        _kpEpisodeProvider.Name.Should().NotBeNullOrWhiteSpace("this is a name of the provider");
 
         HttpResponseInfo response = await _kpEpisodeProvider.GetImageResponse("https://www.google.com", CancellationToken.None);
-        Assert.True(response.StatusCode == HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.OK, "this is status code of the response to google.com");
 
         _logManager.Verify(lm => lm.GetLogger("KpEpisodeProvider"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
@@ -78,17 +80,17 @@ public class KpEpisodeProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Episode> result = await _kpEpisodeProvider.GetMetadata(episodeInfo, cancellationTokenSource.Token);
 
-        Assert.True(result.HasMetadata);
+        result.HasMetadata.Should().BeTrue("that mean the item was found");
         Episode episode = result.Item;
-        Assert.NotNull(episode);
-        Assert.Equal(2, episode.IndexNumber);
-        Assert.Equal("Video", episode.MediaType);
-        Assert.Equal("А я сказал — оседлаю!", episode.Name);
-        Assert.Equal("I Said I'm Gonna Pilot That Thing!!", episode.OriginalTitle);
-        Assert.Equal(1, episode.ParentIndexNumber);
-        Assert.NotNull(episode.PremiereDate);
-        Assert.Equal(new DateTime(2007, 04, 08), episode.PremiereDate.Value.DateTime, new DateTimeEqualityComparer());
-        Assert.Equal(episode.Name, episode.SortName);
+        episode.Should().NotBeNull("that mean the episode was found");
+        episode.IndexNumber.Should().Be(2, "requested second episode");
+        episode.MediaType.Should().Be("Video", "this is video");
+        episode.Name.Should().Be("А я сказал — оседлаю!", "this is the name of the episode");
+        episode.OriginalTitle.Should().Be("I Said I'm Gonna Pilot That Thing!!", "this is the original name of the episode");
+        episode.ParentIndexNumber.Should().Be(1, "requested first season");
+        episode.PremiereDate.Should().NotBeNull("episode premier date should have a date");
+        episode.PremiereDate!.Value.DateTime.Should().HaveYear(2007).And.HaveMonth(4).And.HaveDay(8);
+        episode.SortName.Should().Be(episode.Name, "Emby sorts episode by name");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -119,17 +121,17 @@ public class KpEpisodeProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Episode> result = await _kpEpisodeProvider.GetMetadata(episodeInfo, cancellationTokenSource.Token);
 
-        Assert.True(result.HasMetadata);
+        result.HasMetadata.Should().BeTrue("that mean the item was found");
         Episode episode = result.Item;
-        Assert.NotNull(episode);
-        Assert.Equal(2, episode.IndexNumber);
-        Assert.Equal("Video", episode.MediaType);
-        Assert.Equal("А я сказал — оседлаю!", episode.Name);
-        Assert.Equal("I Said I'm Gonna Pilot That Thing!!", episode.OriginalTitle);
-        Assert.Equal(1, episode.ParentIndexNumber);
-        Assert.NotNull(episode.PremiereDate);
-        Assert.Equal(new DateTime(2007, 04, 08), episode.PremiereDate.Value.DateTime, new DateTimeEqualityComparer());
-        Assert.Equal(episode.Name, episode.SortName);
+        episode.Should().NotBeNull("that mean the episode was found");
+        episode.IndexNumber.Should().Be(2, "requested second episode");
+        episode.MediaType.Should().Be("Video", "this is video");
+        episode.Name.Should().Be("А я сказал — оседлаю!", "this is the name of the episode");
+        episode.OriginalTitle.Should().Be("I Said I'm Gonna Pilot That Thing!!", "this is the original name of the episode");
+        episode.ParentIndexNumber.Should().Be(1, "requested first season");
+        episode.PremiereDate.Should().NotBeNull("episode premier date should have a date");
+        episode.PremiereDate!.Value.DateTime.Should().HaveYear(2007).And.HaveMonth(4).And.HaveDay(8);
+        episode.SortName.Should().Be(episode.Name, "SortName should be equal to Name");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());

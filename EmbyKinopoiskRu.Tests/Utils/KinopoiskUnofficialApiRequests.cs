@@ -1,5 +1,7 @@
 using System.Text.Json;
 
+using FluentAssertions;
+
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model;
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Film;
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Person;
@@ -28,23 +30,23 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         KpFilm? film = JsonSerializer.Deserialize<KpFilm>(response, _jsonOptions);
-        Assert.NotNull(film);
-        Assert.Equal(1, film!.Countries?.Count);
-        Assert.Equal("https://avatars.mds.yandex.net/get-ott/1652588/2a00000186aca5e13ea6cec11d584ac5455b/orig", film.CoverUrl);
-        Assert.Equal("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.", film.Description);
-        Assert.Equal(142, film.FilmLength);
-        Assert.Equal(1, film.Genres?.Count);
-        Assert.Equal("tt0111161", film.ImdbId);
-        Assert.Equal(326, film.KinopoiskId);
-        Assert.Equal("https://avatars.mds.yandex.net/get-ott/1648503/2a000001705c8bf514c033f1019473a4caae/orig", film.LogoUrl);
-        Assert.Equal("The Shawshank Redemption", film.NameOriginal);
-        Assert.Equal("Побег из Шоушенка", film.NameRu);
-        Assert.Equal("https://kinopoiskapiunofficial.tech/images/posters/kp/326.jpg", film.PosterUrl);
-        Assert.Equal("https://kinopoiskapiunofficial.tech/images/posters/kp_small/326.jpg", film.PosterUrlPreview);
-        Assert.Equal("r", film.RatingMpaa);
-        Assert.Equal("Страх - это кандалы. Надежда - это свобода", film.Slogan);
-        Assert.Equal(1994, film.Year);
-        Assert.True(0 < film.RatingKinopoisk);
+        film.Should().NotBeNull("");
+        film!.Countries?.Count.Should().Be(1);
+        film.CoverUrl.Should().Be("https://avatars.mds.yandex.net/get-ott/1652588/2a00000186aca5e13ea6cec11d584ac5455b/orig");
+        film.Description.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.");
+        film.FilmLength.Should().Be(142);
+        film.Genres?.Count.Should().Be(1);
+        film.ImdbId.Should().Be("tt0111161");
+        film.KinopoiskId.Should().Be(326);
+        film.LogoUrl.Should().Be("https://avatars.mds.yandex.net/get-ott/1648503/2a000001705c8bf514c033f1019473a4caae/orig");
+        film.NameOriginal.Should().Be("The Shawshank Redemption");
+        film.NameRu.Should().Be("Побег из Шоушенка");
+        film.PosterUrl.Should().Be("https://kinopoiskapiunofficial.tech/images/posters/kp/326.jpg");
+        film.PosterUrlPreview.Should().Be("https://kinopoiskapiunofficial.tech/images/posters/kp_small/326.jpg");
+        film.RatingMpaa.Should().Be("r");
+        film.Slogan.Should().Be("Страх - это кандалы. Надежда - это свобода");
+        film.Year.Should().Be(1994);
+        film.RatingKinopoisk.Should().BeGreaterThan(0);
     }
 
     [Fact(Skip = "not in use")]
@@ -55,16 +57,16 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         KpSearchResult<KpSeason>? seasons = JsonSerializer.Deserialize<KpSearchResult<KpSeason>>(response, _jsonOptions);
-        Assert.NotNull(seasons);
-        Assert.Equal(10, seasons!.Items.Count);
+        seasons.Should().NotBeNull("");
+        seasons!.Items.Count.Should().Be(10);
         KpSeason kpSeason = seasons.Items[0];
-        Assert.Equal(24, kpSeason.Episodes.Count);
+        kpSeason.Episodes.Count.Should().Be(24);
         KpEpisode kpEpisode = kpSeason.Episodes[23];
-        Assert.Equal(24, kpEpisode.EpisodeNumber);
-        Assert.Equal(1, kpEpisode.SeasonNumber);
-        Assert.Equal("Эпизод, где Рейчел понимает", kpEpisode.NameRu);
-        Assert.Equal("The One Where Rachel Finds Out", kpEpisode.NameEn);
-        Assert.Equal("1995-05-18", kpEpisode.ReleaseDate);
+        kpEpisode.EpisodeNumber.Should().Be(24);
+        kpEpisode.SeasonNumber.Should().Be(1);
+        kpEpisode.NameRu.Should().Be("Эпизод, где Рейчел понимает");
+        kpEpisode.NameEn.Should().Be("The One Where Rachel Finds Out");
+        kpEpisode.ReleaseDate.Should().Be("1995-05-18");
     }
 
     [Fact(Skip = "not in use")]
@@ -75,10 +77,10 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         KpSearchResult<KpVideo>? videos = JsonSerializer.Deserialize<KpSearchResult<KpVideo>>(response, _jsonOptions);
-        Assert.NotNull(videos);
-        Assert.Equal(8, videos!.Items.Count);
+        videos.Should().NotBeNull("");
+        videos!.Items.Count.Should().Be(8);
         KpVideo kpVideo = videos.Items[0];
-        Assert.Equal("http://trailers.s3.mds.yandex.net/video_original/160983-05ae2e39521817fce4e34a89968f3808.mp4", kpVideo.Url);
+        kpVideo.Url.Should().Be("http://trailers.s3.mds.yandex.net/video_original/160983-05ae2e39521817fce4e34a89968f3808.mp4");
     }
 
     [Fact(Skip = "not in use")]
@@ -89,16 +91,16 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         KpPerson? kpPerson = JsonSerializer.Deserialize<KpPerson>(response, _jsonOptions);
-        Assert.NotNull(kpPerson);
-        Assert.Equal("1958-10-16", kpPerson!.Birthday);
-        Assert.Equal("Уэст-Ковина, штат Калифорния, США", kpPerson.BirthPlace);
-        Assert.Null(kpPerson.Death);
-        Assert.Null(kpPerson.DeathPlace);
-        Assert.Equal(4, kpPerson.Facts?.Count);
-        Assert.Equal("Tim Robbins", kpPerson.NameEn);
-        Assert.Equal("Тим Роббинс", kpPerson.NameRu);
-        Assert.Equal(7987, kpPerson.PersonId);
-        Assert.Equal("https://kinopoiskapiunofficial.tech/images/actor_posters/kp/7987.jpg", kpPerson.PosterUrl);
+        kpPerson.Should().NotBeNull("");
+        kpPerson!.Birthday.Should().Be("1958-10-16");
+        kpPerson.BirthPlace.Should().Be("Уэст-Ковина, штат Калифорния, США");
+        kpPerson.Death.Should().BeNull("person still alive");
+        kpPerson.DeathPlace.Should().BeNull("person still alive");
+        kpPerson.Facts?.Count.Should().Be(4);
+        kpPerson.NameEn.Should().Be("Tim Robbins");
+        kpPerson.NameRu.Should().Be("Тим Роббинс");
+        kpPerson.PersonId.Should().Be(7987);
+        kpPerson.PosterUrl.Should().Be("https://kinopoiskapiunofficial.tech/images/actor_posters/kp/7987.jpg");
     }
 
     [Fact(Skip = "not in use")]
@@ -109,15 +111,15 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         List<KpFilmStaff>? filmStaffList = JsonSerializer.Deserialize<List<KpFilmStaff>>(response, _jsonOptions);
-        Assert.NotNull(filmStaffList);
-        Assert.Equal(90, filmStaffList!.Count);
+        filmStaffList.Should().NotBeNull("");
+        filmStaffList!.Count.Should().Be(90);
         KpFilmStaff filmStaff = filmStaffList[1];
-        Assert.Equal("Andy Dufresne", filmStaff.Description);
-        Assert.Equal("Tim Robbins", filmStaff.NameEn);
-        Assert.Equal("Тим Роббинс", filmStaff.NameRu);
-        Assert.Equal("https://kinopoiskapiunofficial.tech/images/actor_posters/kp/7987.jpg", filmStaff.PosterUrl);
-        Assert.Equal("ACTOR", filmStaff.ProfessionKey);
-        Assert.Equal(7987, filmStaff.StaffId);
+        filmStaff.Description.Should().Be("Andy Dufresne");
+        filmStaff.NameEn.Should().Be("Tim Robbins");
+        filmStaff.NameRu.Should().Be("Тим Роббинс");
+        filmStaff.PosterUrl.Should().Be("https://kinopoiskapiunofficial.tech/images/actor_posters/kp/7987.jpg");
+        filmStaff.ProfessionKey.Should().Be("ACTOR");
+        filmStaff.StaffId.Should().Be(7987);
     }
 
     [Fact(Skip = "not in use")]
@@ -128,20 +130,20 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         KpSearchResult<KpFilm>? filmSearchResult = JsonSerializer.Deserialize<KpSearchResult<KpFilm>>(response, _jsonOptions);
-        Assert.NotNull(filmSearchResult);
-        Assert.Equal(3, filmSearchResult!.Items.Count);
+        filmSearchResult.Should().NotBeNull("");
+        filmSearchResult!.Items.Count.Should().Be(3);
         KpFilm film = filmSearchResult.Items.First(f => f.KinopoiskId == 933277);
-        Assert.NotNull(film);
-        Assert.Equal(933277, film!.KinopoiskId);
-        Assert.Equal("tt3904078", film.ImdbId);
-        Assert.Equal("100 Things to Do Before High School", film.NameOriginal);
-        Assert.Equal("100 шагов: Успеть до старших классов", film.NameRu);
-        Assert.Equal(1, film.Countries?.Count);
-        Assert.Equal(2, film.Genres?.Count);
-        Assert.True(0 < film.RatingKinopoisk);
-        Assert.Equal(2014, film.Year);
-        Assert.Equal("https://kinopoiskapiunofficial.tech/images/posters/kp/933277.jpg", film.PosterUrl);
-        Assert.Equal("https://kinopoiskapiunofficial.tech/images/posters/kp_small/933277.jpg", film.PosterUrlPreview);
+        film.Should().NotBeNull("");
+        film!.KinopoiskId.Should().Be(933277);
+        film.ImdbId.Should().Be("tt3904078");
+        film.NameOriginal.Should().Be("100 Things to Do Before High School");
+        film.NameRu.Should().Be("100 шагов: Успеть до старших классов");
+        film.Countries?.Count.Should().Be(1);
+        film.Genres?.Count.Should().Be(2);
+        film.RatingKinopoisk.Should().BeGreaterThan(0);
+        film.Year.Should().Be(2014);
+        film.PosterUrl.Should().Be("https://kinopoiskapiunofficial.tech/images/posters/kp/933277.jpg");
+        film.PosterUrlPreview.Should().Be("https://kinopoiskapiunofficial.tech/images/posters/kp_small/933277.jpg");
     }
 
     [Fact(Skip = "not in use")]
@@ -152,20 +154,20 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         KpSearchResult<KpFilm>? filmSearchResult = JsonSerializer.Deserialize<KpSearchResult<KpFilm>>(response, _jsonOptions);
-        Assert.NotNull(filmSearchResult);
-        Assert.True(1 == filmSearchResult!.Items.Count);
+        filmSearchResult.Should().NotBeNull("");
+        filmSearchResult!.Items.Count.Should().Be(1);
         KpFilm film = filmSearchResult.Items.First(f => f.KinopoiskId == 933277);
-        Assert.NotNull(film);
-        Assert.Equal(933277, film!.KinopoiskId);
-        Assert.Equal("tt3904078", film.ImdbId);
-        Assert.Equal("100 Things to Do Before High School", film.NameOriginal);
-        Assert.Equal("100 шагов: Успеть до старших классов", film.NameRu);
-        Assert.Equal(1, film.Countries?.Count);
-        Assert.Equal(2, film.Genres?.Count);
-        Assert.True(0 < film.RatingKinopoisk);
-        Assert.Equal(2014, film.Year);
-        Assert.Equal("https://kinopoiskapiunofficial.tech/images/posters/kp/933277.jpg", film.PosterUrl);
-        Assert.Equal("https://kinopoiskapiunofficial.tech/images/posters/kp_small/933277.jpg", film.PosterUrlPreview);
+        film.Should().NotBeNull("");
+        film!.KinopoiskId.Should().Be(933277);
+        film.ImdbId.Should().Be("tt3904078");
+        film.NameOriginal.Should().Be("100 Things to Do Before High School");
+        film.NameRu.Should().Be("100 шагов: Успеть до старших классов");
+        film.Countries?.Count.Should().Be(1);
+        film.Genres?.Count.Should().Be(2);
+        film.RatingKinopoisk.Should().BeGreaterThan(0);
+        film.Year.Should().Be(2014);
+        film.PosterUrl.Should().Be("https://kinopoiskapiunofficial.tech/images/posters/kp/933277.jpg");
+        film.PosterUrlPreview.Should().Be("https://kinopoiskapiunofficial.tech/images/posters/kp_small/933277.jpg");
     }
 
     [Fact(Skip = "not in use")]
@@ -176,14 +178,14 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         KpSearchResult<KpStaff>? staffSearchResult = JsonSerializer.Deserialize<KpSearchResult<KpStaff>>(response, _jsonOptions);
-        Assert.NotNull(staffSearchResult);
-        Assert.Equal(4, staffSearchResult!.Items.Count);
+        staffSearchResult.Should().NotBeNull("");
+        staffSearchResult!.Items.Count.Should().Be(4);
         KpStaff staff = staffSearchResult.Items.First(f => f.KinopoiskId == 7987);
-        Assert.NotNull(staff);
-        Assert.Equal(7987, staff!.KinopoiskId);
-        Assert.Equal("Tim Robbins", staff.NameEn);
-        Assert.Equal("Тим Роббинс", staff.NameRu);
-        Assert.Equal("https://kinopoiskapiunofficial.tech/images/actor_posters/kp/7987.jpg", staff.PosterUrl);
+        staff.Should().NotBeNull("");
+        staff!.KinopoiskId.Should().Be(7987);
+        staff.NameEn.Should().Be("Tim Robbins");
+        staff.NameRu.Should().Be("Тим Роббинс");
+        staff.PosterUrl.Should().Be("https://kinopoiskapiunofficial.tech/images/actor_posters/kp/7987.jpg");
     }
 
     public void Dispose()

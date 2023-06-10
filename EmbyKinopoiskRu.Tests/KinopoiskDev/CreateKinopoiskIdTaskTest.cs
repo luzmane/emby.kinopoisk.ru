@@ -2,6 +2,8 @@ using EmbyKinopoiskRu.Configuration;
 using EmbyKinopoiskRu.ScheduledTasks;
 using EmbyKinopoiskRu.Tests.EmbyMock;
 
+using FluentAssertions;
+
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
@@ -51,12 +53,12 @@ public class CreateKinopoiskIdTaskTest : BaseTest
     {
         Logger.Info($"Start '{nameof(CreateKinopoiskIdTask_ForCodeCoverage)}'");
 
-        Assert.False(_createKinopoiskIdTask.IsHidden);
-        Assert.False(_createKinopoiskIdTask.IsEnabled);
-        Assert.True(_createKinopoiskIdTask.IsLogged);
-        Assert.NotNull(_createKinopoiskIdTask.Key);
+        _createKinopoiskIdTask.IsHidden.Should().BeFalse("this is default task config");
+        _createKinopoiskIdTask.IsEnabled.Should().BeFalse("this is default task config");
+        _createKinopoiskIdTask.IsLogged.Should().BeTrue("this is default task config");
+        _createKinopoiskIdTask.Key.Should().NotBeNull("key is hardcoded");
 
-        Assert.Empty(_createKinopoiskIdTask.GetDefaultTriggers());
+        _createKinopoiskIdTask.GetDefaultTriggers().Should().BeEmpty("there is no triggers defined");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("CreateKinopoiskIdTask"), Times.Once());
@@ -75,9 +77,9 @@ public class CreateKinopoiskIdTaskTest : BaseTest
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration() { UICulture = "ru" });
 
-        Assert.Equal("Добавить ID Кинопоиска по ключам IMDB, TMDB", _createKinopoiskIdTask.Name);
-        Assert.Equal("Добавить ID Кинопоиска, ища через API по ID IMDB и TMDB. Поддерживает только kinopoisk.dev", _createKinopoiskIdTask.Description);
-        Assert.Equal("Плагин Кинопоиска", _createKinopoiskIdTask.Category);
+        _createKinopoiskIdTask.Name.Should().Be("Добавить ID Кинопоиска по ключам IMDB, TMDB", "this is the name of the task");
+        _createKinopoiskIdTask.Description.Should().Be("Добавить ID Кинопоиска, ища через API по ID IMDB и TMDB. Поддерживает только kinopoisk.dev", "this is the description of the task");
+        _createKinopoiskIdTask.Category.Should().Be("Плагин Кинопоиска", "this is the category of the task");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("CreateKinopoiskIdTask"), Times.Once());
@@ -96,9 +98,9 @@ public class CreateKinopoiskIdTaskTest : BaseTest
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration() { UICulture = "en-us" });
 
-        Assert.Equal("Add KinopoiskId based on IMDB, TMDB", _createKinopoiskIdTask.Name);
-        Assert.Equal("Add KinopoiskId searching them by IMDB and TMDB ids. Support kinopoisk.dev only", _createKinopoiskIdTask.Description);
-        Assert.Equal("Kinopoisk Plugin", _createKinopoiskIdTask.Category);
+        _createKinopoiskIdTask.Name.Should().Be("Add KinopoiskId based on IMDB, TMDB", "this is the name of the task");
+        _createKinopoiskIdTask.Description.Should().Be("Add KinopoiskId searching them by IMDB and TMDB ids. Support kinopoisk.dev only", "this is the description of the task");
+        _createKinopoiskIdTask.Category.Should().Be("Kinopoisk Plugin", "this is the category of the task");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("CreateKinopoiskIdTask"), Times.Once());
@@ -117,9 +119,9 @@ public class CreateKinopoiskIdTaskTest : BaseTest
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration() { UICulture = "uk" });
 
-        Assert.Equal("Додати ID Кінопошуку за ключами IMDB, TMDB", _createKinopoiskIdTask.Name);
-        Assert.Equal("Додати ID Кінопошуку, шукаючи через API за ID IMDB та TMDB. Підтримує лише kinopoisk.dev", _createKinopoiskIdTask.Description);
-        Assert.Equal("Плагін Кінопошуку", _createKinopoiskIdTask.Category);
+        _createKinopoiskIdTask.Name.Should().Be("Додати ID Кінопошуку за ключами IMDB, TMDB", "this is the name of the task");
+        _createKinopoiskIdTask.Description.Should().Be("Додати ID Кінопошуку, шукаючи через API за ID IMDB та TMDB. Підтримує лише kinopoisk.dev", "this is the description of the task");
+        _createKinopoiskIdTask.Category.Should().Be("Плагін Кінопошуку", "this is the category of the task");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("CreateKinopoiskIdTask"), Times.Once());
@@ -138,9 +140,9 @@ public class CreateKinopoiskIdTaskTest : BaseTest
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration() { UICulture = "bg" });
 
-        Assert.Equal("Add KinopoiskId based on IMDB, TMDB", _createKinopoiskIdTask.Name);
-        Assert.Equal("Add KinopoiskId searching them by IMDB and TMDB ids. Support kinopoisk.dev only", _createKinopoiskIdTask.Description);
-        Assert.Equal("Kinopoisk Plugin", _createKinopoiskIdTask.Category);
+        _createKinopoiskIdTask.Name.Should().Be("Add KinopoiskId based on IMDB, TMDB", "this is the name of the task");
+        _createKinopoiskIdTask.Description.Should().Be("Add KinopoiskId searching them by IMDB and TMDB ids. Support kinopoisk.dev only", "this is the description of the task");
+        _createKinopoiskIdTask.Category.Should().Be("Kinopoisk Plugin", "this is the category of the task");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("CreateKinopoiskIdTask"), Times.Once());
@@ -154,7 +156,7 @@ public class CreateKinopoiskIdTaskTest : BaseTest
     public async void CreateKinopoiskIdTask_Execute()
     {
         Logger.Info($"Start '{nameof(CreateKinopoiskIdTask_Execute)}'");
-        
+
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("CreateKinopoiskIdTask_Execute");

@@ -1,5 +1,7 @@
 using EmbyKinopoiskRu.Provider.ExternalId;
 
+using FluentAssertions;
+
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.TV;
 
@@ -18,12 +20,12 @@ public class PersonExternalIdProviderTest
 
         PersonExternalIdProvider personExternalIdProvider = new();
 
-        Assert.Equal(Plugin.PluginName, personExternalIdProvider.Name);
-        Assert.Equal(Plugin.PluginKey, personExternalIdProvider.Key);
-        Assert.Equal("https://www.kinopoisk.ru/name/{0}/", personExternalIdProvider.UrlFormatString);
+        personExternalIdProvider.Name.Should().Be(Plugin.PluginName, "has value of Plugin.PluginName");
+        personExternalIdProvider.Key.Should().Be(Plugin.PluginKey, "has value of Plugin.PluginKey");
+        personExternalIdProvider.UrlFormatString.Should().Be("https://www.kinopoisk.ru/name/{0}/", "this is constant");
 
-        Assert.True(personExternalIdProvider.Supports(new Person()));
-        Assert.False(personExternalIdProvider.Supports(new Series()));
+        personExternalIdProvider.Supports(new Person()).Should().BeTrue("this provider supports only Person");
+        personExternalIdProvider.Supports(new Series()).Should().BeFalse("this provider supports only Person");
 
         _logger.Info($"Finished '{nameof(PersonExternalIdProvider_ForCodeCoverage)}'");
     }
