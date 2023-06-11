@@ -38,10 +38,10 @@ namespace EmbyKinopoiskRu.Provider.RemoteMetadata
             return await Plugin.Instance.GetKinopoiskService().GetMetadata(info, cancellationToken);
         }
 
-        public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(SeriesInfo info, CancellationToken cancellationToken)
+        public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(SeriesInfo searchInfo, CancellationToken cancellationToken)
         {
-            _log.Info($"GetSearchResults by SeriesInfo:'{info.Name}', '{info.Year}'");
-            return await Plugin.Instance.GetKinopoiskService().GetSearchResults(info, cancellationToken);
+            _log.Info($"GetSearchResults by SeriesInfo:'{searchInfo.Name}', '{searchInfo.Year}'");
+            return await Plugin.Instance.GetKinopoiskService().GetSearchResults(searchInfo, cancellationToken);
         }
     }
 }

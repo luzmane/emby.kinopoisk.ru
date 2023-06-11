@@ -137,12 +137,9 @@ namespace EmbyKinopoiskRu.Helper
                 logger.Info($"Found {tmdbCollectionItems.Items.Length} internal TMDB objects");
 
                 var list = new List<BaseItem>(imdbCollectionItems.Items);
-                foreach (BaseItem item in tmdbCollectionItems.Items)
+                foreach (BaseItem item in tmdbCollectionItems.Items.Where(x => list.All(i => i.InternalId != x.InternalId)))
                 {
-                    if (list.All(i => i.InternalId != item.InternalId))
-                    {
-                        list.Add(item);
-                    }
+                    list.Add(item);
                 }
                 logger.Info($"Adding {list.Count} additional internal objects");
                 toReturn.AddRange(list);

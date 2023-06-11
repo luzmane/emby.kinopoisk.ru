@@ -33,16 +33,6 @@ public class KpMovieProviderTest : BaseTest
 
         _kpMovieProvider = new(_httpClient, _logManager.Object);
     }
-    protected override void ConfigLibraryManager()
-    {
-        base.ConfigLibraryManager();
-
-    }
-    protected override void ConfigXmlSerializer()
-    {
-        base.ConfigXmlSerializer();
-
-    }
 
     #endregion
 

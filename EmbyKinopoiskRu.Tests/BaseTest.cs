@@ -98,7 +98,7 @@ public abstract class BaseTest
         Plugin.Instance.SetAttributes("EmbyKinopoiskRu.dll", "", new Version(1, 0, 0));
     }
 
-    protected virtual void ConfigLibraryManager()
+    protected void ConfigLibraryManager()
     {
         _ = _libraryManager
             .SetupGet(lm => lm.IsScanRunning)
@@ -143,7 +143,7 @@ public abstract class BaseTest
             .Setup(lm => lm.AddVirtualFolder("Collections", It.IsAny<LibraryOptions>(), true));
 
     }
-    protected virtual void ConfigXmlSerializer()
+    protected void ConfigXmlSerializer()
     {
         _ = _xmlSerializer
             .Setup(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), It.IsAny<string>()))

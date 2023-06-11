@@ -32,7 +32,7 @@ public class KpLocalMetadataTest : BaseTest
     {
         _pluginConfiguration.Token = GetKinopoiskDevToken();
 
-        ConfigLibraryManager();
+        SetupLibraryManager();
 
         ConfigXmlSerializer();
 
@@ -65,9 +65,9 @@ public class KpLocalMetadataTest : BaseTest
 
         _kpMovieLocalMetadata = new KpMovieLocalMetadata(_logManager.Object);
     }
-    protected override void ConfigLibraryManager()
+    private void SetupLibraryManager()
     {
-        base.ConfigLibraryManager();
+        ConfigLibraryManager();
 
         var potterSequences = new long[] { 688, 322, 8408, 48356, 89515, 276762, 407636, 4716622 }
             .Select(id => new KeyValuePair<string, string>(Plugin.PluginKey, id.ToString(CultureInfo.InvariantCulture)))
@@ -81,7 +81,7 @@ public class KpLocalMetadataTest : BaseTest
 
         _ = _libraryManager // EmbyHelper.GetSequenceInternalIds(). Items in lib with Kp internal Id
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
-                query.Recursive == false
+                !query.Recursive
                 && query.IsVirtualItem == false
                 && query.IncludeItemTypes.Length == 2
                 && nameof(Movie).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
@@ -116,7 +116,7 @@ public class KpLocalMetadataTest : BaseTest
 
         _ = _libraryManager // EmbyHelper.GetSequenceInternalIds(). Items in lib with IMDB internal Id
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
-                query.Recursive == false
+                !query.Recursive
                 && query.IsVirtualItem == false
                 && query.IncludeItemTypes.Length == 2
                 && nameof(Movie).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
@@ -172,7 +172,7 @@ public class KpLocalMetadataTest : BaseTest
 
         _ = _libraryManager // EmbyHelper.GetSequenceInternalIds(). Items in lib with TMDB internal Id
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
-                query.Recursive == false
+                !query.Recursive
                 && query.IsVirtualItem == false
                 && query.IncludeItemTypes.Length == 2
                 && nameof(Movie).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
@@ -205,11 +205,6 @@ public class KpLocalMetadataTest : BaseTest
                     },
                 }
             });
-
-    }
-    protected override void ConfigXmlSerializer()
-    {
-        base.ConfigXmlSerializer();
 
     }
 
@@ -376,7 +371,7 @@ public class KpLocalMetadataTest : BaseTest
 
         _ = _libraryManager // EmbyHelper.SearchExistingCollection(). Search movies in boxset
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
-                query.Recursive == false
+                !query.Recursive
                 && query.IsVirtualItem == false
                 && query.IncludeItemTypes.Length == 2
                 && nameof(Movie).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)

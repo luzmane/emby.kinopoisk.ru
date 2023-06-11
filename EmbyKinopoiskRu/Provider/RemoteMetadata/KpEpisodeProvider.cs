@@ -37,9 +37,9 @@ namespace EmbyKinopoiskRu.Provider.RemoteMetadata
             _log.Info($"GetMetadata by EpisodeInfo:'{info.Name}', '{info.Year}'");
             return await Plugin.Instance.GetKinopoiskService().GetMetadata(info, cancellationToken);
         }
-        public Task<IEnumerable<RemoteSearchResult>> GetSearchResults(EpisodeInfo info, CancellationToken cancellationToken)
+        public Task<IEnumerable<RemoteSearchResult>> GetSearchResults(EpisodeInfo searchInfo, CancellationToken cancellationToken)
         {
-            _log.Info($"GetSearchResults by EpisodeInfo:'{info.Name}', '{info.Year}'");
+            _log.Info($"GetSearchResults by EpisodeInfo:'{searchInfo.Name}', '{searchInfo.Year}'");
             throw new NotImplementedException();
         }
     }

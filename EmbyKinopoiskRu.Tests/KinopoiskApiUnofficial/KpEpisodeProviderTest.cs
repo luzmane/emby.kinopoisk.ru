@@ -31,14 +31,6 @@ public class KpEpisodeProviderTest : BaseTest
 
         _kpEpisodeProvider = new(_httpClient, _logManager.Object);
     }
-    protected override void ConfigLibraryManager()
-    {
-        base.ConfigLibraryManager();
-    }
-    protected override void ConfigXmlSerializer()
-    {
-        base.ConfigXmlSerializer();
-    }
 
     #endregion
 

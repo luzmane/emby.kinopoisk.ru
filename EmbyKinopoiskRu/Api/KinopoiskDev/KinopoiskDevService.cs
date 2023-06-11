@@ -755,7 +755,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             releaseYears
                 .Where(i => i.End != null)
                 .ToList()
-                .ForEach(i => max = Math.Max((int)max, (int)i.End));
+                .ForEach(i => max = Math.Max(max, (int)i.End));
 
             return DateTimeOffset.TryParseExact(
                             max.ToString(CultureInfo.InvariantCulture),
@@ -846,6 +846,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             if (collection == null && internalCollectionItems.Count > 0)
             {
                 var newCollectionName = GetNewCollectionName(movie);
+                if (!string.IsNullOrWhiteSpace(newCollectionName))
+                {
+                    _log.Warn("New collection has no name, skip creation");
+                    return;
+                }
                 _log.Info($"Creating '{newCollectionName}' collection with following items: '{string.Join("', '", internalCollectionItems.Select(m => m.Name))}'");
                 collection = await _collectionManager.CreateCollection(new CollectionCreationOptions()
                 {
@@ -886,11 +891,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 .Select(s => (s.Id, s.Name))
                 .ToList();
             itemsList.Add((movie.Id, movie.Name));
-            (var id, var name) = itemsList
+            return itemsList
                 .Where(m => !string.IsNullOrWhiteSpace(m.Name))
                 .OrderBy(m => m.Id)
+                .Select(m => m.Name)
                 .FirstOrDefault();
-            return name;
         }
         private static string PrepareOverview(KpMovie movie)
         {

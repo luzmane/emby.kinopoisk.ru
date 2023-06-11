@@ -64,10 +64,10 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             try
             {
                 await Execute(
-                    cancellationToken,
                     progress,
                     Plugin.Configuration.GetCurrentTop250SeriesCollectionName(),
-                    Plugin.GetKinopoiskService().GetTop250SeriesCollection);
+                    Plugin.GetKinopoiskService().GetTop250SeriesCollection,
+                    cancellationToken);
             }
             finally
             {

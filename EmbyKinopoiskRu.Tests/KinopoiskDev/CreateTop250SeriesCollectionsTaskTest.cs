@@ -38,14 +38,6 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
             _jsonSerializer,
             _serverConfigurationManager.Object);
     }
-    protected override void ConfigLibraryManager()
-    {
-        base.ConfigLibraryManager();
-    }
-    protected override void ConfigXmlSerializer()
-    {
-        base.ConfigXmlSerializer();
-    }
 
     #endregion
 
@@ -190,7 +182,7 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
 
         _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
-                query.Recursive == false
+                !query.Recursive
                 && query.IncludeItemTypes.Length == 1
                 && nameof(CollectionFolder).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))))
             .Returns(new QueryResult<BaseItem>()
@@ -207,7 +199,7 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
 
         _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
-                query.Recursive == false
+                !query.Recursive
                 && query.IsVirtualItem == false
                 && query.IncludeItemTypes.Length == 1
                 && nameof(Series).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
@@ -260,7 +252,7 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
 
         _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
-                query.Recursive == false
+                !query.Recursive
                 && query.Name == "Кинопоиск Топ 250 (Сериалы) (My TV Shows)"
                 && query.IncludeItemTypes.Length == 1
                 && "BoxSet".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))))
@@ -364,7 +356,7 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
 
         _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
-                query.Recursive == false
+                !query.Recursive
                 && query.IncludeItemTypes.Length == 1
                 && nameof(CollectionFolder).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))))
             .Returns(new QueryResult<BaseItem>()
@@ -381,7 +373,7 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
 
         _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
-                query.Recursive == false
+                !query.Recursive
                 && query.IsVirtualItem == false
                 && query.IncludeItemTypes.Length == 1
                 && nameof(Series).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
@@ -434,7 +426,7 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
 
         _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
-                query.Recursive == false
+                !query.Recursive
                 && query.Name == "Кинопоиск Топ 250 (Сериалы) (My Series)"
                 && query.IncludeItemTypes.Length == 1
                 && "BoxSet".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))))

@@ -131,10 +131,10 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         }
 
         protected async Task Execute(
-            CancellationToken cancellationToken,
             IProgress<double> progress,
             string baseCollectionName,
-            Func<CancellationToken, Task<List<BaseItem>>> getTop250Collection)
+            Func<CancellationToken, Task<List<BaseItem>>> getTop250Collection,
+            CancellationToken cancellationToken)
         {
             Log.Info("Fetch top 250 list from API");
             List<BaseItem> videos = await getTop250Collection(cancellationToken);

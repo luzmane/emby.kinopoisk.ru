@@ -154,9 +154,9 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 foreach (BaseItem item in workingList)
                 {
                     var id = item.GetProviderId(providerId);
-                    if (fetchedIds.Item.ContainsKey(id))
+                    if (fetchedIds.Item.TryGetValue(id, out var itemId))
                     {
-                        item.SetProviderId(Plugin.PluginKey, fetchedIds.Item[id].ToString(CultureInfo.InvariantCulture));
+                        item.SetProviderId(Plugin.PluginKey, itemId.ToString(CultureInfo.InvariantCulture));
                         item.UpdateToRepository(ItemUpdateType.MetadataEdit);
                     }
                     else

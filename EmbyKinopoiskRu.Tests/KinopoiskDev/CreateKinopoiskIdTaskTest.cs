@@ -37,14 +37,6 @@ public class CreateKinopoiskIdTaskTest : BaseTest
             _serverConfigurationManager.Object,
             _jsonSerializer);
     }
-    protected override void ConfigLibraryManager()
-    {
-        base.ConfigLibraryManager();
-    }
-    protected override void ConfigXmlSerializer()
-    {
-        base.ConfigXmlSerializer();
-    }
 
     #endregion
 

@@ -33,14 +33,6 @@ public class KpPersonProviderTest : BaseTest
 
         _kpPersonProvider = new(_httpClient, _logManager.Object);
     }
-    protected override void ConfigLibraryManager()
-    {
-        base.ConfigLibraryManager();
-    }
-    protected override void ConfigXmlSerializer()
-    {
-        base.ConfigXmlSerializer();
-    }
 
     #endregion
 
@@ -86,7 +78,6 @@ public class KpPersonProviderTest : BaseTest
         person.PremiereDate.Should().NotBeNull("person should have a birthday date");
         person.PremiereDate!.Value.DateTime.Should().HaveYear(1954).And.HaveMonth(04).And.HaveDay(07);
         person.ProductionLocations.Should().ContainSingle();
-        var place = person.ProductionLocations.First();
         person.GetProviderId(Plugin.PluginKey).Should().Be("29855", "id of the requested item");
         person.SortName.Should().Be(person.Name, "SortName should be equal to Name");
 
@@ -124,7 +115,6 @@ public class KpPersonProviderTest : BaseTest
         person.PremiereDate.Should().NotBeNull("person should have a birthday date");
         person.PremiereDate!.Value.DateTime.Should().HaveYear(1975).And.HaveMonth(12).And.HaveDay(17);
         person.ProductionLocations.Should().ContainSingle();
-        var place = person.ProductionLocations.First();
         person.GetProviderId(Plugin.PluginKey).Should().Be("24507", "id of the requested item");
         person.SortName.Should().Be(person.Name, "SortName should be equal to Name");
 
@@ -162,7 +152,6 @@ public class KpPersonProviderTest : BaseTest
         person.PremiereDate.Should().NotBeNull("person should have a birthday date");
         person.PremiereDate!.Value.DateTime.Should().HaveYear(1975).And.HaveMonth(12).And.HaveDay(17);
         person.ProductionLocations.Should().ContainSingle();
-        var place = person.ProductionLocations.First();
         person.GetProviderId(Plugin.PluginKey).Should().Be("24507", "id of the requested item");
         person.SortName.Should().Be(person.Name, "SortName should be equal to Name");
 
