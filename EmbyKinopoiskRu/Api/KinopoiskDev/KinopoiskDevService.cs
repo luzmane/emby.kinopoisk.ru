@@ -846,7 +846,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             if (collection == null && internalCollectionItems.Count > 0)
             {
                 var newCollectionName = GetNewCollectionName(movie);
-                if (!string.IsNullOrWhiteSpace(newCollectionName))
+                if (string.IsNullOrWhiteSpace(newCollectionName))
                 {
                     _log.Warn("New collection has no name, skip creation");
                     return;
