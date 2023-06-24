@@ -466,7 +466,7 @@ public class KpLocalMetadataTest : BaseTest
             Name = "Гарри Поттер и философский камень"
         });
         using var cancellationTokenSource = new CancellationTokenSource();
-        _pluginConfiguration.CreateCollections = true;
+        _pluginConfiguration.CreateSeqCollections = true;
         MetadataResult<Movie> result = await _kpMovieLocalMetadata.GetMetadata(itemInfo, _movieLibraryOptions, _directoryService.Object, cancellationTokenSource.Token);
 
 
@@ -583,7 +583,7 @@ public class KpLocalMetadataTest : BaseTest
             Name = "Гарри Поттер и философский камень"
         });
         using var cancellationTokenSource = new CancellationTokenSource();
-        _pluginConfiguration.CreateCollections = true;
+        _pluginConfiguration.CreateSeqCollections = true;
         MetadataResult<Movie> result = await _kpMovieLocalMetadata.GetMetadata(itemInfo, _movieLibraryOptions, _directoryService.Object, cancellationTokenSource.Token);
 
         result.HasMetadata.Should().BeTrue("that mean the item was found");

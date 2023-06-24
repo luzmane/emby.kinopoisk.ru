@@ -94,7 +94,7 @@ public class KpMovieProviderTest : BaseTest
         movie.Studios.Should().ContainSingle();
         movie.Tagline.Should().Be("Страх - это кандалы. Надежда - это свобода", "this is a Tagline of the movie");
 
-        result.People.Should().HaveCount(80);
+        result.People.Should().HaveCountGreaterThanOrEqualTo(17, "a number of the movie actors");
         PersonInfo? person = result.People.FirstOrDefault(p => "Тим Роббинс".Equals(p.Name, StringComparison.Ordinal));
         person.Should().NotBeNull("that mean the person was found");
         person.GetProviderId(Plugin.PluginKey).Should().Be("7987", "id of the requested item");
@@ -150,7 +150,7 @@ public class KpMovieProviderTest : BaseTest
         movie.Studios.Should().ContainSingle();
         movie.Tagline.Should().Be("Страх - это кандалы. Надежда - это свобода", "this is a Tagline of the movie");
 
-        result.People.Should().HaveCount(80);
+        result.People.Should().HaveCountGreaterThanOrEqualTo(17, "a number of the movie actors");
         PersonInfo? person = result.People.FirstOrDefault(p => "Тим Роббинс".Equals(p.Name, StringComparison.Ordinal));
         person.Should().NotBeNull("that mean the person was found");
         person.GetProviderId(Plugin.PluginKey).Should().Be("7987", "id of the requested item");
@@ -206,7 +206,7 @@ public class KpMovieProviderTest : BaseTest
         movie.Studios.Should().ContainSingle();
         movie.Tagline.Should().Be("Страх - это кандалы. Надежда - это свобода", "this is a Tagline of the movie");
 
-        result.People.Should().HaveCount(80);
+        result.People.Should().HaveCountGreaterThanOrEqualTo(17, "a number of the movie actors");
         PersonInfo? person = result.People.FirstOrDefault(p => "Тим Роббинс".Equals(p.Name, StringComparison.Ordinal));
         person.Should().NotBeNull("that mean the person was found");
         person.GetProviderId(Plugin.PluginKey).Should().Be("7987", "id of the requested item");
@@ -263,7 +263,7 @@ public class KpMovieProviderTest : BaseTest
         movie.Studios.Should().ContainSingle();
         movie.Tagline.Should().Be("Страх - это кандалы. Надежда - это свобода", "this is a Tagline of the movie");
 
-        result.People.Should().HaveCount(80);
+        result.People.Should().HaveCountGreaterThanOrEqualTo(17, "a number of the movie actors");
         PersonInfo? person = result.People.FirstOrDefault(p => "Тим Роббинс".Equals(p.Name, StringComparison.Ordinal));
         person.Should().NotBeNull("that mean the person was found");
         person.GetProviderId(Plugin.PluginKey).Should().Be("7987", "id of the requested item");

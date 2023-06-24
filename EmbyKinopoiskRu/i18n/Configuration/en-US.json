@@ -3,10 +3,10 @@
     "Token configuration": "Token configuration",
     "Get Token From Here": "Get token from here",
     "Token": "Token",
-    "Collection creation configuration (for kinopoisk.dev only)": "Collection creation configuration (for kinopoisk.dev only)",
-    "Create collections": "Create collections",
+    "Sequels collection creation configuration": "Sequels collection creation configuration",
+    "Group sequels and prequels into a collection": "Group sequels and prequels into a collection",
+    "Top 250 collection creation configuration": "Top 250 collection creation configuration",
+    "Add items to a collection from all libraries": "Add items to a collection from all libraries",
     "Top 250 Movie Collection Name": "Top 250 Movie Collection Name",
-    "Top 250 Series Collection Name": "Top 250 Series Collection Name",
-    "Name": "Add KinopoiskId based on IMDB, TMDB",
-    "Description": "Add KinopoiskId searching them by IMDB and TMDB ids. Support kinopoisk.dev only"
+    "Top 250 Series Collection Name": "Top 250 Series Collection Name"
 }

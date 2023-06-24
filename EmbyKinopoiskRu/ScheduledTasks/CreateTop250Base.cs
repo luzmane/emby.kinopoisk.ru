@@ -207,7 +207,10 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                             .ToList();
             Log.Info($"Found {videosInLibrary.Count} {_itemType} in '{library.Name}' library");
 
-            await UpdateLibrary(videosInLibrary, $"{baseCollectionName} ({library.Name})");
+            string collectionName = Plugin.Configuration.NeedToCreateTop250PerLib() ?
+                $"{baseCollectionName} ({library.Name})" :
+                $"{baseCollectionName}";
+            await UpdateLibrary(videosInLibrary, collectionName);
 
             Log.Info($"Finished with library '{library.Name}'");
         }

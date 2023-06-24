@@ -55,7 +55,7 @@ public abstract class BaseTest
     {
         _logger = logger;
 
-        _pluginConfiguration = new() { CreateCollections = false };
+        _pluginConfiguration = new() { CreateSeqCollections = false };
 
 
         _ = _fileSystem

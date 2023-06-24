@@ -1,5 +1,6 @@
 {
     "dotnet.defaultSolution": "EmbyKinopoiskRu.sln",
+    "csharp.debug.suppressJITOptimizations": true,
     "csharp.inlayHints.enableInlayHintsForImplicitObjectCreation": true,
     "csharp.inlayHints.enableInlayHintsForTypes": true,
     "dotnet.inlayHints.enableInlayHintsForIndexerParameters": true,

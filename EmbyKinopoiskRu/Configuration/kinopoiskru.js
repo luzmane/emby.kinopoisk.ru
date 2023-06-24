@@ -5,7 +5,8 @@
         page.querySelector('.txtToken').value = config.Token || '';
         page.querySelector('.top250MovieName').value = config.Top250CollectionName || 'КинопоискТоп250';
         page.querySelector('.top250SeriesName').value = config.Top250CollectionName || 'КинопоискТоп250 (Сериалы)';
-        page.querySelector('.chkCreateCollections').checked = (config.ApiType == "kinopoisk.dev" && config.CreateCollections);
+        page.querySelector('.chkCreateSeqCollections').checked = (config.ApiType == "kinopoisk.dev" && config.CreateSeqCollections);
+        page.querySelector('.chkTop250PerLib').checked = (config.ApiType == "kinopoisk.dev" && config.Top250PerLib);
         page.querySelector('.kinopoiskUnofficial').checked = (config.ApiType == "kinopoiskapiunofficial.tech");
         page.querySelector('.kinopoiskUnofficial').addEventListener('change', (event) => {
             if (event.currentTarget.checked) page.querySelector('.kinopoiskDevOnly').style.display = 'none';
@@ -22,7 +23,8 @@
         var form = this;
         getConfig().then(function (config) {
             config.Token = form.querySelector('.txtToken').value;
-            config.CreateCollections = form.querySelector('.chkCreateCollections').checked;
+            config.CreateSeqCollections = form.querySelector('.chkCreateSeqCollections').checked;
+            config.Top250PerLib = form.querySelector('.chkTop250PerLib').checked;
             config.Top250CollectionName = form.querySelector('.top250MovieName').value;
             config.Top250CollectionName = form.querySelector('.top250SeriesName').value;
             config.ApiType = form.querySelector('input[name="radioAPI"]:checked').value;

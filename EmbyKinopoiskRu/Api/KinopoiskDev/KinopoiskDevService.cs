@@ -248,7 +248,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 .ToList()
                 .ForEach(j => toReturn.AddTrailerUrl(j));
 
-            if (PluginConfig.NeedToCreateCollection() && movie.SequelsAndPrequels.Any())
+            if (PluginConfig.NeedToCreateSequenceCollection() && movie.SequelsAndPrequels.Any())
             {
                 await AddMovieToCollection(toReturn, movie, cancellationToken);
             }
@@ -430,7 +430,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 .ToList()
                 .ForEach(j => toReturn.AddTrailerUrl(j));
 
-            if (PluginConfig.NeedToCreateCollection() && series.SequelsAndPrequels.Any())
+            if (PluginConfig.NeedToCreateSequenceCollection() && series.SequelsAndPrequels.Any())
             {
                 await AddMovieToCollection(toReturn, series, cancellationToken);
             }
@@ -880,7 +880,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
             else
             {
-                _log.Info("No collection created/updated");
+                _log.Info("No other films were found in Emby, collection was not created");
             }
 
             _log.Info("Finished adding to collection");
