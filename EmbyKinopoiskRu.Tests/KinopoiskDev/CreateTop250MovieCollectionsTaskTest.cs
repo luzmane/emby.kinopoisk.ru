@@ -294,7 +294,7 @@ public class CreateTop250MovieCollectionsTaskTest : BaseTest
     {
         Logger.Info($"Start '{nameof(CreateTop250MovieCollectionsTask_Execute_CollectionNotExists_OneLib)}'");
 
-        _pluginConfiguration.Top250PerLib = false;
+        _pluginConfiguration.Top250InOneLib = true;
 
         LibraryOptions collectionLibraryOptions = new()
         {

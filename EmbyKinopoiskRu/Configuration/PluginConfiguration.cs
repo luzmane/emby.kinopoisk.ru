@@ -17,7 +17,7 @@ namespace EmbyKinopoiskRu.Configuration
         public string Token { get; set; } = string.Empty;
         public string ApiType { get; set; } = KinopoiskDev;
         public bool CreateSeqCollections { get; set; } = true;
-        public bool Top250PerLib { get; set; } = true;
+        public bool Top250InOneLib { get; set; }
         public string Top250MovieCollectionName { get; set; } = DefaultTop250MovieCollectionName;
         public string Top250SeriesCollectionName { get; set; } = DefaultTop250SeriesCollectionName;
 
@@ -34,9 +34,9 @@ namespace EmbyKinopoiskRu.Configuration
         {
             return KinopoiskDev.Equals(ApiType, StringComparison.Ordinal) && CreateSeqCollections;
         }
-        public bool NeedToCreateTop250PerLib()
+        public bool NeedToCreateTop250InOneLib()
         {
-            return KinopoiskDev.Equals(ApiType, StringComparison.Ordinal) && Top250PerLib;
+            return KinopoiskDev.Equals(ApiType, StringComparison.Ordinal) && Top250InOneLib;
         }
         public string GetCurrentTop250MovieCollectionName()
         {

@@ -294,7 +294,7 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
     {
         Logger.Info($"Start '{nameof(CreateTop250SeriesCollectionsTask_Execute_CollectionNotExists_OneLib)}'");
 
-        _pluginConfiguration.Top250PerLib = false;
+        _pluginConfiguration.Top250InOneLib = true;
 
         LibraryOptions collectionLibraryOptions = new()
         {
