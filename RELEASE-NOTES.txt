@@ -1,3 +1,6 @@
+v.1.18.1
+- Fix top250 collections name was not saved and flag was inverted
+
 v.1.18.0
 - Add option to create a single Top250 movie/series collection for all libraries
 
