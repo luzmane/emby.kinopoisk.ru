@@ -52,7 +52,7 @@ public class EmbyHttpClient : IHttpClient
         }
         return new HttpResponseInfo()
         {
-            Content = res.Content.ReadAsStream(),
+            Content = await res.Content.ReadAsStreamAsync(),
             StatusCode = res.StatusCode
         };
     }
