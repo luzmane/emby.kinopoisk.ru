@@ -1,5 +1,5 @@
 using EmbyKinopoiskRu.Configuration;
-using EmbyKinopoiskRu.Tests.EmbyMock;
+using EmbyKinopoiskRu.Tests.Utils;
 
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Controller;
@@ -95,7 +95,7 @@ public abstract class BaseTest
             _libraryManager.Object,
             _collectionManager.Object
         );
-        Plugin.Instance.SetAttributes("EmbyKinopoiskRu.dll", "", new Version(1, 0, 0));
+        Plugin.Instance.SetAttributes("EmbyKinopoiskRu.dll", string.Empty, new Version(1, 0, 0));
     }
 
     protected void ConfigLibraryManager()

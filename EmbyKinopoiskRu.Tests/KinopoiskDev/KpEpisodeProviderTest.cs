@@ -76,7 +76,7 @@ public class KpEpisodeProviderTest : BaseTest
         episode.Should().NotBeNull("that mean the episode was found");
         episode.IndexNumber.Should().Be(2, "requested second episode");
         episode.MediaType.Should().Be("Video", "this is video");
-        episode.Name.Should().Be("А я сказал — оседлаю!", "this is the name of the episode");
+        episode.Name.Should().Be("Эпизод 2. А я сказал — оседлаю!", "this is the name of the episode");
         episode.OriginalTitle.Should().Be("I Said I'm Gonna Pilot That Thing!!", "this is the original name of the episode");
         episode.ParentIndexNumber.Should().Be(1, "requested first season");
         episode.PremiereDate.Should().NotBeNull("episode premier date should have a date");
@@ -117,7 +117,7 @@ public class KpEpisodeProviderTest : BaseTest
         episode.Should().NotBeNull("that mean the episode was found");
         episode.IndexNumber.Should().Be(2, "requested second episode");
         episode.MediaType.Should().Be("Video", "this is video");
-        episode.Name.Should().Be("А я сказал — оседлаю!", "this is the name of the episode");
+        episode.Name.Should().Be("Эпизод 2. А я сказал — оседлаю!", "this is the name of the episode");
         episode.OriginalTitle.Should().Be("I Said I'm Gonna Pilot That Thing!!", "this is the original name of the episode");
         episode.ParentIndexNumber.Should().Be(1, "requested first season");
         episode.PremiereDate.Should().NotBeNull("episode premier date should have a date");

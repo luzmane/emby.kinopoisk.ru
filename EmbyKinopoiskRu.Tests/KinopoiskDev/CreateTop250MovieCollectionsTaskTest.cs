@@ -1,6 +1,6 @@
 using EmbyKinopoiskRu.Configuration;
 using EmbyKinopoiskRu.ScheduledTasks;
-using EmbyKinopoiskRu.Tests.EmbyMock;
+using EmbyKinopoiskRu.Tests.Utils;
 
 using FluentAssertions;
 

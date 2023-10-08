@@ -6,23 +6,28 @@ using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model;
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Film;
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Person;
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Season;
+using NLog;
 
-namespace EmbyKinopoiskRu.Tests.Utils;
+namespace EmbyKinopoiskRu.Tests.KinopoiskApiUnofficial;
 
-public class KinopoiskUnofficialApiRequests : IDisposable
+public class ApiTests : IDisposable
 {
+    private const string KINOPOISK_UNOFFICIAL_TOKEN = "0f162131-81c1-4979-b46c-3eea4263fb11";
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
+    private readonly ILogger _logger;
 
-    public KinopoiskUnofficialApiRequests()
+    public ApiTests()
     {
+        _logger = LogManager.GetCurrentClassLogger();
+
         _httpClient = new();
-        _httpClient.DefaultRequestHeaders.Add("X-API-KEY", "0f162131-81c1-4979-b46c-3eea4263fb11");
+        _httpClient.DefaultRequestHeaders.Add("X-API-KEY", GetKinopoiskUnofficialToken());
 
         _jsonOptions = new() { PropertyNameCaseInsensitive = true };
     }
 
-    [Fact(Skip = "not in use")]
+    [Fact]
     public async Task GetFilm()
     {
         var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/326";
@@ -30,7 +35,7 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         KpFilm? film = JsonSerializer.Deserialize<KpFilm>(response, _jsonOptions);
-        film.Should().NotBeNull("");
+        film.Should().NotBeNull();
         film!.Countries?.Count.Should().Be(1);
         film.CoverUrl.Should().Be("https://avatars.mds.yandex.net/get-ott/1652588/2a00000186aca5e13ea6cec11d584ac5455b/orig");
         film.Description.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.");
@@ -49,7 +54,7 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         film.RatingKinopoisk.Should().BeGreaterThan(0);
     }
 
-    [Fact(Skip = "not in use")]
+    [Fact]
     public async Task GetSeasons()
     {
         var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/77044/seasons";
@@ -57,7 +62,7 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         KpSearchResult<KpSeason>? seasons = JsonSerializer.Deserialize<KpSearchResult<KpSeason>>(response, _jsonOptions);
-        seasons.Should().NotBeNull("");
+        seasons.Should().NotBeNull();
         seasons!.Items.Count.Should().Be(10);
         KpSeason kpSeason = seasons.Items[0];
         kpSeason.Episodes.Count.Should().Be(24);
@@ -69,7 +74,7 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         kpEpisode.ReleaseDate.Should().Be("1995-05-18");
     }
 
-    [Fact(Skip = "not in use")]
+    [Fact]
     public async Task GetVideos()
     {
         var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/77044/videos";
@@ -77,13 +82,13 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         KpSearchResult<KpVideo>? videos = JsonSerializer.Deserialize<KpSearchResult<KpVideo>>(response, _jsonOptions);
-        videos.Should().NotBeNull("");
+        videos.Should().NotBeNull();
         videos!.Items.Count.Should().Be(8);
         KpVideo kpVideo = videos.Items[0];
         kpVideo.Url.Should().Be("http://trailers.s3.mds.yandex.net/video_original/160983-05ae2e39521817fce4e34a89968f3808.mp4");
     }
 
-    [Fact(Skip = "not in use")]
+    [Fact]
     public async Task GetStaff()
     {
         var request = $"https://kinopoiskapiunofficial.tech/api/v1/staff/7987";
@@ -91,9 +96,9 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         KpPerson? kpPerson = JsonSerializer.Deserialize<KpPerson>(response, _jsonOptions);
-        kpPerson.Should().NotBeNull("");
+        kpPerson.Should().NotBeNull();
         kpPerson!.Birthday.Should().Be("1958-10-16");
-        kpPerson.BirthPlace.Should().Be("Уэст-Ковина, штат Калифорния, США");
+        kpPerson.BirthPlace.Should().Be("Уэст-Ковина, Калифорния, США");
         kpPerson.Death.Should().BeNull("person still alive");
         kpPerson.DeathPlace.Should().BeNull("person still alive");
         kpPerson.Facts?.Count.Should().Be(4);
@@ -103,7 +108,7 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         kpPerson.PosterUrl.Should().Be("https://kinopoiskapiunofficial.tech/images/actor_posters/kp/7987.jpg");
     }
 
-    [Fact(Skip = "not in use")]
+    [Fact]
     public async Task GetFilmsStaff()
     {
         var request = $"https://kinopoiskapiunofficial.tech/api/v1/staff?filmId=326";
@@ -111,7 +116,7 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         List<KpFilmStaff>? filmStaffList = JsonSerializer.Deserialize<List<KpFilmStaff>>(response, _jsonOptions);
-        filmStaffList.Should().NotBeNull("");
+        filmStaffList.Should().NotBeNull();
         filmStaffList!.Count.Should().Be(90);
         KpFilmStaff filmStaff = filmStaffList[1];
         filmStaff.Description.Should().Be("Andy Dufresne");
@@ -122,7 +127,7 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         filmStaff.StaffId.Should().Be(7987);
     }
 
-    [Fact(Skip = "not in use")]
+    [Fact]
     public async Task SearchFilmByName()
     {
         var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films?keyword=100 шагов";
@@ -130,10 +135,10 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         KpSearchResult<KpFilm>? filmSearchResult = JsonSerializer.Deserialize<KpSearchResult<KpFilm>>(response, _jsonOptions);
-        filmSearchResult.Should().NotBeNull("");
+        filmSearchResult.Should().NotBeNull();
         filmSearchResult!.Items.Count.Should().Be(3);
         KpFilm film = filmSearchResult.Items.First(f => f.KinopoiskId == 933277);
-        film.Should().NotBeNull("");
+        film.Should().NotBeNull();
         film!.KinopoiskId.Should().Be(933277);
         film.ImdbId.Should().Be("tt3904078");
         film.NameOriginal.Should().Be("100 Things to Do Before High School");
@@ -146,7 +151,7 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         film.PosterUrlPreview.Should().Be("https://kinopoiskapiunofficial.tech/images/posters/kp_small/933277.jpg");
     }
 
-    [Fact(Skip = "not in use")]
+    [Fact]
     public async Task SearchFilmByNameAndYear()
     {
         var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films?keyword=100 шагов&yearFrom=2014&yearTo=2014";
@@ -154,10 +159,10 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         KpSearchResult<KpFilm>? filmSearchResult = JsonSerializer.Deserialize<KpSearchResult<KpFilm>>(response, _jsonOptions);
-        filmSearchResult.Should().NotBeNull("");
+        filmSearchResult.Should().NotBeNull();
         filmSearchResult!.Items.Count.Should().Be(1);
         KpFilm film = filmSearchResult.Items.First(f => f.KinopoiskId == 933277);
-        film.Should().NotBeNull("");
+        film.Should().NotBeNull();
         film!.KinopoiskId.Should().Be(933277);
         film.ImdbId.Should().Be("tt3904078");
         film.NameOriginal.Should().Be("100 Things to Do Before High School");
@@ -170,7 +175,7 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         film.PosterUrlPreview.Should().Be("https://kinopoiskapiunofficial.tech/images/posters/kp_small/933277.jpg");
     }
 
-    [Fact(Skip = "not in use")]
+    [Fact]
     public async Task SearchStaffByName()
     {
         var request = $"https://kinopoiskapiunofficial.tech/api/v1/persons?name=Тим Роббинс";
@@ -178,10 +183,10 @@ public class KinopoiskUnofficialApiRequests : IDisposable
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
         KpSearchResult<KpStaff>? staffSearchResult = JsonSerializer.Deserialize<KpSearchResult<KpStaff>>(response, _jsonOptions);
-        staffSearchResult.Should().NotBeNull("");
+        staffSearchResult.Should().NotBeNull();
         staffSearchResult!.Items.Count.Should().Be(4);
         KpStaff staff = staffSearchResult.Items.First(f => f.KinopoiskId == 7987);
-        staff.Should().NotBeNull("");
+        staff.Should().NotBeNull();
         staff!.KinopoiskId.Should().Be(7987);
         staff.NameEn.Should().Be("Tim Robbins");
         staff.NameRu.Should().Be("Тим Роббинс");
@@ -197,6 +202,13 @@ public class KinopoiskUnofficialApiRequests : IDisposable
     protected virtual void Dispose(bool disposeAll)
     {
         _httpClient.Dispose();
+    }
+
+    protected string GetKinopoiskUnofficialToken()
+    {
+        var token = Environment.GetEnvironmentVariable("KINOPOISK_UNOFFICIAL_TOKEN");
+        _logger.Info($"Env token length is: {(token != null ? token.Length : 0)}");
+        return string.IsNullOrWhiteSpace(token) ? KINOPOISK_UNOFFICIAL_TOKEN : token;
     }
 
 }

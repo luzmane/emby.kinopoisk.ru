@@ -490,12 +490,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 _log.Info($"Episode with index '{info.IndexNumber}' not found");
                 return result;
             }
-            _ = DateTimeOffset.TryParseExact(
-                kpEpisode.Date,
-                "yyyy-MM-dd'T'HH:mm:ss.fffZ",
-                CultureInfo.InvariantCulture,
-                DateTimeStyles.None,
-                out DateTimeOffset premiereDate);
+            DateTimeOffset? premiereDate = null;
+            if (DateTimeOffset.TryParseExact(kpEpisode.AirDate, "yyyy-MM-dd'T'HH:mm:ss.fffZ", CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTimeOffset tmp))
+            {
+                premiereDate = tmp;
+            }
             result.Item = new Episode()
             {
                 Name = kpEpisode.Name,

@@ -95,7 +95,7 @@ public class KpImageProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         Movie item = new()
         {
-            Name = "",
+            Name = string.Empty,
             OriginalTitle = "The Shawshank Redemption",
         };
         LibraryOptions options = new();
@@ -147,7 +147,7 @@ public class KpImageProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         Movie item = new()
         {
-            Name = "",
+            Name = string.Empty,
             OriginalTitle = "The Shawshank Redemption",
             ProductionYear = 1994,
         };
@@ -200,7 +200,7 @@ public class KpImageProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         Movie item = new()
         {
-            Name = "",
+            Name = string.Empty,
             OriginalTitle = "Shawshank Redemption",
         };
         LibraryOptions options = new();

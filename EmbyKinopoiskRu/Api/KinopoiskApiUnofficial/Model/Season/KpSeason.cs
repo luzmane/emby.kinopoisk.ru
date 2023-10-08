@@ -5,6 +5,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Season
     internal sealed class KpSeason
     {
         public int Number { get; set; }
-        public List<KpEpisode> Episodes { get; } = new List<KpEpisode>();
+        public List<KpEpisode> Episodes { get; set; } = new List<KpEpisode>();
     }
 }

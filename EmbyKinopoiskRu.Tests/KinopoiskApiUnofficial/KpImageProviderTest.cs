@@ -199,7 +199,7 @@ public class KpImageProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         Movie item = new()
         {
-            Name = "",
+            Name = string.Empty,
         };
         LibraryOptions options = new();
 

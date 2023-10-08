@@ -4,7 +4,7 @@ using MediaBrowser.Model.Serialization;
 
 using Newtonsoft.Json;
 
-namespace EmbyKinopoiskRu.Tests.EmbyMock;
+namespace EmbyKinopoiskRu.Tests.Utils;
 public class EmbyJsonSerializer : IJsonSerializer
 {
 
