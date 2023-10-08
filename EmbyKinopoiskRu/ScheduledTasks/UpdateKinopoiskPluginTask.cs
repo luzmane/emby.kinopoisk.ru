@@ -20,16 +20,30 @@ using MediaBrowser.Model.Updates;
 
 namespace EmbyKinopoiskRu.ScheduledTasks
 {
+    /// <inheritdoc />
     public class UpdateKinopoiskPluginTask : IScheduledTask, IConfigurableScheduledTask
     {
         private const string DLL_NAME = "EmbyKinopoiskRu.dll";
 
+        /// <inheritdoc />
         public bool IsHidden => false;
+
+        /// <inheritdoc />
         public bool IsEnabled => true;
+
+        /// <inheritdoc />
         public bool IsLogged => true;
+
+        /// <inheritdoc />
         public string Name => GetTranslation().Name;
+
+        /// <inheritdoc />
         public string Key => "KinopoiskNewVersion";
+
+        /// <inheritdoc />
         public string Description => GetTranslation().Description;
+
+        /// <inheritdoc />
         public string Category => GetTranslation().Category;
 
         private readonly IHttpClient _httpClient;
@@ -40,12 +54,20 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         private readonly Dictionary<string, TaskTranslation> _translations = new Dictionary<string, TaskTranslation>();
         private readonly Dictionary<string, string> _availableTranslations = new Dictionary<string, string>();
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UpdateKinopoiskPluginTask"/> class.
+        /// </summary>
+        /// <param name="httpClient">Instance of the <see cref="IHttpClient"/> interface.</param>
+        /// <param name="jsonSerializer">Instance of the <see cref="IJsonSerializer"/> interface.</param>
+        /// <param name="logManager">Instance of the <see cref="ILogManager"/> interface.</param>
+        /// <param name="installationManager">Instance of the <see cref="IInstallationManager"/> interface.</param>
+        /// <param name="serverConfigurationManager">Instance of the <see cref="IServerConfigurationManager"/> interface.</param>
         public UpdateKinopoiskPluginTask(
-            IHttpClient httpClient,
-            IJsonSerializer jsonSerializer,
-            ILogManager logManager,
-            IInstallationManager installationManager,
-            IServerConfigurationManager serverConfigurationManager)
+                 IHttpClient httpClient,
+                 IJsonSerializer jsonSerializer,
+                 ILogManager logManager,
+                 IInstallationManager installationManager,
+                 IServerConfigurationManager serverConfigurationManager)
         {
             _httpClient = httpClient;
             _jsonSerializer = jsonSerializer;
@@ -55,6 +77,8 @@ namespace EmbyKinopoiskRu.ScheduledTasks
 
             _availableTranslations = EmbyHelper.GetAvailableTransactions($"ScheduledTasks.{Key}");
         }
+
+        /// <inheritdoc />
         public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
         {
             return new List<TaskTriggerInfo>()
@@ -68,6 +92,8 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 }
             };
         }
+
+        /// <inheritdoc />
         public async Task Execute(CancellationToken cancellationToken, IProgress<double> progress)
         {
             Version version = Assembly.GetExecutingAssembly().GetName().Version ?? throw new Exception("Unable to get dll version");

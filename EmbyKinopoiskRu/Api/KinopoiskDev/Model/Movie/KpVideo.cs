@@ -1,6 +1,6 @@
 namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
 {
-    public class KpVideo
+    internal sealed class KpVideo
     {
         public string Url { get; set; }
         public string Name { get; set; }

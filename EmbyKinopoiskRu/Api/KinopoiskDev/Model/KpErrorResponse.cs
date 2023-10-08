@@ -1,6 +1,6 @@
 namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model
 {
-    public class KpErrorResponse
+    internal sealed class KpErrorResponse
     {
         public int StatusCode { get; set; }
         public string Message { get; set; }

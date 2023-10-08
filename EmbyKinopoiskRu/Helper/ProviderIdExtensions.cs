@@ -4,7 +4,7 @@ using MediaBrowser.Controller.Providers;
 
 namespace EmbyKinopoiskRu.Helper
 {
-    public static class ProviderIdExtensions
+    internal static class ProviderIdExtensions
     {
         public static string GetSeriesProviderId(this EpisodeInfo instance, string name)
         {

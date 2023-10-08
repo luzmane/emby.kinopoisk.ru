@@ -1,6 +1,6 @@
 namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Season
 {
-    public class KpEpisode
+    internal sealed class KpEpisode
     {
         public string EnName { get; set; }
         public string Date { get; set; }

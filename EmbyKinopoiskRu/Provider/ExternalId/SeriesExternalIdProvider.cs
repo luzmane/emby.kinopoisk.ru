@@ -9,15 +9,16 @@ namespace EmbyKinopoiskRu.Provider.ExternalId
     /// </summary>
     public class SeriesExternalIdProvider : IExternalId
     {
+        /// <inheritdoc />
         public string Name => Plugin.PluginName;
 
+        /// <inheritdoc />
         public string Key => Plugin.PluginKey;
 
-        /// <summary>
-        /// Used on paget for link
-        /// </summary>
+        /// <inheritdoc />
         public string UrlFormatString => "https://www.kinopoisk.ru/series/{0}/";
 
+        /// <inheritdoc />
         public bool Supports(IHasProviderIds item)
         {
             return item is Series;

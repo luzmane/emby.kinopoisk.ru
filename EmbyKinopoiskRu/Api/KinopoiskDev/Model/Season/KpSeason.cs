@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Season
 {
-    public class KpSeason
+    internal sealed class KpSeason
     {
         public long MovieId { get; set; }
         public int Number { get; set; }

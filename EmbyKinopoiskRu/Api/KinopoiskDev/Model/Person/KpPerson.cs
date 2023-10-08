@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Person
 {
-    public class KpPerson
+    internal sealed class KpPerson
     {
         public string Birthday { get; set; }
         public List<KpValued> BirthPlace { get; set; }

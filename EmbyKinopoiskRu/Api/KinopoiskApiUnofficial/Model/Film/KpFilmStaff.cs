@@ -1,6 +1,6 @@
 namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Film
 {
-    public class KpFilmStaff
+    internal sealed class KpFilmStaff
     {
         /// <summary>
         /// KinopoiskId

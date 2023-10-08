@@ -1,6 +1,6 @@
 namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
 {
-    public class KpPersonMovie
+    internal sealed class KpPersonMovie
     {
         public long Id { get; set; }
         public string Name { get; set; }

@@ -10,19 +10,26 @@ using MediaBrowser.Model.Logging;
 
 namespace EmbyKinopoiskRu.Provider.LocalMetadata
 {
+    /// <inheritdoc />
     public abstract class KpBaseLocalMetadata<T> : ILocalMetadataProvider<T>
-        where T : BaseItem, IHasProviderIds, new()
+            where T : BaseItem, IHasProviderIds, new()
     {
         private static readonly Regex KinopoiskIdRegex = new Regex(@"kp-?(?<kinopoiskId>\d+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private readonly ILogger _log;
 
+        /// <inheritdoc />
         public string Name => Plugin.PluginName;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KpBaseLocalMetadata&lt;T&gt;"/> class.
+        /// </summary>
+        /// <param name="logManager">Instance of the <see cref="ILogManager"/> interface.</param>
         protected KpBaseLocalMetadata(ILogManager logManager)
         {
             _log = logManager.GetLogger(GetType().Name);
         }
 
+        /// <inheritdoc />
         public virtual Task<MetadataResult<T>> GetMetadata(ItemInfo info, LibraryOptions libraryOptions, IDirectoryService directoryService, CancellationToken cancellationToken)
         {
             _log.Info($"GetMetadata by ItemInfo: '{info.Path}'");

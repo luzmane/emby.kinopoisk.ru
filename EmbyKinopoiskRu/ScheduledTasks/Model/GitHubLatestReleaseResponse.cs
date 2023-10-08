@@ -4,7 +4,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks.Model
 {
 #pragma warning disable IDE1006
 #pragma warning disable CA1707
-    public class GitHubLatestReleaseResponse
+    internal sealed class GitHubLatestReleaseResponse
     {
         public string tag_name { get; set; }
         public string body { get; set; }

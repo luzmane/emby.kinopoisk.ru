@@ -14,6 +14,7 @@ using MediaBrowser.Model.Logging;
 
 namespace EmbyKinopoiskRu.Provider.LocalMetadata
 {
+    /// <inheritdoc />
     public class KpMovieLocalMetadata : KpBaseLocalMetadata<Movie>
     {
         private static readonly Regex NotAlphaNumeric = new Regex(@"[^0-9ЁA-ZА-Я-]", RegexOptions.IgnoreCase | RegexOptions.Compiled);
@@ -21,11 +22,16 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
 
         private readonly ILogger _log;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KpMovieLocalMetadata"/> class.
+        /// </summary>
+        /// <param name="logManager">Instance of the <see cref="ILogManager"/> interface.</param>
         public KpMovieLocalMetadata(ILogManager logManager) : base(logManager)
         {
             _log = logManager.GetLogger(GetType().Name);
         }
 
+        /// <inheritdoc />
         public override async Task<MetadataResult<Movie>> GetMetadata(ItemInfo info, LibraryOptions libraryOptions, IDirectoryService directoryService, CancellationToken cancellationToken)
         {
             MetadataResult<Movie> result = await base.GetMetadata(info, libraryOptions, directoryService, cancellationToken);

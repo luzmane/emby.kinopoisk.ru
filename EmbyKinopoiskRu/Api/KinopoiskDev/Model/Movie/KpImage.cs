@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class KpImage
+    internal sealed class KpImage
     {
         public string Url { get; set; }
         public string PreviewUrl { get; set; }

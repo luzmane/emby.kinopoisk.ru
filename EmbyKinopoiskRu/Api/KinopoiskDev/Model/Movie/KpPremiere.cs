@@ -1,6 +1,6 @@
 namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
 {
-    public class KpPremiere
+    internal sealed class KpPremiere
     {
         public string World { get; set; }
         public string Russia { get; set; }

@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class KpMovie
+    internal sealed class KpMovie
     {
         public string AlternativeName { get; set; }
         public KpImage Backdrop { get; set; }

@@ -1,6 +1,6 @@
 namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model
 {
-    public class KpValued
+    internal sealed class KpValued
     {
         public string Value { get; set; }
     }

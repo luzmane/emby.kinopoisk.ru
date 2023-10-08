@@ -4,7 +4,7 @@ using System.Diagnostics;
 namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Film
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class KpFilm
+    internal sealed class KpFilm
     {
         public long KinopoiskId { get; set; }
         public string ImdbId { get; set; }

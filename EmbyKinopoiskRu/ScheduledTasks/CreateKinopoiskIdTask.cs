@@ -23,10 +23,11 @@ using MediaBrowser.Model.Tasks;
 
 namespace EmbyKinopoiskRu.ScheduledTasks
 {
+    /// <inheritdoc />
     public class CreateKinopoiskIdTask : IScheduledTask, IConfigurableScheduledTask
     {
         private readonly ILogger _log;
-        private static bool _isScanRunning;
+        private static bool s_isScanRunning;
         private static readonly object ScanLock = new object();
         private const int CHUNK_SIZE = 150;
 
@@ -36,19 +37,40 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         private readonly Dictionary<string, TaskTranslation> _translations = new Dictionary<string, TaskTranslation>();
         private readonly Dictionary<string, string> _availableTranslations = new Dictionary<string, string>();
         private Plugin Plugin { get; set; }
+
+        /// <inheritdoc />
         public string Name => GetTranslation().Name;
+
+        /// <inheritdoc />
         public string Key => "KinopoiskFromOther";
+
+        /// <inheritdoc />
         public string Description => GetTranslation().Description;
+
+        /// <inheritdoc />
         public string Category => GetTranslation().Category;
+
+        /// <inheritdoc />
         public bool IsHidden => false;
+
+        /// <inheritdoc />
         public bool IsEnabled => false;
+
+        /// <inheritdoc />
         public bool IsLogged => true;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CreateKinopoiskIdTask"/> class.
+        /// </summary>
+        /// <param name="logManager">Instance of the <see cref="ILogManager"/> interface.</param>
+        /// <param name="libraryManager">Instance of the <see cref="ILibraryManager"/> interface.</param>
+        /// <param name="serverConfigurationManager">Instance of the <see cref="IServerConfigurationManager"/> interface.</param>
+        /// <param name="jsonSerializer">Instance of the <see cref="IJsonSerializer"/> interface.</param>
         public CreateKinopoiskIdTask(
-            ILogManager logManager,
-            ILibraryManager libraryManager,
-            IServerConfigurationManager serverConfigurationManager,
-            IJsonSerializer jsonSerializer)
+                 ILogManager logManager,
+                 ILibraryManager libraryManager,
+                 IServerConfigurationManager serverConfigurationManager,
+                 IJsonSerializer jsonSerializer)
         {
             _log = logManager.GetLogger(GetType().Name);
             _libraryManager = libraryManager;
@@ -63,14 +85,18 @@ namespace EmbyKinopoiskRu.ScheduledTasks
 
             _availableTranslations = EmbyHelper.GetAvailableTransactions($"ScheduledTasks.{Key}");
         }
+
+        /// <inheritdoc />
         public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
         {
             return Array.Empty<TaskTriggerInfo>();
         }
+
+        /// <inheritdoc />
         public async Task Execute(CancellationToken cancellationToken, IProgress<double> progress)
         {
             _log.Info("Task started");
-            if (_isScanRunning)
+            if (s_isScanRunning)
             {
                 _log.Info("Another task is running, exiting");
                 _log.Info("Task finished");
@@ -78,13 +104,13 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             }
             lock (ScanLock)
             {
-                if (_isScanRunning)
+                if (s_isScanRunning)
                 {
                     _log.Info("Another task is running, exiting");
                     _log.Info("Task finished");
                     return;
                 }
-                _isScanRunning = true;
+                s_isScanRunning = true;
             }
             try
             {
@@ -131,7 +157,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             }
             finally
             {
-                _isScanRunning = false;
+                s_isScanRunning = false;
                 _log.Info("Task finished");
             }
         }

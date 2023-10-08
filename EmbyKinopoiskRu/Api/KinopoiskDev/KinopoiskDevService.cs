@@ -30,7 +30,7 @@ using MediaBrowser.Model.Serialization;
 
 namespace EmbyKinopoiskRu.Api.KinopoiskDev
 {
-    public class KinopoiskDevService : IKinopoiskRuService
+    internal sealed class KinopoiskDevService : IKinopoiskRuService
     {
         private readonly ILogger _log;
         private readonly KinopoiskDevApi _api;

@@ -21,12 +21,18 @@ using MediaBrowser.Model.Serialization;
 
 namespace EmbyKinopoiskRu
 {
+    /// <summary>
+    /// The main plugin.
+    /// </summary>
     public class Plugin : BasePlugin<PluginConfiguration>, IHasThumbImage, IHasWebPages, IHasTranslations
     {
-        public const string PluginKey = "KinopoiskRu";
-        public const string PluginName = "Кинопоиск";
-        public const string PluginGuid = "0417364b-5a93-4ad0-a5f0-b8756957cf80";
+        internal const string PluginKey = "KinopoiskRu";
+        internal const string PluginName = "Кинопоиск";
+        internal const string PluginGuid = "0417364b-5a93-4ad0-a5f0-b8756957cf80";
 
+        /// <summary>
+        /// Gets the current plugin instance.
+        /// </summary>
         public static Plugin Instance { get; private set; }
 
         private readonly Dictionary<string, IKinopoiskRuService> _kinopoiskServiciesDictionary = new Dictionary<string, IKinopoiskRuService>();
@@ -38,10 +44,26 @@ namespace EmbyKinopoiskRu
         private readonly ILibraryManager _libraryManager;
         private readonly ICollectionManager _collectionManager;
 
+        /// <inheritdoc />
         public override string Name => PluginName;
+
+        /// <inheritdoc />
         public override string Description => "Fetch metadata from Kinopoisk.ru";
+
+        /// <inheritdoc />
         public ImageFormat ThumbImageFormat => ImageFormat.Png;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Plugin"/> class.
+        /// </summary>
+        /// <param name="applicationPaths">Instance of the <see cref="IApplicationPaths"/> interface.</param>
+        /// <param name="xmlSerializer">Instance of the <see cref="IXmlSerializer"/> interface.</param>
+        /// <param name="logManager">Instance of the <see cref="ILogManager"/> interface.</param>
+        /// <param name="httpClient">Instance of the <see cref="IHttpClient"/> interface.</param>
+        /// <param name="jsonSerializer">Instance of the <see cref="IJsonSerializer"/> interface.</param>
+        /// <param name="activityManager">Instance of the <see cref="IActivityManager"/> interface.</param>
+        /// <param name="libraryManager">Instance of the <see cref="ILibraryManager"/> interface.</param>
+        /// <param name="collectionManager">Instance of the <see cref="ICollectionManager"/> interface.</param>
         public Plugin(
             IApplicationPaths applicationPaths,
             IXmlSerializer xmlSerializer,
@@ -64,11 +86,15 @@ namespace EmbyKinopoiskRu
             _libraryManager = libraryManager;
             _collectionManager = collectionManager;
         }
+
+        /// <inheritdoc />
         public Stream GetThumbImage()
         {
             Type type = GetType();
             return type.Assembly.GetManifestResourceStream(type.Namespace + ".thumb.png");
         }
+
+        /// <inheritdoc />
         public IEnumerable<PluginPageInfo> GetPages()
         {
             return new[]
@@ -85,6 +111,8 @@ namespace EmbyKinopoiskRu
                 }
             };
         }
+
+        /// <inheritdoc />
         public TranslationInfo[] GetTranslations()
         {
             var basePath = GetType().Namespace + ".i18n.Configuration.";
@@ -98,7 +126,7 @@ namespace EmbyKinopoiskRu
                     })
                 .ToArray();
         }
-        public IKinopoiskRuService GetKinopoiskService()
+        internal IKinopoiskRuService GetKinopoiskService()
         {
             if (PluginConfiguration.KinopoiskDev.Equals(Configuration.ApiType, StringComparison.Ordinal))
             {

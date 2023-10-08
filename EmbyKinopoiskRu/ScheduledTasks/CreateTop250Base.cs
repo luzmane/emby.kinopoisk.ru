@@ -20,21 +20,60 @@ using MediaBrowser.Model.Tasks;
 
 namespace EmbyKinopoiskRu.ScheduledTasks
 {
+    /// <summary>
+    /// Base class for Top250 tasks
+    /// </summary>
     public abstract class CreateTop250Base
     {
+        /// <summary>
+        /// Gets logger
+        /// </summary>
         protected ILogger Log { get; private set; }
+
+        /// <summary>
+        /// Gets library manager
+        /// </summary>
         protected ILibraryManager LibraryManager { get; private set; }
+
+        /// <summary>
+        /// Gets collection manager
+        /// </summary>
         protected ICollectionManager CollectionManager { get; private set; }
+
+        /// <summary>
+        /// Gets the key of the task
+        /// </summary>
         public string Key { get; private set; }
+
+        /// <summary>
+        /// Gets the plugin
+        /// </summary>
         protected Plugin Plugin { get; private set; }
+
         private readonly IServerConfigurationManager _serverConfigurationManager;
+
         private readonly IJsonSerializer _jsonSerializer;
+
         private readonly Dictionary<string, TaskTranslation> _translations = new Dictionary<string, TaskTranslation>();
+
         private readonly Dictionary<string, string> _availableTranslations = new Dictionary<string, string>();
+
         private readonly string _libraryType;
+
         private readonly string _itemType;
 
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CreateTop250Base"/> class.
+        /// </summary>
+        /// <param name="libraryManager">Instance of the <see cref="ILibraryManager"/> interface.</param>
+        /// <param name="collectionManager">Instance of the <see cref="ICollectionManager"/> interface.</param>
+        /// <param name="log">Instance of the <see cref="ILogger"/> interface.</param>
+        /// <param name="jsonSerializer">Instance of the <see cref="IJsonSerializer"/> interface.</param>
+        /// <param name="serverConfigurationManager">Instance of the <see cref="IServerConfigurationManager"/> interface.</param>
+        /// <param name="libraryType">Instance of the <see cref="string"/> interface.</param>
+        /// <param name="itemType">Instance of the <see cref="string"/> interface.</param>
+        /// <param name="key">Instance of the <see cref="string"/> interface.</param>
         protected CreateTop250Base(
             ILibraryManager libraryManager,
             ICollectionManager collectionManager,
@@ -62,6 +101,10 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             _availableTranslations = EmbyHelper.GetAvailableTransactions($"ScheduledTasks.{Key}");
         }
 
+
+        /// <summary>
+        /// Gets default triggers 
+        /// </summary>
         public virtual IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
         {
             return Array.Empty<TaskTriggerInfo>();
@@ -125,11 +168,17 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             }
         }
 
+        /// <summary>
+        /// Gets task transation
+        /// </summary>
         protected TaskTranslation GetTranslation()
         {
             return EmbyHelper.GetTaskTranslation(_translations, _serverConfigurationManager, _jsonSerializer, _availableTranslations);
         }
 
+        /// <summary>
+        /// Execute base task
+        /// </summary>
         protected async Task Execute(
             IProgress<double> progress,
             string baseCollectionName,

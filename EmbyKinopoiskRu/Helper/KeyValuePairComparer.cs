@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace EmbyKinopoiskRu.Helper
 {
-    public class KeyValuePairComparer : IEqualityComparer<KeyValuePair<string, long>>
+    internal sealed class KeyValuePairComparer : IEqualityComparer<KeyValuePair<string, long>>
     {
         public bool Equals(KeyValuePair<string, long> x, KeyValuePair<string, long> y)
         {

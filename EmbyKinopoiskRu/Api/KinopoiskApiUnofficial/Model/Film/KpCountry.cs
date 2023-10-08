@@ -1,6 +1,6 @@
 namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Film
 {
-    public class KpCountry
+    internal class KpCountry
     {
         public string Country { get; set; }
     }

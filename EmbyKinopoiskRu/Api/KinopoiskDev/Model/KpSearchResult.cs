@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model
 {
-    public class KpSearchResult<TItem>
+    internal sealed class KpSearchResult<TItem>
     {
         public List<TItem> Docs { get; set; } = new List<TItem>();
         public int Limit { get; set; }

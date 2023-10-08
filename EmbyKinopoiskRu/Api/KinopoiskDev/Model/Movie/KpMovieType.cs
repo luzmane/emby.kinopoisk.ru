@@ -1,6 +1,6 @@
 namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
 {
-    public enum KpMovieType
+    internal enum KpMovieType
     {
         None,
         Movie,

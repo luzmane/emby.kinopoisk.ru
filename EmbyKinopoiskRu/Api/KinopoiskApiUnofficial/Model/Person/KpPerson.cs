@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Person
 {
-    public class KpPerson
+    internal sealed class KpPerson
     {
         /// <summary>
         /// KinopoiskId

@@ -3,7 +3,7 @@ using System.Diagnostics;
 namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
 {
     [DebuggerDisplay("{DebuggerDisplay,nq}")]
-    public class KpRating
+    internal sealed class KpRating
     {
         /// <summary>
         /// Kinopoisk rating

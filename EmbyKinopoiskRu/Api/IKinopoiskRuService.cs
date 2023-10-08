@@ -11,7 +11,7 @@ using MediaBrowser.Model.Providers;
 
 namespace EmbyKinopoiskRu.Api
 {
-    public interface IKinopoiskRuService
+    internal interface IKinopoiskRuService
     {
         Task<MetadataResult<Movie>> GetMetadata(MovieInfo info, CancellationToken cancellationToken);
         Task<IEnumerable<RemoteSearchResult>> GetSearchResults(MovieInfo searchInfo, CancellationToken cancellationToken);

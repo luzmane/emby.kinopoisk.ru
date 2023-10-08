@@ -10,18 +10,27 @@ using MediaBrowser.Model.Providers;
 
 namespace EmbyKinopoiskRu.Provider.RemoteMetadata
 {
+    /// <inheritdoc />
     public class KpPersonProvider : IRemoteMetadataProvider<Person, PersonLookupInfo>
     {
         private readonly IHttpClient _httpClient;
         private readonly ILogger _log;
+
+        /// <inheritdoc />
         public string Name => Plugin.PluginName;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="KpPersonProvider"/> class.
+        /// </summary>
+        /// <param name="httpClient">Instance of the <see cref="IHttpClient"/> interface.</param>
+        /// <param name="logManager">Instance of the <see cref="ILogManager"/> interface.</param>
         public KpPersonProvider(IHttpClient httpClient, ILogManager logManager)
         {
             _httpClient = httpClient;
             _log = logManager.GetLogger(GetType().Name);
         }
 
+        /// <inheritdoc />
         public Task<HttpResponseInfo> GetImageResponse(string url, CancellationToken cancellationToken)
         {
             return _httpClient.GetResponse(new HttpRequestOptions
@@ -31,11 +40,15 @@ namespace EmbyKinopoiskRu.Provider.RemoteMetadata
                 BufferContent = false
             });
         }
+
+        /// <inheritdoc />
         public async Task<MetadataResult<Person>> GetMetadata(PersonLookupInfo info, CancellationToken cancellationToken)
         {
             _log.Info($"GetMetadata by PersonLookupInfo:'{info.Name}'");
             return await Plugin.Instance.GetKinopoiskService().GetMetadata(info, cancellationToken);
         }
+
+        /// <inheritdoc />
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(PersonLookupInfo searchInfo, CancellationToken cancellationToken)
         {
             _log.Info($"GetSearchResults by PersonLookupInfo:'{searchInfo.Name}'");
