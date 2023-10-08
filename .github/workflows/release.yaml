@@ -1,0 +1,53 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  release:
+    name: release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.x
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build
+        run: dotnet build --configuration Release
+
+      - name: Prepare release notes
+        id: release_notes
+        shell: bash
+        run: |
+          tags=$(awk '/^v.*/ {print}' ./RELEASE-NOTES.txt)
+          tags_array=($tags)
+          len=${#tags_array[@]}
+          echo "release_tag=${tags_array[0]}" >> $GITHUB_OUTPUT
+          if [ ${len} -ge 2 ]
+          then
+            prev_tag=${tags_array[1]};
+            notes=$(awk "BEGIN{ found=1 } /$prev_tag/{found=0}  {if (found) print }" ./RELEASE-NOTES.txt)
+            echo "${notes}" > ./RELEASE-NOTES.txt
+            echo "" >> ./RELEASE-NOTES.txt
+            echo "**Full Changelog**: https://github.com/luzmane/emby.kinopoisk.ru/compare/${tags_array[1]}...${tags_array[0]}" >> ./RELEASE-NOTES.txt
+          fi
+
+      - name: Create release
+        uses: "softprops/action-gh-release@v1"
+        with:
+          files: ./EmbyKinopoiskRu/bin/Release/*/EmbyKinopoiskRu.dll
+          body_path: ./RELEASE-NOTES.txt
+          fail_on_unmatched_files: true
+          name: "EmbyKinopoiskRu ${{ steps.release_notes.outputs.release_tag }}"
+          tag_name: "${{ steps.release_notes.outputs.release_tag }}"
+          token: "${{ secrets.GITHUB_TOKEN }}"
