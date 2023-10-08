@@ -1,4 +1,4 @@
-namespace EmbyKinopoiskRu.Tests.EmbyMock;
+namespace EmbyKinopoiskRu.Tests.Utils;
 
 public class EmbyProgress : IProgress<double>
 {

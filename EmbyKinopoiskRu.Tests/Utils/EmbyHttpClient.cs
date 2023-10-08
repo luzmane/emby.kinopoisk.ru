@@ -3,11 +3,9 @@ using System.Text;
 
 using EasyCaching.Core;
 
-using EmbyKinopoiskRu.Tests.Utils;
-
 using MediaBrowser.Common.Net;
 
-namespace EmbyKinopoiskRu.Tests.EmbyMock;
+namespace EmbyKinopoiskRu.Tests.Utils;
 
 public class EmbyHttpClient : IHttpClient
 {

@@ -334,7 +334,7 @@ public class KpLocalMetadataTest : BaseTest
         _fileSystem.Verify(fs => fs.GetDirectoryName("/emby/movie_library/Робин Гуд.mkv"), Times.Once());
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
         _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "UN_KpLocalMetadata_WithNameOnly_MultiResult/EmbyKinopoiskRu.xml"), Times.Once());
-        _localizationManager.Verify(lm => lm.RemoveDiacritics("Робин Гуд"), Times.Exactly(5));
+        _localizationManager.Verify(lm => lm.RemoveDiacritics("Робин Гуд"), Times.Exactly(6));
         VerifyNoOtherCalls();
 
         Logger.Info($"Finished '{nameof(KpLocalMetadata_WithNameOnly_MultiResult)}'");

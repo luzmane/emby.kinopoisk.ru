@@ -3,7 +3,7 @@ using System.Text;
 
 using MediaBrowser.Model.Logging;
 
-namespace EmbyKinopoiskRu.Tests.EmbyMock;
+namespace EmbyKinopoiskRu.Tests.Utils;
 
 public class EmbyLogger : ILogger
 {

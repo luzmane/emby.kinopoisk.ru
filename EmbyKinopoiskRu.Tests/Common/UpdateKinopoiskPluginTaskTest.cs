@@ -2,7 +2,7 @@ using System.Net;
 using System.Text;
 
 using EmbyKinopoiskRu.ScheduledTasks;
-using EmbyKinopoiskRu.Tests.EmbyMock;
+using EmbyKinopoiskRu.Tests.Utils;
 
 using FluentAssertions;
 

@@ -1,7 +1,6 @@
 namespace EmbyKinopoiskRu.ScheduledTasks.Model
 {
 #pragma warning disable IDE1006
-#pragma warning disable CA1707
     internal sealed class GitHubLatestReleaseAsset
     {
         public const string CorrectContentType = "application/x-msdos-program";
@@ -11,5 +10,4 @@ namespace EmbyKinopoiskRu.ScheduledTasks.Model
 
     }
 #pragma warning restore IDE1006
-#pragma warning restore CA1707
 }
