@@ -7,6 +7,8 @@ dotnet_diagnostic.CA2007.severity = none
 dotnet_diagnostic.CS8618.severity = none
 # CA1051: Do not declare visible instance fields
 dotnet_diagnostic.CA1051.severity = none
+# CS1591 Missing XML comment for publicly visible type or member
+dotnet_diagnostic.CS1591.severity = none
 # xUnit1004: Test methods should not be skipped
 dotnet_diagnostic.xUnit1004.severity = none
 # IDE0160: Convert to block-scoped namespace: file_scoped\block_scoped
