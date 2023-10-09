@@ -109,7 +109,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             try
             {
                 _logger.Info("Fetch top 250 list from API");
-                List<BaseItem> videos = await _plugin.GetKinopoiskService().GetTop250MovieCollection(cancellationToken);
+                List<BaseItem> videos = await _plugin.GetKinopoiskService().GetTop250Collection(cancellationToken);
                 if (videos.Count == 0)
                 {
                     _logger.Info("Top 250 list was not fetched from API");

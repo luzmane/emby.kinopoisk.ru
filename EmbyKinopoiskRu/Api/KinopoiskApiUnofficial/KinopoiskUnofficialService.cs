@@ -775,12 +775,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         #endregion
 
         #region Scheduled Tasks
-        public Task<List<BaseItem>> GetTop250MovieCollection(CancellationToken cancellationToken)
-        {
-            _log.Info("KinopoiskUnofficial doesn't have information about Top250");
-            return Task.FromResult(new List<BaseItem>());
-        }
-        public Task<List<BaseItem>> GetTop250SeriesCollection(CancellationToken cancellationToken)
+        public Task<List<BaseItem>> GetTop250Collection(CancellationToken cancellationToken)
         {
             _log.Info("KinopoiskUnofficial doesn't have information about Top250");
             return Task.FromResult(new List<BaseItem>());

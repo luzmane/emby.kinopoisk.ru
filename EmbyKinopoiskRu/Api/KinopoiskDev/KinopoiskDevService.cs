@@ -977,62 +977,52 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         #endregion
 
         #region Scheduled Tasks
-        public async Task<List<BaseItem>> GetTop250MovieCollection(CancellationToken cancellationToken)
+        public async Task<List<BaseItem>> GetTop250Collection(CancellationToken cancellationToken)
         {
-            _log.Info("Get Top250 Movies Collection");
+            _log.Info("Get Top250 Collection");
             var toReturn = new List<BaseItem>();
             KpSearchResult<KpMovie> movies = await _api.GetTop250Collection(cancellationToken);
-            movies.Docs
-                .Where(m => _movieTypes.Contains(m.TypeNumber))
-                .ToList()
-                .ForEach(m =>
+            _log.Info($"Fetched {movies.Docs.Count} items");
+            movies.Docs.ForEach(m =>
                 {
-                    var movie = new Movie()
+                    BaseItem item;
+                    if (_movieTypes.Contains(m.TypeNumber))
                     {
-                        Name = m.Name,
-                        OriginalTitle = m.AlternativeName
-                    };
-                    movie.SetProviderId(Plugin.PluginKey, m.Id.ToString(CultureInfo.InvariantCulture));
-                    if (!string.IsNullOrWhiteSpace(m.ExternalId?.Imdb))
-                    {
-                        movie.SetProviderId(MetadataProviders.Imdb.ToString(), m.ExternalId.Imdb);
+                        item = new Movie()
+                        {
+                            Name = m.Name,
+                            OriginalTitle = m.AlternativeName
+                        };
+                        item.SetProviderId(Plugin.PluginKey, m.Id.ToString(CultureInfo.InvariantCulture));
+                        if (!string.IsNullOrWhiteSpace(m.ExternalId?.Imdb))
+                        {
+                            item.SetProviderId(MetadataProviders.Imdb.ToString(), m.ExternalId.Imdb);
+                        }
+                        if (m.ExternalId?.Tmdb != null && m.ExternalId.Tmdb > 0)
+                        {
+                            item.SetProviderId(MetadataProviders.Tmdb.ToString(), m.ExternalId.Tmdb.ToString());
+                        }
                     }
-                    if (m.ExternalId?.Tmdb != null && m.ExternalId.Tmdb > 0)
+                    else
                     {
-                        movie.SetProviderId(MetadataProviders.Tmdb.ToString(), m.ExternalId.Tmdb.ToString());
+                        item = new Series()
+                        {
+                            Name = m.Name,
+                            OriginalTitle = m.AlternativeName
+                        };
+                        item.SetProviderId(Plugin.PluginKey, m.Id.ToString(CultureInfo.InvariantCulture));
+                        if (!string.IsNullOrWhiteSpace(m.ExternalId?.Imdb))
+                        {
+                            item.SetProviderId(MetadataProviders.Imdb.ToString(), m.ExternalId.Imdb);
+                        }
+                        if (m.ExternalId?.Tmdb != null && m.ExternalId.Tmdb > 0)
+                        {
+                            item.SetProviderId(MetadataProviders.Tmdb.ToString(), m.ExternalId.Tmdb.ToString());
+                        }
                     }
-
-                    toReturn.Add(movie);
+                    toReturn.Add(item);
                 });
-            return toReturn;
-        }
-        public async Task<List<BaseItem>> GetTop250SeriesCollection(CancellationToken cancellationToken)
-        {
-            _log.Info("Get Top250 Series Collection");
-            var toReturn = new List<BaseItem>();
-            KpSearchResult<KpMovie> movies = await _api.GetTop250Collection(cancellationToken);
-            movies.Docs
-                .Where(m => !_movieTypes.Contains(m.TypeNumber))
-                .ToList()
-                .ForEach(m =>
-                {
-                    var series = new Series()
-                    {
-                        Name = m.Name,
-                        OriginalTitle = m.AlternativeName
-                    };
-                    series.SetProviderId(Plugin.PluginKey, m.Id.ToString(CultureInfo.InvariantCulture));
-                    if (!string.IsNullOrWhiteSpace(m.ExternalId?.Imdb))
-                    {
-                        series.SetProviderId(MetadataProviders.Imdb.ToString(), m.ExternalId.Imdb);
-                    }
-                    if (m.ExternalId?.Tmdb != null && m.ExternalId.Tmdb > 0)
-                    {
-                        series.SetProviderId(MetadataProviders.Tmdb.ToString(), m.ExternalId.Tmdb.ToString());
-                    }
 
-                    toReturn.Add(series);
-                });
             return toReturn;
         }
         public async Task<ApiResult<Dictionary<string, long>>> GetKpIdByAnotherId(string externalIdType, IEnumerable<string> idList, CancellationToken cancellationToken)
