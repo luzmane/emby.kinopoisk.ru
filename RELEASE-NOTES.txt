@@ -1,3 +1,6 @@
+v.1.19.0
+- Unite Top 250 tasks - KinopoiskDev supply correct data with 250 items total
+
 v.1.18.1
 - Fix top250 collections name was not saved and flag was inverted
 
