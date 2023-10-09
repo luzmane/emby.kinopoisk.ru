@@ -59,13 +59,9 @@
     <None Remove="i18n/ScheduledTasks/KinopoiskNewVersion/en-US.json" />
     <None Remove="i18n/ScheduledTasks/KinopoiskNewVersion/uk.json" />
 
-    <None Remove="i18n/ScheduledTasks/KinopoiskTop250Movie/ru.json" />
-    <None Remove="i18n/ScheduledTasks/KinopoiskTop250Movie/en-US.json" />
-    <None Remove="i18n/ScheduledTasks/KinopoiskTop250Movie/uk.json" />
-
-    <None Remove="i18n/ScheduledTasks/KinopoiskTop250Series/ru.json" />
-    <None Remove="i18n/ScheduledTasks/KinopoiskTop250Series/en-US.json" />
-    <None Remove="i18n/ScheduledTasks/KinopoiskTop250Series/uk.json" />
+    <None Remove="i18n/ScheduledTasks/KinopoiskTop250/ru.json" />
+    <None Remove="i18n/ScheduledTasks/KinopoiskTop250/en-US.json" />
+    <None Remove="i18n/ScheduledTasks/KinopoiskTop250/uk.json" />
 
   </ItemGroup>
 
@@ -86,13 +82,9 @@
     <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskNewVersion/en-US.json" />
     <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskNewVersion/uk.json" />
 
-    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250Movie/ru.json" />
-    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250Movie/en-US.json" />
-    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250Movie/uk.json" />
-
-    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250Series/ru.json" />
-    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250Series/en-US.json" />
-    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250Series/uk.json" />
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250/ru.json" />
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250/en-US.json" />
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250/uk.json" />
 
   </ItemGroup>
 

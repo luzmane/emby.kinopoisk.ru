@@ -6,7 +6,7 @@ using FluentAssertions;
 
 using MediaBrowser.Controller.Collections;
 using MediaBrowser.Controller.Entities;
-using MediaBrowser.Controller.Entities.TV;
+using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Entities;
@@ -15,15 +15,15 @@ using MediaBrowser.Model.Querying;
 namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
 
 [Collection("Sequential")]
-public class CreateTop250SeriesCollectionsTaskTest : BaseTest
+public class CreateTop250CollectionsTaskTest : BaseTest
 {
     private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpEpisodeProviderTest));
 
-    private readonly CreateTop250SeriesCollectionsTask _createTop250SeriesCollectionsTask;
+    private readonly CreateTop250CollectionsTask _CreateTop250CollectionsTaskTest;
 
 
     #region Test configs
-    public CreateTop250SeriesCollectionsTaskTest() : base(Logger)
+    public CreateTop250CollectionsTaskTest() : base(Logger)
     {
         _pluginConfiguration.Token = GetKinopoiskDevToken();
 
@@ -31,7 +31,7 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
 
         ConfigXmlSerializer();
 
-        _createTop250SeriesCollectionsTask = new(
+        _CreateTop250CollectionsTaskTest = new(
             _logManager.Object,
             _libraryManager.Object,
             _collectionManager.Object,
@@ -42,127 +42,131 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
     #endregion
 
     [Fact]
-    public void CreateTop250SeriesCollectionsTask_ForCodeCoverage()
+    public void CreateTop250CollectionsTaskTest_ForCodeCoverage()
     {
-        Logger.Info($"Start '{nameof(CreateTop250SeriesCollectionsTask_ForCodeCoverage)}'");
+        Logger.Info($"Start '{nameof(CreateTop250CollectionsTaskTest_ForCodeCoverage)}'");
 
-        _createTop250SeriesCollectionsTask.IsHidden.Should().BeFalse("this is default task config");
-        _createTop250SeriesCollectionsTask.IsEnabled.Should().BeFalse("this is default task config");
-        _createTop250SeriesCollectionsTask.IsLogged.Should().BeTrue("this is default task config");
-        _createTop250SeriesCollectionsTask.Key.Should().NotBeNull("key is hardcoded");
+        _CreateTop250CollectionsTaskTest.IsHidden.Should().BeFalse("this is default task config");
+        _CreateTop250CollectionsTaskTest.IsEnabled.Should().BeFalse("this is default task config");
+        _CreateTop250CollectionsTaskTest.IsLogged.Should().BeTrue("this is default task config");
+        _CreateTop250CollectionsTaskTest.Key.Should().Be("KinopoiskTop250");
 
-        _createTop250SeriesCollectionsTask.GetDefaultTriggers().Should().BeEmpty("there is no triggers defined");
+        _CreateTop250CollectionsTaskTest.GetDefaultTriggers().Should().BeEmpty("there is no triggers defined");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
-        _logManager.Verify(lm => lm.GetLogger("CreateTop250SeriesCollectionsTask"), Times.Once());
+        _logManager.Verify(lm => lm.GetLogger("CreateTop250CollectionsTask"), Times.Once());
 
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(CreateTop250SeriesCollectionsTask_ForCodeCoverage)}'");
+        Logger.Info($"Finished '{nameof(CreateTop250CollectionsTaskTest_ForCodeCoverage)}'");
     }
 
     [Fact]
-    public void CreateTop250SeriesCollectionsTask_GetTranslation_RU()
+    public void CreateTop250CollectionsTaskTest_GetTranslation_RU()
     {
-        Logger.Info($"Start '{nameof(CreateTop250SeriesCollectionsTask_GetTranslation_RU)}'");
+        Logger.Info($"Start '{nameof(CreateTop250CollectionsTaskTest_GetTranslation_RU)}'");
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration() { UICulture = "ru" });
 
-        _createTop250SeriesCollectionsTask.Name.Should().Be("Создать коллекцию сериалов топ 250 Кинопоиска", "this is the name of the task");
-        _createTop250SeriesCollectionsTask.Description.Should().Be("Создать коллекцию сериалов основываясь на топ 250 Кинопоиска. Поддерживает только kinopoisk.dev", "this is the description of the task");
-        _createTop250SeriesCollectionsTask.Category.Should().Be("Плагин Кинопоиска", "this is the category of the task");
+        _CreateTop250CollectionsTaskTest.Name.Should().Be("Создать коллекцию топ 250 Кинопоиска", "this is the name of the task");
+        _CreateTop250CollectionsTaskTest.Description.Should().Be("Создать коллекцию основываясь на топ 250 Кинопоиска. Поддерживает только kinopoisk.dev", "this is the description of the task");
+        _CreateTop250CollectionsTaskTest.Category.Should().Be("Плагин Кинопоиска", "this is the category of the task");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
-        _logManager.Verify(lm => lm.GetLogger("CreateTop250SeriesCollectionsTask"), Times.Once());
+        _logManager.Verify(lm => lm.GetLogger("CreateTop250CollectionsTask"), Times.Once());
         _serverConfigurationManager.VerifyGet(scm => scm.Configuration, Times.Exactly(6));
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(CreateTop250SeriesCollectionsTask_GetTranslation_RU)}'");
+        Logger.Info($"Finished '{nameof(CreateTop250CollectionsTaskTest_GetTranslation_RU)}'");
     }
 
     [Fact]
-    public void CreateTop250SeriesCollectionsTask_GetTranslation_EnUs()
+    public void CreateTop250CollectionsTaskTest_GetTranslation_EnUs()
     {
-        Logger.Info($"Start '{nameof(CreateTop250SeriesCollectionsTask_GetTranslation_EnUs)}'");
+        Logger.Info($"Start '{nameof(CreateTop250CollectionsTaskTest_GetTranslation_EnUs)}'");
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration() { UICulture = "en-us" });
 
-        _createTop250SeriesCollectionsTask.Name.Should().Be("Create Top250 Series collection from Kinopoisk", "this is the name of the task");
-        _createTop250SeriesCollectionsTask.Description.Should().Be("Create a series collection based on the top 250 list from Kinopoisk.ru. Support kinopoisk.dev only", "this is the description of the task");
-        _createTop250SeriesCollectionsTask.Category.Should().Be("Kinopoisk Plugin", "this is the category of the task");
+        _CreateTop250CollectionsTaskTest.Name.Should().Be("Create Top250 collection from Kinopoisk", "this is the name of the task");
+        _CreateTop250CollectionsTaskTest.Description.Should().Be("Create a collection based on the top 250 list from Kinopoisk.ru. Support kinopoisk.dev only", "this is the description of the task");
+        _CreateTop250CollectionsTaskTest.Category.Should().Be("Kinopoisk Plugin", "this is the category of the task");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
-        _logManager.Verify(lm => lm.GetLogger("CreateTop250SeriesCollectionsTask"), Times.Once());
+        _logManager.Verify(lm => lm.GetLogger("CreateTop250CollectionsTask"), Times.Once());
         _serverConfigurationManager.VerifyGet(scm => scm.Configuration, Times.Exactly(6));
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(CreateTop250SeriesCollectionsTask_GetTranslation_EnUs)}'");
+        Logger.Info($"Finished '{nameof(CreateTop250CollectionsTaskTest_GetTranslation_EnUs)}'");
     }
 
     [Fact]
-    public void CreateTop250SeriesCollectionsTask_GetTranslation_UK()
+    public void CreateTop250CollectionsTaskTest_GetTranslation_UK()
     {
-        Logger.Info($"Start '{nameof(CreateTop250SeriesCollectionsTask_GetTranslation_UK)}'");
+        Logger.Info($"Start '{nameof(CreateTop250CollectionsTaskTest_GetTranslation_UK)}'");
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration() { UICulture = "uk" });
 
-        _createTop250SeriesCollectionsTask.Name.Should().Be("Створити колекцію серіалів топ 250 Кінопошуку", "this is the name of the task");
-        _createTop250SeriesCollectionsTask.Description.Should().Be("Створити колекцію серіалів ґрунтуючись на топ 250 Кінопошуку. Підтримує лише kinopoisk.dev", "this is the description of the task");
-        _createTop250SeriesCollectionsTask.Category.Should().Be("Плагін Кінопошуку", "this is the category of the task");
+        _CreateTop250CollectionsTaskTest.Name.Should().Be("Створити колекцію топ 250 Кінопошуку", "this is the name of the task");
+        _CreateTop250CollectionsTaskTest.Description.Should().Be("Створити колекцію ґрунтуючись на топ 250 Кінопошуку. Підтримує лише kinopoisk.dev", "this is the description of the task");
+        _CreateTop250CollectionsTaskTest.Category.Should().Be("Плагін Кінопошуку", "this is the category of the task");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
-        _logManager.Verify(lm => lm.GetLogger("CreateTop250SeriesCollectionsTask"), Times.Once());
+        _logManager.Verify(lm => lm.GetLogger("CreateTop250CollectionsTask"), Times.Once());
         _serverConfigurationManager.VerifyGet(scm => scm.Configuration, Times.Exactly(6));
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(CreateTop250SeriesCollectionsTask_GetTranslation_UK)}'");
+        Logger.Info($"Finished '{nameof(CreateTop250CollectionsTaskTest_GetTranslation_UK)}'");
     }
 
     [Fact]
-    public void CreateTop250SeriesCollectionsTask_GetTranslation_BG()
+    public void CreateTop250CollectionsTaskTest_GetTranslation_BG()
     {
-        Logger.Info($"Start '{nameof(CreateTop250SeriesCollectionsTask_GetTranslation_BG)}'");
+        Logger.Info($"Start '{nameof(CreateTop250CollectionsTaskTest_GetTranslation_BG)}'");
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration() { UICulture = "bg" });
 
-        _createTop250SeriesCollectionsTask.Name.Should().Be("Create Top250 Series collection from Kinopoisk", "this is the name of the task");
-        _createTop250SeriesCollectionsTask.Description.Should().Be("Create a series collection based on the top 250 list from Kinopoisk.ru. Support kinopoisk.dev only", "this is the description of the task");
-        _createTop250SeriesCollectionsTask.Category.Should().Be("Kinopoisk Plugin", "this is the category of the task");
+        _CreateTop250CollectionsTaskTest.Name.Should().Be("Create Top250 collection from Kinopoisk", "this is the name of the task");
+        _CreateTop250CollectionsTaskTest.Description.Should().Be("Create a collection based on the top 250 list from Kinopoisk.ru. Support kinopoisk.dev only", "this is the description of the task");
+        _CreateTop250CollectionsTaskTest.Category.Should().Be("Kinopoisk Plugin", "this is the category of the task");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
-        _logManager.Verify(lm => lm.GetLogger("CreateTop250SeriesCollectionsTask"), Times.Once());
+        _logManager.Verify(lm => lm.GetLogger("CreateTop250CollectionsTask"), Times.Once());
         _serverConfigurationManager.VerifyGet(scm => scm.Configuration, Times.Exactly(6));
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(CreateTop250SeriesCollectionsTask_GetTranslation_BG)}'");
+        Logger.Info($"Finished '{nameof(CreateTop250CollectionsTaskTest_GetTranslation_BG)}'");
     }
 
     [Fact]
-    public async void CreateTop250SeriesCollectionsTask_Execute_CollectionExists()
+    public async void CreateTop250CollectionsTaskTest_Execute_CollectionExists()
     {
-        Logger.Info($"Start '{nameof(CreateTop250SeriesCollectionsTask_Execute_CollectionExists)}'");
+        Logger.Info($"Start '{nameof(CreateTop250CollectionsTaskTest_Execute_CollectionExists)}'");
+
+        _ = _applicationPaths
+            .SetupGet(m => m.PluginConfigurationsPath)
+            .Returns("CreateTop250CollectionsTaskTest_Execute_CollectionExists");
 
         LibraryOptions collectionLibraryOptions = new()
         {
-            ContentType = CollectionType.TvShows.ToString(),
+            ContentType = CollectionType.Movies.ToString(),
             EnableAdultMetadata = true,
             ImportCollections = true,
             MetadataCountryCode = "RU",
             MinCollectionItems = 1,
-            Name = PluginConfiguration.DefaultTop250SeriesCollectionName,
+            Name = PluginConfiguration.DefaultTop250CollectionName,
             PathInfos = new MediaPathInfo[]{
                         new MediaPathInfo()
                         {
                             NetworkPath = null,
-                            Path = "/emby/tvshow_library"
+                            Path = "/emby/film_library"
                         }
                     },
             PreferredImageLanguage = "ru",
@@ -172,7 +176,7 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
             TypeOptions = new TypeOptions[]{
                         new TypeOptions()
                         {
-                            Type = "Series"
+                            Type = "Movie"
                         }
                     }
         };
@@ -190,8 +194,8 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
                 Items = new BaseItem[] {
                     new CollectionFolder()
                     {
-                        Name = "My TV Shows",
-                        Path = "/emby/tvshow_library",
+                        Name = "My Movies",
+                        Path = "/emby/film_library",
                         InternalId = 123L
                     }
                 }
@@ -202,48 +206,48 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
                 !query.Recursive
                 && query.IsVirtualItem == false
                 && query.IncludeItemTypes.Length == 1
-                && nameof(Series).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
+                && nameof(Movie).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
                 && query.ParentIds.Length == 1
                 && query.ParentIds[0] == 123L)))
             .Returns(new QueryResult<BaseItem>()
             {
                 Items = new BaseItem[] {
-                     new Series() {
+                     new Movie() {
                         Name = "Гарри Поттер и Кубок огня",
                         InternalId = 103L,
-                        Path = "/emby/tvshow_library/103",
+                        Path = "/tmp/103",
                         ProviderIds = new(new Dictionary<string, string>()
                         {
-                            { Plugin.PluginKey, "464963" },
+                            { Plugin.PluginKey, "535341" },
                         })
                     },
-                    new Series() {
+                    new Movie() {
                         Name = "Гарри Поттер и Орден Феникса",
                         InternalId = 104L,
-                        Path = "/emby/tvshow_library/104",
+                        Path = "/tmp/104",
                         ProviderIds = new(new Dictionary<string, string>()
                         {
-                            { MetadataProviders.Tmdb.ToString(), "60625" },
+                            { MetadataProviders.Tmdb.ToString(), "522627" },
                         })
                     },
-                    new Series() {
+                    new Movie() {
                         Name = "Гарри Поттер и Принц-полукровка",
                         InternalId = 105L,
-                        Path = "/emby/tvshow_library/105",
+                        Path = "/tmp/105",
                         ProviderIds = new(new Dictionary<string, string>()
                         {
-                            { MetadataProviders.Imdb.ToString(), "tt9011124" }
+                            { MetadataProviders.Imdb.ToString(), "tt0993846" }
                         })
                     },
-                    new Series() {
+                    new Movie() {
                         Name = "Гарри Поттер и Дары Смерти: Часть I",
                         InternalId = 106L,
-                        Path = "/emby/tvshow_library/106",
+                        Path = "/tmp/106",
                         ProviderIds = new(new Dictionary<string, string>()
                         {
-                            { Plugin.PluginKey, "820638" },
-                            { MetadataProviders.Tmdb.ToString(), "63435" },
-                            { MetadataProviders.Imdb.ToString(), "tt4426042" }
+                            { Plugin.PluginKey, "41519" },
+                            { MetadataProviders.Tmdb.ToString(), "20992" },
+                            { MetadataProviders.Imdb.ToString(), "tt0118767" }
                         }),
                     },
 
@@ -253,7 +257,7 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
         _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
                 !query.Recursive
-                && query.Name == "Кинопоиск Топ 250 (Сериалы) (My TV Shows)"
+                && query.Name == "Кинопоиск Топ 250 (My Movies)"
                 && query.IncludeItemTypes.Length == 1
                 && "BoxSet".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))))
             .Returns(new QueryResult<BaseItem>()
@@ -262,53 +266,49 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
                 Items = new BaseItem[] {
                     new BoxSet()
                     {
-                        Name = "Кинопоиск Топ 250 (Сериалы) (My TV Shows)",
-                        Path = "/emby/tvshow_library",
+                        Name = "Кинопоиск Топ 250 (My Movies)",
+                        Path = "/emby/film_library",
                         InternalId = 321L
                     }
                 }
             });
 
-        _ = _applicationPaths
-            .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("CreateTop250SeriesCollectionsTask_Execute_CollectionExists");
-
         using CancellationTokenSource cancellationTokenSource = new();
-        await _createTop250SeriesCollectionsTask.Execute(cancellationTokenSource.Token, new EmbyProgress());
+        await _CreateTop250CollectionsTaskTest.Execute(cancellationTokenSource.Token, new EmbyProgress());
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "CreateTop250SeriesCollectionsTask_Execute_CollectionExists/EmbyKinopoiskRu.xml"), Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "/emby/tvshow_library/options.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "CreateTop250CollectionsTaskTest_Execute_CollectionExists/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "/emby/film_library/options.xml"), Times.Once());
         _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(3));
         _libraryManager.Verify(lm => lm.GetItemLinks(It.IsInRange(103L, 106L, Moq.Range.Inclusive), It.IsAny<List<ItemLinkType>>()), Times.Exactly(4));
         _libraryManager.Verify(lm => lm.UpdateItem(It.IsAny<BaseItem>(), It.IsAny<BaseItem>(), ItemUpdateType.MetadataEdit, null), Times.Exactly(4));
-        _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/tvshow_library"), Times.Once());
+        _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/film_library"), Times.Once());
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finish '{nameof(CreateTop250SeriesCollectionsTask_Execute_CollectionExists)}'");
+        Logger.Info($"Finish '{nameof(CreateTop250CollectionsTaskTest_Execute_CollectionExists)}'");
     }
 
     [Fact]
-    public async void CreateTop250SeriesCollectionsTask_Execute_CollectionNotExists_OneLib()
+    public async void CreateTop250CollectionsTaskTest_Execute_CollectionNotExists_OneLib()
     {
-        Logger.Info($"Start '{nameof(CreateTop250SeriesCollectionsTask_Execute_CollectionNotExists_OneLib)}'");
+        Logger.Info($"Start '{nameof(CreateTop250CollectionsTaskTest_Execute_CollectionNotExists_OneLib)}'");
 
         _pluginConfiguration.Top250InOneLib = true;
 
         LibraryOptions collectionLibraryOptions = new()
         {
-            ContentType = CollectionType.TvShows.ToString(),
+            ContentType = CollectionType.Movies.ToString(),
             EnableAdultMetadata = true,
             ImportCollections = true,
             MetadataCountryCode = "RU",
             MinCollectionItems = 1,
-            Name = PluginConfiguration.DefaultTop250SeriesCollectionName,
+            Name = PluginConfiguration.DefaultTop250CollectionName,
             PathInfos = new MediaPathInfo[]{
                         new MediaPathInfo()
                         {
                             NetworkPath = null,
-                            Path = "/emby/series_library_onelib"
+                            Path = "/emby/video_library_onelib"
                         }
                     },
             PreferredImageLanguage = "ru",
@@ -318,19 +318,17 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
             TypeOptions = new TypeOptions[]{
                         new TypeOptions()
                         {
-                            Type = "Series"
+                            Type = "Movie"
                         }
                     }
         };
         _ = _xmlSerializer
-            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "/emby/series_library_onelib/options.xml"))
+            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "/emby/video_library_onelib/options.xml"))
             .Returns(collectionLibraryOptions);
 
         LibraryOptions boxsetLibraryOptions = new()
         {
             ContentType = CollectionType.BoxSets.ToString(),
-            EnableAdultMetadata = true,
-            ImportCollections = true,
             MetadataCountryCode = "RU",
             MinCollectionItems = 1,
             Name = "Collections",
@@ -338,22 +336,14 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
                         new MediaPathInfo()
                         {
                             NetworkPath = null,
-                            Path = "/emby/series_library_onelib"
+                            Path = "/emby/video_library_onelib"
                         }
                     },
             PreferredImageLanguage = "ru",
             PreferredMetadataLanguage = "ru",
-            SkipSubtitlesIfEmbeddedSubtitlesPresent = true,
-            SkipSubtitlesIfAudioTrackMatches = true,
-            TypeOptions = new TypeOptions[]{
-                        new TypeOptions()
-                        {
-                            Type = "Series"
-                        }
-                    }
         };
         _ = _xmlSerializer
-            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "CreateTop250SeriesCollectionsTask_Execute_CollectionNotExists_OneLib/options.xml"))
+            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "CreateTop250CollectionsTaskTest_Execute_CollectionNotExists_OneLib/options.xml"))
             .Returns(boxsetLibraryOptions);
 
         _ = _libraryManager
@@ -363,11 +353,12 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
                 && nameof(CollectionFolder).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))))
             .Returns(new QueryResult<BaseItem>()
             {
-                Items = new BaseItem[] {
+                Items = new BaseItem[]
+                {
                     new CollectionFolder()
                     {
-                        Name = "My Series",
-                        Path = "/emby/series_library_onelib",
+                        Name = "My Movies",
+                        Path = "/emby/video_library_onelib",
                         InternalId = 123L
                     }
                 }
@@ -378,48 +369,48 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
                 !query.Recursive
                 && query.IsVirtualItem == false
                 && query.IncludeItemTypes.Length == 1
-                && nameof(Series).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
+                && nameof(Movie).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
                 && query.ParentIds.Length == 1
                 && query.ParentIds[0] == 123L)))
             .Returns(new QueryResult<BaseItem>()
             {
                 Items = new BaseItem[] {
-                     new Series() {
+                     new Movie() {
                         Name = "Гарри Поттер и Кубок огня",
                         InternalId = 103L,
-                        Path = "/emby/series_library_onelib/103",
+                        Path = "/tmp/103",
                         ProviderIds = new(new Dictionary<string, string>()
                         {
-                            { Plugin.PluginKey, "464963" },
+                            { Plugin.PluginKey, "535341" },
                         })
                     },
-                    new Series() {
+                    new Movie() {
                         Name = "Гарри Поттер и Орден Феникса",
                         InternalId = 104L,
-                        Path = "/emby/series_library_onelib/104",
+                        Path = "/tmp/104",
                         ProviderIds = new(new Dictionary<string, string>()
                         {
-                            { MetadataProviders.Tmdb.ToString(), "60625" },
+                            { MetadataProviders.Tmdb.ToString(), "522627" },
                         })
                     },
-                    new Series() {
+                    new Movie() {
                         Name = "Гарри Поттер и Принц-полукровка",
                         InternalId = 105L,
-                        Path = "/emby/series_library_onelib/105",
+                        Path = "/tmp/105",
                         ProviderIds = new(new Dictionary<string, string>()
                         {
-                            { MetadataProviders.Imdb.ToString(), "tt9011124" }
+                            { MetadataProviders.Imdb.ToString(), "tt0993846" }
                         })
                     },
-                    new Series() {
+                    new Movie() {
                         Name = "Гарри Поттер и Дары Смерти: Часть I",
                         InternalId = 106L,
-                        Path = "/emby/series_library_onelib/106",
+                        Path = "/tmp/106",
                         ProviderIds = new(new Dictionary<string, string>()
                         {
-                            { Plugin.PluginKey, "820638" },
-                            { MetadataProviders.Tmdb.ToString(), "63435" },
-                            { MetadataProviders.Imdb.ToString(), "tt4426042" }
+                            { Plugin.PluginKey, "41519" },
+                            { MetadataProviders.Tmdb.ToString(), "20992" },
+                            { MetadataProviders.Imdb.ToString(), "tt0118767" }
                         }),
                     },
 
@@ -429,7 +420,7 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
         _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
                 !query.Recursive
-                && query.Name == _pluginConfiguration.GetCurrentTop250SeriesCollectionName()
+                && query.Name == _pluginConfiguration.GetCurrentTop250CollectionName()
                 && query.IncludeItemTypes.Length == 1
                 && "BoxSet".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))))
             .Returns(new QueryResult<BaseItem>()
@@ -457,51 +448,51 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
             .Returns(new CollectionFolder()
             {
                 Name = "Collections",
-                Path = "CreateTop250SeriesCollectionsTask_Execute_CollectionNotExists_OneLib"
+                Path = "CreateTop250CollectionsTaskTest_Execute_CollectionNotExists_OneLib"
             });
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("CreateTop250SeriesCollectionsTask_Execute_CollectionNotExists_OneLib");
+            .Returns("CreateTop250CollectionsTaskTest_Execute_CollectionNotExists_OneLib");
 
         using CancellationTokenSource cancellationTokenSource = new();
-        await _createTop250SeriesCollectionsTask.Execute(cancellationTokenSource.Token, new EmbyProgress());
+        await _CreateTop250CollectionsTaskTest.Execute(cancellationTokenSource.Token, new EmbyProgress());
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "CreateTop250SeriesCollectionsTask_Execute_CollectionNotExists_OneLib/EmbyKinopoiskRu.xml"), Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "/emby/series_library_onelib/options.xml"), Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "CreateTop250SeriesCollectionsTask_Execute_CollectionNotExists_OneLib/options.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "CreateTop250CollectionsTaskTest_Execute_CollectionNotExists_OneLib/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "/emby/video_library_onelib/options.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "CreateTop250CollectionsTaskTest_Execute_CollectionNotExists_OneLib/options.xml"), Times.Once());
         _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(3));
         _libraryManager.Verify(lm => lm.GetUserRootFolder(), Times.Once());
         _libraryManager.Verify(lm => lm.GetLibraryOptions(It.IsAny<UserRootFolder>()), Times.Once());
         _libraryManager.Verify(lm => lm.GetInternalItemIds(It.IsAny<InternalItemsQuery>()), Times.Exactly(2));
         _libraryManager.Verify(lm => lm.GetItemById(1L), Times.Once());
         _collectionManager.Verify(cm => cm.CreateCollection(It.IsAny<CollectionCreationOptions>()), Times.Once());
-        _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/series_library_onelib"), Times.Exactly(2));
+        _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/video_library_onelib"), Times.Exactly(2));
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finish '{nameof(CreateTop250SeriesCollectionsTask_Execute_CollectionNotExists_OneLib)}'");
+        Logger.Info($"Finish '{nameof(CreateTop250CollectionsTaskTest_Execute_CollectionNotExists_OneLib)}'");
     }
 
     [Fact]
-    public async void CreateTop250SeriesCollectionsTask_Execute_CollectionNotExists()
+    public async void CreateTop250CollectionsTaskTest_Execute_CollectionNotExists()
     {
-        Logger.Info($"Start '{nameof(CreateTop250SeriesCollectionsTask_Execute_CollectionNotExists)}'");
+        Logger.Info($"Start '{nameof(CreateTop250CollectionsTaskTest_Execute_CollectionNotExists)}'");
 
         LibraryOptions collectionLibraryOptions = new()
         {
-            ContentType = CollectionType.TvShows.ToString(),
+            ContentType = CollectionType.Movies.ToString(),
             EnableAdultMetadata = true,
             ImportCollections = true,
             MetadataCountryCode = "RU",
             MinCollectionItems = 1,
-            Name = PluginConfiguration.DefaultTop250SeriesCollectionName,
+            Name = PluginConfiguration.DefaultTop250CollectionName,
             PathInfos = new MediaPathInfo[]{
                         new MediaPathInfo()
                         {
                             NetworkPath = null,
-                            Path = "/emby/series_library"
+                            Path = "/emby/video_library"
                         }
                     },
             PreferredImageLanguage = "ru",
@@ -511,19 +502,17 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
             TypeOptions = new TypeOptions[]{
                         new TypeOptions()
                         {
-                            Type = "Series"
+                            Type = "Movie"
                         }
                     }
         };
         _ = _xmlSerializer
-            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "/emby/series_library/options.xml"))
+            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "/emby/video_library/options.xml"))
             .Returns(collectionLibraryOptions);
 
         LibraryOptions boxsetLibraryOptions = new()
         {
             ContentType = CollectionType.BoxSets.ToString(),
-            EnableAdultMetadata = true,
-            ImportCollections = true,
             MetadataCountryCode = "RU",
             MinCollectionItems = 1,
             Name = "Collections",
@@ -531,22 +520,14 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
                         new MediaPathInfo()
                         {
                             NetworkPath = null,
-                            Path = "/emby/series_library"
+                            Path = "/emby/video_library"
                         }
                     },
             PreferredImageLanguage = "ru",
             PreferredMetadataLanguage = "ru",
-            SkipSubtitlesIfEmbeddedSubtitlesPresent = true,
-            SkipSubtitlesIfAudioTrackMatches = true,
-            TypeOptions = new TypeOptions[]{
-                        new TypeOptions()
-                        {
-                            Type = "Series"
-                        }
-                    }
         };
         _ = _xmlSerializer
-            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "CreateTop250SeriesCollectionsTask_Execute_CollectionNotExists/options.xml"))
+            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "CreateTop250CollectionsTaskTest_Execute_CollectionNotExists/options.xml"))
             .Returns(boxsetLibraryOptions);
 
         _ = _libraryManager
@@ -556,11 +537,12 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
                 && nameof(CollectionFolder).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))))
             .Returns(new QueryResult<BaseItem>()
             {
-                Items = new BaseItem[] {
+                Items = new BaseItem[]
+                {
                     new CollectionFolder()
                     {
-                        Name = "My Series",
-                        Path = "/emby/series_library",
+                        Name = "My Movies",
+                        Path = "/emby/video_library",
                         InternalId = 123L
                     }
                 }
@@ -571,48 +553,48 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
                 !query.Recursive
                 && query.IsVirtualItem == false
                 && query.IncludeItemTypes.Length == 1
-                && nameof(Series).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
+                && nameof(Movie).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
                 && query.ParentIds.Length == 1
                 && query.ParentIds[0] == 123L)))
             .Returns(new QueryResult<BaseItem>()
             {
                 Items = new BaseItem[] {
-                     new Series() {
+                     new Movie() {
                         Name = "Гарри Поттер и Кубок огня",
                         InternalId = 103L,
-                        Path = "/emby/series_library/103",
+                        Path = "/tmp/103",
                         ProviderIds = new(new Dictionary<string, string>()
                         {
-                            { Plugin.PluginKey, "464963" },
+                            { Plugin.PluginKey, "535341" },
                         })
                     },
-                    new Series() {
+                    new Movie() {
                         Name = "Гарри Поттер и Орден Феникса",
                         InternalId = 104L,
-                        Path = "/emby/series_library/104",
+                        Path = "/tmp/104",
                         ProviderIds = new(new Dictionary<string, string>()
                         {
-                            { MetadataProviders.Tmdb.ToString(), "60625" },
+                            { MetadataProviders.Tmdb.ToString(), "522627" },
                         })
                     },
-                    new Series() {
+                    new Movie() {
                         Name = "Гарри Поттер и Принц-полукровка",
                         InternalId = 105L,
-                        Path = "/emby/series_library/105",
+                        Path = "/tmp/105",
                         ProviderIds = new(new Dictionary<string, string>()
                         {
-                            { MetadataProviders.Imdb.ToString(), "tt9011124" }
+                            { MetadataProviders.Imdb.ToString(), "tt0993846" }
                         })
                     },
-                    new Series() {
+                    new Movie() {
                         Name = "Гарри Поттер и Дары Смерти: Часть I",
                         InternalId = 106L,
-                        Path = "/emby/series_library/106",
+                        Path = "/tmp/106",
                         ProviderIds = new(new Dictionary<string, string>()
                         {
-                            { Plugin.PluginKey, "820638" },
-                            { MetadataProviders.Tmdb.ToString(), "63435" },
-                            { MetadataProviders.Imdb.ToString(), "tt4426042" }
+                            { Plugin.PluginKey, "41519" },
+                            { MetadataProviders.Tmdb.ToString(), "20992" },
+                            { MetadataProviders.Imdb.ToString(), "tt0118767" }
                         }),
                     },
 
@@ -622,7 +604,7 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
         _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
                 !query.Recursive
-                && query.Name == $"{_pluginConfiguration.GetCurrentTop250SeriesCollectionName()} (My Series)"
+                && query.Name == $"{_pluginConfiguration.GetCurrentTop250CollectionName()} (My Movies)"
                 && query.IncludeItemTypes.Length == 1
                 && "BoxSet".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))))
             .Returns(new QueryResult<BaseItem>()
@@ -650,31 +632,31 @@ public class CreateTop250SeriesCollectionsTaskTest : BaseTest
             .Returns(new CollectionFolder()
             {
                 Name = "Collections",
-                Path = "CreateTop250SeriesCollectionsTask_Execute_CollectionNotExists"
+                Path = "CreateTop250CollectionsTaskTest_Execute_CollectionNotExists"
             });
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("CreateTop250SeriesCollectionsTask_Execute_CollectionNotExists");
+            .Returns("CreateTop250CollectionsTaskTest_Execute_CollectionNotExists");
 
         using CancellationTokenSource cancellationTokenSource = new();
-        await _createTop250SeriesCollectionsTask.Execute(cancellationTokenSource.Token, new EmbyProgress());
+        await _CreateTop250CollectionsTaskTest.Execute(cancellationTokenSource.Token, new EmbyProgress());
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "CreateTop250SeriesCollectionsTask_Execute_CollectionNotExists/EmbyKinopoiskRu.xml"), Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "/emby/series_library/options.xml"), Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "CreateTop250SeriesCollectionsTask_Execute_CollectionNotExists/options.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "CreateTop250CollectionsTaskTest_Execute_CollectionNotExists/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "/emby/video_library/options.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "CreateTop250CollectionsTaskTest_Execute_CollectionNotExists/options.xml"), Times.Once());
         _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(3));
         _libraryManager.Verify(lm => lm.GetUserRootFolder(), Times.Once());
         _libraryManager.Verify(lm => lm.GetLibraryOptions(It.IsAny<UserRootFolder>()), Times.Once());
         _libraryManager.Verify(lm => lm.GetInternalItemIds(It.IsAny<InternalItemsQuery>()), Times.Exactly(2));
         _libraryManager.Verify(lm => lm.GetItemById(1L), Times.Once());
         _collectionManager.Verify(cm => cm.CreateCollection(It.IsAny<CollectionCreationOptions>()), Times.Once());
-        _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/series_library"), Times.Exactly(2));
+        _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/video_library"), Times.Exactly(2));
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finish '{nameof(CreateTop250SeriesCollectionsTask_Execute_CollectionNotExists)}'");
+        Logger.Info($"Finish '{nameof(CreateTop250CollectionsTaskTest_Execute_CollectionNotExists)}'");
     }
 
 }
