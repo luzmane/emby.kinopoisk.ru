@@ -1,3 +1,6 @@
+v.1.20.0
+- Update "Update Kinopoisk Plugin" task to support new tags name
+
 v.1.19.0
 - Unite Top 250 tasks - KinopoiskDev supply correct data with 250 items total
 
