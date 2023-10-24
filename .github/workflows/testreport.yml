@@ -8,6 +8,7 @@ on:
     branches: [ "master" ]
   schedule:
     - cron: '15 00 9 * *'
+  workflow_dispatch:
 
 jobs:
   test:
@@ -31,6 +32,7 @@ jobs:
       run: dotnet build
     
     - name: Run tests
+      continue-on-error: true
       env:
         KINOPOISK_DEV_TOKEN: ${{ secrets.KINOPOISK_DEV_TOKEN }}
         KINOPOISK_UNOFFICIAL_TOKEN: ${{ secrets.KINOPOISK_UNOFFICIAL_TOKEN }}
