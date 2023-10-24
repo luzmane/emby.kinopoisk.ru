@@ -1,6 +1,5 @@
 {
     "dotnet.defaultSolution": "EmbyKinopoiskRu.sln",
-    "csharp.debug.suppressJITOptimizations": true,
     "csharp.inlayHints.enableInlayHintsForImplicitObjectCreation": true,
     "csharp.inlayHints.enableInlayHintsForTypes": true,
     "dotnet.inlayHints.enableInlayHintsForIndexerParameters": true,
@@ -8,5 +7,6 @@
     "dotnet.inlayHints.enableInlayHintsForObjectCreationParameters": true,
     "dotnet.inlayHints.enableInlayHintsForOtherParameters": true,
     "dotnetAcquisitionExtension.enableTelemetry": false,
-    "gitlens.telemetry.enabled": false
+    "gitlens.telemetry.enabled": false,
+    "redhat.telemetry.enabled": false
 }

@@ -1,39 +1,36 @@
 {
     "version": "2.0.0",
     "tasks": [
+        // clean
         {
             "label": "clean",
             "command": "dotnet",
             "type": "process",
             "args": [
-                "clean",
-                "${workspaceFolder}/EmbyKinopoiskRu.sln"
+                "clean"
             ],
             "problemMatcher": "$msCompile"
         },
+        // build library
         {
             "label": "build library",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/EmbyKinopoiskRu.sln",
+                "${workspaceFolder}/EmbyKinopoiskRu/EmbyKinopoiskRu.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:Summary"
             ],
-            "problemMatcher": "$msCompile",
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            }
+            "problemMatcher": "$msCompile"
         },
+        // build with test
         {
-            "label": "build test",
+            "label": "build with test",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/EmbyKinopoiskRu.Tests/EmbyKinopoiskRu.Tests.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:Summary"
             ],
@@ -43,24 +40,26 @@
                 "isDefault": true
             }
         },
+        // build library release
         {
             "label": "build library release",
             "command": "dotnet",
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/EmbyKinopoiskRu.sln",
+                "${workspaceFolder}/EmbyKinopoiskRu/EmbyKinopoiskRu.csproj",
                 "/property:Configuration=Release"
             ],
             "problemMatcher": "$msCompile"
         },
+        // move plugin
         {
-            "label": "move file",
+            "label": "move plugin",
             "command": "mv",
             "type": "shell",
             "args": [
                 "${workspaceFolder}/EmbyKinopoiskRu/bin/Debug/netstandard2.0/EmbyKinopoiskRu.dll",
-                "${workspaceFolder}/../emby/plugins/"
+                "${workspaceFolder}/../emby/server/emby-data/plugins/"
             ],
             "problemMatcher": {
                 "owner": "shell",
@@ -73,6 +72,7 @@
                 }
             }
         },
+        // start emby
         {
             "label": "start emby",
             "command": "/usr/bin/nohup",
@@ -80,14 +80,15 @@
             "isBackground": true,
             "options": {
                 "env": {
-                    "EMBY_DATA": "${workspaceFolder}/../emby/"
+                    "EMBY_DATA": "${workspaceFolder}/../emby/server/emby-data"
                 },
                 "shell": {
                     "executable": "/bin/bash"
-                }
+                },
+                "cwd": "${workspaceFolder}/../emby/server/emby-server"
             },
             "args": [
-                "/opt/emby-server/bin/emby-server"
+                "${workspaceFolder}/../emby/server/emby-server/bin/emby-server"
             ],
             "problemMatcher": [
                 {
@@ -107,27 +108,26 @@
                 }
             ]
         },
+        // build, start server
         {
-            "label": "build, deploy, start server",
+            "label": "build, start server",
             "dependsOrder": "sequence",
             "dependsOn": [
-                "clean",
                 "build library",
-                "move file",
+                "move plugin",
                 "start emby"
             ]
         },
+        // build, move plugin
         {
-            "label": "pack",
-            "command": "dotnet",
-            "type": "process",
-            "args": [
-                "pack",
-                "${workspaceFolder}/EmbyKinopoiskRu/EmbyKinopoiskRu.csproj",
-                "/property:Configuration=Release"
-            ],
-            "problemMatcher": "$msCompile"
+            "label": "build, move plugin",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "build library",
+                "move plugin"
+            ]
         },
+        // run tests with coverage
         {
             "label": "run tests with coverage",
             "type": "process",
@@ -144,6 +144,7 @@
                 "panel": "new"
             }
         },
+        // generate HTML coverage
         {
             "label": "generate HTML coverage",
             "type": "shell",
@@ -158,6 +159,26 @@
             "presentation": {
                 "panel": "new"
             }
-        }
+        },
+        // tests with report
+        {
+            "label": "tests with report",
+            "dependsOrder": "sequence",
+            "dependsOn": [
+                "clean",
+                "build with test",
+                "run tests with coverage",
+                "generate HTML coverage"
+            ]
+        },
+        // kill emby server
+        {
+            "label": "kill emby server",
+            "type": "shell",
+            "command": "killall",
+            "args": [
+                "EmbyServer"
+            ]
+        },
     ]
 }

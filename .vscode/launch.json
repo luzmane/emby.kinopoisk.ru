@@ -2,12 +2,23 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": ".NET Core Attach",
+            "name": "Launch Emby",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build, move plugin",
+            "program": "${workspaceFolder}/../emby/server/emby-server/bin/emby-server",
+            "cwd": "${workspaceFolder}/../emby/server/emby-server",
+            "env": {
+                "EMBY_DATA": "${workspaceFolder}/../emby/server/emby-data"
+            }
+        },
+        {
+            "name": "Attach to Emby",
             "type": "coreclr",
             "request": "attach",
-            "preLaunchTask": "build, deploy, start server",
+            "preLaunchTask": "build, start server",
             "processName": "EmbyServer",
-            //"justMyCode": false
+            "postDebugTask": "kill emby server"
         }
     ]
 }
