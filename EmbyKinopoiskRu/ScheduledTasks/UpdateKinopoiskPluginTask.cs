@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -23,6 +24,8 @@ namespace EmbyKinopoiskRu.ScheduledTasks
     /// <inheritdoc />
     public class UpdateKinopoiskPluginTask : IScheduledTask, IConfigurableScheduledTask
     {
+        private static readonly Regex Version = new Regex(".*(?<version>\\d+\\.\\d+\\.\\d+).*", RegexOptions.Compiled);
+
         private const string DLL_NAME = "EmbyKinopoiskRu.dll";
 
         /// <inheritdoc />
@@ -167,12 +170,29 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             using (var reader = new StreamReader((await _httpClient.GetResponse(options)).Content))
             {
                 var latestVersionJson = await reader.ReadToEndAsync();
-                return _jsonSerializer.DeserializeFromString<GitHubLatestReleaseResponse>(latestVersionJson);
+                var gitResponse = _jsonSerializer.DeserializeFromString<GitHubLatestReleaseResponse>(latestVersionJson);
+                gitResponse.tag_name = PrepareTagName(gitResponse.tag_name);
+                return gitResponse;
             }
         }
         private TaskTranslation GetTranslation()
         {
             return EmbyHelper.GetTaskTranslation(_translations, _serverConfigurationManager, _jsonSerializer, _availableTranslations);
+        }
+        private string PrepareTagName(string tagName)
+        {
+            Match match = Version.Match(tagName);
+            if (match.Success)
+            {
+                var version = match.Groups["version"].Value;
+                _logger.Info("Converting tag '{TagName}' to '{Version}'", tagName, version);
+                return version;
+            }
+            else
+            {
+                _logger.Info("Unable to parse tag: '{TagName}'", tagName);
+                return string.Empty;
+            }
         }
     }
 }

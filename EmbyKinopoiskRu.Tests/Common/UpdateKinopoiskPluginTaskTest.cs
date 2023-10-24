@@ -155,9 +155,9 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
     }
 
     [Fact]
-    public async void UpdateKinopoiskPluginTask_Execute_Updated()
+    public async void UpdateKinopoiskPluginTask_Execute_Updated_OldTag()
     {
-        Logger.Info($"Start '{nameof(UpdateKinopoiskPluginTask_Execute_Updated)}'");
+        Logger.Info($"Start '{nameof(UpdateKinopoiskPluginTask_Execute_Updated_OldTag)}'");
 
         using HttpResponseInfo response = new()
         {
@@ -172,7 +172,7 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(2));
         _installationManager.Verify(
             im => im.InstallPackage(
-                It.IsAny<PackageVersionInfo>(),
+                It.Is<PackageVersionInfo>(i => string.Equals(i.versionStr, "1.0.0", StringComparison.Ordinal)),
                 true,
                 It.IsAny<SimpleProgress<double>>(),
                 It.IsAny<CancellationToken>()),
@@ -180,6 +180,34 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
         _installationManager.VerifyNoOtherCalls();
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(UpdateKinopoiskPluginTask_Execute_Updated)}'");
+        Logger.Info($"Finished '{nameof(UpdateKinopoiskPluginTask_Execute_Updated_OldTag)}'");
+    }
+    [Fact]
+    public async void UpdateKinopoiskPluginTask_Execute_Updated_NewTag()
+    {
+        Logger.Info($"Start '{nameof(UpdateKinopoiskPluginTask_Execute_Updated_NewTag)}'");
+
+        using HttpResponseInfo response = new()
+        {
+            Content = new MemoryStream(Encoding.UTF8.GetBytes(/*lang=json,strict*/ "{\"html_url\":\"https://\",\"tag_name\":\"v.1.0.0\",\"assets\":[{\"name\":\"EmbyKinopoiskRu.dll\",\"content_type\":\"program\",\"browser_download_url\":\"https://\"}],\"body\":\"description\"}")),
+            StatusCode = HttpStatusCode.OK
+        };
+        _httpClient.ReturnResponse = response;
+
+        using var cancellationTokenSource = new CancellationTokenSource();
+        await _updateKinopoiskPluginTask.Execute(cancellationTokenSource.Token, new EmbyProgress());
+
+        _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(2));
+        _installationManager.Verify(
+            im => im.InstallPackage(
+                It.Is<PackageVersionInfo>(i => string.Equals(i.versionStr, "1.0.0", StringComparison.Ordinal)),
+                true,
+                It.IsAny<SimpleProgress<double>>(),
+                It.IsAny<CancellationToken>()),
+            Times.Once());
+        _installationManager.VerifyNoOtherCalls();
+        VerifyNoOtherCalls();
+
+        Logger.Info($"Finished '{nameof(UpdateKinopoiskPluginTask_Execute_Updated_NewTag)}'");
     }
 }
