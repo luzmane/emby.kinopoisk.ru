@@ -63,7 +63,7 @@ public class KpPersonProviderTest : BaseTest
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("UN_KpPersonProvider_GetMetadata_Provider_Kp");
 
-        var personInfo = new PersonLookupInfo()
+        var personInfo = new PersonLookupInfo
         {
             ProviderIds = new(new() { { Plugin.PluginKey, "29855" } })
         };
@@ -99,7 +99,7 @@ public class KpPersonProviderTest : BaseTest
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("UN_KpPersonProvider_GetMetadata_ByName");
 
-        var personInfo = new PersonLookupInfo()
+        var personInfo = new PersonLookupInfo
         {
             Name = "Милла Йовович"
         };
@@ -136,7 +136,7 @@ public class KpPersonProviderTest : BaseTest
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("UN_KpPersonProvider_GetMetadata_ByEnName");
 
-        var personInfo = new PersonLookupInfo()
+        var personInfo = new PersonLookupInfo
         {
             Name = "Milla Jovovich"
         };
@@ -173,7 +173,7 @@ public class KpPersonProviderTest : BaseTest
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("UN_KpPersonProvider_GetSearchResults_Provider_Kp");
 
-        var personInfo = new PersonLookupInfo()
+        var personInfo = new PersonLookupInfo
         {
             ProviderIds = new(new() { { Plugin.PluginKey, "29855" } })
         };
@@ -204,7 +204,7 @@ public class KpPersonProviderTest : BaseTest
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("UN_KpPersonProvider_GetSearchResults_ByName");
 
-        var personInfo = new PersonLookupInfo()
+        var personInfo = new PersonLookupInfo
         {
             Name = "Джеки Чан"
         };
@@ -237,7 +237,7 @@ public class KpPersonProviderTest : BaseTest
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("UN_KpPersonProvider_GetSearchResults_ByEnName");
 
-        var personInfo = new PersonLookupInfo()
+        var personInfo = new PersonLookupInfo
         {
             Name = "Jackie Chan"
         };

@@ -61,7 +61,7 @@ namespace EmbyKinopoiskRu.Provider.RemoteImage
         /// <inheritdoc />
         public async Task<IEnumerable<RemoteImageInfo>> GetImages(BaseItem item, LibraryOptions libraryOptions, CancellationToken cancellationToken)
         {
-            return await Plugin.Instance.GetKinopoiskService().GetImages(item, libraryOptions, cancellationToken);
+            return await Plugin.Instance.GetKinopoiskService().GetImagesAsync(item, libraryOptions, cancellationToken);
         }
     }
 }

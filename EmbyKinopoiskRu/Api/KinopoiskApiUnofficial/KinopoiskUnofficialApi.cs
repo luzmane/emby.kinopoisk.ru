@@ -37,28 +37,28 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             _activityManager = activityManager;
         }
 
-        internal async Task<KpFilm> GetFilmById(string movieId, CancellationToken cancellationToken)
+        internal async Task<KpFilm> GetFilmByIdAsync(string movieId, CancellationToken cancellationToken)
         {
             var url = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/{movieId}";
-            var response = await SendRequest(url, cancellationToken);
+            var response = await SendRequestAsync(url, cancellationToken);
             return string.IsNullOrEmpty(response) ? null : _jsonSerializer.DeserializeFromString<KpFilm>(response);
         }
-        internal async Task<KpSearchResult<KpFilm>> GetFilmsByNameAndYear(string name, int? year, CancellationToken cancellationToken)
+        internal async Task<KpSearchResult<KpFilm>> GetFilmsByNameAndYearAsync(string name, int? year, CancellationToken cancellationToken)
         {
             var hasName = !string.IsNullOrWhiteSpace(name);
             var hasYear = year != null && year > 1000;
-            var url = "https://kinopoiskapiunofficial.tech/api/v2.2/films";
+            const string url = "https://kinopoiskapiunofficial.tech/api/v2.2/films";
             var namePart = $"?keyword={name}";
             var yearPart = $"&yearFrom={year}&yearTo={year}";
 
             if (hasYear && hasName)
             {
                 var request = url + namePart + yearPart;
-                var response = await SendRequest(request, cancellationToken);
+                var response = await SendRequestAsync(request, cancellationToken);
                 KpSearchResult<KpFilm> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpFilm>>(response);
                 if (toReturn != null && toReturn.Items.Count > 0)
                 {
-                    _log.Info($"Found {toReturn.Items.Count} movies");
+                    _log.Info($"Found {toReturn.Items.Count} movies for name '{name}' year '{year}'");
                     return toReturn;
                 }
             }
@@ -66,54 +66,55 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             if (hasName)
             {
                 var request = url + namePart;
-                var response = await SendRequest(request, cancellationToken);
+                var response = await SendRequestAsync(request, cancellationToken);
                 KpSearchResult<KpFilm> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpFilm>>(response);
                 if (toReturn != null && toReturn.Items.Count > 0)
                 {
-                    _log.Info($"Found {toReturn.Items.Count} movies");
+                    _log.Info($"Found {toReturn.Items.Count} movies for name '{name}' year '{year}'");
                     return toReturn;
                 }
             }
+            _log.Info($"Nothing found for name '{name}' year '{year}'");
             return new KpSearchResult<KpFilm>();
         }
-        internal async Task<List<KpFilmStaff>> GetStaffByFilmId(string movieId, CancellationToken cancellationToken)
+        internal async Task<List<KpFilmStaff>> GetStaffByFilmIdAsync(string movieId, CancellationToken cancellationToken)
         {
             var url = $"https://kinopoiskapiunofficial.tech/api/v1/staff?filmId={movieId}";
-            var response = await SendRequest(url, cancellationToken);
+            var response = await SendRequestAsync(url, cancellationToken);
             return string.IsNullOrEmpty(response) ? new List<KpFilmStaff>() : _jsonSerializer.DeserializeFromString<List<KpFilmStaff>>(response);
         }
-        internal async Task<KpSearchResult<KpVideo>> GetVideosByFilmId(string movieId, CancellationToken cancellationToken)
+        internal async Task<KpSearchResult<KpVideo>> GetVideosByFilmIdAsync(string movieId, CancellationToken cancellationToken)
         {
             var url = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/{movieId}/videos";
-            var response = await SendRequest(url, cancellationToken);
+            var response = await SendRequestAsync(url, cancellationToken);
             return string.IsNullOrEmpty(response) ? new KpSearchResult<KpVideo>() : _jsonSerializer.DeserializeFromString<KpSearchResult<KpVideo>>(response);
         }
-        internal async Task<KpSearchResult<KpSeason>> GetEpisodesBySeriesId(string seriesId, CancellationToken cancellationToken)
+        internal async Task<KpSearchResult<KpSeason>> GetEpisodesBySeriesIdAsync(string seriesId, CancellationToken cancellationToken)
         {
             var url = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/{seriesId}/seasons";
-            var response = await SendRequest(url, cancellationToken);
+            var response = await SendRequestAsync(url, cancellationToken);
             return string.IsNullOrEmpty(response) ? null : _jsonSerializer.DeserializeFromString<KpSearchResult<KpSeason>>(response);
         }
-        internal async Task<KpPerson> GetPersonById(string personId, CancellationToken cancellationToken)
+        internal async Task<KpPerson> GetPersonByIdAsync(string personId, CancellationToken cancellationToken)
         {
             var url = $"https://kinopoiskapiunofficial.tech/api/v1/staff/{personId}";
-            var response = await SendRequest(url, cancellationToken);
+            var response = await SendRequestAsync(url, cancellationToken);
             return string.IsNullOrEmpty(response) ? null : _jsonSerializer.DeserializeFromString<KpPerson>(response);
         }
-        internal async Task<KpSearchResult<KpStaff>> GetPersonsByName(string name, CancellationToken cancellationToken)
+        internal async Task<KpSearchResult<KpStaff>> GetPersonsByNameAsync(string name, CancellationToken cancellationToken)
         {
             var url = $"https://kinopoiskapiunofficial.tech/api/v1/persons?name={name}";
-            var response = await SendRequest(url, cancellationToken);
+            var response = await SendRequestAsync(url, cancellationToken);
             return string.IsNullOrEmpty(response) ? new KpSearchResult<KpStaff>() : _jsonSerializer.DeserializeFromString<KpSearchResult<KpStaff>>(response);
         }
-        internal async Task<KpSearchResult<KpFilm>> GetFilmByImdbId(string imdbMovieId, CancellationToken cancellationToken)
+        internal async Task<KpSearchResult<KpFilm>> GetFilmByImdbIdAsync(string imdbMovieId, CancellationToken cancellationToken)
         {
             var hasImdb = !string.IsNullOrWhiteSpace(imdbMovieId);
             var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films?imdbId={imdbMovieId}";
 
             if (hasImdb)
             {
-                var response = await SendRequest(request, cancellationToken);
+                var response = await SendRequestAsync(request, cancellationToken);
                 KpSearchResult<KpFilm> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpFilm>>(response);
                 if (toReturn != null && toReturn.Items.Count > 0)
                 {
@@ -125,7 +126,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             return new KpSearchResult<KpFilm>();
         }
 
-        private async Task<string> SendRequest(string url, CancellationToken cancellationToken)
+        private async Task<string> SendRequestAsync(string url, CancellationToken cancellationToken)
         {
             _log.Info($"Sending request to {url}");
             var token = Plugin.Instance?.Configuration.GetCurrentToken();
@@ -134,7 +135,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 _log.Error("The token is empty. Skip request");
                 return string.Empty;
             }
-            var options = new HttpRequestOptions()
+            var options = new HttpRequestOptions
             {
                 CancellationToken = cancellationToken,
                 Url = url,
@@ -164,13 +165,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                                 var msg = $"Token is invalid: '{token}'";
                                 _log.Error(msg);
                                 AddToActivityLog(msg, "Token is invalid");
-                                // await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
                                 return string.Empty;
                             case 402:
                                 msg = "Request limit exceeded (either daily or total) for current token";
                                 _log.Warn(msg);
                                 AddToActivityLog(msg, "Request limit exceeded");
-                                // await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
                                 return string.Empty;
                             case 404:
                                 _log.Info($"Data not found for URL: {url}");
@@ -178,7 +177,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                             case 429:
                                 _log.Info("Too many requests per second. Waiting 2 sec");
                                 await Task.Delay(2000, cancellationToken);
-                                return await SendRequest(url, cancellationToken);
+                                return await SendRequestAsync(url, cancellationToken);
                             default:
                                 _log.Error($"Received '{response.StatusCode}' from API: {result}");
                                 return string.Empty;
@@ -194,13 +193,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                         var msg = $"Token is invalid: '{token}'";
                         _log.Error(msg);
                         AddToActivityLog(msg, "Token is invalid");
-                        // await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
                         break;
                     case 402:
                         msg = "Request limit exceeded (either daily or total) for current token";
                         _log.Warn(msg);
                         AddToActivityLog(msg, "Request limit exceeded");
-                        // await EmbyHelper.SendNotification(_notificationManager, msg, cancellationToken);
                         break;
                     default:
                         _log.Error($"Received '{ex.StatusCode}' from API: Message-'{ex.Message}'", ex);

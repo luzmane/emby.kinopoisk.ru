@@ -2,10 +2,10 @@ namespace EmbyKinopoiskRu.Api
 {
     internal sealed class ApiResult<TItem>
     {
-        public TItem Item { get; set; }
-        public bool HasError { get; set; }
+        internal TItem Item { get; set; }
+        internal bool HasError { get; set; }
 
-        public ApiResult(TItem item)
+        internal ApiResult(TItem item)
         {
             Item = item;
         }

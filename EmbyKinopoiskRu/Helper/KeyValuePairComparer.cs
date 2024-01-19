@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 namespace EmbyKinopoiskRu.Helper
@@ -6,7 +7,7 @@ namespace EmbyKinopoiskRu.Helper
     {
         public bool Equals(KeyValuePair<string, long> x, KeyValuePair<string, long> y)
         {
-            return string.Equals(x.Key, y.Key);
+            return string.Equals(x.Key, y.Key, StringComparison.OrdinalIgnoreCase);
         }
 
         public int GetHashCode(KeyValuePair<string, long> obj)

@@ -8,6 +8,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
         public string Url { get; set; }
         public string PreviewUrl { get; set; }
 
-        private string DebuggerDisplay => $"Url is {string.IsNullOrWhiteSpace(Url)}, PreviewUrl is {string.IsNullOrWhiteSpace(PreviewUrl)}";
+        private string DebuggerDisplay => $"Url is empty - {string.IsNullOrWhiteSpace(Url)}, PreviewUrl is empty - {string.IsNullOrWhiteSpace(PreviewUrl)}";
     }
 }

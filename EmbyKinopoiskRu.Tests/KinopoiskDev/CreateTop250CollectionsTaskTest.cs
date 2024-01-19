@@ -68,7 +68,7 @@ public class CreateTop250CollectionsTaskTest : BaseTest
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
-            .Returns(new ServerConfiguration() { UICulture = "ru" });
+            .Returns(new ServerConfiguration { UICulture = "ru" });
 
         _CreateTop250CollectionsTaskTest.Name.Should().Be("Создать коллекцию топ 250 Кинопоиска", "this is the name of the task");
         _CreateTop250CollectionsTaskTest.Description.Should().Be("Создать коллекцию основываясь на топ 250 Кинопоиска. Поддерживает только kinopoisk.dev", "this is the description of the task");
@@ -89,7 +89,7 @@ public class CreateTop250CollectionsTaskTest : BaseTest
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
-            .Returns(new ServerConfiguration() { UICulture = "en-us" });
+            .Returns(new ServerConfiguration { UICulture = "en-us" });
 
         _CreateTop250CollectionsTaskTest.Name.Should().Be("Create Top250 collection from Kinopoisk", "this is the name of the task");
         _CreateTop250CollectionsTaskTest.Description.Should().Be("Create a collection based on the top 250 list from Kinopoisk.ru. Support kinopoisk.dev only", "this is the description of the task");
@@ -110,7 +110,7 @@ public class CreateTop250CollectionsTaskTest : BaseTest
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
-            .Returns(new ServerConfiguration() { UICulture = "uk" });
+            .Returns(new ServerConfiguration { UICulture = "uk" });
 
         _CreateTop250CollectionsTaskTest.Name.Should().Be("Створити колекцію топ 250 Кінопошуку", "this is the name of the task");
         _CreateTop250CollectionsTaskTest.Description.Should().Be("Створити колекцію ґрунтуючись на топ 250 Кінопошуку. Підтримує лише kinopoisk.dev", "this is the description of the task");
@@ -131,7 +131,7 @@ public class CreateTop250CollectionsTaskTest : BaseTest
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
-            .Returns(new ServerConfiguration() { UICulture = "bg" });
+            .Returns(new ServerConfiguration { UICulture = "bg" });
 
         _CreateTop250CollectionsTaskTest.Name.Should().Be("Create Top250 collection from Kinopoisk", "this is the name of the task");
         _CreateTop250CollectionsTaskTest.Description.Should().Be("Create a collection based on the top 250 list from Kinopoisk.ru. Support kinopoisk.dev only", "this is the description of the task");
@@ -162,8 +162,8 @@ public class CreateTop250CollectionsTaskTest : BaseTest
             MetadataCountryCode = "RU",
             MinCollectionItems = 1,
             Name = PluginConfiguration.DefaultTop250CollectionName,
-            PathInfos = new MediaPathInfo[]{
-                        new MediaPathInfo()
+            PathInfos = new[]{
+                        new MediaPathInfo
                         {
                             NetworkPath = null,
                             Path = "/emby/film_library"
@@ -173,8 +173,8 @@ public class CreateTop250CollectionsTaskTest : BaseTest
             PreferredMetadataLanguage = "ru",
             SkipSubtitlesIfEmbeddedSubtitlesPresent = true,
             SkipSubtitlesIfAudioTrackMatches = true,
-            TypeOptions = new TypeOptions[]{
-                        new TypeOptions()
+            TypeOptions = new[]{
+                        new TypeOptions
                         {
                             Type = "Movie"
                         }
@@ -189,10 +189,10 @@ public class CreateTop250CollectionsTaskTest : BaseTest
                 !query.Recursive
                 && query.IncludeItemTypes.Length == 1
                 && nameof(CollectionFolder).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))))
-            .Returns(new QueryResult<BaseItem>()
+            .Returns(new QueryResult<BaseItem>
             {
                 Items = new BaseItem[] {
-                    new CollectionFolder()
+                    new CollectionFolder
                     {
                         Name = "My Movies",
                         Path = "/emby/film_library",
@@ -209,41 +209,41 @@ public class CreateTop250CollectionsTaskTest : BaseTest
                 && nameof(Movie).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
                 && query.ParentIds.Length == 1
                 && query.ParentIds[0] == 123L)))
-            .Returns(new QueryResult<BaseItem>()
+            .Returns(new QueryResult<BaseItem>
             {
                 Items = new BaseItem[] {
-                     new Movie() {
+                     new Movie {
                         Name = "Гарри Поттер и Кубок огня",
                         InternalId = 103L,
                         Path = "/tmp/103",
-                        ProviderIds = new(new Dictionary<string, string>()
+                        ProviderIds = new(new Dictionary<string, string>
                         {
                             { Plugin.PluginKey, "535341" },
                         })
                     },
-                    new Movie() {
+                    new Movie {
                         Name = "Гарри Поттер и Орден Феникса",
                         InternalId = 104L,
                         Path = "/tmp/104",
-                        ProviderIds = new(new Dictionary<string, string>()
+                        ProviderIds = new(new Dictionary<string, string>
                         {
                             { MetadataProviders.Tmdb.ToString(), "522627" },
                         })
                     },
-                    new Movie() {
+                    new Movie {
                         Name = "Гарри Поттер и Принц-полукровка",
                         InternalId = 105L,
                         Path = "/tmp/105",
-                        ProviderIds = new(new Dictionary<string, string>()
+                        ProviderIds = new(new Dictionary<string, string>
                         {
                             { MetadataProviders.Imdb.ToString(), "tt0993846" }
                         })
                     },
-                    new Movie() {
+                    new Movie {
                         Name = "Гарри Поттер и Дары Смерти: Часть I",
                         InternalId = 106L,
                         Path = "/tmp/106",
-                        ProviderIds = new(new Dictionary<string, string>()
+                        ProviderIds = new(new Dictionary<string, string>
                         {
                             { Plugin.PluginKey, "41519" },
                             { MetadataProviders.Tmdb.ToString(), "20992" },
@@ -260,11 +260,11 @@ public class CreateTop250CollectionsTaskTest : BaseTest
                 && query.Name == "Кинопоиск Топ 250 (My Movies)"
                 && query.IncludeItemTypes.Length == 1
                 && "BoxSet".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))))
-            .Returns(new QueryResult<BaseItem>()
+            .Returns(new QueryResult<BaseItem>
             {
                 TotalRecordCount = 1,
                 Items = new BaseItem[] {
-                    new BoxSet()
+                    new BoxSet
                     {
                         Name = "Кинопоиск Топ 250 (My Movies)",
                         Path = "/emby/film_library",
@@ -304,8 +304,8 @@ public class CreateTop250CollectionsTaskTest : BaseTest
             MetadataCountryCode = "RU",
             MinCollectionItems = 1,
             Name = PluginConfiguration.DefaultTop250CollectionName,
-            PathInfos = new MediaPathInfo[]{
-                        new MediaPathInfo()
+            PathInfos = new[]{
+                        new MediaPathInfo
                         {
                             NetworkPath = null,
                             Path = "/emby/video_library_onelib"
@@ -315,8 +315,8 @@ public class CreateTop250CollectionsTaskTest : BaseTest
             PreferredMetadataLanguage = "ru",
             SkipSubtitlesIfEmbeddedSubtitlesPresent = true,
             SkipSubtitlesIfAudioTrackMatches = true,
-            TypeOptions = new TypeOptions[]{
-                        new TypeOptions()
+            TypeOptions = new[]{
+                        new TypeOptions
                         {
                             Type = "Movie"
                         }
@@ -332,8 +332,8 @@ public class CreateTop250CollectionsTaskTest : BaseTest
             MetadataCountryCode = "RU",
             MinCollectionItems = 1,
             Name = "Collections",
-            PathInfos = new MediaPathInfo[]{
-                        new MediaPathInfo()
+            PathInfos = new[]{
+                        new MediaPathInfo
                         {
                             NetworkPath = null,
                             Path = "/emby/video_library_onelib"
@@ -351,11 +351,11 @@ public class CreateTop250CollectionsTaskTest : BaseTest
                 !query.Recursive
                 && query.IncludeItemTypes.Length == 1
                 && nameof(CollectionFolder).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))))
-            .Returns(new QueryResult<BaseItem>()
+            .Returns(new QueryResult<BaseItem>
             {
                 Items = new BaseItem[]
                 {
-                    new CollectionFolder()
+                    new CollectionFolder
                     {
                         Name = "My Movies",
                         Path = "/emby/video_library_onelib",
@@ -372,41 +372,41 @@ public class CreateTop250CollectionsTaskTest : BaseTest
                 && nameof(Movie).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
                 && query.ParentIds.Length == 1
                 && query.ParentIds[0] == 123L)))
-            .Returns(new QueryResult<BaseItem>()
+            .Returns(new QueryResult<BaseItem>
             {
                 Items = new BaseItem[] {
-                     new Movie() {
+                     new Movie {
                         Name = "Гарри Поттер и Кубок огня",
                         InternalId = 103L,
                         Path = "/tmp/103",
-                        ProviderIds = new(new Dictionary<string, string>()
+                        ProviderIds = new(new Dictionary<string, string>
                         {
                             { Plugin.PluginKey, "535341" },
                         })
                     },
-                    new Movie() {
+                    new Movie {
                         Name = "Гарри Поттер и Орден Феникса",
                         InternalId = 104L,
                         Path = "/tmp/104",
-                        ProviderIds = new(new Dictionary<string, string>()
+                        ProviderIds = new(new Dictionary<string, string>
                         {
                             { MetadataProviders.Tmdb.ToString(), "522627" },
                         })
                     },
-                    new Movie() {
+                    new Movie {
                         Name = "Гарри Поттер и Принц-полукровка",
                         InternalId = 105L,
                         Path = "/tmp/105",
-                        ProviderIds = new(new Dictionary<string, string>()
+                        ProviderIds = new(new Dictionary<string, string>
                         {
                             { MetadataProviders.Imdb.ToString(), "tt0993846" }
                         })
                     },
-                    new Movie() {
+                    new Movie {
                         Name = "Гарри Поттер и Дары Смерти: Часть I",
                         InternalId = 106L,
                         Path = "/tmp/106",
-                        ProviderIds = new(new Dictionary<string, string>()
+                        ProviderIds = new(new Dictionary<string, string>
                         {
                             { Plugin.PluginKey, "41519" },
                             { MetadataProviders.Tmdb.ToString(), "20992" },
@@ -423,7 +423,7 @@ public class CreateTop250CollectionsTaskTest : BaseTest
                 && query.Name == _pluginConfiguration.GetCurrentTop250CollectionName()
                 && query.IncludeItemTypes.Length == 1
                 && "BoxSet".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))))
-            .Returns(new QueryResult<BaseItem>()
+            .Returns(new QueryResult<BaseItem>
             {
                 TotalRecordCount = 0,
                 Items = Array.Empty<BaseItem>()
@@ -432,7 +432,7 @@ public class CreateTop250CollectionsTaskTest : BaseTest
         _ = _collectionManager
             .Setup(m => m.CreateCollection(It.IsAny<CollectionCreationOptions>()))
             .Returns((CollectionCreationOptions options) =>
-                Task.FromResult(new BoxSet()
+                Task.FromResult(new BoxSet
                 {
                     Name = options.Name,
                     ParentId = options.ParentId,
@@ -441,11 +441,11 @@ public class CreateTop250CollectionsTaskTest : BaseTest
 
         _ = _libraryManager
             .Setup(m => m.GetInternalItemIds(It.Is<InternalItemsQuery>(q => Equals(true, q.IsFolder))))
-            .Returns(new long[] { 1L });
+            .Returns(new[] { 1L });
 
         _ = _libraryManager
             .Setup(m => m.GetItemById(It.Is<long>(id => id == 1L)))
-            .Returns(new CollectionFolder()
+            .Returns(new CollectionFolder
             {
                 Name = "Collections",
                 Path = "CreateTop250CollectionsTaskTest_Execute_CollectionNotExists_OneLib"
@@ -488,8 +488,8 @@ public class CreateTop250CollectionsTaskTest : BaseTest
             MetadataCountryCode = "RU",
             MinCollectionItems = 1,
             Name = PluginConfiguration.DefaultTop250CollectionName,
-            PathInfos = new MediaPathInfo[]{
-                        new MediaPathInfo()
+            PathInfos = new[]{
+                        new MediaPathInfo
                         {
                             NetworkPath = null,
                             Path = "/emby/video_library"
@@ -499,8 +499,8 @@ public class CreateTop250CollectionsTaskTest : BaseTest
             PreferredMetadataLanguage = "ru",
             SkipSubtitlesIfEmbeddedSubtitlesPresent = true,
             SkipSubtitlesIfAudioTrackMatches = true,
-            TypeOptions = new TypeOptions[]{
-                        new TypeOptions()
+            TypeOptions = new[]{
+                        new TypeOptions
                         {
                             Type = "Movie"
                         }
@@ -516,8 +516,8 @@ public class CreateTop250CollectionsTaskTest : BaseTest
             MetadataCountryCode = "RU",
             MinCollectionItems = 1,
             Name = "Collections",
-            PathInfos = new MediaPathInfo[]{
-                        new MediaPathInfo()
+            PathInfos = new[]{
+                        new MediaPathInfo
                         {
                             NetworkPath = null,
                             Path = "/emby/video_library"
@@ -535,11 +535,11 @@ public class CreateTop250CollectionsTaskTest : BaseTest
                 !query.Recursive
                 && query.IncludeItemTypes.Length == 1
                 && nameof(CollectionFolder).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))))
-            .Returns(new QueryResult<BaseItem>()
+            .Returns(new QueryResult<BaseItem>
             {
                 Items = new BaseItem[]
                 {
-                    new CollectionFolder()
+                    new CollectionFolder
                     {
                         Name = "My Movies",
                         Path = "/emby/video_library",
@@ -556,41 +556,41 @@ public class CreateTop250CollectionsTaskTest : BaseTest
                 && nameof(Movie).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
                 && query.ParentIds.Length == 1
                 && query.ParentIds[0] == 123L)))
-            .Returns(new QueryResult<BaseItem>()
+            .Returns(new QueryResult<BaseItem>
             {
                 Items = new BaseItem[] {
-                     new Movie() {
+                     new Movie {
                         Name = "Гарри Поттер и Кубок огня",
                         InternalId = 103L,
                         Path = "/tmp/103",
-                        ProviderIds = new(new Dictionary<string, string>()
+                        ProviderIds = new(new Dictionary<string, string>
                         {
                             { Plugin.PluginKey, "535341" },
                         })
                     },
-                    new Movie() {
+                    new Movie {
                         Name = "Гарри Поттер и Орден Феникса",
                         InternalId = 104L,
                         Path = "/tmp/104",
-                        ProviderIds = new(new Dictionary<string, string>()
+                        ProviderIds = new(new Dictionary<string, string>
                         {
                             { MetadataProviders.Tmdb.ToString(), "522627" },
                         })
                     },
-                    new Movie() {
+                    new Movie {
                         Name = "Гарри Поттер и Принц-полукровка",
                         InternalId = 105L,
                         Path = "/tmp/105",
-                        ProviderIds = new(new Dictionary<string, string>()
+                        ProviderIds = new(new Dictionary<string, string>
                         {
                             { MetadataProviders.Imdb.ToString(), "tt0993846" }
                         })
                     },
-                    new Movie() {
+                    new Movie {
                         Name = "Гарри Поттер и Дары Смерти: Часть I",
                         InternalId = 106L,
                         Path = "/tmp/106",
-                        ProviderIds = new(new Dictionary<string, string>()
+                        ProviderIds = new(new Dictionary<string, string>
                         {
                             { Plugin.PluginKey, "41519" },
                             { MetadataProviders.Tmdb.ToString(), "20992" },
@@ -607,7 +607,7 @@ public class CreateTop250CollectionsTaskTest : BaseTest
                 && query.Name == $"{_pluginConfiguration.GetCurrentTop250CollectionName()} (My Movies)"
                 && query.IncludeItemTypes.Length == 1
                 && "BoxSet".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))))
-            .Returns(new QueryResult<BaseItem>()
+            .Returns(new QueryResult<BaseItem>
             {
                 TotalRecordCount = 0,
                 Items = Array.Empty<BaseItem>()
@@ -616,7 +616,7 @@ public class CreateTop250CollectionsTaskTest : BaseTest
         _ = _collectionManager
             .Setup(m => m.CreateCollection(It.IsAny<CollectionCreationOptions>()))
             .Returns((CollectionCreationOptions options) =>
-                Task.FromResult(new BoxSet()
+                Task.FromResult(new BoxSet
                 {
                     Name = options.Name,
                     ParentId = options.ParentId,
@@ -625,11 +625,11 @@ public class CreateTop250CollectionsTaskTest : BaseTest
 
         _ = _libraryManager
             .Setup(m => m.GetInternalItemIds(It.Is<InternalItemsQuery>(q => Equals(true, q.IsFolder))))
-            .Returns(new long[] { 1L });
+            .Returns(new[] { 1L });
 
         _ = _libraryManager
             .Setup(m => m.GetItemById(It.Is<long>(id => id == 1L)))
-            .Returns(new CollectionFolder()
+            .Returns(new CollectionFolder
             {
                 Name = "Collections",
                 Path = "CreateTop250CollectionsTaskTest_Execute_CollectionNotExists"

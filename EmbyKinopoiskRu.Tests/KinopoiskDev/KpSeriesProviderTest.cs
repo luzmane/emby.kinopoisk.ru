@@ -62,7 +62,7 @@ public class KpSeriesProviderTest : BaseTest
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("KpSeriesProvider_GetMetadata_Provider_Kp");
 
-        var seriesInfo = new SeriesInfo()
+        var seriesInfo = new SeriesInfo
         {
             ProviderIds = new(new() { { Plugin.PluginKey, "452973" } })
         };
@@ -118,7 +118,7 @@ public class KpSeriesProviderTest : BaseTest
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("KpSeriesProvider_GetMetadata_Provider_Imdb");
 
-        var seriesInfo = new SeriesInfo()
+        var seriesInfo = new SeriesInfo
         {
             ProviderIds = new(new() { { MetadataProviders.Imdb.ToString(), "tt0948103" } })
         };
@@ -174,7 +174,7 @@ public class KpSeriesProviderTest : BaseTest
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("KpSeriesProvider_GetMetadata_Provider_Tmdb");
 
-        var seriesInfo = new SeriesInfo()
+        var seriesInfo = new SeriesInfo
         {
             ProviderIds = new(new() { { MetadataProviders.Tmdb.ToString(), "21729" } })
         };
@@ -230,7 +230,7 @@ public class KpSeriesProviderTest : BaseTest
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("KpSeriesProvider_GetMetadata_NameAndYear");
 
-        var seriesInfo = new SeriesInfo()
+        var seriesInfo = new SeriesInfo
         {
             Name = "Гуррен-Лаганн",
             Year = 2007
@@ -287,7 +287,7 @@ public class KpSeriesProviderTest : BaseTest
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("KpSeriesProvider_GetSearchResults_Provider_Kp");
 
-        var seriesInfo = new SeriesInfo()
+        var seriesInfo = new SeriesInfo
         {
             ProviderIds = new(new() { { Plugin.PluginKey, "452973" } })
         };
@@ -322,7 +322,7 @@ public class KpSeriesProviderTest : BaseTest
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("KpSeriesProvider_GetSearchResults_NameAndYear");
 
-        var seriesInfo = new SeriesInfo()
+        var seriesInfo = new SeriesInfo
         {
             Name = "Гуррен-Лаганн",
             Year = 2007

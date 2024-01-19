@@ -57,7 +57,7 @@ public class KpEpisodeProviderTest : BaseTest
     {
         Logger.Info($"Start '{nameof(KpEpisodeProvider_GetMetadata_ProviderIds)}'");
 
-        var episodeInfo = new EpisodeInfo()
+        var episodeInfo = new EpisodeInfo
         {
             SeriesProviderIds = null,
             IndexNumber = 2,
@@ -99,7 +99,7 @@ public class KpEpisodeProviderTest : BaseTest
     {
         Logger.Info($"Start '{nameof(KpEpisodeProvider_GetMetadata_SeriesProviderIds)}'");
 
-        var episodeInfo = new EpisodeInfo()
+        var episodeInfo = new EpisodeInfo
         {
             IndexNumber = 2,
             ParentIndexNumber = 1,

@@ -69,8 +69,6 @@ public class EmbyLogger : ILogger
             case LogSeverity.Fatal:
                 Fatal(message, paramList);
                 break;
-            default:
-                break;
         }
     }
     public void Log(LogSeverity severity, ReadOnlyMemory<char> message)

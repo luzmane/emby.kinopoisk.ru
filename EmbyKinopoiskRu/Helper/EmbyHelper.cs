@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,7 +26,7 @@ using MediaBrowser.Model.Serialization;
 namespace EmbyKinopoiskRu.Helper
 {
 
-    internal class EmbyHelper
+    internal static class EmbyHelper
     {
         private static readonly object Locker = new Object();
 
@@ -35,12 +34,12 @@ namespace EmbyKinopoiskRu.Helper
         {
             return libraryManager
                 .GetUserRootFolder()
-                .GetChildren(new InternalItemsQuery() { IsFolder = true })
+                .GetChildren(new InternalItemsQuery { IsFolder = true })
                 .OfType<CollectionFolder>()
                 .Where(i => MemoryExtensions.Equals(i.CollectionType.AsSpan(), CollectionType.BoxSets.Span, StringComparison.OrdinalIgnoreCase))
                 .ToList();
         }
-        internal static async Task<CollectionFolder> InsureCollectionLibraryFolder(ILibraryManager libraryManager, ILogger logger)
+        internal static async Task<CollectionFolder> InsureCollectionLibraryFolderAsync(ILibraryManager libraryManager, ILogger logger)
         {
             List<CollectionFolder> folders = FindCollectionFolders(libraryManager);
             CollectionFolder toReturn = folders.FirstOrDefault(f => "Collections".Equals(f.Name, StringComparison.Ordinal));
@@ -49,7 +48,7 @@ namespace EmbyKinopoiskRu.Helper
                 return toReturn;
             }
             logger.Info($"Creating 'Collections' virtual folder");
-            var options = new LibraryOptions()
+            var options = new LibraryOptions
             {
                 EnableRealtimeMonitor = false,
                 SaveLocalMetadata = true,
@@ -58,7 +57,7 @@ namespace EmbyKinopoiskRu.Helper
             await libraryManager.AddVirtualFolder("Collections", options, true);
             return FindCollectionFolders(libraryManager).FirstOrDefault(f => "Collections".Equals(f.Name, StringComparison.Ordinal));
         }
-        internal static async Task<List<BaseItem>> GetSequenceInternalIds(
+        internal static async Task<List<BaseItem>> GetSequenceInternalIdsAsync(
             List<long> choosenItems,
             ILibraryManager libraryManager,
             ILogger logger,
@@ -71,7 +70,7 @@ namespace EmbyKinopoiskRu.Helper
                 logger.Info("Provided list is empty");
                 return new List<BaseItem>();
             }
-            QueryResult<BaseItem> collectionItems = libraryManager.QueryItems(new InternalItemsQuery()
+            QueryResult<BaseItem> collectionItems = libraryManager.QueryItems(new InternalItemsQuery
             {
                 IncludeItemTypes = new[] { nameof(Movie), nameof(Series) },
                 Recursive = false,
@@ -91,21 +90,19 @@ namespace EmbyKinopoiskRu.Helper
                         _ = choosenItems.Remove(id);
                     }
                 }
-                KpSearchResult<KpMovie> kpSearchResult = await api.GetMoviesByIds(choosenItems.Select(i => i.ToString(CultureInfo.InvariantCulture)).ToList(), cancellationToken);
+                KpSearchResult<KpMovie> kpSearchResult = await api.GetMoviesByIdsAsync(choosenItems.Select(i => i.ToString(CultureInfo.InvariantCulture)).ToList(), cancellationToken);
                 var kpExternalIdist = kpSearchResult.Docs
                     .Where(m => m.ExternalId != null)
                     .Select(m => m.ExternalId)
-                    .Cast<KpExternalId>()
                     .ToList();
 
                 var imdbList = kpExternalIdist
                     .Where(e => !string.IsNullOrWhiteSpace(e.Imdb))
                     .Select(e => e.Imdb)
-                    .Cast<string>()
                     .ToList();
                 logger.Info($"Found {imdbList.Count} IMDB ids");
                 QueryResult<BaseItem> imdbCollectionItems = imdbList.Any()
-                    ? libraryManager.QueryItems(new InternalItemsQuery()
+                    ? libraryManager.QueryItems(new InternalItemsQuery
                     {
                         IncludeItemTypes = new[] { nameof(Movie), nameof(Series) },
                         Recursive = false,
@@ -120,11 +117,10 @@ namespace EmbyKinopoiskRu.Helper
                 var tmdbList = kpExternalIdist
                     .Where(e => e.Tmdb != null && e.Tmdb > 0)
                     .Select(e => e.Tmdb.ToString())
-                    .Cast<string>()
                     .ToList();
                 logger.Info($"Found {tmdbList.Count} TMDB ids");
                 QueryResult<BaseItem> tmdbCollectionItems = tmdbList.Any()
-                    ? libraryManager.QueryItems(new InternalItemsQuery()
+                    ? libraryManager.QueryItems(new InternalItemsQuery
                     {
                         IncludeItemTypes = new[] { nameof(Movie), nameof(Series) },
                         Recursive = false,
@@ -137,7 +133,7 @@ namespace EmbyKinopoiskRu.Helper
                 logger.Info($"Found {tmdbCollectionItems.Items.Length} internal TMDB objects");
 
                 var list = new List<BaseItem>(imdbCollectionItems.Items);
-                foreach (BaseItem item in tmdbCollectionItems.Items.Where(x => list.All(i => i.InternalId != x.InternalId)))
+                foreach (BaseItem item in tmdbCollectionItems.Items.Where(x => list.TrueForAll(i => i.InternalId != x.InternalId)))
                 {
                     list.Add(item);
                 }
@@ -152,19 +148,19 @@ namespace EmbyKinopoiskRu.Helper
         {
             logger.Info($"Search existing collections for item with ids: '{string.Join(" ,", internalIds)}'");
             var boxsetList = new List<KeyValuePair<BoxSet, int>>();
-            QueryResult<BaseItem> collections = libraryManager.QueryItems(new InternalItemsQuery()
+            QueryResult<BaseItem> collections = libraryManager.QueryItems(new InternalItemsQuery
             {
                 IncludeItemTypes = new[] { "boxset" },
                 ListItemIds = internalIds.ToArray()
             });
             foreach (BoxSet collection in collections.Items.Cast<BoxSet>())
             {
-                QueryResult<BaseItem> collectionItems = libraryManager.QueryItems(new InternalItemsQuery()
+                QueryResult<BaseItem> collectionItems = libraryManager.QueryItems(new InternalItemsQuery
                 {
                     IncludeItemTypes = new[] { nameof(Movie), nameof(Series) },
                     Recursive = false,
                     IsVirtualItem = false,
-                    CollectionIds = new long[] { collection.InternalId }
+                    CollectionIds = new[] { collection.InternalId }
                 });
                 var count = collectionItems.Items.Select(i => internalIds.Contains(i.InternalId)).Count();
                 if (collectionItems.TotalRecordCount <= internalIds.Count && collectionItems.TotalRecordCount == count)
@@ -182,10 +178,10 @@ namespace EmbyKinopoiskRu.Helper
         internal static Dictionary<string, string> GetAvailableTransactions(string key)
         {
             var basePath = Plugin.Instance.GetType().Namespace + $".i18n.{key}.";
-            return Assembly.GetExecutingAssembly().GetManifestResourceNames()
+            return typeof(EmbyHelper).Assembly.GetManifestResourceNames()
                 .Where(i => i.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
                 .Select(i =>
-                    new TranslationInfo()
+                    new TranslationInfo
                     {
                         Locale = Path.GetFileNameWithoutExtension(i.Substring(basePath.Length)),
                         EmbeddedResourcePath = i
@@ -208,7 +204,7 @@ namespace EmbyKinopoiskRu.Helper
                         {
                             resourcePath = availableTranslations["en-US"];
                         }
-                        using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourcePath))
+                        using (Stream stream = typeof(EmbyHelper).Assembly.GetManifestResourceStream(resourcePath))
                         {
                             translation = jsonSerializer.DeserializeFromStream<TaskTranslation>(stream);
                         }

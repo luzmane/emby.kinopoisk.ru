@@ -11,11 +11,13 @@ using MediaBrowser.Model.Logging;
 
 namespace EmbyKinopoiskRu.Helper
 {
-    internal class KpHelper
+    internal static class KpHelper
     {
         private static readonly Regex Year = new Regex("(?<year>[0-9]{4})", RegexOptions.Compiled);
         private static readonly Regex NonAlphaNumeric = new Regex("[^а-яА-Яa-zA-Z0-9\\s]", RegexOptions.Compiled);
         private static readonly Regex MultiWhitespace = new Regex("\\s\\s+", RegexOptions.Compiled);
+        private const string PremierDateFormat = "yyyy-MM-dd'T'HH:mm:ss.fffZ";
+        private const string DateTimeYearFormat = "yyyy";
 
         internal static DateTimeOffset? GetPremierDate(KpPremiere premiere)
         {
@@ -25,7 +27,7 @@ namespace EmbyKinopoiskRu.Helper
             }
             if (DateTimeOffset.TryParseExact(
                 premiere.World,
-                "yyyy-MM-dd'T'HH:mm:ss.fffZ",
+                PremierDateFormat,
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.None,
                 out DateTimeOffset world))
@@ -34,7 +36,7 @@ namespace EmbyKinopoiskRu.Helper
             }
             if (DateTimeOffset.TryParseExact(
                 premiere.Russia,
-                "yyyy-MM-dd'T'HH:mm:ss.fffZ",
+                PremierDateFormat,
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.None,
                 out DateTimeOffset russia))
@@ -43,7 +45,7 @@ namespace EmbyKinopoiskRu.Helper
             }
             if (DateTimeOffset.TryParseExact(
                 premiere.Cinema,
-                "yyyy-MM-dd'T'HH:mm:ss.fffZ",
+                PremierDateFormat,
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.None,
                 out DateTimeOffset cinema))
@@ -52,7 +54,7 @@ namespace EmbyKinopoiskRu.Helper
             }
             if (DateTimeOffset.TryParseExact(
                 premiere.Digital,
-                "yyyy-MM-dd'T'HH:mm:ss.fffZ",
+                PremierDateFormat,
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.None,
                 out DateTimeOffset digital))
@@ -61,7 +63,7 @@ namespace EmbyKinopoiskRu.Helper
             }
             if (DateTimeOffset.TryParseExact(
                 premiere.Bluray,
-                "yyyy-MM-dd'T'HH:mm:ss.fffZ",
+                PremierDateFormat,
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.None,
                 out DateTimeOffset bluray))
@@ -70,7 +72,7 @@ namespace EmbyKinopoiskRu.Helper
             }
             if (DateTimeOffset.TryParseExact(
                 premiere.Dvd,
-                "yyyy-MM-dd'T'HH:mm:ss.fffZ",
+                PremierDateFormat,
                 CultureInfo.InvariantCulture,
                 DateTimeStyles.None,
                 out DateTimeOffset dvd))
@@ -85,7 +87,7 @@ namespace EmbyKinopoiskRu.Helper
         }
         internal static void AddToActivityLog(IActivityManager activityManager, string overview, string shortOverview)
         {
-            activityManager.Create(new ActivityLogEntry()
+            activityManager.Create(new ActivityLogEntry
             {
                 Name = Plugin.PluginKey,
                 Type = "PluginError",
@@ -105,7 +107,7 @@ namespace EmbyKinopoiskRu.Helper
                 yearSt = match.Success ? match.Groups["year"].Value : string.Empty;
             }
             _ = int.TryParse(yearSt, out var year);
-            _ = int.TryParse(DateTime.Now.ToString("yyyy", CultureInfo.InvariantCulture), out var currentYear);
+            _ = int.TryParse(DateTimeOffset.Now.ToString(DateTimeYearFormat, CultureInfo.InvariantCulture), out var currentYear);
             return (year > 1800 && year <= currentYear + 1) ? year : (int?)null;
         }
         internal static string CleanName(string name)

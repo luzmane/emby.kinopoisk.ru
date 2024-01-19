@@ -14,7 +14,7 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
     public abstract class KpBaseLocalMetadata<T> : ILocalMetadataProvider<T>
             where T : BaseItem, IHasProviderIds, new()
     {
-        private static readonly Regex KinopoiskIdRegex = new Regex(@"kp-?(?<kinopoiskId>\d+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+        private readonly Regex _kinopoiskIdRegex = new Regex(@"kp-?(?<kinopoiskId>\d+)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
         private readonly ILogger _log;
 
         /// <inheritdoc />
@@ -37,7 +37,7 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
 
             if (!string.IsNullOrEmpty(info.Path))
             {
-                Match match = KinopoiskIdRegex.Match(info.Path);
+                Match match = _kinopoiskIdRegex.Match(info.Path);
                 if (match.Success && int.TryParse(match.Groups["kinopoiskId"].Value, out var kinopoiskId))
                 {
                     _log.Info($"Detected kinopoisk id '{kinopoiskId}' for file '{info.Path}'");

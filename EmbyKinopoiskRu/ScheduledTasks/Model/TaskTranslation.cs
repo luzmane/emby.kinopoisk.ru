@@ -20,11 +20,5 @@ namespace EmbyKinopoiskRu.ScheduledTasks.Model
         /// </summary>
         public string Category { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TaskTranslation"/> class.
-        /// </summary>
-        public TaskTranslation()
-        {
-        }
     }
 }

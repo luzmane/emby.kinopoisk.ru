@@ -130,7 +130,7 @@ public abstract class BaseTest
 
         _ = _libraryManager
             .Setup(lm => lm.GetItemLinks(It.IsAny<long>(), It.IsAny<List<ItemLinkType>>()))
-            .Returns((long itemId, List<ItemLinkType> types) => new());
+            .Returns((long _, List<ItemLinkType> _) => new());
 
         _ = _libraryManager
             .Setup(lm => lm.UpdateItem(

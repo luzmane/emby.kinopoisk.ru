@@ -119,7 +119,7 @@ namespace EmbyKinopoiskRu
             return GetType().Assembly.GetManifestResourceNames()
                 .Where(i => i.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
                 .Select(i =>
-                    new TranslationInfo()
+                    new TranslationInfo
                     {
                         Locale = Path.GetFileNameWithoutExtension(i.Substring(basePath.Length)),
                         EmbeddedResourcePath = i

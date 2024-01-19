@@ -8,5 +8,6 @@
     "dotnet.inlayHints.enableInlayHintsForOtherParameters": true,
     "dotnetAcquisitionExtension.enableTelemetry": false,
     "gitlens.telemetry.enabled": false,
-    "redhat.telemetry.enabled": false
+    "redhat.telemetry.enabled": false,
+    "sonarlint.disableTelemetry": true
 }

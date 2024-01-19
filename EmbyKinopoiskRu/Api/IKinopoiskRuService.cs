@@ -13,21 +13,21 @@ namespace EmbyKinopoiskRu.Api
 {
     internal interface IKinopoiskRuService
     {
-        Task<MetadataResult<Movie>> GetMetadata(MovieInfo info, CancellationToken cancellationToken);
-        Task<IEnumerable<RemoteSearchResult>> GetSearchResults(MovieInfo searchInfo, CancellationToken cancellationToken);
-        Task<List<Movie>> GetMoviesByOriginalNameAndYear(string name, int? year, CancellationToken cancellationToken);
+        Task<MetadataResult<Movie>> GetMetadataAsync(MovieInfo info, CancellationToken cancellationToken);
+        Task<IEnumerable<RemoteSearchResult>> GetSearchResultsAsync(MovieInfo searchInfo, CancellationToken cancellationToken);
+        Task<List<Movie>> GetMoviesByOriginalNameAndYearAsync(string name, int? year, CancellationToken cancellationToken);
 
-        Task<MetadataResult<Series>> GetMetadata(SeriesInfo info, CancellationToken cancellationToken);
-        Task<IEnumerable<RemoteSearchResult>> GetSearchResults(SeriesInfo searchInfo, CancellationToken cancellationToken);
+        Task<MetadataResult<Series>> GetMetadataAsync(SeriesInfo info, CancellationToken cancellationToken);
+        Task<IEnumerable<RemoteSearchResult>> GetSearchResultsAsync(SeriesInfo searchInfo, CancellationToken cancellationToken);
 
-        Task<MetadataResult<Episode>> GetMetadata(EpisodeInfo info, CancellationToken cancellationToken);
+        Task<MetadataResult<Episode>> GetMetadataAsync(EpisodeInfo info, CancellationToken cancellationToken);
 
-        Task<MetadataResult<Person>> GetMetadata(PersonLookupInfo info, CancellationToken cancellationToken);
-        Task<IEnumerable<RemoteSearchResult>> GetSearchResults(PersonLookupInfo searchInfo, CancellationToken cancellationToken);
+        Task<MetadataResult<Person>> GetMetadataAsync(PersonLookupInfo info, CancellationToken cancellationToken);
+        Task<IEnumerable<RemoteSearchResult>> GetSearchResultsAsync(PersonLookupInfo searchInfo, CancellationToken cancellationToken);
 
-        Task<IEnumerable<RemoteImageInfo>> GetImages(BaseItem item, LibraryOptions libraryOptions, CancellationToken cancellationToken);
+        Task<IEnumerable<RemoteImageInfo>> GetImagesAsync(BaseItem item, LibraryOptions libraryOptions, CancellationToken cancellationToken);
 
-        Task<List<BaseItem>> GetTop250Collection(CancellationToken cancellationToken);
-        Task<ApiResult<Dictionary<string, long>>> GetKpIdByAnotherId(string externalIdType, IEnumerable<string> idList, CancellationToken cancellationToken);
+        Task<List<BaseItem>> GetTop250CollectionAsync(CancellationToken cancellationToken);
+        Task<ApiResult<Dictionary<string, long>>> GetKpIdByAnotherIdAsync(string externalIdType, IEnumerable<string> idList, CancellationToken cancellationToken);
     }
 }

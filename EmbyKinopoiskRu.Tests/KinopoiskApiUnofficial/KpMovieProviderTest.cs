@@ -62,7 +62,7 @@ public class KpMovieProviderTest : BaseTest
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_GetMetadata_Provider_Kp)}'");
 
-        var movieInfo = new MovieInfo()
+        var movieInfo = new MovieInfo
         {
             ProviderIds = new(new() { { Plugin.PluginKey, "326" } })
         };
@@ -115,7 +115,7 @@ public class KpMovieProviderTest : BaseTest
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_GetMetadata_Provider_Imdb)}'");
 
-        var movieInfo = new MovieInfo()
+        var movieInfo = new MovieInfo
         {
             ProviderIds = new(new() { { MetadataProviders.Imdb.ToString(), "tt0111161" } })
         };
@@ -168,7 +168,7 @@ public class KpMovieProviderTest : BaseTest
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_GetMetadata_NameAndYear)}'");
 
-        var movieInfo = new MovieInfo()
+        var movieInfo = new MovieInfo
         {
             Name = "Побег из Шоушенка",
             Year = 1994
@@ -226,7 +226,7 @@ public class KpMovieProviderTest : BaseTest
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("UN_KpMovieProvider_GetSearchResults_Provider_Kp");
 
-        var movieInfo = new MovieInfo()
+        var movieInfo = new MovieInfo
         {
             ProviderIds = new(new() { { Plugin.PluginKey, "326" } })
         };
@@ -259,7 +259,7 @@ public class KpMovieProviderTest : BaseTest
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("UN_KpMovieProvider_GetSearchResults_Provider_Imdb");
 
-        var movieInfo = new MovieInfo()
+        var movieInfo = new MovieInfo
         {
             ProviderIds = new(new() { { Plugin.PluginKey, "326" } })
         };
@@ -292,7 +292,7 @@ public class KpMovieProviderTest : BaseTest
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("UN_KpMovieProvider_GetSearchResults_NameAndYear");
 
-        var movieInfo = new MovieInfo()
+        var movieInfo = new MovieInfo
         {
             Name = "Побег из Шоушенка",
             Year = 1994

@@ -109,7 +109,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             try
             {
                 _logger.Info("Fetch top 250 list from API");
-                List<BaseItem> videos = await _plugin.GetKinopoiskService().GetTop250Collection(cancellationToken);
+                List<BaseItem> videos = await _plugin.GetKinopoiskService().GetTop250CollectionAsync(cancellationToken);
                 if (videos.Count == 0)
                 {
                     _logger.Info("Top 250 list was not fetched from API");
@@ -118,7 +118,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 _logger.Info($"Received {videos.Count} items from API");
 
                 _logger.Info($"Get all movies libraries");
-                QueryResult<BaseItem> librariesResult = _libraryManager.QueryItems(new InternalItemsQuery()
+                QueryResult<BaseItem> librariesResult = _libraryManager.QueryItems(new InternalItemsQuery
                 {
                     IncludeItemTypes = new[] { nameof(CollectionFolder) },
                     HasPath = true,
@@ -136,7 +136,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
 
                 foreach (CollectionFolder library in libraries)
                 {
-                    await ProcessLibrary(library, videos, _plugin.Configuration.GetCurrentTop250CollectionName());
+                    await ProcessLibraryAsync(library, videos, _plugin.Configuration.GetCurrentTop250CollectionName());
                     p += 90d / libraries.Count;
                     progress.Report(p);
                 }
@@ -156,7 +156,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             return Array.Empty<TaskTriggerInfo>();
         }
 
-        private async Task UpdateLibrary(List<BaseItem> itemsList, string collectionName)
+        private async Task UpdateLibraryAsync(List<BaseItem> itemsList, string collectionName)
         {
             if (!itemsList.Any())
             {
@@ -164,7 +164,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             }
             _logger.Info($"Adding {itemsList.Count} items to '{collectionName}'");
             _logger.Info($"Check if '{collectionName}' already exists");
-            QueryResult<BaseItem> existingCollectionResult = _libraryManager.QueryItems(new InternalItemsQuery()
+            QueryResult<BaseItem> existingCollectionResult = _libraryManager.QueryItems(new InternalItemsQuery
             {
                 IncludeItemTypes = new[] { "BoxSet" },
                 Recursive = false,
@@ -191,14 +191,14 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             else if (existingCollectionResult.TotalRecordCount == 0)
             {
                 _logger.Info($"Creating '{collectionName}' collection with following items: '{string.Join("', '", itemsList.Select(m => m.Name))}'");
-                CollectionFolder rootCollectionFolder = await EmbyHelper.InsureCollectionLibraryFolder(_libraryManager, _logger);
+                CollectionFolder rootCollectionFolder = await EmbyHelper.InsureCollectionLibraryFolderAsync(_libraryManager, _logger);
                 if (rootCollectionFolder == null)
                 {
                     _logger.Info($"The virtual folder 'Collections' was not found nor created. {collectionName} will not be created");
                 }
                 else
                 {
-                    _ = await _collectionManager.CreateCollection(new CollectionCreationOptions()
+                    _ = await _collectionManager.CreateCollection(new CollectionCreationOptions
                     {
                         IsLocked = false,
                         Name = collectionName,
@@ -219,13 +219,13 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             return EmbyHelper.GetTaskTranslation(_translations, _serverConfigurationManager, _jsonSerializer, _availableTranslations);
         }
 
-        private async Task ProcessLibrary(CollectionFolder library, List<BaseItem> items, string baseCollectionName)
+        private async Task ProcessLibraryAsync(CollectionFolder library, List<BaseItem> items, string baseCollectionName)
         {
             _logger.Info($"Searching relevant movies in '{library.Name}' library");
             var top250ProviderIdList = items
                 .SelectMany(m =>
                 {
-                    var toReturn = new List<KeyValuePair<string, string>>()
+                    var toReturn = new List<KeyValuePair<string, string>>
                     {
                         new KeyValuePair<string, string>(Plugin.PluginKey, m.GetProviderId(Plugin.PluginKey))
                     };
@@ -241,13 +241,13 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 })
                 .ToList();
             QueryResult<BaseItem> videosInLibraryQueryResult = top250ProviderIdList.Any()
-                ? _libraryManager.QueryItems(new InternalItemsQuery()
+                ? _libraryManager.QueryItems(new InternalItemsQuery
                 {
                     IncludeItemTypes = new[] { nameof(Movie) },
                     AnyProviderIdEquals = top250ProviderIdList,
                     Recursive = false,
                     IsVirtualItem = false,
-                    ParentIds = new long[] { library.InternalId },
+                    ParentIds = new[] { library.InternalId },
                 })
                 : new QueryResult<BaseItem>();
             var videosInLibrary = videosInLibraryQueryResult.Items
@@ -259,7 +259,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             string collectionName = _plugin.Configuration.NeedToCreateTop250InOneLib() ?
                 $"{baseCollectionName}" :
                 $"{baseCollectionName} ({library.Name})";
-            await UpdateLibrary(videosInLibrary, collectionName);
+            await UpdateLibraryAsync(videosInLibrary, collectionName);
 
             _logger.Info($"Finished with library '{library.Name}'");
         }

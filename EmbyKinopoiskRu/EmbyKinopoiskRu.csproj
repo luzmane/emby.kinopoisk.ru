@@ -7,7 +7,7 @@
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
 
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
-    <!-- <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild> -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
 
     <!-- nuget setup -->

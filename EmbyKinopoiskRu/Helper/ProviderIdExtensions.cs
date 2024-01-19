@@ -6,7 +6,7 @@ namespace EmbyKinopoiskRu.Helper
 {
     internal static class ProviderIdExtensions
     {
-        public static string GetSeriesProviderId(this EpisodeInfo instance, string name)
+        internal static string GetSeriesProviderId(this EpisodeInfo instance, string name)
         {
             if (instance.SeriesProviderIds == null)
             {

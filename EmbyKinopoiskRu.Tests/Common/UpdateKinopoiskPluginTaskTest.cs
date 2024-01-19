@@ -63,7 +63,7 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
-            .Returns(new ServerConfiguration() { UICulture = "ru" });
+            .Returns(new ServerConfiguration { UICulture = "ru" });
 
         _updateKinopoiskPluginTask.Name.Should().Be("Обновить плагин Кинопоиска", "this is name of the task on Russian");
         _updateKinopoiskPluginTask.Description.Should().Be("Скачать и установить новую версию плагина Кинопоиска с GitHub", "this is description of the task on Russian");
@@ -84,7 +84,7 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
-            .Returns(new ServerConfiguration() { UICulture = "en-us" });
+            .Returns(new ServerConfiguration { UICulture = "en-us" });
 
         _updateKinopoiskPluginTask.Name.Should().Be("Update Kinopoisk Plugin", "this is name of the task on English");
         _updateKinopoiskPluginTask.Description.Should().Be("Update Kinopoisk Plugin from GitHub", "this is description of the task on English");
@@ -105,7 +105,7 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
-            .Returns(new ServerConfiguration() { UICulture = "uk" });
+            .Returns(new ServerConfiguration { UICulture = "uk" });
 
         _updateKinopoiskPluginTask.Name.Should().Be("Оновити плагін Кінопошуку", "this is name of the task on Ukranian");
         _updateKinopoiskPluginTask.Description.Should().Be("Завантажити та встановити нову версію плагіна Кінопошуку з GitHub", "this is description of the task on Ukranian");
@@ -126,7 +126,7 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
-            .Returns(new ServerConfiguration() { UICulture = "bg" });
+            .Returns(new ServerConfiguration { UICulture = "bg" });
 
         _updateKinopoiskPluginTask.Name.Should().Be("Update Kinopoisk Plugin", "this is name of the task on not available language");
         _updateKinopoiskPluginTask.Description.Should().Be("Update Kinopoisk Plugin from GitHub", "this is description of the task on not available language");
@@ -144,6 +144,16 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
     public async void UpdateKinopoiskPluginTask_Execute_NoChanges()
     {
         Logger.Info($"Start '{nameof(UpdateKinopoiskPluginTask_Execute_NoChanges)}'");
+
+        Version version = typeof(UpdateKinopoiskPluginTask).Assembly.GetName().Version ?? throw new Exception("Unable to get dll version");
+        var currentVersion = $"{version.Major}.{version.Minor}.{version.Build}";
+
+        using HttpResponseInfo response = new()
+        {
+            Content = new MemoryStream(Encoding.UTF8.GetBytes(/*lang=json,strict*/ $"{{\"html_url\":\"https://\",\"tag_name\":\"{currentVersion}\",\"assets\":[{{\"name\":\"EmbyKinopoiskRu.dll\",\"content_type\":\"program\",\"browser_download_url\":\"https://\"}}],\"body\":\"description\"}}")),
+            StatusCode = HttpStatusCode.OK
+        };
+        _httpClient.ReturnResponse = response;
 
         using var cancellationTokenSource = new CancellationTokenSource();
         await _updateKinopoiskPluginTask.Execute(cancellationTokenSource.Token, new EmbyProgress());

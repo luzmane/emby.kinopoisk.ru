@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -55,7 +54,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         private readonly IInstallationManager _installationManager;
         private readonly IServerConfigurationManager _serverConfigurationManager;
         private readonly Dictionary<string, TaskTranslation> _translations = new Dictionary<string, TaskTranslation>();
-        private readonly Dictionary<string, string> _availableTranslations = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _availableTranslations;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateKinopoiskPluginTask"/> class.
@@ -84,14 +83,14 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         /// <inheritdoc />
         public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
         {
-            return new List<TaskTriggerInfo>()
+            return new List<TaskTriggerInfo>
             {
                 new TaskTriggerInfo
                 {
                     Type = TaskTriggerInfo.TriggerWeekly,
                     DayOfWeek = (DayOfWeek)new Random().Next(7),
-                    TimeOfDayTicks = new Random().Next(96) * 9000000000,
-                    MaxRuntimeTicks = 36000000000
+                    TimeOfDayTicks = new Random().Next(96) * 9_000_000_000,
+                    MaxRuntimeTicks = 36_000_000_000
                 }
             };
         }
@@ -99,10 +98,10 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         /// <inheritdoc />
         public async Task Execute(CancellationToken cancellationToken, IProgress<double> progress)
         {
-            Version version = Assembly.GetExecutingAssembly().GetName().Version ?? throw new Exception("Unable to get dll version");
+            Version version = typeof(UpdateKinopoiskPluginTask).Assembly.GetName().Version ?? throw new Exception("Unable to get dll version");
             var currentVersion = $"{version.Major}.{version.Minor}.{version.Build}";
 
-            GitHubLatestReleaseResponse release = await GetGitHubLatestRelease(cancellationToken);
+            GitHubLatestReleaseResponse release = await GetGitHubLatestReleaseAsync(cancellationToken);
 
             progress.Report(40d);
 
@@ -117,7 +116,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             else
             {
                 _logger.Info($"Update plugin from version {currentVersion} to version {release.tag_name}");
-                var package = new PackageVersionInfo()
+                var package = new PackageVersionInfo
                 {
                     guid = Plugin.PluginGuid,
                     name = Plugin.PluginName,
@@ -155,9 +154,9 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             }
         }
 
-        private async Task<GitHubLatestReleaseResponse> GetGitHubLatestRelease(CancellationToken cancellationToken)
+        private async Task<GitHubLatestReleaseResponse> GetGitHubLatestReleaseAsync(CancellationToken cancellationToken)
         {
-            var options = new HttpRequestOptions()
+            var options = new HttpRequestOptions
             {
                 CancellationToken = cancellationToken,
                 Url = "https://api.github.com/repos/luzmane/emby.kinopoisk.ru/releases/latest",
@@ -185,12 +184,12 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             if (match.Success)
             {
                 var version = match.Groups["version"].Value;
-                _logger.Info("Converting tag '{TagName}' to '{Version}'", tagName, version);
+                _logger.Info("Converting tag '{0}' to '{1}'", tagName, version);
                 return version;
             }
             else
             {
-                _logger.Info("Unable to parse tag: '{TagName}'", tagName);
+                _logger.Info("Unable to parse tag: '{0}'", tagName);
                 return string.Empty;
             }
         }

@@ -122,7 +122,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 }
 
                 _log.Info("Searching for movies/series without KP id, but with IMDB or TMDB");
-                QueryResult<BaseItem> itemsToUpdateResult = _libraryManager.QueryItems(new InternalItemsQuery()
+                QueryResult<BaseItem> itemsToUpdateResult = _libraryManager.QueryItems(new InternalItemsQuery
                 {
                     IncludeItemTypes = new[] { nameof(Movie), nameof(Series) },
                     MissingAnyProviderId = new[] { Plugin.PluginKey },
@@ -141,7 +141,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                         .Where(m => m.HasProviderId(MetadataProviders.Imdb.ToString()))
                         .Where(m => !string.IsNullOrWhiteSpace(m.GetProviderId(MetadataProviders.Imdb.ToString())))
                         .ToList();
-                    await UpdateItemsByProviderId(imdbList, MetadataProviders.Imdb.ToString(), cancellationToken);
+                    await UpdateItemsByProviderIdAsync(imdbList, MetadataProviders.Imdb.ToString(), cancellationToken);
                     _log.Info("Finishing update Kinopoisk IDs by Imdb ID");
                     progress.Report(50d);
 
@@ -150,7 +150,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                         .Where(m => m.HasProviderId(MetadataProviders.Tmdb.ToString()))
                         .Where(m => !string.IsNullOrWhiteSpace(m.GetProviderId(MetadataProviders.Tmdb.ToString())))
                         .ToList();
-                    await UpdateItemsByProviderId(tmdbList, MetadataProviders.Tmdb.ToString(), cancellationToken);
+                    await UpdateItemsByProviderIdAsync(tmdbList, MetadataProviders.Tmdb.ToString(), cancellationToken);
                     _log.Info("Finishing update Kinopoisk IDs by Tmdb ID");
                     progress.Report(100d);
                 }
@@ -162,7 +162,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             }
         }
 
-        private async Task UpdateItemsByProviderId(List<BaseItem> itemsToUpdate, string providerId, CancellationToken cancellationToken)
+        private async Task UpdateItemsByProviderIdAsync(List<BaseItem> itemsToUpdate, string providerId, CancellationToken cancellationToken)
         {
             _log.Info($"Requesting KP ID for {itemsToUpdate.Count} items by {providerId} ID from API");
             var count = (int)Math.Ceiling((double)itemsToUpdate.Count / CHUNK_SIZE);
@@ -170,7 +170,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             {
                 IEnumerable<BaseItem> workingList = itemsToUpdate.Skip(CHUNK_SIZE * i).Take(CHUNK_SIZE);
                 ApiResult<Dictionary<string, long>> fetchedIds = await Plugin.GetKinopoiskService()
-                    .GetKpIdByAnotherId(providerId, workingList.Select(m => m.GetProviderId(providerId)), cancellationToken);
+                    .GetKpIdByAnotherIdAsync(providerId, workingList.Select(m => m.GetProviderId(providerId)), cancellationToken);
                 if (fetchedIds.HasError)
                 {
                     var processed = i == 0 ? workingList.Count() : (CHUNK_SIZE * (i - 1)) + workingList.Count();

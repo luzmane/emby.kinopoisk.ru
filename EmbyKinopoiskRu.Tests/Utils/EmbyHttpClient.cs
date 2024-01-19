@@ -30,7 +30,7 @@ public class EmbyHttpClient : IHttpClient
         CacheValue<string> cachedResponse = CacheManager.GetFromCache(options.Url);
         if (cachedResponse.HasValue)
         {
-            return new HttpResponseInfo()
+            return new HttpResponseInfo
             {
                 Content = new MemoryStream(Encoding.UTF8.GetBytes(cachedResponse.Value)),
                 StatusCode = HttpStatusCode.OK
@@ -48,7 +48,7 @@ public class EmbyHttpClient : IHttpClient
         {
             CacheManager.AddToCache(options.Url, await res.Content.ReadAsStringAsync());
         }
-        return new HttpResponseInfo()
+        return new HttpResponseInfo
         {
             Content = await res.Content.ReadAsStreamAsync(),
             StatusCode = res.StatusCode
@@ -57,26 +57,26 @@ public class EmbyHttpClient : IHttpClient
 
     public Task<Stream> Get(MediaBrowser.Common.Net.HttpRequestOptions options)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public IDisposable GetConnectionContext(MediaBrowser.Common.Net.HttpRequestOptions options)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public Task<string> GetTempFile(MediaBrowser.Common.Net.HttpRequestOptions options)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public Task<HttpResponseInfo> GetTempFileResponse(MediaBrowser.Common.Net.HttpRequestOptions options)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public Task<HttpResponseInfo> Post(MediaBrowser.Common.Net.HttpRequestOptions options)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public Task<HttpResponseInfo> SendAsync(MediaBrowser.Common.Net.HttpRequestOptions options, string httpMethod)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 }

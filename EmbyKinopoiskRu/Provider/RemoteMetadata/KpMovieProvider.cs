@@ -50,14 +50,14 @@ namespace EmbyKinopoiskRu.Provider.RemoteMetadata
         public async Task<MetadataResult<Movie>> GetMetadata(MovieInfo info, CancellationToken cancellationToken)
         {
             _log.Info($"GetMetadata by MovieInfo:'{info.Name}', '{info.Year}'");
-            return await Plugin.Instance.GetKinopoiskService().GetMetadata(info, cancellationToken);
+            return await Plugin.Instance.GetKinopoiskService().GetMetadataAsync(info, cancellationToken);
         }
 
         /// <inheritdoc />
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(MovieInfo searchInfo, CancellationToken cancellationToken)
         {
             _log.Info($"GetSearchResults by MovieInfo:'{searchInfo.Name}', '{searchInfo.Year}'");
-            return await Plugin.Instance.GetKinopoiskService().GetSearchResults(searchInfo, cancellationToken);
+            return await Plugin.Instance.GetKinopoiskService().GetSearchResultsAsync(searchInfo, cancellationToken);
         }
     }
 }

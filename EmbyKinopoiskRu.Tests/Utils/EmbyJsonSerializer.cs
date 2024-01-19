@@ -21,62 +21,62 @@ public class EmbyJsonSerializer : IJsonSerializer
 
     public object DeserializeFromBytes(ReadOnlySpan<byte> bytes, Type type)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public T DeserializeFromBytes<T>(ReadOnlySpan<byte> bytes)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public T DeserializeFromFile<T>(string file) where T : class
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public Task<object> DeserializeFromFileAsync(Type type, string file)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public Task<T> DeserializeFromFileAsync<T>(string file) where T : class
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public T DeserializeFromSpan<T>(ReadOnlySpan<char> text)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public object DeserializeFromSpan(ReadOnlySpan<char> json, Type type)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public object DeserializeFromStream(Stream stream, Type type)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public Task<T> DeserializeFromStreamAsync<T>(Stream stream)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public Task<object> DeserializeFromStreamAsync(Stream stream, Type type)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public object DeserializeFromString(string json, Type type)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public void SerializeToFile(object obj, string file)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public ReadOnlySpan<char> SerializeToSpan(object obj)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public void SerializeToStream(object obj, Stream stream)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
     public string SerializeToString(object obj)
     {
-        throw new NotImplementedException();
+        throw new NotSupportedException();
     }
 }
