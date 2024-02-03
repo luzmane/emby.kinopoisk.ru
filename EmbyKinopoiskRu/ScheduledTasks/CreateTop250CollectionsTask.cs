@@ -22,7 +22,7 @@ using MediaBrowser.Model.Tasks;
 namespace EmbyKinopoiskRu.ScheduledTasks
 {
     /// <inheritdoc />
-    public class CreateTop250CollectionsTask : IScheduledTask, IConfigurableScheduledTask
+    public class CreateTop250CollectionsTask// : IScheduledTask, IConfigurableScheduledTask
     {
         private static bool s_isScanRunning;
         private static readonly object ScanLock = new object();
@@ -73,7 +73,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                   IJsonSerializer jsonSerializer,
                   IServerConfigurationManager serverConfigurationManager)
         {
-            _logger = logManager.GetLogger(nameof(CreateTop250CollectionsTask));
+            _logger = logManager.GetLogger(GetType().Name);
             if (Plugin.Instance == null)
             {
                 throw new NullReferenceException($"Plugin '{Plugin.PluginName}' instance is null");

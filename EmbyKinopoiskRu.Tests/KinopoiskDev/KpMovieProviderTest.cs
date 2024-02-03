@@ -1,4 +1,5 @@
 using System.Net;
+using System.Globalization;
 
 using EmbyKinopoiskRu.Configuration;
 using EmbyKinopoiskRu.Provider.RemoteMetadata;
@@ -8,9 +9,14 @@ using FluentAssertions;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
+using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Providers;
+using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Providers;
+using MediaBrowser.Model.Querying;
+using MediaBrowser.Controller.Collections;
+using MediaBrowser.Controller.Library;
 
 namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
 
@@ -20,6 +26,7 @@ public class KpMovieProviderTest : BaseTest
     private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpMovieProviderTest));
 
     private readonly KpMovieProvider _kpMovieProvider;
+    private readonly long[] _internalIdPotterSequence = new long[] { 101, 102, 103, 104, 105, 106, 107, 108 };
 
 
     #region Test configs
@@ -27,11 +34,153 @@ public class KpMovieProviderTest : BaseTest
     {
         _pluginConfiguration.Token = GetKinopoiskDevToken();
 
-        ConfigLibraryManager();
+        SetupLibraryManager();
 
         ConfigXmlSerializer();
 
         _kpMovieProvider = new(_httpClient, _logManager.Object);
+    }
+    private void SetupLibraryManager()
+    {
+        ConfigLibraryManager();
+
+        var potterSequences = new long[] { 688, 322, 8_408, 48_356, 89_515, 276_762, 407_636, 4_716_622 }
+            .Select(id => new KeyValuePair<string, string>(Plugin.PluginKey, id.ToString(CultureInfo.InvariantCulture)))
+            .ToList();
+        var imdbPotterSequences = new[] { "tt1201607", "tt0330373", "tt0373889", "tt0417741", "tt0926084", "tt16116174" }
+            .Select(id => new KeyValuePair<string, string>(MetadataProviders.Imdb.ToString(), id.ToString(CultureInfo.InvariantCulture)))
+            .ToList();
+        var tmdbPotterSequences = new[] { "12445", "674", "675", "767", "12444", "899082" }
+            .Select(id => new KeyValuePair<string, string>(MetadataProviders.Tmdb.ToString(), id.ToString(CultureInfo.InvariantCulture)))
+            .ToList();
+
+        _ = _libraryManager // EmbyHelper.GetSequenceInternalIds(). Items in lib with Kp internal Id
+            .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
+                !query.Recursive
+                && query.IsVirtualItem == false
+                && query.IncludeItemTypes.Length == 2
+                && nameof(Movie).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
+                && nameof(Series).Equals(query.IncludeItemTypes[1], StringComparison.Ordinal)
+                && query.AnyProviderIdEquals.Count == potterSequences.Count
+                && query.AnyProviderIdEquals.All(item => potterSequences.Contains(item)))))
+            .Returns(new QueryResult<BaseItem>
+            {
+                Items = new BaseItem[] {
+                    new Movie {
+                        Name = "Гарри Поттер и Тайная комната",
+                        InternalId = 101L,
+                        ProviderIds = new(new Dictionary<string, string>
+                        {
+                            { Plugin.PluginKey, "688" },
+                            { MetadataProviders.Imdb.ToString(), "tt0295297" },
+                            { MetadataProviders.Tmdb.ToString(), "672" }
+                        })
+                    },
+                    new Movie {
+                        Name = "Гарри Поттер и узник Азкабана",
+                        InternalId = 102L,
+                        ProviderIds = new(new Dictionary<string, string>
+                        {
+                            { Plugin.PluginKey, "322" },
+                            { MetadataProviders.Imdb.ToString(), "tt0304141" },
+                            { MetadataProviders.Tmdb.ToString(), "673" }
+                        }),
+                    },
+                }
+            });
+
+        _ = _libraryManager // EmbyHelper.GetSequenceInternalIds(). Items in lib with IMDB internal Id
+            .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
+                !query.Recursive
+                && query.IsVirtualItem == false
+                && query.IncludeItemTypes.Length == 2
+                && nameof(Movie).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
+                && nameof(Series).Equals(query.IncludeItemTypes[1], StringComparison.Ordinal)
+                && query.AnyProviderIdEquals.Count == imdbPotterSequences.Count
+                && query.AnyProviderIdEquals.All(item => imdbPotterSequences.Contains(item))
+            )))
+            .Returns(new QueryResult<BaseItem>
+            {
+                Items = new BaseItem[] {
+                    new Movie {
+                        Name = "Гарри Поттер и Кубок огня",
+                        InternalId = 103L,
+                        ProviderIds = new(new Dictionary<string, string>
+                        {
+                            { Plugin.PluginKey, "8408" },
+                            { MetadataProviders.Imdb.ToString(), "tt0330373" },
+                            { MetadataProviders.Tmdb.ToString(), "674" }
+                        })
+                    },
+                    new Movie {
+                        Name = "Гарри Поттер и Орден Феникса",
+                        InternalId = 104L,
+                        ProviderIds = new(new Dictionary<string, string>
+                        {
+                            { Plugin.PluginKey, "48356" },
+                            { MetadataProviders.Tmdb.ToString(), "675" },
+                            { MetadataProviders.Imdb.ToString(), "tt0373889" }
+                        })
+                    },
+                    new Movie {
+                        Name = "Гарри Поттер и Принц-полукровка",
+                        InternalId = 105L,
+                        ProviderIds = new(new Dictionary<string, string>
+                        {
+                            { Plugin.PluginKey, "89515" },
+                            { MetadataProviders.Tmdb.ToString(), "767" },
+                            { MetadataProviders.Imdb.ToString(), "tt0417741" }
+                        })
+                    },
+                    new Movie {
+                        Name = "Гарри Поттер и Дары Смерти: Часть I",
+                        InternalId = 106L,
+                        ProviderIds = new(new Dictionary<string, string>
+                        {
+                            { Plugin.PluginKey, "276762" },
+                            { MetadataProviders.Tmdb.ToString(), "12444" },
+                            { MetadataProviders.Imdb.ToString(), "tt0926084" }
+                        }),
+                    },
+                }
+            });
+
+        _ = _libraryManager // EmbyHelper.GetSequenceInternalIds(). Items in lib with TMDB internal Id
+            .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
+                !query.Recursive
+                && query.IsVirtualItem == false
+                && query.IncludeItemTypes.Length == 2
+                && nameof(Movie).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
+                && nameof(Series).Equals(query.IncludeItemTypes[1], StringComparison.Ordinal)
+                && query.AnyProviderIdEquals.Count == tmdbPotterSequences.Count
+                && query.AnyProviderIdEquals.All(item => tmdbPotterSequences.Contains(item))
+            )))
+            .Returns(new QueryResult<BaseItem>
+            {
+                Items = new BaseItem[] {
+                    new Movie {
+                        Name = "Гарри Поттер и Дары Смерти: Часть II",
+                        InternalId = 107L,
+                        ProviderIds = new(new Dictionary<string, string>
+                        {
+                            { Plugin.PluginKey, "407636" },
+                            { MetadataProviders.Imdb.ToString(), "tt1201607" },
+                            { MetadataProviders.Tmdb.ToString(), "12445" }
+                        })
+                    },
+                    new Movie {
+                        Name = "Гарри Поттер 20 лет спустя: Возвращение в Хогвартс",
+                        InternalId = 108L,
+                        ProviderIds = new(new Dictionary<string, string>
+                        {
+                            { Plugin.PluginKey, "4716622" },
+                            { MetadataProviders.Tmdb.ToString(), "899082" },
+                            { MetadataProviders.Imdb.ToString(), "tt16116174" }
+                        })
+                    },
+                }
+            });
+
     }
 
     #endregion
@@ -41,12 +190,12 @@ public class KpMovieProviderTest : BaseTest
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_ForCodeCoverage)}'");
 
-        _kpMovieProvider.Name.Should().NotBeNull("name is hardcoded");
+        _kpMovieProvider.Name.Should().NotBeNull();
 
         _kpMovieProvider.Features.Should().NotBeEmpty();
 
         HttpResponseInfo response = await _kpMovieProvider.GetImageResponse("https://www.google.com", CancellationToken.None);
-        response.StatusCode.Should().Be(HttpStatusCode.OK, "this is status code of the response to google.com");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         _logManager.Verify(lm => lm.GetLogger("KpMovieProvider"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
@@ -72,35 +221,12 @@ public class KpMovieProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Movie> result = await _kpMovieProvider.GetMetadata(movieInfo, cancellationTokenSource.Token);
 
-        result.HasMetadata.Should().BeTrue("that mean the item was found");
-        Movie movie = result.Item;
-        movie.Should().NotBeNull("that mean the movie was found");
-        movie.GetProviderId(Plugin.PluginKey).Should().Be("326", "id of the requested item");
-        movie.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0111161", "IMDB id of the requested item");
-        movie.GetProviderId(MetadataProviders.Tmdb).Should().Be("278", "TMDB id of the requested item");
-        movie.MediaType.Should().Be("Video", "this is video");
-        movie.CommunityRating.Should().BeGreaterThan(5, "such value received from API");
-        movie.ExternalId.Should().Be("326", "KP id of requested item");
-        movie.Genres.Should().ContainSingle();
-        movie.Genres[0].Should().Be("драма", "the film has only this genre");
-        movie.Name.Should().Be("Побег из Шоушенка", "this is the name of the movie");
-        movie.OfficialRating.Should().Be("r", "this is film's OfficialRating");
-        movie.OriginalTitle.Should().Be("The Shawshank Redemption", "this is the original name of the movie");
-        movie.Overview.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.<br/><br/><b>Интересное:</b><br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фильм снят по мотивам повести <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> «Рита Хейуорт и спасение из Шоушенка» (Rita Hayworth and Shawshank Redemption), опубликованной в составе сборника «Четыре сезона» (Different Seasons, 1982).<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Съемки проходили в&#160;Мэнсфилдской исправительной колонии в&#160;штате Огайо. Тюрьма находилась в&#160;таком плачевном состоянии, что пришлось приводить её&#160;в&#160;должный вид.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Оригинальная повесть <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> была, по словам самого писателя, кульминацией всех его впечатлений от различных тюремных фильмов, которые он смотрел в детстве.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* <a href=\"/name/24263/\" class=\"all\">Стивен Кинг</a> согласился продать права на&#160;свое произведение практически даром, так как с&#160;<a href=\"/name/24262/\" class=\"all\">Фрэнком</a> их&#160;связывает давняя крепкая дружба. Произошло это после того, как Фрэнк довольно успешно экранизировал рассказ Кинга &#171;<a href=\"/film/7429/\" class=\"all\">Женщина в палате</a>&#187;.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Американское общество защиты животных выступило с&#160;критикой в&#160;адрес фильма, в&#160;котором единственным представителем фауны стал ворон старика Брукса. В&#160;картине есть сцена кормления птицы червяком, найденном во&#160;время обеда в&#160;тарелке главного героя фильма. Общество настояло на&#160;том, чтобы была использована уже мертвая личинка, погибшая естественной смертью. После того как такая особь была найдена, сцену отсняли.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Томми Уильямса изначально была написана под <a href=\"/name/25584/\" class=\"all\">Брэда Питта</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Картина, которую смотрят заключенные, — &#171;<a href=\"/film/8299/\" class=\"all\">Гильда</a>&#187;.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Начальник тюрьмы Нортон насвистывает гимн «Eine feste Burg ist unser Gott», название которого переводится примерно так: «Могучая крепость и есть наш бог».<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фотографии молодого <a href=\"/name/6750/\" class=\"all\">Моргана Фримана</a> на&#160;документах на&#160;самом деле являются фотографиями его сына <a href=\"/name/6767/\" class=\"all\">Альфонсо Фримана</a>, который также снялся в&#160;одном из&#160;эпизодов фильма.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Несмотря на&#160;то, что в&#160;кинотеатрах фильм не&#160;собрал больших денег, он&#160;стал одним из&#160;самых кассовых релизов на&#160;видео, а&#160;впоследствии и&#160;на&#160;DVD.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фильм посвящён Аллену Грину (Allen Greene) — близкому другу режиссёра. Аллен скончался незадолго до выхода фильма из-за осложнений СПИДа.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Бывший начальник Мэнсфилдской тюрьмы, где проходили натурные съёмки фильма, <a href=\"/name/1104241/\" class=\"all\">Дэннис Бэйкер</a> снялся в роли пожилого заключённого, сидящего в тюремном автобусе позади Томми Уильямса.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Сценарий <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a> очень понравился другому режиссёру, успешно экранизировавшему произведения <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a>, — <a href=\"/name/5899/\" class=\"all\">Робу Райнеру</a>, постановщику &#171;<a href=\"/film/498/\" class=\"all\">Останься со мной</a>&#187; (1986) и &#171;<a href=\"/film/1574/\" class=\"all\">Мизери</a>&#187; (1990). Райнер был так захвачен материалом, что предложил Дарабонту $2,5 млн за права на сценарий и постановку фильма. Дарабонт серьёзно обдумал предложение, но в конечном счёте решил, что для него этот проект — &#171;шанс сделать что-то действительно великое&#187;, и поставил фильм сам.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* <a href=\"/name/5899/\" class=\"all\">Роб Райнер</a> видел в ролях Реда и Энди Дюфрейна соответственно <a href=\"/name/5679/\" class=\"all\">Харрисона Форда</a> и <a href=\"/name/20302/\" class=\"all\">Тома Круза</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Энди Дюфрейна изначально предложили <a href=\"/name/9144/\" class=\"all\">Тому Хэнксу</a>. Он очень заинтересовался, но не смог принять предложение, из-за того что уже был занят в проекте &#171;<a href=\"/film/448/\" class=\"all\">Форрест Гамп</a>&#187; (1994). Впоследствии Том Хэнкс снялся в главной роли в тюремной драме <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a> &#171;<a href=\"/film/435/\" class=\"all\">Зеленая миля</a>&#187; (1999), также поставленной по роману <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Энди Дюфрейна также предлагали <a href=\"/name/24087/\" class=\"all\">Кевину Костнеру</a>, но актёр отказался от предложения, о чем впоследствии сильно жалел.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* В оригинальной повести <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> Ред — ирландец. Несмотря на то, что в экранизации роль Реда сыграл чернокожий <a href=\"/name/6750/\" class=\"all\">Морган Фриман</a>, было решено оставить в фильме реплику Реда «Может быть, потому что я — ирландец», — как удачную шутку.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Несмотря на то что почти все жители города Мэнсфилда изъявили желание принять участие в съёмках массовых сцен фильма, большинство жителей оказались слишком заняты своей работой и не смогли сниматься. Массовку пришлось набирать в местной богадельне, причём некоторые из её обитателей были бывшими заключенными.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Когда на экране показываются крупные планы рук Энди Дюфрейна, когда в начале фильма он заряжает револьвер и когда Энди вырезает своё имя на стене камеры, — это на самом деле руки режиссёра <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a>. Эти кадры были сняты в процессе постпроизводства фильма.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Двое из заключённых Шоушенка носят имена Хейвуд и Флойд. Это отсылка к трилогии <a href=\"/name/47956/\" class=\"all\">Артура Ч. Кларка</a> «<a href=\"/film/380/\" class=\"all\">Космическая одиссея</a>», связующим героем которой является доктор Хейвуд Флойд.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Тюремный номер Энди Дюфрейна — 37927.<br/>", "this is film's Overview");
-        movie.ProductionYear.Should().Be(1994, "this is movie ProductionYear");
-        movie.RemoteTrailers.Length.Should().Be(0);
-        movie.Size.Should().Be(142, "this is movie Size");
-        movie.SortName.Should().Be(movie.Name, "SortName should be equal to Name");
-        movie.Studios.Should().ContainSingle();
-        movie.Tagline.Should().Be("Страх - это кандалы. Надежда - это свобода", "this is a Tagline of the movie");
+        result.HasMetadata.Should().BeTrue();
+        VerifyMovie326(result.Item);
 
-        result.People.Should().HaveCountGreaterThanOrEqualTo(17, "a number of the movie actors");
-        PersonInfo? person = result.People.FirstOrDefault(p => "Тим Роббинс".Equals(p.Name, StringComparison.Ordinal));
-        person.Should().NotBeNull("that mean the person was found");
-        person.GetProviderId(Plugin.PluginKey).Should().Be("7987", "id of the requested item");
-        person!.Role.Should().Be("Andy Dufresne", "this is person's Role");
-        person.Name.Should().Be("Тим Роббинс", "this is the person's name");
-        person.ImageUrl.Should().NotBeNullOrWhiteSpace("person image exists");
+        result.People.Should().NotBeEmpty();
+        result.People.Should().HaveCountGreaterThanOrEqualTo(17);
+        VerifyPersonInfo7987(result.People.FirstOrDefault(p => "Тим Роббинс".Equals(p.Name, StringComparison.Ordinal)));
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -128,35 +254,12 @@ public class KpMovieProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Movie> result = await _kpMovieProvider.GetMetadata(movieInfo, cancellationTokenSource.Token);
 
-        result.HasMetadata.Should().BeTrue("that mean the item was found");
-        Movie movie = result.Item;
-        movie.Should().NotBeNull("that mean the movie was found");
-        movie.GetProviderId(Plugin.PluginKey).Should().Be("326", "id of the requested item");
-        movie.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0111161", "IMDB id of the requested item");
-        movie.GetProviderId(MetadataProviders.Tmdb).Should().Be("278", "TMDB id of the requested item");
-        movie.MediaType.Should().Be("Video", "this is video");
-        movie.CommunityRating.Should().BeGreaterThan(5, "such value received from API");
-        movie.ExternalId.Should().Be("326", "KP id of requested item");
-        movie.Genres.Should().ContainSingle();
-        movie.Genres[0].Should().Be("драма", "the film has only this genre");
-        movie.Name.Should().Be("Побег из Шоушенка", "this is the name of the movie");
-        movie.OfficialRating.Should().Be("r", "this is film's OfficialRating");
-        movie.OriginalTitle.Should().Be("The Shawshank Redemption", "this is the original name of the movie");
-        movie.Overview.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.<br/><br/><b>Интересное:</b><br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фильм снят по мотивам повести <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> «Рита Хейуорт и спасение из Шоушенка» (Rita Hayworth and Shawshank Redemption), опубликованной в составе сборника «Четыре сезона» (Different Seasons, 1982).<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Съемки проходили в&#160;Мэнсфилдской исправительной колонии в&#160;штате Огайо. Тюрьма находилась в&#160;таком плачевном состоянии, что пришлось приводить её&#160;в&#160;должный вид.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Оригинальная повесть <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> была, по словам самого писателя, кульминацией всех его впечатлений от различных тюремных фильмов, которые он смотрел в детстве.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* <a href=\"/name/24263/\" class=\"all\">Стивен Кинг</a> согласился продать права на&#160;свое произведение практически даром, так как с&#160;<a href=\"/name/24262/\" class=\"all\">Фрэнком</a> их&#160;связывает давняя крепкая дружба. Произошло это после того, как Фрэнк довольно успешно экранизировал рассказ Кинга &#171;<a href=\"/film/7429/\" class=\"all\">Женщина в палате</a>&#187;.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Американское общество защиты животных выступило с&#160;критикой в&#160;адрес фильма, в&#160;котором единственным представителем фауны стал ворон старика Брукса. В&#160;картине есть сцена кормления птицы червяком, найденном во&#160;время обеда в&#160;тарелке главного героя фильма. Общество настояло на&#160;том, чтобы была использована уже мертвая личинка, погибшая естественной смертью. После того как такая особь была найдена, сцену отсняли.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Томми Уильямса изначально была написана под <a href=\"/name/25584/\" class=\"all\">Брэда Питта</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Картина, которую смотрят заключенные, — &#171;<a href=\"/film/8299/\" class=\"all\">Гильда</a>&#187;.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Начальник тюрьмы Нортон насвистывает гимн «Eine feste Burg ist unser Gott», название которого переводится примерно так: «Могучая крепость и есть наш бог».<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фотографии молодого <a href=\"/name/6750/\" class=\"all\">Моргана Фримана</a> на&#160;документах на&#160;самом деле являются фотографиями его сына <a href=\"/name/6767/\" class=\"all\">Альфонсо Фримана</a>, который также снялся в&#160;одном из&#160;эпизодов фильма.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Несмотря на&#160;то, что в&#160;кинотеатрах фильм не&#160;собрал больших денег, он&#160;стал одним из&#160;самых кассовых релизов на&#160;видео, а&#160;впоследствии и&#160;на&#160;DVD.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фильм посвящён Аллену Грину (Allen Greene) — близкому другу режиссёра. Аллен скончался незадолго до выхода фильма из-за осложнений СПИДа.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Бывший начальник Мэнсфилдской тюрьмы, где проходили натурные съёмки фильма, <a href=\"/name/1104241/\" class=\"all\">Дэннис Бэйкер</a> снялся в роли пожилого заключённого, сидящего в тюремном автобусе позади Томми Уильямса.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Сценарий <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a> очень понравился другому режиссёру, успешно экранизировавшему произведения <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a>, — <a href=\"/name/5899/\" class=\"all\">Робу Райнеру</a>, постановщику &#171;<a href=\"/film/498/\" class=\"all\">Останься со мной</a>&#187; (1986) и &#171;<a href=\"/film/1574/\" class=\"all\">Мизери</a>&#187; (1990). Райнер был так захвачен материалом, что предложил Дарабонту $2,5 млн за права на сценарий и постановку фильма. Дарабонт серьёзно обдумал предложение, но в конечном счёте решил, что для него этот проект — &#171;шанс сделать что-то действительно великое&#187;, и поставил фильм сам.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* <a href=\"/name/5899/\" class=\"all\">Роб Райнер</a> видел в ролях Реда и Энди Дюфрейна соответственно <a href=\"/name/5679/\" class=\"all\">Харрисона Форда</a> и <a href=\"/name/20302/\" class=\"all\">Тома Круза</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Энди Дюфрейна изначально предложили <a href=\"/name/9144/\" class=\"all\">Тому Хэнксу</a>. Он очень заинтересовался, но не смог принять предложение, из-за того что уже был занят в проекте &#171;<a href=\"/film/448/\" class=\"all\">Форрест Гамп</a>&#187; (1994). Впоследствии Том Хэнкс снялся в главной роли в тюремной драме <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a> &#171;<a href=\"/film/435/\" class=\"all\">Зеленая миля</a>&#187; (1999), также поставленной по роману <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Энди Дюфрейна также предлагали <a href=\"/name/24087/\" class=\"all\">Кевину Костнеру</a>, но актёр отказался от предложения, о чем впоследствии сильно жалел.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* В оригинальной повести <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> Ред — ирландец. Несмотря на то, что в экранизации роль Реда сыграл чернокожий <a href=\"/name/6750/\" class=\"all\">Морган Фриман</a>, было решено оставить в фильме реплику Реда «Может быть, потому что я — ирландец», — как удачную шутку.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Несмотря на то что почти все жители города Мэнсфилда изъявили желание принять участие в съёмках массовых сцен фильма, большинство жителей оказались слишком заняты своей работой и не смогли сниматься. Массовку пришлось набирать в местной богадельне, причём некоторые из её обитателей были бывшими заключенными.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Когда на экране показываются крупные планы рук Энди Дюфрейна, когда в начале фильма он заряжает револьвер и когда Энди вырезает своё имя на стене камеры, — это на самом деле руки режиссёра <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a>. Эти кадры были сняты в процессе постпроизводства фильма.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Двое из заключённых Шоушенка носят имена Хейвуд и Флойд. Это отсылка к трилогии <a href=\"/name/47956/\" class=\"all\">Артура Ч. Кларка</a> «<a href=\"/film/380/\" class=\"all\">Космическая одиссея</a>», связующим героем которой является доктор Хейвуд Флойд.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Тюремный номер Энди Дюфрейна — 37927.<br/>", "this is film's Overview");
-        movie.ProductionYear.Should().Be(1994, "this is movie ProductionYear");
-        movie.RemoteTrailers.Length.Should().Be(0);
-        movie.Size.Should().Be(142, "this is movie Size");
-        movie.SortName.Should().Be(movie.Name, "SortName should be equal to Name");
-        movie.Studios.Should().ContainSingle();
-        movie.Tagline.Should().Be("Страх - это кандалы. Надежда - это свобода", "this is a Tagline of the movie");
+        result.HasMetadata.Should().BeTrue();
+        VerifyMovie326(result.Item);
 
-        result.People.Should().HaveCountGreaterThanOrEqualTo(17, "a number of the movie actors");
-        PersonInfo? person = result.People.FirstOrDefault(p => "Тим Роббинс".Equals(p.Name, StringComparison.Ordinal));
-        person.Should().NotBeNull("that mean the person was found");
-        person.GetProviderId(Plugin.PluginKey).Should().Be("7987", "id of the requested item");
-        person!.Role.Should().Be("Andy Dufresne", "this is person's Role");
-        person.Name.Should().Be("Тим Роббинс", "this is the person's name");
-        person.ImageUrl.Should().NotBeNullOrWhiteSpace("person image exists");
+        result.People.Should().NotBeEmpty();
+        result.People.Should().HaveCountGreaterThanOrEqualTo(17);
+        VerifyPersonInfo7987(result.People.FirstOrDefault(p => "Тим Роббинс".Equals(p.Name, StringComparison.Ordinal)));
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -184,35 +287,12 @@ public class KpMovieProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Movie> result = await _kpMovieProvider.GetMetadata(movieInfo, cancellationTokenSource.Token);
 
-        result.HasMetadata.Should().BeTrue("that mean the item was found");
-        Movie movie = result.Item;
-        movie.Should().NotBeNull("that mean the movie was found");
-        movie.GetProviderId(Plugin.PluginKey).Should().Be("326", "id of the requested item");
-        movie.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0111161", "IMDB id of the requested item");
-        movie.GetProviderId(MetadataProviders.Tmdb).Should().Be("278", "TMDB id of the requested item");
-        movie.MediaType.Should().Be("Video", "this is video");
-        movie.CommunityRating.Should().BeGreaterThan(5, "such value received from API");
-        movie.ExternalId.Should().Be("326", "KP id of requested item");
-        movie.Genres.Should().ContainSingle();
-        movie.Genres[0].Should().Be("драма", "the film has only this genre");
-        movie.Name.Should().Be("Побег из Шоушенка", "this is the name of the movie");
-        movie.OfficialRating.Should().Be("r", "this is film's OfficialRating");
-        movie.OriginalTitle.Should().Be("The Shawshank Redemption", "this is the original name of the movie");
-        movie.Overview.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.<br/><br/><b>Интересное:</b><br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фильм снят по мотивам повести <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> «Рита Хейуорт и спасение из Шоушенка» (Rita Hayworth and Shawshank Redemption), опубликованной в составе сборника «Четыре сезона» (Different Seasons, 1982).<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Съемки проходили в&#160;Мэнсфилдской исправительной колонии в&#160;штате Огайо. Тюрьма находилась в&#160;таком плачевном состоянии, что пришлось приводить её&#160;в&#160;должный вид.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Оригинальная повесть <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> была, по словам самого писателя, кульминацией всех его впечатлений от различных тюремных фильмов, которые он смотрел в детстве.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* <a href=\"/name/24263/\" class=\"all\">Стивен Кинг</a> согласился продать права на&#160;свое произведение практически даром, так как с&#160;<a href=\"/name/24262/\" class=\"all\">Фрэнком</a> их&#160;связывает давняя крепкая дружба. Произошло это после того, как Фрэнк довольно успешно экранизировал рассказ Кинга &#171;<a href=\"/film/7429/\" class=\"all\">Женщина в палате</a>&#187;.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Американское общество защиты животных выступило с&#160;критикой в&#160;адрес фильма, в&#160;котором единственным представителем фауны стал ворон старика Брукса. В&#160;картине есть сцена кормления птицы червяком, найденном во&#160;время обеда в&#160;тарелке главного героя фильма. Общество настояло на&#160;том, чтобы была использована уже мертвая личинка, погибшая естественной смертью. После того как такая особь была найдена, сцену отсняли.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Томми Уильямса изначально была написана под <a href=\"/name/25584/\" class=\"all\">Брэда Питта</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Картина, которую смотрят заключенные, — &#171;<a href=\"/film/8299/\" class=\"all\">Гильда</a>&#187;.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Начальник тюрьмы Нортон насвистывает гимн «Eine feste Burg ist unser Gott», название которого переводится примерно так: «Могучая крепость и есть наш бог».<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фотографии молодого <a href=\"/name/6750/\" class=\"all\">Моргана Фримана</a> на&#160;документах на&#160;самом деле являются фотографиями его сына <a href=\"/name/6767/\" class=\"all\">Альфонсо Фримана</a>, который также снялся в&#160;одном из&#160;эпизодов фильма.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Несмотря на&#160;то, что в&#160;кинотеатрах фильм не&#160;собрал больших денег, он&#160;стал одним из&#160;самых кассовых релизов на&#160;видео, а&#160;впоследствии и&#160;на&#160;DVD.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фильм посвящён Аллену Грину (Allen Greene) — близкому другу режиссёра. Аллен скончался незадолго до выхода фильма из-за осложнений СПИДа.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Бывший начальник Мэнсфилдской тюрьмы, где проходили натурные съёмки фильма, <a href=\"/name/1104241/\" class=\"all\">Дэннис Бэйкер</a> снялся в роли пожилого заключённого, сидящего в тюремном автобусе позади Томми Уильямса.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Сценарий <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a> очень понравился другому режиссёру, успешно экранизировавшему произведения <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a>, — <a href=\"/name/5899/\" class=\"all\">Робу Райнеру</a>, постановщику &#171;<a href=\"/film/498/\" class=\"all\">Останься со мной</a>&#187; (1986) и &#171;<a href=\"/film/1574/\" class=\"all\">Мизери</a>&#187; (1990). Райнер был так захвачен материалом, что предложил Дарабонту $2,5 млн за права на сценарий и постановку фильма. Дарабонт серьёзно обдумал предложение, но в конечном счёте решил, что для него этот проект — &#171;шанс сделать что-то действительно великое&#187;, и поставил фильм сам.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* <a href=\"/name/5899/\" class=\"all\">Роб Райнер</a> видел в ролях Реда и Энди Дюфрейна соответственно <a href=\"/name/5679/\" class=\"all\">Харрисона Форда</a> и <a href=\"/name/20302/\" class=\"all\">Тома Круза</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Энди Дюфрейна изначально предложили <a href=\"/name/9144/\" class=\"all\">Тому Хэнксу</a>. Он очень заинтересовался, но не смог принять предложение, из-за того что уже был занят в проекте &#171;<a href=\"/film/448/\" class=\"all\">Форрест Гамп</a>&#187; (1994). Впоследствии Том Хэнкс снялся в главной роли в тюремной драме <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a> &#171;<a href=\"/film/435/\" class=\"all\">Зеленая миля</a>&#187; (1999), также поставленной по роману <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Энди Дюфрейна также предлагали <a href=\"/name/24087/\" class=\"all\">Кевину Костнеру</a>, но актёр отказался от предложения, о чем впоследствии сильно жалел.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* В оригинальной повести <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> Ред — ирландец. Несмотря на то, что в экранизации роль Реда сыграл чернокожий <a href=\"/name/6750/\" class=\"all\">Морган Фриман</a>, было решено оставить в фильме реплику Реда «Может быть, потому что я — ирландец», — как удачную шутку.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Несмотря на то что почти все жители города Мэнсфилда изъявили желание принять участие в съёмках массовых сцен фильма, большинство жителей оказались слишком заняты своей работой и не смогли сниматься. Массовку пришлось набирать в местной богадельне, причём некоторые из её обитателей были бывшими заключенными.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Когда на экране показываются крупные планы рук Энди Дюфрейна, когда в начале фильма он заряжает револьвер и когда Энди вырезает своё имя на стене камеры, — это на самом деле руки режиссёра <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a>. Эти кадры были сняты в процессе постпроизводства фильма.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Двое из заключённых Шоушенка носят имена Хейвуд и Флойд. Это отсылка к трилогии <a href=\"/name/47956/\" class=\"all\">Артура Ч. Кларка</a> «<a href=\"/film/380/\" class=\"all\">Космическая одиссея</a>», связующим героем которой является доктор Хейвуд Флойд.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Тюремный номер Энди Дюфрейна — 37927.<br/>", "this is film's Overview");
-        movie.ProductionYear.Should().Be(1994, "this is movie ProductionYear");
-        movie.RemoteTrailers.Length.Should().Be(0);
-        movie.Size.Should().Be(142, "this is movie Size");
-        movie.SortName.Should().Be(movie.Name, "SortName should be equal to Name");
-        movie.Studios.Should().ContainSingle();
-        movie.Tagline.Should().Be("Страх - это кандалы. Надежда - это свобода", "this is a Tagline of the movie");
+        result.HasMetadata.Should().BeTrue();
+        VerifyMovie326(result.Item);
 
-        result.People.Should().HaveCountGreaterThanOrEqualTo(17, "a number of the movie actors");
-        PersonInfo? person = result.People.FirstOrDefault(p => "Тим Роббинс".Equals(p.Name, StringComparison.Ordinal));
-        person.Should().NotBeNull("that mean the person was found");
-        person.GetProviderId(Plugin.PluginKey).Should().Be("7987", "id of the requested item");
-        person!.Role.Should().Be("Andy Dufresne", "this is person's Role");
-        person.Name.Should().Be("Тим Роббинс", "this is the person's name");
-        person.ImageUrl.Should().NotBeNullOrWhiteSpace("person image exists");
+        result.People.Should().NotBeEmpty();
+        result.People.Should().HaveCountGreaterThanOrEqualTo(17);
+        VerifyPersonInfo7987(result.People.FirstOrDefault(p => "Тим Роббинс".Equals(p.Name, StringComparison.Ordinal)));
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -241,35 +321,12 @@ public class KpMovieProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Movie> result = await _kpMovieProvider.GetMetadata(movieInfo, cancellationTokenSource.Token);
 
-        result.HasMetadata.Should().BeTrue("that mean the item was found");
-        Movie movie = result.Item;
-        movie.Should().NotBeNull("that mean the movie was found");
-        movie.GetProviderId(Plugin.PluginKey).Should().Be("326", "id of the requested item");
-        movie.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0111161", "IMDB id of the requested item");
-        movie.GetProviderId(MetadataProviders.Tmdb).Should().Be("278", "TMDB id of the requested item");
-        movie.MediaType.Should().Be("Video", "this is video");
-        movie.CommunityRating.Should().BeGreaterThan(5, "such value received from API");
-        movie.ExternalId.Should().Be("326", "KP id of requested item");
-        movie.Genres.Should().ContainSingle();
-        movie.Genres[0].Should().Be("драма", "the film has only this genre");
-        movie.Name.Should().Be("Побег из Шоушенка", "this is the name of the movie");
-        movie.OfficialRating.Should().Be("r", "this is film's OfficialRating");
-        movie.OriginalTitle.Should().Be("The Shawshank Redemption", "this is the original name of the movie");
-        movie.Overview.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.<br/><br/><b>Интересное:</b><br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фильм снят по мотивам повести <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> «Рита Хейуорт и спасение из Шоушенка» (Rita Hayworth and Shawshank Redemption), опубликованной в составе сборника «Четыре сезона» (Different Seasons, 1982).<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Съемки проходили в&#160;Мэнсфилдской исправительной колонии в&#160;штате Огайо. Тюрьма находилась в&#160;таком плачевном состоянии, что пришлось приводить её&#160;в&#160;должный вид.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Оригинальная повесть <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> была, по словам самого писателя, кульминацией всех его впечатлений от различных тюремных фильмов, которые он смотрел в детстве.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* <a href=\"/name/24263/\" class=\"all\">Стивен Кинг</a> согласился продать права на&#160;свое произведение практически даром, так как с&#160;<a href=\"/name/24262/\" class=\"all\">Фрэнком</a> их&#160;связывает давняя крепкая дружба. Произошло это после того, как Фрэнк довольно успешно экранизировал рассказ Кинга &#171;<a href=\"/film/7429/\" class=\"all\">Женщина в палате</a>&#187;.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Американское общество защиты животных выступило с&#160;критикой в&#160;адрес фильма, в&#160;котором единственным представителем фауны стал ворон старика Брукса. В&#160;картине есть сцена кормления птицы червяком, найденном во&#160;время обеда в&#160;тарелке главного героя фильма. Общество настояло на&#160;том, чтобы была использована уже мертвая личинка, погибшая естественной смертью. После того как такая особь была найдена, сцену отсняли.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Томми Уильямса изначально была написана под <a href=\"/name/25584/\" class=\"all\">Брэда Питта</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Картина, которую смотрят заключенные, — &#171;<a href=\"/film/8299/\" class=\"all\">Гильда</a>&#187;.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Начальник тюрьмы Нортон насвистывает гимн «Eine feste Burg ist unser Gott», название которого переводится примерно так: «Могучая крепость и есть наш бог».<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фотографии молодого <a href=\"/name/6750/\" class=\"all\">Моргана Фримана</a> на&#160;документах на&#160;самом деле являются фотографиями его сына <a href=\"/name/6767/\" class=\"all\">Альфонсо Фримана</a>, который также снялся в&#160;одном из&#160;эпизодов фильма.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Несмотря на&#160;то, что в&#160;кинотеатрах фильм не&#160;собрал больших денег, он&#160;стал одним из&#160;самых кассовых релизов на&#160;видео, а&#160;впоследствии и&#160;на&#160;DVD.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фильм посвящён Аллену Грину (Allen Greene) — близкому другу режиссёра. Аллен скончался незадолго до выхода фильма из-за осложнений СПИДа.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Бывший начальник Мэнсфилдской тюрьмы, где проходили натурные съёмки фильма, <a href=\"/name/1104241/\" class=\"all\">Дэннис Бэйкер</a> снялся в роли пожилого заключённого, сидящего в тюремном автобусе позади Томми Уильямса.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Сценарий <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a> очень понравился другому режиссёру, успешно экранизировавшему произведения <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a>, — <a href=\"/name/5899/\" class=\"all\">Робу Райнеру</a>, постановщику &#171;<a href=\"/film/498/\" class=\"all\">Останься со мной</a>&#187; (1986) и &#171;<a href=\"/film/1574/\" class=\"all\">Мизери</a>&#187; (1990). Райнер был так захвачен материалом, что предложил Дарабонту $2,5 млн за права на сценарий и постановку фильма. Дарабонт серьёзно обдумал предложение, но в конечном счёте решил, что для него этот проект — &#171;шанс сделать что-то действительно великое&#187;, и поставил фильм сам.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* <a href=\"/name/5899/\" class=\"all\">Роб Райнер</a> видел в ролях Реда и Энди Дюфрейна соответственно <a href=\"/name/5679/\" class=\"all\">Харрисона Форда</a> и <a href=\"/name/20302/\" class=\"all\">Тома Круза</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Энди Дюфрейна изначально предложили <a href=\"/name/9144/\" class=\"all\">Тому Хэнксу</a>. Он очень заинтересовался, но не смог принять предложение, из-за того что уже был занят в проекте &#171;<a href=\"/film/448/\" class=\"all\">Форрест Гамп</a>&#187; (1994). Впоследствии Том Хэнкс снялся в главной роли в тюремной драме <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a> &#171;<a href=\"/film/435/\" class=\"all\">Зеленая миля</a>&#187; (1999), также поставленной по роману <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Энди Дюфрейна также предлагали <a href=\"/name/24087/\" class=\"all\">Кевину Костнеру</a>, но актёр отказался от предложения, о чем впоследствии сильно жалел.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* В оригинальной повести <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> Ред — ирландец. Несмотря на то, что в экранизации роль Реда сыграл чернокожий <a href=\"/name/6750/\" class=\"all\">Морган Фриман</a>, было решено оставить в фильме реплику Реда «Может быть, потому что я — ирландец», — как удачную шутку.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Несмотря на то что почти все жители города Мэнсфилда изъявили желание принять участие в съёмках массовых сцен фильма, большинство жителей оказались слишком заняты своей работой и не смогли сниматься. Массовку пришлось набирать в местной богадельне, причём некоторые из её обитателей были бывшими заключенными.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Когда на экране показываются крупные планы рук Энди Дюфрейна, когда в начале фильма он заряжает револьвер и когда Энди вырезает своё имя на стене камеры, — это на самом деле руки режиссёра <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a>. Эти кадры были сняты в процессе постпроизводства фильма.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Двое из заключённых Шоушенка носят имена Хейвуд и Флойд. Это отсылка к трилогии <a href=\"/name/47956/\" class=\"all\">Артура Ч. Кларка</a> «<a href=\"/film/380/\" class=\"all\">Космическая одиссея</a>», связующим героем которой является доктор Хейвуд Флойд.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Тюремный номер Энди Дюфрейна — 37927.<br/>", "this is film's Overview");
-        movie.ProductionYear.Should().Be(1994, "this is movie ProductionYear");
-        movie.RemoteTrailers.Length.Should().Be(0);
-        movie.Size.Should().Be(142, "this is movie Size");
-        movie.SortName.Should().Be(movie.Name, "SortName should be equal to Name");
-        movie.Studios.Should().ContainSingle();
-        movie.Tagline.Should().Be("Страх - это кандалы. Надежда - это свобода", "this is a Tagline of the movie");
+        result.HasMetadata.Should().BeTrue();
+        VerifyMovie326(result.Item);
 
-        result.People.Should().HaveCountGreaterThanOrEqualTo(17, "a number of the movie actors");
-        PersonInfo? person = result.People.FirstOrDefault(p => "Тим Роббинс".Equals(p.Name, StringComparison.Ordinal));
-        person.Should().NotBeNull("that mean the person was found");
-        person.GetProviderId(Plugin.PluginKey).Should().Be("7987", "id of the requested item");
-        person!.Role.Should().Be("Andy Dufresne", "this is person's Role");
-        person.Name.Should().Be("Тим Роббинс", "this is the person's name");
-        person.ImageUrl.Should().NotBeNullOrWhiteSpace("person image exists");
+        result.People.Should().NotBeEmpty();
+        result.People.Should().HaveCountGreaterThanOrEqualTo(17);
+        VerifyPersonInfo7987(result.People.FirstOrDefault(p => "Тим Роббинс".Equals(p.Name, StringComparison.Ordinal)));
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -296,16 +353,7 @@ public class KpMovieProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         IEnumerable<RemoteSearchResult> result = await _kpMovieProvider.GetSearchResults(movieInfo, cancellationTokenSource.Token);
         result.Should().ContainSingle();
-        RemoteSearchResult movie = result.First();
-        movie.Should().NotBeNull("that mean the movie was found");
-        movie.GetProviderId(Plugin.PluginKey).Should().Be("326", "id of the requested item");
-        movie.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0111161", "IMDB id of the requested item");
-        movie.GetProviderId(MetadataProviders.Tmdb).Should().Be("278", "TMDB id of the requested item");
-        movie.Name.Should().Be("Побег из Шоушенка", "this is the name of the movie");
-        movie.ImageUrl.Should().NotBeNullOrWhiteSpace("movie image exists");
-        movie.ProductionYear.Should().Be(1994, "this is movie ProductionYear");
-        movie.SearchProviderName.Should().Be(Plugin.PluginKey, "this is movie's SearchProviderName");
-        movie.Overview.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.<br/><br/><b>Интересное:</b><br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фильм снят по мотивам повести <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> «Рита Хейуорт и спасение из Шоушенка» (Rita Hayworth and Shawshank Redemption), опубликованной в составе сборника «Четыре сезона» (Different Seasons, 1982).<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Съемки проходили в&#160;Мэнсфилдской исправительной колонии в&#160;штате Огайо. Тюрьма находилась в&#160;таком плачевном состоянии, что пришлось приводить её&#160;в&#160;должный вид.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Оригинальная повесть <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> была, по словам самого писателя, кульминацией всех его впечатлений от различных тюремных фильмов, которые он смотрел в детстве.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* <a href=\"/name/24263/\" class=\"all\">Стивен Кинг</a> согласился продать права на&#160;свое произведение практически даром, так как с&#160;<a href=\"/name/24262/\" class=\"all\">Фрэнком</a> их&#160;связывает давняя крепкая дружба. Произошло это после того, как Фрэнк довольно успешно экранизировал рассказ Кинга &#171;<a href=\"/film/7429/\" class=\"all\">Женщина в палате</a>&#187;.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Американское общество защиты животных выступило с&#160;критикой в&#160;адрес фильма, в&#160;котором единственным представителем фауны стал ворон старика Брукса. В&#160;картине есть сцена кормления птицы червяком, найденном во&#160;время обеда в&#160;тарелке главного героя фильма. Общество настояло на&#160;том, чтобы была использована уже мертвая личинка, погибшая естественной смертью. После того как такая особь была найдена, сцену отсняли.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Томми Уильямса изначально была написана под <a href=\"/name/25584/\" class=\"all\">Брэда Питта</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Картина, которую смотрят заключенные, — &#171;<a href=\"/film/8299/\" class=\"all\">Гильда</a>&#187;.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Начальник тюрьмы Нортон насвистывает гимн «Eine feste Burg ist unser Gott», название которого переводится примерно так: «Могучая крепость и есть наш бог».<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фотографии молодого <a href=\"/name/6750/\" class=\"all\">Моргана Фримана</a> на&#160;документах на&#160;самом деле являются фотографиями его сына <a href=\"/name/6767/\" class=\"all\">Альфонсо Фримана</a>, который также снялся в&#160;одном из&#160;эпизодов фильма.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Несмотря на&#160;то, что в&#160;кинотеатрах фильм не&#160;собрал больших денег, он&#160;стал одним из&#160;самых кассовых релизов на&#160;видео, а&#160;впоследствии и&#160;на&#160;DVD.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фильм посвящён Аллену Грину (Allen Greene) — близкому другу режиссёра. Аллен скончался незадолго до выхода фильма из-за осложнений СПИДа.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Бывший начальник Мэнсфилдской тюрьмы, где проходили натурные съёмки фильма, <a href=\"/name/1104241/\" class=\"all\">Дэннис Бэйкер</a> снялся в роли пожилого заключённого, сидящего в тюремном автобусе позади Томми Уильямса.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Сценарий <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a> очень понравился другому режиссёру, успешно экранизировавшему произведения <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a>, — <a href=\"/name/5899/\" class=\"all\">Робу Райнеру</a>, постановщику &#171;<a href=\"/film/498/\" class=\"all\">Останься со мной</a>&#187; (1986) и &#171;<a href=\"/film/1574/\" class=\"all\">Мизери</a>&#187; (1990). Райнер был так захвачен материалом, что предложил Дарабонту $2,5 млн за права на сценарий и постановку фильма. Дарабонт серьёзно обдумал предложение, но в конечном счёте решил, что для него этот проект — &#171;шанс сделать что-то действительно великое&#187;, и поставил фильм сам.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* <a href=\"/name/5899/\" class=\"all\">Роб Райнер</a> видел в ролях Реда и Энди Дюфрейна соответственно <a href=\"/name/5679/\" class=\"all\">Харрисона Форда</a> и <a href=\"/name/20302/\" class=\"all\">Тома Круза</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Энди Дюфрейна изначально предложили <a href=\"/name/9144/\" class=\"all\">Тому Хэнксу</a>. Он очень заинтересовался, но не смог принять предложение, из-за того что уже был занят в проекте &#171;<a href=\"/film/448/\" class=\"all\">Форрест Гамп</a>&#187; (1994). Впоследствии Том Хэнкс снялся в главной роли в тюремной драме <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a> &#171;<a href=\"/film/435/\" class=\"all\">Зеленая миля</a>&#187; (1999), также поставленной по роману <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Энди Дюфрейна также предлагали <a href=\"/name/24087/\" class=\"all\">Кевину Костнеру</a>, но актёр отказался от предложения, о чем впоследствии сильно жалел.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* В оригинальной повести <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> Ред — ирландец. Несмотря на то, что в экранизации роль Реда сыграл чернокожий <a href=\"/name/6750/\" class=\"all\">Морган Фриман</a>, было решено оставить в фильме реплику Реда «Может быть, потому что я — ирландец», — как удачную шутку.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Несмотря на то что почти все жители города Мэнсфилда изъявили желание принять участие в съёмках массовых сцен фильма, большинство жителей оказались слишком заняты своей работой и не смогли сниматься. Массовку пришлось набирать в местной богадельне, причём некоторые из её обитателей были бывшими заключенными.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Когда на экране показываются крупные планы рук Энди Дюфрейна, когда в начале фильма он заряжает револьвер и когда Энди вырезает своё имя на стене камеры, — это на самом деле руки режиссёра <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a>. Эти кадры были сняты в процессе постпроизводства фильма.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Двое из заключённых Шоушенка носят имена Хейвуд и Флойд. Это отсылка к трилогии <a href=\"/name/47956/\" class=\"all\">Артура Ч. Кларка</a> «<a href=\"/film/380/\" class=\"all\">Космическая одиссея</a>», связующим героем которой является доктор Хейвуд Флойд.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Тюремный номер Энди Дюфрейна — 37927.<br/>", "this is film's Overview");
+        VerifyRemoteSearchResult326(result.First());
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -313,6 +361,59 @@ public class KpMovieProviderTest : BaseTest
         VerifyNoOtherCalls();
 
         Logger.Info($"Finished '{nameof(KpMovieProvider_GetSearchResults_Provider_Kp)}'");
+    }
+
+    [Fact]
+    public async void KpMovieProvider_GetSearchResults_Provider_Imdb()
+    {
+        Logger.Info($"Start '{nameof(KpMovieProvider_GetSearchResults_Provider_Imdb)}'");
+
+        _ = _applicationPaths
+            .SetupGet(m => m.PluginConfigurationsPath)
+            .Returns("KpMovieProvider_GetSearchResults_Provider_Imdb");
+
+        var movieInfo = new MovieInfo
+        {
+            ProviderIds = new(new() { { MetadataProviders.Imdb.ToString(), "tt0111161" } })
+        };
+        using var cancellationTokenSource = new CancellationTokenSource();
+        IEnumerable<RemoteSearchResult> result = await _kpMovieProvider.GetSearchResults(movieInfo, cancellationTokenSource.Token);
+        result.Should().ContainSingle();
+        VerifyRemoteSearchResult326(result.First());
+
+        _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
+        _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_GetSearchResults_Provider_Imdb/EmbyKinopoiskRu.xml"), Times.Once());
+        VerifyNoOtherCalls();
+
+        Logger.Info($"Finished '{nameof(KpMovieProvider_GetSearchResults_Provider_Imdb)}'");
+    }
+
+    [Fact]
+    public async void KpMovieProvider_GetSearchResults_Name()
+    {
+        Logger.Info($"Start '{nameof(KpMovieProvider_GetSearchResults_Name)}'");
+
+        _ = _applicationPaths
+            .SetupGet(m => m.PluginConfigurationsPath)
+            .Returns("KpMovieProvider_GetSearchResults_Name");
+
+        var movieInfo = new MovieInfo
+        {
+            Name = "Побег из Шоушенка",
+            Year = 1994
+        };
+        using var cancellationTokenSource = new CancellationTokenSource();
+        IEnumerable<RemoteSearchResult> result = await _kpMovieProvider.GetSearchResults(movieInfo, cancellationTokenSource.Token);
+        result.Should().HaveCount(20);
+        VerifyRemoteSearchResult326(result.First(x => "Побег из Шоушенка".Equals(x.Name, StringComparison.Ordinal)));
+
+        _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
+        _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_GetSearchResults_Name/EmbyKinopoiskRu.xml"), Times.Once());
+        VerifyNoOtherCalls();
+
+        Logger.Info($"Finished '{nameof(KpMovieProvider_GetSearchResults_Name)}'");
     }
 
     [Fact]
@@ -331,17 +432,8 @@ public class KpMovieProviderTest : BaseTest
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         IEnumerable<RemoteSearchResult> result = await _kpMovieProvider.GetSearchResults(movieInfo, cancellationTokenSource.Token);
-        result.Should().ContainSingle();
-        RemoteSearchResult movie = result.First();
-        movie.Should().NotBeNull("that mean the movie was found");
-        movie.GetProviderId(Plugin.PluginKey).Should().Be("326", "id of the requested item");
-        movie.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0111161", "IMDB id of the requested item");
-        movie.GetProviderId(MetadataProviders.Tmdb).Should().Be("278", "TMDB id of the requested item");
-        movie.Name.Should().Be("Побег из Шоушенка", "this is the name of the movie");
-        movie.ImageUrl.Should().NotBeNullOrWhiteSpace("movie image exists");
-        movie.ProductionYear.Should().Be(1994, "this is movie ProductionYear");
-        movie.SearchProviderName.Should().Be(Plugin.PluginKey, "this is movie's SearchProviderName");
-        movie.Overview.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.<br/><br/><b>Интересное:</b><br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фильм снят по мотивам повести <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> «Рита Хейуорт и спасение из Шоушенка» (Rita Hayworth and Shawshank Redemption), опубликованной в составе сборника «Четыре сезона» (Different Seasons, 1982).<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Съемки проходили в&#160;Мэнсфилдской исправительной колонии в&#160;штате Огайо. Тюрьма находилась в&#160;таком плачевном состоянии, что пришлось приводить её&#160;в&#160;должный вид.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Оригинальная повесть <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> была, по словам самого писателя, кульминацией всех его впечатлений от различных тюремных фильмов, которые он смотрел в детстве.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* <a href=\"/name/24263/\" class=\"all\">Стивен Кинг</a> согласился продать права на&#160;свое произведение практически даром, так как с&#160;<a href=\"/name/24262/\" class=\"all\">Фрэнком</a> их&#160;связывает давняя крепкая дружба. Произошло это после того, как Фрэнк довольно успешно экранизировал рассказ Кинга &#171;<a href=\"/film/7429/\" class=\"all\">Женщина в палате</a>&#187;.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Американское общество защиты животных выступило с&#160;критикой в&#160;адрес фильма, в&#160;котором единственным представителем фауны стал ворон старика Брукса. В&#160;картине есть сцена кормления птицы червяком, найденном во&#160;время обеда в&#160;тарелке главного героя фильма. Общество настояло на&#160;том, чтобы была использована уже мертвая личинка, погибшая естественной смертью. После того как такая особь была найдена, сцену отсняли.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Томми Уильямса изначально была написана под <a href=\"/name/25584/\" class=\"all\">Брэда Питта</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Картина, которую смотрят заключенные, — &#171;<a href=\"/film/8299/\" class=\"all\">Гильда</a>&#187;.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Начальник тюрьмы Нортон насвистывает гимн «Eine feste Burg ist unser Gott», название которого переводится примерно так: «Могучая крепость и есть наш бог».<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фотографии молодого <a href=\"/name/6750/\" class=\"all\">Моргана Фримана</a> на&#160;документах на&#160;самом деле являются фотографиями его сына <a href=\"/name/6767/\" class=\"all\">Альфонсо Фримана</a>, который также снялся в&#160;одном из&#160;эпизодов фильма.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Несмотря на&#160;то, что в&#160;кинотеатрах фильм не&#160;собрал больших денег, он&#160;стал одним из&#160;самых кассовых релизов на&#160;видео, а&#160;впоследствии и&#160;на&#160;DVD.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Фильм посвящён Аллену Грину (Allen Greene) — близкому другу режиссёра. Аллен скончался незадолго до выхода фильма из-за осложнений СПИДа.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Бывший начальник Мэнсфилдской тюрьмы, где проходили натурные съёмки фильма, <a href=\"/name/1104241/\" class=\"all\">Дэннис Бэйкер</a> снялся в роли пожилого заключённого, сидящего в тюремном автобусе позади Томми Уильямса.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Сценарий <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a> очень понравился другому режиссёру, успешно экранизировавшему произведения <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a>, — <a href=\"/name/5899/\" class=\"all\">Робу Райнеру</a>, постановщику &#171;<a href=\"/film/498/\" class=\"all\">Останься со мной</a>&#187; (1986) и &#171;<a href=\"/film/1574/\" class=\"all\">Мизери</a>&#187; (1990). Райнер был так захвачен материалом, что предложил Дарабонту $2,5 млн за права на сценарий и постановку фильма. Дарабонт серьёзно обдумал предложение, но в конечном счёте решил, что для него этот проект — &#171;шанс сделать что-то действительно великое&#187;, и поставил фильм сам.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* <a href=\"/name/5899/\" class=\"all\">Роб Райнер</a> видел в ролях Реда и Энди Дюфрейна соответственно <a href=\"/name/5679/\" class=\"all\">Харрисона Форда</a> и <a href=\"/name/20302/\" class=\"all\">Тома Круза</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Энди Дюфрейна изначально предложили <a href=\"/name/9144/\" class=\"all\">Тому Хэнксу</a>. Он очень заинтересовался, но не смог принять предложение, из-за того что уже был занят в проекте &#171;<a href=\"/film/448/\" class=\"all\">Форрест Гамп</a>&#187; (1994). Впоследствии Том Хэнкс снялся в главной роли в тюремной драме <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a> &#171;<a href=\"/film/435/\" class=\"all\">Зеленая миля</a>&#187; (1999), также поставленной по роману <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a>.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Роль Энди Дюфрейна также предлагали <a href=\"/name/24087/\" class=\"all\">Кевину Костнеру</a>, но актёр отказался от предложения, о чем впоследствии сильно жалел.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* В оригинальной повести <a href=\"/name/24263/\" class=\"all\">Стивена Кинга</a> Ред — ирландец. Несмотря на то, что в экранизации роль Реда сыграл чернокожий <a href=\"/name/6750/\" class=\"all\">Морган Фриман</a>, было решено оставить в фильме реплику Реда «Может быть, потому что я — ирландец», — как удачную шутку.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Несмотря на то что почти все жители города Мэнсфилда изъявили желание принять участие в съёмках массовых сцен фильма, большинство жителей оказались слишком заняты своей работой и не смогли сниматься. Массовку пришлось набирать в местной богадельне, причём некоторые из её обитателей были бывшими заключенными.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Когда на экране показываются крупные планы рук Энди Дюфрейна, когда в начале фильма он заряжает револьвер и когда Энди вырезает своё имя на стене камеры, — это на самом деле руки режиссёра <a href=\"/name/24262/\" class=\"all\">Фрэнка Дарабонта</a>. Эти кадры были сняты в процессе постпроизводства фильма.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Двое из заключённых Шоушенка носят имена Хейвуд и Флойд. Это отсылка к трилогии <a href=\"/name/47956/\" class=\"all\">Артура Ч. Кларка</a> «<a href=\"/film/380/\" class=\"all\">Космическая одиссея</a>», связующим героем которой является доктор Хейвуд Флойд.<br/>&nbsp;&nbsp;&nbsp;&nbsp;* Тюремный номер Энди Дюфрейна — 37927.<br/>", "this is film's Overview");
+        result.Should().HaveCount(20);
+        VerifyRemoteSearchResult326(result.First(x => "Побег из Шоушенка".Equals(x.Name, StringComparison.Ordinal)));
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -349,6 +441,241 @@ public class KpMovieProviderTest : BaseTest
         VerifyNoOtherCalls();
 
         Logger.Info($"Finished '{nameof(KpMovieProvider_GetSearchResults_NameAndYear)}'");
+    }
+
+    [Fact]
+    public async void KpMovieProvider_WithNameYearAndAddToExistingCollection()
+    {
+        Logger.Info($"Start '{nameof(KpMovieProvider_WithNameYearAndAddToExistingCollection)}'");
+
+        _ = _libraryManager
+            .Setup(m => m.GetInternalItemIds(It.Is<InternalItemsQuery>(q => Equals(true, q.IsFolder))))
+            .Returns(new[] { 1L });
+
+        _ = _libraryManager // EmbyHelper.SearchExistingCollection(). Search boxset contains all sequence movies
+            .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
+                Array.TrueForAll(query.IncludeItemTypes, item => "boxset".Equals(item, StringComparison.Ordinal))
+            )))
+            .Returns(new QueryResult<BaseItem>
+            {
+                Items = new BaseItem[] {
+                    new BoxSet {
+                        InternalId = 201L,
+                        Name = "Гарри Поттер"
+                    }
+                }
+            });
+
+        _ = _libraryManager // EmbyHelper.SearchExistingCollection(). Search movies in boxset
+            .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
+                !query.Recursive
+                && query.IsVirtualItem == false
+                && query.IncludeItemTypes.Length == 2
+                && nameof(Movie).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
+                && nameof(Series).Equals(query.IncludeItemTypes[1], StringComparison.Ordinal)
+                && query.CollectionIds.Length == 1
+                && Array.TrueForAll(query.CollectionIds, item => item == 201L))))
+            .Returns(new QueryResult<BaseItem>
+            {
+                TotalRecordCount = 4,
+                Items = new BaseItem[] {
+                    new Movie {
+                        Name = "Гарри Поттер и Дары Смерти: Часть II",
+                        InternalId = 107L,
+                        ProviderIds = new(new Dictionary<string, string>
+                        {
+                            { Plugin.PluginKey, "407636" },
+                            { MetadataProviders.Imdb.ToString(), "tt1201607" },
+                            { MetadataProviders.Tmdb.ToString(), "12445" }
+                        })
+                    },
+                    new Movie {
+                        Name = "Гарри Поттер и Кубок огня",
+                        InternalId = 103L,
+                        ProviderIds = new(new Dictionary<string, string>
+                        {
+                            { Plugin.PluginKey, "8408" },
+                            { MetadataProviders.Imdb.ToString(), "tt0330373" },
+                            { MetadataProviders.Tmdb.ToString(), "674" }
+                        })
+                    },
+                    new Movie {
+                        Name = "Гарри Поттер и Орден Феникса",
+                        InternalId = 104L,
+                        ProviderIds = new(new Dictionary<string, string>
+                        {
+                            { Plugin.PluginKey, "48356" },
+                            { MetadataProviders.Tmdb.ToString(), "675" },
+                            { MetadataProviders.Imdb.ToString(), "tt0373889" }
+                        })
+                    },
+                    new Movie {
+                        Name = "Гарри Поттер и Дары Смерти: Часть I",
+                        InternalId = 106L,
+                        ProviderIds = new(new Dictionary<string, string>
+                        {
+                            { Plugin.PluginKey, "276762" },
+                            { MetadataProviders.Tmdb.ToString(), "12444" },
+                            { MetadataProviders.Imdb.ToString(), "tt0926084" }
+                        }),
+                    },
+                }
+            });
+
+        LibraryOptions boxsetLibraryOptions = new()
+        {
+            ContentType = CollectionType.BoxSets.ToString(),
+            MetadataCountryCode = "RU",
+            MinCollectionItems = 1,
+            Name = "Collections",
+            PathInfos = new[]{
+                        new MediaPathInfo
+                        {
+                            NetworkPath = null,
+                            Path = "/emby/movie_library"
+                        }
+                    },
+            PreferredImageLanguage = "ru",
+            PreferredMetadataLanguage = "ru",
+        };
+        _ = _xmlSerializer
+            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "KpMovieProvider_WithNameYearAndAddToExistingCollection/options.xml"))
+            .Returns(boxsetLibraryOptions);
+
+        _ = _applicationPaths
+            .SetupGet(m => m.PluginConfigurationsPath)
+            .Returns("KpMovieProvider_WithNameYearAndAddToExistingCollection");
+
+        _ = _libraryManager
+            .Setup(m => m.GetItemById(It.Is<long>(id => id == 1L)))
+            .Returns(new CollectionFolder
+            {
+                Name = "Collections",
+                Path = "KpMovieProvider_WithNameYearAndAddToExistingCollection"
+            });
+
+        var movieInfo = new MovieInfo();
+        movieInfo.SetProviderId(Plugin.PluginKey, "689");
+        using var cancellationTokenSource = new CancellationTokenSource();
+        _pluginConfiguration.CreateSeqCollections = true;
+        MetadataResult<Movie> result = await _kpMovieProvider.GetMetadata(movieInfo, cancellationTokenSource.Token);
+
+        result.HasMetadata.Should().BeTrue();
+        VerifyMovie689(result.Item);
+
+        result.People.Should().NotBeEmpty();
+        result.People.Should().HaveCountGreaterThanOrEqualTo(18);
+        VerifyPersonInfo40779(result.People.FirstOrDefault(p => "Эмма Уотсон".Equals(p.Name, StringComparison.Ordinal)));
+
+        _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
+        _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_WithNameYearAndAddToExistingCollection/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "KpMovieProvider_WithNameYearAndAddToExistingCollection/options.xml"), Times.Once());
+        _localizationManager.Verify(lm => lm.RemoveDiacritics("Гарри Поттер и философский камень"), Times.Once());
+        _libraryManager.Verify(lm => lm.GetUserRootFolder(), Times.Once());
+        _libraryManager.Verify(lm => lm.GetLibraryOptions(It.IsAny<UserRootFolder>()), Times.Once());
+        _libraryManager.Verify(lm => lm.GetInternalItemIds(It.IsAny<InternalItemsQuery>()), Times.Exactly(2));
+        _libraryManager.Verify(lm => lm.GetItemById(1L), Times.Once());
+        _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(5));
+        _libraryManager.Verify(lm => lm.GetItemLinks(It.IsInRange(101L, 108L, Moq.Range.Inclusive), It.IsAny<List<ItemLinkType>>()), Times.Exactly(8));
+        _libraryManager.Verify(lm => lm.UpdateItem(It.IsAny<BaseItem>(), It.IsAny<BaseItem>(), ItemUpdateType.MetadataEdit, null), Times.Exactly(8));
+        _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/movie_library"), Times.Once());
+        VerifyNoOtherCalls();
+
+        Logger.Info($"Finished '{nameof(KpMovieProvider_WithNameYearAndAddToExistingCollection)}'");
+    }
+
+    // Will create a Collections virtual folder
+    [Fact]
+    public async void KpMovieProvider_WithNameYearAndAddToNewCollection()
+    {
+        Logger.Info($"Start '{nameof(KpMovieProvider_WithNameYearAndAddToNewCollection)}'");
+
+        _ = _libraryManager
+            .SetupSequence(m => m.GetInternalItemIds(It.Is<InternalItemsQuery>(q => Equals(true, q.IsFolder))))
+            .Returns(Array.Empty<long>())
+            .Returns(new[] { 1L });
+
+        _ = _libraryManager // EmbyHelper.SearchExistingCollection(). Search boxset contains all sequence movies
+            .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
+                query.IncludeItemTypes.Length == 1
+                && Array.TrueForAll(query.IncludeItemTypes, item => "boxset".Equals(item, StringComparison.Ordinal))
+                && query.ListItemIds.Length == _internalIdPotterSequence.Length
+                && Array.TrueForAll(query.ListItemIds, item => _internalIdPotterSequence.Contains(item))
+            )))
+            .Returns(new QueryResult<BaseItem> { Items = Array.Empty<BaseItem>() });
+
+        _ = _collectionManager
+            .Setup(m => m.CreateCollection(It.IsAny<CollectionCreationOptions>()))
+            .Returns((CollectionCreationOptions options) =>
+                Task.FromResult(new BoxSet
+                {
+                    Name = options.Name,
+                    ParentId = options.ParentId,
+                    InternalId = 201L,
+                }));
+
+        LibraryOptions boxsetLibraryOptions = new()
+        {
+            ContentType = CollectionType.BoxSets.ToString(),
+            MetadataCountryCode = "RU",
+            MinCollectionItems = 1,
+            Name = "Collections",
+            PathInfos = new[]{
+                        new MediaPathInfo
+                        {
+                            NetworkPath = null,
+                            Path = "/emby/movie_library"
+                        }
+                    },
+            PreferredImageLanguage = "ru",
+            PreferredMetadataLanguage = "ru",
+        };
+        _ = _xmlSerializer
+            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "KpMovieProvider_WithNameYearAndAddToNewCollection/options.xml"))
+            .Returns(boxsetLibraryOptions);
+
+        _ = _applicationPaths
+            .SetupGet(m => m.PluginConfigurationsPath)
+            .Returns("KpMovieProvider_WithNameYearAndAddToNewCollection");
+
+        _ = _libraryManager
+            .Setup(m => m.GetItemById(It.Is<long>(id => id == 1L)))
+            .Returns(new CollectionFolder
+            {
+                Name = "Collections",
+                Path = "KpMovieProvider_WithNameYearAndAddToNewCollection"
+            });
+
+        var movieInfo = new MovieInfo();
+        movieInfo.SetProviderId(Plugin.PluginKey, "689");
+        using var cancellationTokenSource = new CancellationTokenSource();
+        _pluginConfiguration.CreateSeqCollections = true;
+        MetadataResult<Movie> result = await _kpMovieProvider.GetMetadata(movieInfo, cancellationTokenSource.Token);
+
+        result.HasMetadata.Should().BeTrue();
+        VerifyMovie689(result.Item);
+
+        result.People.Should().NotBeEmpty();
+        result.People.Should().HaveCountGreaterThanOrEqualTo(18);
+        VerifyPersonInfo40779(result.People.FirstOrDefault(p => "Эмма Уотсон".Equals(p.Name, StringComparison.Ordinal)));
+
+        _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
+        _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_WithNameYearAndAddToNewCollection/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "KpMovieProvider_WithNameYearAndAddToNewCollection/options.xml"), Times.Once());
+        _localizationManager.Verify(lm => lm.RemoveDiacritics("Гарри Поттер и философский камень"), Times.Once());
+        _libraryManager.Verify(lm => lm.GetUserRootFolder(), Times.Exactly(2));
+        _libraryManager.Verify(lm => lm.GetLibraryOptions(It.IsAny<UserRootFolder>()), Times.Exactly(2));
+        _libraryManager.Verify(lm => lm.GetInternalItemIds(It.IsAny<InternalItemsQuery>()), Times.Exactly(3));
+        _libraryManager.Verify(lm => lm.AddVirtualFolder("Collections", It.IsAny<LibraryOptions>(), true), Times.Once());
+        _libraryManager.Verify(lm => lm.GetItemById(1L), Times.Once());
+        _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(4));
+        _collectionManager.Verify(cm => cm.CreateCollection(It.IsAny<CollectionCreationOptions>()), Times.Once());
+        _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/movie_library"), Times.Once());
+        VerifyNoOtherCalls();
+
+        Logger.Info($"Finished '{nameof(KpMovieProvider_WithNameYearAndAddToNewCollection)}'");
     }
 
 }

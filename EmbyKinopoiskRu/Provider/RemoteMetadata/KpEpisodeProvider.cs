@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -50,10 +50,12 @@ namespace EmbyKinopoiskRu.Provider.RemoteMetadata
         }
 
         /// <inheritdoc />
-        public Task<IEnumerable<RemoteSearchResult>> GetSearchResults(EpisodeInfo searchInfo, CancellationToken cancellationToken)
+        public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(EpisodeInfo searchInfo, CancellationToken cancellationToken)
         {
-            _log.Info($"GetSearchResults by EpisodeInfo:'{searchInfo.Name}', '{searchInfo.Year}'");
-            throw new NotSupportedException();
+            _log.Info($"GetSearchResults by EpisodeInfo:[Name='{searchInfo.Name}', Year='{searchInfo.Year}', " +
+                    $"IndexNumber='{searchInfo.IndexNumber}', ParentIndexNumber='{searchInfo.ParentIndexNumber}', " +
+                    $"ProviderIds='{string.Join(",", searchInfo.ProviderIds.Select(x => x.Key))}', ProviderIds='{string.Join(",", searchInfo.SeriesProviderIds.Select(x => x.Key))}']");
+            return await Plugin.Instance.GetKinopoiskService().GetSearchResultsAsync(searchInfo, cancellationToken);
         }
     }
 }

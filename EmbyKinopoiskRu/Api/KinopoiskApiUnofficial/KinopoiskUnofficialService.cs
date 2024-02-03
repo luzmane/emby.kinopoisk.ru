@@ -140,28 +140,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             _log.Info($"By name '{searchInfo.Name}' found {result.Count} movies");
             return result;
         }
-        public async Task<List<Movie>> GetMoviesByOriginalNameAndYearAsync(string name, int? year, CancellationToken cancellationToken)
-        {
-            var result = new List<Movie>();
-
-            if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
-            {
-                _log.Warn($"The Token for {Plugin.PluginName} is empty");
-                return result;
-            }
-
-            // no name cleanup - search 'as is', otherwise doesn't work
-            _log.Info($"Searching movies by name '{name}' and year '{year}'");
-            KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYearAsync(name, year, cancellationToken);
-            List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, name, year);
-            foreach (KpFilm movie in relevantMovies)
-            {
-                KpFilm film = await _api.GetFilmByIdAsync(movie.KinopoiskId.ToString(), cancellationToken);
-                result.Add(CreateMovieFromKpFilm(film));
-            }
-            _log.Info($"By keywords '{name}' found {result.Count} movies");
-            return result;
-        }
 
         private async Task CreateMovieAsync(MetadataResult<Movie> result, KpFilm movie, CancellationToken cancellationToken)
         {
@@ -547,6 +525,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             result.HasMetadata = true;
             _log.Info($"Episode {info.IndexNumber} of season {info.ParentIndexNumber} of series {seriesId} updated");
             return result;
+        }
+        public Task<IEnumerable<RemoteSearchResult>> GetSearchResultsAsync(EpisodeInfo searchInfo, CancellationToken cancellationToken)
+        {
+            _log.Info("KinopoiskUnofficial unable to search episodes");
+            return Task.FromResult(Enumerable.Empty<RemoteSearchResult>());
         }
 
         #endregion

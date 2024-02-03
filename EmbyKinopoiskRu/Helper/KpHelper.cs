@@ -14,9 +14,9 @@ namespace EmbyKinopoiskRu.Helper
     internal static class KpHelper
     {
         private static readonly Regex Year = new Regex("(?<year>[0-9]{4})", RegexOptions.Compiled);
-        private static readonly Regex NonAlphaNumeric = new Regex("[^а-яА-Яa-zA-Z0-9\\s]", RegexOptions.Compiled);
-        private static readonly Regex MultiWhitespace = new Regex("\\s\\s+", RegexOptions.Compiled);
-        private const string PremierDateFormat = "yyyy-MM-dd'T'HH:mm:ss.fffZ";
+        internal static readonly Regex NonAlphaNumeric = new Regex("[^а-яА-Яa-zA-Z0-9\\s]", RegexOptions.Compiled);
+        internal static readonly Regex MultiWhitespace = new Regex("\\s\\s+", RegexOptions.Compiled);
+        internal const string PremierDateFormat = "yyyy-MM-dd'T'HH:mm:ss.fffZ";
         private const string DateTimeYearFormat = "yyyy";
 
         internal static DateTimeOffset? GetPremierDate(KpPremiere premiere)

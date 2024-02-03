@@ -20,12 +20,12 @@ public class SeriesExternalIdProviderTest
 
         SeriesExternalIdProvider seriesExternalIdProvider = new();
 
-        seriesExternalIdProvider.Name.Should().Be(Plugin.PluginName, "has value of Plugin.PluginName");
-        seriesExternalIdProvider.Key.Should().Be(Plugin.PluginKey, "has value of Plugin.PluginKey");
-        seriesExternalIdProvider.UrlFormatString.Should().Be("https://www.kinopoisk.ru/series/{0}/", "this is constant");
+        seriesExternalIdProvider.Name.Should().Be(Plugin.PluginName);
+        seriesExternalIdProvider.Key.Should().Be(Plugin.PluginKey);
+        seriesExternalIdProvider.UrlFormatString.Should().Be("https://www.kinopoisk.ru/series/{0}/");
 
-        seriesExternalIdProvider.Supports(new Series()).Should().BeTrue("this provider supports only Series");
-        seriesExternalIdProvider.Supports(new Movie()).Should().BeFalse("this provider supports only Series");
+        seriesExternalIdProvider.Supports(new Series()).Should().BeTrue();
+        seriesExternalIdProvider.Supports(new Movie()).Should().BeFalse();
 
         _logger.Info($"Finished '{nameof(SeriesExternalIdProvider_ForCodeCoverage)}'");
     }

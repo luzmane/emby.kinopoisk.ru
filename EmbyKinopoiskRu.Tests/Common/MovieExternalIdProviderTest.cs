@@ -20,12 +20,12 @@ public class MovieExternalIdProviderTest
 
         MovieExternalIdProvider movieExternalIdProvider = new();
 
-        movieExternalIdProvider.Name.Should().Be(Plugin.PluginName, "has value of Plugin.PluginName");
-        movieExternalIdProvider.Key.Should().Be(Plugin.PluginKey, "has value of Plugin.PluginKey");
-        movieExternalIdProvider.UrlFormatString.Should().Be("https://www.kinopoisk.ru/film/{0}/", "this is constant");
+        movieExternalIdProvider.Name.Should().Be(Plugin.PluginName);
+        movieExternalIdProvider.Key.Should().Be(Plugin.PluginKey);
+        movieExternalIdProvider.UrlFormatString.Should().Be("https://www.kinopoisk.ru/film/{0}/");
 
-        movieExternalIdProvider.Supports(new Movie()).Should().BeTrue("this provider supports only Movie");
-        movieExternalIdProvider.Supports(new Series()).Should().BeFalse("this provider supports only Movie");
+        movieExternalIdProvider.Supports(new Movie()).Should().BeTrue();
+        movieExternalIdProvider.Supports(new Series()).Should().BeFalse();
 
         _logger.Info($"Finished '{nameof(MovieExternalIdProvider_ForCodeCoverage)}'");
     }

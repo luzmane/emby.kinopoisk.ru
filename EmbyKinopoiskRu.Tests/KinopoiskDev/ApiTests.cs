@@ -19,6 +19,12 @@ namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
 public class ApiTests : IDisposable
 {
     private const string KINOPOISK_DEV_TOKEN = "8DA0EV2-KTP4A5Q-G67QP3K-S2VFBX7";
+    private const int REQUEST_LIMIT = 250;
+
+    // doesn't have "productionCompanies" in the result
+    private static readonly IList<string> Movie_Universal_SelectFields = new List<string> { "alternativeName", "backdrop", "countries", "description", "enName", "externalId", "genres", "id", "logo", "movieLength", "name", "persons", "poster", "premiere", "rating", "ratingMpaa", "slogan", "videos", "year", "sequelsAndPrequels", "top250", "facts", "releaseYears", "seasonsInfo", "lists" }.AsReadOnly();
+    private static readonly IList<string> Person_Universal_SelectFields = new List<string> { "birthday", "birthPlace", "death", "deathPlace", "enName", "facts", "id", "movies", "name", "photo" }.AsReadOnly();
+    private static readonly IList<string> Season_Universal_SelectFields = new List<string> { "airDate", "description", "episodes", "episodesCount", "movieId", "name", "number", "poster" }.AsReadOnly();
 
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
@@ -35,331 +41,456 @@ public class ApiTests : IDisposable
         _jsonOptions = new() { PropertyNameCaseInsensitive = true };
     }
 
+    #region Tests
     [Fact]
     public async Task GetMovieById()
     {
-        var request = new Uri("https://api.kinopoisk.dev/v1.3/movie/435");
-        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(request).ConfigureAwait(false);
+        var request = new Uri("https://api.kinopoisk.dev/v1.4/movie/435");
+        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(request);
         _ = responseMessage.EnsureSuccessStatusCode();
-        var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
-        KpMovie? kpMovie = JsonSerializer.Deserialize<KpMovie>(response, _jsonOptions);
-        kpMovie.Should().NotBeNull("should find and desiralize something");
-        kpMovie!.AlternativeName.Should().Be("The Green Mile");
-        kpMovie.Backdrop?.Url.Should().Be("https://imagetmdb.com/t/p/original/l6hQWH9eDksNJNiXWYRkWqikOdu.jpg");
-        kpMovie.Backdrop?.PreviewUrl.Should().Be("https://imagetmdb.com/t/p/w500/l6hQWH9eDksNJNiXWYRkWqikOdu.jpg");
-        kpMovie.Countries?.Count.Should().Be(1);
-        kpMovie.Description.Should().Be("Пол Эджкомб — начальник блока смертников в тюрьме «Холодная гора», каждый из узников которого однажды проходит «зеленую милю» по пути к месту казни. Пол повидал много заключённых и надзирателей за время работы. Однако гигант Джон Коффи, обвинённый в страшном преступлении, стал одним из самых необычных обитателей блока.");
-        kpMovie.ExternalId?.Imdb.Should().Be("tt0120689");
-        kpMovie.ExternalId?.Tmdb.Should().Be(497);
-        kpMovie.Genres?.Count.Should().Be(3);
-        kpMovie.Id.Should().Be(435);
-        kpMovie.Logo?.Url.Should().Be("https://avatars.mds.yandex.net/get-ott/239697/2a0000016f12f1eb8870b609ee94313774b2/orig");
-        kpMovie.MovieLength.Should().Be(189);
-        kpMovie.Name.Should().Be("Зеленая миля");
-        kpMovie.Persons?.Count.Should().Be(26);
-        kpMovie.Poster?.Url.Should().Be("https://avatars.mds.yandex.net/get-kinopoisk-image/1599028/4057c4b8-8208-4a04-b169-26b0661453e3/orig");
-        kpMovie.Poster?.PreviewUrl.Should().Be("https://avatars.mds.yandex.net/get-kinopoisk-image/1599028/4057c4b8-8208-4a04-b169-26b0661453e3/x1000");
-        kpMovie.Premiere?.World.Should().Be("1999-12-06T00:00:00.000Z");
-        kpMovie.ProductionCompanies?.Count.Should().Be(4);
-        kpMovie.Rating?.Kp.Should().NotBeNull("should have a KP rating");
-        kpMovie.RatingMpaa.Should().Be("r");
-        kpMovie.Slogan.Should().Be("Пол Эджкомб не верил в чудеса. Пока не столкнулся с одним из них");
-        kpMovie.Videos?.Teasers.Count.Should().Be(0);
-        kpMovie.Videos?.Trailers.Count.Should().Be(0);
-        kpMovie.Year.Should().Be(1999);
-        kpMovie.Facts?.Count.Should().Be(21);
-        kpMovie.SequelsAndPrequels?.Count.Should().Be(0);
-        kpMovie.Top250.Should().Be(1);
+        var response = await responseMessage.Content.ReadAsStringAsync();
+
+        VerifyMovie435(JsonSerializer.Deserialize<KpMovie>(response, _jsonOptions));
     }
 
     [Fact]
-    public async Task GetMoviesByMovieIds()
+    public async Task GetMovies_Universal_Ids()
     {
-        var request = $"https://api.kinopoisk.dev/v1.3/movie?";
-        request += "&limit=50";
-        request += "&selectFields=alternativeName backdrop countries description enName externalId genres id logo movieLength name persons poster premiere productionCompanies rating ratingMpaa slogan videos year sequelsAndPrequels top250 facts releaseYears seasonsInfo";
+        var request = $"https://api.kinopoisk.dev/v1.4/movie?";
+        request += $"limit={REQUEST_LIMIT}";
+        request += $"&selectFields={string.Join("&selectFields=", Movie_Universal_SelectFields)}";
         request += "&id=689&id=435";
-        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request)).ConfigureAwait(false);
+        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
-        var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var response = await responseMessage.Content.ReadAsStringAsync();
         KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, _jsonOptions);
-        searchResultMovie.Should().NotBeNull("should find and desiralize something");
+        searchResultMovie.Should().NotBeNull();
         searchResultMovie!.Docs.Count.Should().Be(2);
 
-        KpMovie? kpMovie = searchResultMovie!.Docs.FirstOrDefault(i => i.Id == 689);
-        kpMovie.Should().NotBeNull("should find and desiralize the video");
-        kpMovie!.AlternativeName.Should().Be("Harry Potter and the Sorcerer's Stone");
-        kpMovie.Backdrop?.Url.Should().Be("https://imagetmdb.com/t/p/original/hziiv14OpD73u9gAak4XDDfBKa2.jpg");
-        kpMovie.Backdrop?.PreviewUrl.Should().Be("https://imagetmdb.com/t/p/w500/hziiv14OpD73u9gAak4XDDfBKa2.jpg");
-        kpMovie.Countries?.Count.Should().Be(2);
-        kpMovie.Description.Should().Be("Жизнь десятилетнего Гарри Поттера нельзя назвать сладкой: родители умерли, едва ему исполнился год, а от дяди и тёти, взявших сироту на воспитание, достаются лишь тычки да подзатыльники. Но в одиннадцатый день рождения Гарри всё меняется. Странный гость, неожиданно появившийся на пороге, приносит письмо, из которого мальчик узнаёт, что на самом деле он - волшебник и зачислен в школу магии под названием Хогвартс. А уже через пару недель Гарри будет мчаться в поезде Хогвартс-экспресс навстречу новой жизни, где его ждут невероятные приключения, верные друзья и самое главное — ключ к разгадке тайны смерти его родителей.");
-        kpMovie.ExternalId?.Imdb.Should().Be("tt0241527");
-        kpMovie.ExternalId?.Tmdb.Should().Be(671);
-        kpMovie.Facts?.Count.Should().Be(52);
-        kpMovie.Genres?.Count.Should().Be(3);
-        kpMovie.Id.Should().Be(689);
-        kpMovie.Logo?.Url.Should().Be("https://avatars.mds.yandex.net/get-ott/223007/2a0000017e127a46aa2122ff48cb306de98b/orig");
-        kpMovie.MovieLength.Should().Be(152);
-        kpMovie.Name.Should().Be("Гарри Поттер и философский камень");
-        kpMovie.Persons?.Count.Should().Be(37);
-        kpMovie.Poster?.Url.Should().Be("https://st.kp.yandex.net/images/film_big/689.jpg");
-        kpMovie.Poster?.PreviewUrl.Should().Be("https://st.kp.yandex.net/images/film_iphone/iphone360_689.jpg");
-        kpMovie.Premiere?.World.Should().Be("2001-11-04T00:00:00.000Z");
-        kpMovie.ProductionCompanies?.Count.Should().Be(3);
-        kpMovie.Rating?.Kp.Should().NotBeNull("should have a KP rating");
-        kpMovie.RatingMpaa.Should().Be("pg");
-        kpMovie.SequelsAndPrequels.Count.Should().Be(8);
-        kpMovie.Slogan.Should().Be("Путешествие в твою мечту");
-        kpMovie.Videos!.Teasers.Count.Should().Be(0);
-        kpMovie.Videos!.Trailers.Count.Should().Be(7);
-        kpMovie.Year.Should().Be(2001);
-        kpMovie.Top250.Should().BeGreaterThan(0);
-
-        kpMovie = searchResultMovie!.Docs.FirstOrDefault(i => i.Id == 435);
-        kpMovie.Should().NotBeNull("should find and desiralize something");
-        kpMovie!.AlternativeName.Should().Be("The Green Mile");
-        kpMovie.Backdrop?.Url.Should().Be("https://imagetmdb.com/t/p/original/l6hQWH9eDksNJNiXWYRkWqikOdu.jpg");
-        kpMovie.Backdrop?.PreviewUrl.Should().Be("https://imagetmdb.com/t/p/w500/l6hQWH9eDksNJNiXWYRkWqikOdu.jpg");
-        kpMovie.Countries?.Count.Should().Be(1);
-        kpMovie.Description.Should().Be("Пол Эджкомб — начальник блока смертников в тюрьме «Холодная гора», каждый из узников которого однажды проходит «зеленую милю» по пути к месту казни. Пол повидал много заключённых и надзирателей за время работы. Однако гигант Джон Коффи, обвинённый в страшном преступлении, стал одним из самых необычных обитателей блока.");
-        kpMovie.ExternalId?.Imdb.Should().Be("tt0120689");
-        kpMovie.ExternalId?.Tmdb.Should().Be(497);
-        kpMovie.Genres?.Count.Should().Be(3);
-        kpMovie.Id.Should().Be(435);
-        kpMovie.Logo?.Url.Should().Be("https://avatars.mds.yandex.net/get-ott/239697/2a0000016f12f1eb8870b609ee94313774b2/orig");
-        kpMovie.MovieLength.Should().Be(189);
-        kpMovie.Name.Should().Be("Зеленая миля");
-        kpMovie.Persons?.Count.Should().Be(26);
-        kpMovie.Poster?.Url.Should().Be("https://avatars.mds.yandex.net/get-kinopoisk-image/1599028/4057c4b8-8208-4a04-b169-26b0661453e3/orig");
-        kpMovie.Poster?.PreviewUrl.Should().Be("https://avatars.mds.yandex.net/get-kinopoisk-image/1599028/4057c4b8-8208-4a04-b169-26b0661453e3/x1000");
-        kpMovie.Premiere?.World.Should().Be("1999-12-06T00:00:00.000Z");
-        kpMovie.ProductionCompanies?.Count.Should().Be(4);
-        kpMovie.Rating?.Kp.Should().NotBeNull("should have a KP rating");
-        kpMovie.RatingMpaa.Should().Be("r");
-        kpMovie.Slogan.Should().Be("Пол Эджкомб не верил в чудеса. Пока не столкнулся с одним из них");
-        kpMovie.Videos?.Teasers.Count.Should().Be(0);
-        kpMovie.Videos?.Trailers.Count.Should().Be(0);
-        kpMovie.Year.Should().Be(1999);
-        kpMovie.Facts?.Count.Should().Be(21);
-        kpMovie.SequelsAndPrequels?.Count.Should().Be(0);
-        kpMovie.Top250.Should().Be(1);
+        VerifyMovie689(searchResultMovie.Docs.FirstOrDefault(i => i.Id == 689), isUniversalSearch: true);
+        VerifyMovie435(searchResultMovie.Docs.FirstOrDefault(i => i.Id == 435), isUniversalSearch: true);
     }
 
     [Fact]
-    public async Task GetMoviesByMovieDetailsNameYear()
+    public async Task GetMovies_Query_Name_Year()
     {
-        var request = $"https://api.kinopoisk.dev/v1.3/movie?";
-        request += "&limit=50";
-        request += "&selectFields=alternativeName backdrop countries description enName externalId genres id logo movieLength name persons poster premiere productionCompanies rating ratingMpaa slogan videos year sequelsAndPrequels top250 facts releaseYears seasonsInfo";
-        request += "&name=Гарри Поттер и философский камень";
-        request += "&year=2001"; // 689
-        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request)).ConfigureAwait(false);
+        var request = $"https://api.kinopoisk.dev/v1.4/movie/search?";
+        request += $"limit={REQUEST_LIMIT}";
+        request += "&query=Гарри Поттер и философский камень 2001"; // 689
+        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
-        var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var response = await responseMessage.Content.ReadAsStringAsync();
         KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, _jsonOptions);
         searchResultMovie.Should().NotBeNull();
-        searchResultMovie!.Docs.Should().ContainSingle();
-        KpMovie kpMovie = searchResultMovie!.Docs[0];
-        kpMovie!.AlternativeName.Should().Be("Harry Potter and the Sorcerer's Stone");
-        kpMovie.Backdrop?.Url.Should().Be("https://imagetmdb.com/t/p/original/hziiv14OpD73u9gAak4XDDfBKa2.jpg");
-        kpMovie.Backdrop?.PreviewUrl.Should().Be("https://imagetmdb.com/t/p/w500/hziiv14OpD73u9gAak4XDDfBKa2.jpg");
-        kpMovie.Countries?.Count.Should().Be(2);
-        kpMovie.Description.Should().Be("Жизнь десятилетнего Гарри Поттера нельзя назвать сладкой: родители умерли, едва ему исполнился год, а от дяди и тёти, взявших сироту на воспитание, достаются лишь тычки да подзатыльники. Но в одиннадцатый день рождения Гарри всё меняется. Странный гость, неожиданно появившийся на пороге, приносит письмо, из которого мальчик узнаёт, что на самом деле он - волшебник и зачислен в школу магии под названием Хогвартс. А уже через пару недель Гарри будет мчаться в поезде Хогвартс-экспресс навстречу новой жизни, где его ждут невероятные приключения, верные друзья и самое главное — ключ к разгадке тайны смерти его родителей.");
-        kpMovie.ExternalId?.Imdb.Should().Be("tt0241527");
-        kpMovie.ExternalId?.Tmdb.Should().Be(671);
-        kpMovie.Facts?.Count.Should().Be(52);
-        kpMovie.Genres?.Count.Should().Be(3);
-        kpMovie.Id.Should().Be(689);
-        kpMovie.Logo?.Url.Should().Be("https://avatars.mds.yandex.net/get-ott/223007/2a0000017e127a46aa2122ff48cb306de98b/orig");
-        kpMovie.MovieLength.Should().Be(152);
-        kpMovie.Name.Should().Be("Гарри Поттер и философский камень");
-        kpMovie.Persons?.Count.Should().Be(37);
-        kpMovie.Poster?.Url.Should().Be("https://st.kp.yandex.net/images/film_big/689.jpg");
-        kpMovie.Poster?.PreviewUrl.Should().Be("https://st.kp.yandex.net/images/film_iphone/iphone360_689.jpg");
-        kpMovie.Premiere?.World.Should().Be("2001-11-04T00:00:00.000Z");
-        kpMovie.ProductionCompanies?.Count.Should().Be(3);
-        kpMovie.Rating?.Kp.Should().NotBeNull("should have a KP rating");
-        kpMovie.RatingMpaa.Should().Be("pg");
-        kpMovie.SequelsAndPrequels.Count.Should().Be(8);
-        kpMovie.Slogan.Should().Be("Путешествие в твою мечту");
-        kpMovie.Videos!.Teasers.Count.Should().Be(0);
-        kpMovie.Videos!.Trailers.Count.Should().Be(7);
-        kpMovie.Year.Should().Be(2001);
-        kpMovie.Top250.Should().BeGreaterThan(0);
+        searchResultMovie!.Docs.Should().NotBeEmpty();
+
+        VerifyMovie689(searchResultMovie.Docs.FirstOrDefault(x => x.Id == 689), isQuerySearch: true);
     }
 
     [Fact]
-    public async Task GetMoviesByMovieDetailsAlternativeNameYear()
+    public async Task GetMovies_Query_AlternativeName_Year()
     {
-        var request = $"https://api.kinopoisk.dev/v1/movie?";
-        request += "&limit=50";
-        request += "&selectFields=alternativeName backdrop countries description enName externalId genres id logo movieLength name persons poster premiere productionCompanies rating ratingMpaa slogan videos year sequelsAndPrequels top250 facts releaseYears seasonsInfo";
-        request += "&alternativeName=Harry Potter and the Sorcerer's Stone";
-        request += "&year=2001"; // 689
-        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request)).ConfigureAwait(false);
+        var request = $"https://api.kinopoisk.dev/v1.4/movie/search?";
+        request += $"limit={REQUEST_LIMIT}";
+        request += "&query=Harry Potter and the Sorcerer's Stone 2001"; // 689
+        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
-        var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var response = await responseMessage.Content.ReadAsStringAsync();
         KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, _jsonOptions);
         searchResultMovie.Should().NotBeNull();
-        searchResultMovie!.Docs.Should().ContainSingle();
-        KpMovie kpMovie = searchResultMovie!.Docs[0];
-        kpMovie!.AlternativeName.Should().Be("Harry Potter and the Sorcerer's Stone");
-        kpMovie.Backdrop?.Url.Should().Be("https://imagetmdb.com/t/p/original/hziiv14OpD73u9gAak4XDDfBKa2.jpg");
-        kpMovie.Backdrop?.PreviewUrl.Should().Be("https://imagetmdb.com/t/p/w500/hziiv14OpD73u9gAak4XDDfBKa2.jpg");
-        kpMovie.Countries?.Count.Should().Be(2);
-        kpMovie.Description.Should().Be("Жизнь десятилетнего Гарри Поттера нельзя назвать сладкой: родители умерли, едва ему исполнился год, а от дяди и тёти, взявших сироту на воспитание, достаются лишь тычки да подзатыльники. Но в одиннадцатый день рождения Гарри всё меняется. Странный гость, неожиданно появившийся на пороге, приносит письмо, из которого мальчик узнаёт, что на самом деле он - волшебник и зачислен в школу магии под названием Хогвартс. А уже через пару недель Гарри будет мчаться в поезде Хогвартс-экспресс навстречу новой жизни, где его ждут невероятные приключения, верные друзья и самое главное — ключ к разгадке тайны смерти его родителей.");
-        kpMovie.ExternalId?.Imdb.Should().Be("tt0241527");
-        kpMovie.ExternalId?.Tmdb.Should().Be(671);
-        kpMovie.Facts?.Count.Should().Be(52);
-        kpMovie.Genres?.Count.Should().Be(3);
-        kpMovie.Id.Should().Be(689);
-        kpMovie.Logo?.Url.Should().Be("https://avatars.mds.yandex.net/get-ott/223007/2a0000017e127a46aa2122ff48cb306de98b/orig");
-        kpMovie.MovieLength.Should().Be(152);
-        kpMovie.Name.Should().Be("Гарри Поттер и философский камень");
-        kpMovie.Persons?.Count.Should().Be(37);
-        kpMovie.Poster?.Url.Should().Be("https://st.kp.yandex.net/images/film_big/689.jpg");
-        kpMovie.Poster?.PreviewUrl.Should().Be("https://st.kp.yandex.net/images/film_iphone/iphone360_689.jpg");
-        kpMovie.Premiere?.World.Should().Be("2001-11-04T00:00:00.000Z");
-        kpMovie.ProductionCompanies?.Count.Should().Be(3);
-        kpMovie.Rating?.Kp.Should().NotBeNull("should have a KP rating");
-        kpMovie.RatingMpaa.Should().Be("pg");
-        kpMovie.SequelsAndPrequels.Count.Should().Be(8);
-        kpMovie.Slogan.Should().Be("Путешествие в твою мечту");
-        kpMovie.Videos!.Teasers.Count.Should().Be(0);
-        kpMovie.Videos!.Trailers.Count.Should().Be(7);
-        kpMovie.Year.Should().Be(2001);
-        kpMovie.Top250.Should().BeGreaterThan(0);
+        searchResultMovie!.Docs.Should().NotBeEmpty();
+
+        VerifyMovie689(searchResultMovie.Docs.FirstOrDefault(x => x.Id == 689), isQuerySearch: true);
     }
 
     [Fact]
-    public async Task GetMoviesByTop250()
+    public async Task GetMovies_Universal_List_Top500()
     {
-        var request = $"https://api.kinopoisk.dev/v1.3/movie?";
-        request += "selectFields=alternativeName externalId id name top250 typeNumber";
-        request += "&limit=1000";
-        request += "&top250=!null";
-        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request)).ConfigureAwait(false);
+        var request = $"https://api.kinopoisk.dev/v1.4/movie?";
+        request += $"limit={REQUEST_LIMIT}";
+        request += $"&selectFields={string.Join("&selectFields=", Movie_Universal_SelectFields)}";
+        request += "&lists=top500";
+        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
-        var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var response = await responseMessage.Content.ReadAsStringAsync();
         KpSearchResult<KpMovie>? kpMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, _jsonOptions);
         kpMovie.Should().NotBeNull();
-        kpMovie!.Docs.Count.Should().Be(250);
+        kpMovie!.Docs.Count.Should().Be(REQUEST_LIMIT);
+        kpMovie.Pages.Should().Be(2);
     }
 
     [Fact]
-    public async Task GetMoviesByExternalIds()
+    public async Task GetMovies_Universal_ExternalIds()
     {
-        var request = $"https://api.kinopoisk.dev/v1.3/movie?";
-        request += "selectFields=alternativeName externalId.imdb id name&limit=1000";
-        request += "&externalId.imdb=tt0241527";
-        request += "&externalId.imdb=tt0120689";
-        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request)).ConfigureAwait(false);
+        var request = $"https://api.kinopoisk.dev/v1.4/movie?";
+        request += $"limit={REQUEST_LIMIT}";
+        request += $"&selectFields={string.Join("&selectFields=", Movie_Universal_SelectFields)}";
+        request += "&externalId.imdb=tt0241527&externalId.imdb=tt0120689";
+        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
-        var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var response = await responseMessage.Content.ReadAsStringAsync();
         KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, _jsonOptions);
         searchResultMovie.Should().NotBeNull();
         searchResultMovie!.Docs.Count.Should().Be(2);
 
-        KpMovie? kpMovie = searchResultMovie!.Docs.FirstOrDefault(i => i.Id == 689);
-        kpMovie.Should().NotBeNull();
-        kpMovie!.AlternativeName.Should().Be("Harry Potter and the Sorcerer's Stone");
-        kpMovie.ExternalId?.Imdb.Should().Be("tt0241527");
-        kpMovie.Id.Should().Be(689);
-        kpMovie.Name.Should().Be("Гарри Поттер и философский камень");
-
-        kpMovie = searchResultMovie!.Docs.First(i => i.Id == 435);
-        kpMovie.Should().NotBeNull();
-        kpMovie!.AlternativeName.Should().Be("The Green Mile");
-        kpMovie.ExternalId?.Imdb.Should().Be("tt0120689");
-        kpMovie.Id.Should().Be(435);
-        kpMovie.Name.Should().Be("Зеленая миля");
+        VerifyMovie689(searchResultMovie!.Docs.FirstOrDefault(i => i.Id == 689), isUniversalSearch: true);
+        VerifyMovie435(searchResultMovie!.Docs.FirstOrDefault(i => i.Id == 435), isUniversalSearch: true);
     }
 
     [Fact]
     public async Task GetPersonById()
     {
-        var request = $"https://api.kinopoisk.dev/v1/person/7987";
-        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request)).ConfigureAwait(false);
+        var request = $"https://api.kinopoisk.dev/v1.4/person/7987";
+        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
-        var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
-        KpPerson? kpPerson = JsonSerializer.Deserialize<KpPerson>(response, _jsonOptions);
-        kpPerson.Should().NotBeNull();
-        kpPerson!.Birthday.Should().Be("1958-10-16T00:00:00.000Z");
-        kpPerson.BirthPlace?.Count.Should().Be(3);
-        kpPerson.Death.Should().BeNull("person still alive");
-        kpPerson.DeathPlace?.Count.Should().Be(0);
-        kpPerson.Facts?.Count.Should().Be(4);
-        kpPerson.EnName.Should().Be("Tim Robbins");
-        kpPerson.Id.Should().Be(7987);
-        kpPerson.Movies?.Count.Should().BeGreaterThanOrEqualTo(233);
-        kpPerson.Name.Should().Be("Тим Роббинс");
-        kpPerson.Photo.Should().Be("https://avatars.mds.yandex.net/get-kinopoisk-image/1777765/598f49ce-05ff-4e33-885e-a7f0225f854d/orig");
+        var response = await responseMessage.Content.ReadAsStringAsync();
+
+        VerifyPerson7987(JsonSerializer.Deserialize<KpPerson>(response, _jsonOptions));
     }
 
     [Fact]
-    public async Task GetPersonByName()
+    public async Task GetPersons_Query_Name()
     {
-        var request = $"https://api.kinopoisk.dev/v1/person?name=Тим Роббинс";
-        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request)).ConfigureAwait(false);
+        var request = $"https://api.kinopoisk.dev/v1.4/person/search?";
+        request += $"limit={REQUEST_LIMIT}";
+        request += "&query=Тим Роббинс";
+        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
-        var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var response = await responseMessage.Content.ReadAsStringAsync();
         KpSearchResult<KpPerson>? searchResultKpPerson = JsonSerializer.Deserialize<KpSearchResult<KpPerson>>(response, _jsonOptions);
         searchResultKpPerson.Should().NotBeNull();
-        searchResultKpPerson!.Docs.Count.Should().Be(2);
-        KpPerson kpPerson = searchResultKpPerson.Docs[0];
-        kpPerson.Id.Should().Be(7987);
-        kpPerson.Name.Should().Be("Тим Роббинс");
-        kpPerson.Photo.Should().Be("https://avatars.mds.yandex.net/get-kinopoisk-image/1777765/598f49ce-05ff-4e33-885e-a7f0225f854d/orig");
+        searchResultKpPerson!.Docs.Count.Should().Be(REQUEST_LIMIT);
+
+        VerifyPerson7987(searchResultKpPerson.Docs.FirstOrDefault(x => x.Id == 7987), isQuerySearch: true);
     }
 
     [Fact]
-    public async Task GetPersonByMovieId()
+    public async Task GetPersons_Universal_MoviesId()
     {
-        var request = $"https://api.kinopoisk.dev/v1/person?";
+        var request = $"https://api.kinopoisk.dev/v1.4/person?";
+        request += $"limit={REQUEST_LIMIT}";
+        request += $"&selectFields={string.Join("&selectFields=", Person_Universal_SelectFields)}";
         request += "&movies.id=326";
-        request += "&selectFields=id movies name";
-        request += "&limit=1000";
-        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request)).ConfigureAwait(false);
+        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
-        var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var response = await responseMessage.Content.ReadAsStringAsync();
         KpSearchResult<KpPerson>? searchResultKpPerson = JsonSerializer.Deserialize<KpSearchResult<KpPerson>>(response, _jsonOptions);
         searchResultKpPerson.Should().NotBeNull();
-        searchResultKpPerson!.Docs.Count.Should().BeGreaterThan(50);
-        KpPerson? kpPerson = searchResultKpPerson.Docs.FirstOrDefault(i => i.Id == 7987);
-        kpPerson.Should().NotBeNull();
-        kpPerson!.Id.Should().Be(7987);
-        kpPerson.Name.Should().Be("Тим Роббинс");
-        kpPerson.Movies?.Count.Should().BeGreaterThanOrEqualTo(233);
+        searchResultKpPerson!.Docs.Should().HaveCountGreaterThan(100);
+
+        VerifyPerson7987(searchResultKpPerson.Docs.FirstOrDefault(i => i.Id == 7987));
     }
 
     [Fact]
-    public async Task GetEpisodesBySeriesId()
+    public async Task GetEpisodes_Universal_MovieId()
     {
-        var request = $"https://api.kinopoisk.dev/v1/season?";
-        request += "movieId=77044";
-        request += "&limit=50";
-        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request)).ConfigureAwait(false);
+        var request = $"https://api.kinopoisk.dev/v1.4/season?";
+        request += $"limit={REQUEST_LIMIT}";
+        request += $"&selectFields={string.Join("&selectFields=", Season_Universal_SelectFields)}";
+        request += "&movieId=77044";
+        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
-        var response = await responseMessage.Content.ReadAsStringAsync().ConfigureAwait(false);
+        var response = await responseMessage.Content.ReadAsStringAsync();
         KpSearchResult<KpSeason>? searchResultKpSeason = JsonSerializer.Deserialize<KpSearchResult<KpSeason>>(response, _jsonOptions);
         searchResultKpSeason.Should().NotBeNull();
-        searchResultKpSeason!.Docs.RemoveAll(x => x.EpisodesCount == 0);
-        searchResultKpSeason!.Docs.Count.Should().Be(10);
+        searchResultKpSeason!.Docs.RemoveAll(x => x.EpisodesCount == 0 || x.Number == 0);
+        searchResultKpSeason.Docs.Count.Should().Be(10);
 
-        KpSeason? kpSeason = searchResultKpSeason.Docs.FirstOrDefault(i => i.Number == 1);
-        kpSeason.Should().NotBeNull();
-        kpSeason!.MovieId.Should().Be(77044);
-        kpSeason.Episodes?.Count.Should().Be(24);
-
-        KpEpisode? kpEpisode = kpSeason.Episodes?.FirstOrDefault(i => i.Number == 1);
-        kpEpisode.Should().NotBeNull();
-        // kpEpisode!.AirDate.Should().Be("1994-09-22");
-        // kpEpisode!.EnName.Should().Be("The One Where Monica Gets a Roommate");
-        kpEpisode!.EnName.Should().Be("Pilot");
-        kpEpisode.Name.Should().Be("Эпизод, где Моника берёт новую соседку");
-        kpEpisode.Description.Should().NotBeNull();
+        VerifySeries77044Season5(searchResultKpSeason.Docs.FirstOrDefault(i => i.Number == 5));
     }
 
+    [Fact]
+    public async Task GetEpisodes_Universal_MovieId_Season()
+    {
+        var request = $"https://api.kinopoisk.dev/v1.4/season?";
+        request += $"limit={REQUEST_LIMIT}";
+        request += $"&selectFields={string.Join("&selectFields=", Season_Universal_SelectFields)}";
+        request += "&movieId=77044&number=5";
+        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
+        _ = responseMessage.EnsureSuccessStatusCode();
+        var response = await responseMessage.Content.ReadAsStringAsync();
+        KpSearchResult<KpSeason>? searchResultKpSeason = JsonSerializer.Deserialize<KpSearchResult<KpSeason>>(response, _jsonOptions);
+        searchResultKpSeason.Should().NotBeNull();
+        searchResultKpSeason!.Docs.Count.Should().Be(1);
+
+        VerifySeries77044Season5(searchResultKpSeason.Docs.FirstOrDefault(i => i.Number == 5));
+    }
+
+    [Fact]
+    public async Task GetAllKinopoiskLists()
+    {
+        var request = $"https://api.kinopoisk.dev/v1.4/list?limit={REQUEST_LIMIT}";
+        request += "&selectFields=name&selectFields=category&selectFields=slug&selectFields=moviesCount&selectFields=cover";
+        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
+        _ = responseMessage.EnsureSuccessStatusCode();
+        var response = await responseMessage.Content.ReadAsStringAsync();
+
+        var lists = JsonSerializer.Deserialize<KpSearchResult<KpLists>>(response, _jsonOptions);
+        lists.Should().NotBeNull();
+        lists!.Docs.Should().NotBeEmpty();
+    }
+
+
+    #endregion
+
+    #region Verify
+    private static void VerifyMovie435(KpMovie? kpMovie, bool isUniversalSearch = false, bool isQuerySearch = false)
+    {
+        kpMovie.Should().NotBeNull();
+        kpMovie!.AlternativeName.Should().Be("The Green Mile");
+        kpMovie.Backdrop.Should().NotBeNull();
+        kpMovie.Backdrop!.Url.Should().NotBeNullOrWhiteSpace();
+        kpMovie.Backdrop!.PreviewUrl.Should().NotBeNullOrWhiteSpace();
+        kpMovie.Countries.Should().NotBeNull();
+        kpMovie.Countries!.Count.Should().Be(1);
+        kpMovie.Description.Should().Be("Пол Эджкомб — начальник блока смертников в тюрьме «Холодная гора», каждый из узников которого однажды проходит «зеленую милю» по пути к месту казни. Пол повидал много заключённых и надзирателей за время работы. Однако гигант Джон Коффи, обвинённый в страшном преступлении, стал одним из самых необычных обитателей блока.");
+        kpMovie.ExternalId.Should().NotBeNull();
+        kpMovie.ExternalId!.Imdb.Should().Be("tt0120689");
+        kpMovie.ExternalId!.Tmdb.Should().Be(497);
+        if (isQuerySearch)
+        {
+            kpMovie.Facts.Should().BeNull();
+        }
+        else
+        {
+            kpMovie.Facts.Should().NotBeNull();
+            kpMovie.Facts.Should().NotBeEmpty();
+        }
+        kpMovie.Genres.Should().NotBeNull();
+        kpMovie.Genres!.Count.Should().Be(3);
+        kpMovie.Id.Should().Be(435);
+        if (isQuerySearch)
+        {
+            kpMovie.Lists.Should().BeNull();
+        }
+        else
+        {
+            kpMovie.Lists.Should().NotBeNull();
+            kpMovie.Lists.Should().NotBeEmpty();
+        }
+        kpMovie.Logo.Should().NotBeNull();
+        kpMovie.Logo!.Url.Should().NotBeNullOrWhiteSpace();
+        kpMovie.MovieLength.Should().Be(189);
+        kpMovie.Name.Should().Be("Зеленая миля");
+        if (isQuerySearch)
+        {
+            kpMovie.Persons.Should().BeNull();
+        }
+        else
+        {
+            kpMovie.Persons.Should().HaveCount(26);
+            KpPersonMovie? kpPersonMovie = kpMovie.Persons!.FirstOrDefault(p => p.Id == 9144L);
+            kpPersonMovie.Should().NotBeNull();
+            VerifyPersonMovie9144(kpPersonMovie!);
+        }
+        kpMovie.Poster.Should().NotBeNull();
+        kpMovie.Poster!.Url.Should().NotBeNullOrWhiteSpace();
+        kpMovie.Poster!.PreviewUrl.Should().NotBeNullOrWhiteSpace();
+        if (isQuerySearch)
+        {
+            kpMovie.Premiere.Should().BeNull();
+        }
+        else
+        {
+            kpMovie.Premiere.Should().NotBeNull();
+            kpMovie.Premiere!.World.Should().Be("1999-12-06T00:00:00.000Z");
+        }
+        if (isQuerySearch || isUniversalSearch)
+        {
+            kpMovie.ProductionCompanies.Should().BeNull();
+        }
+        else
+        {
+            kpMovie.ProductionCompanies.Should().NotBeNull();
+            kpMovie.ProductionCompanies!.Count.Should().Be(4);
+        }
+        kpMovie.Rating.Should().NotBeNull();
+        kpMovie.Rating!.Kp.Should().NotBeNull();
+        kpMovie.RatingMpaa.Should().Be("r");
+        kpMovie.Top250.Should().NotBeNull();
+        if (isQuerySearch)
+        {
+            kpMovie.SequelsAndPrequels.Should().BeNull();
+            kpMovie.Slogan.Should().BeNull();
+            kpMovie.Videos.Should().BeNull();
+        }
+        else
+        {
+            kpMovie.SequelsAndPrequels.Should().NotBeNull();
+            kpMovie.SequelsAndPrequels.Should().BeEmpty();
+            kpMovie.Slogan.Should().Be("Пол Эджкомб не верил в чудеса. Пока не столкнулся с одним из них");
+            kpMovie.Videos.Should().NotBeNull();
+            kpMovie.Videos!.Teasers.Should().BeEmpty();
+            kpMovie.Videos!.Trailers.Should().NotBeEmpty();
+        }
+        kpMovie.Year.Should().Be(1999);
+    }
+
+    private static void VerifyMovie689(KpMovie? kpMovie, bool isUniversalSearch = false, bool isQuerySearch = false)
+    {
+        kpMovie.Should().NotBeNull();
+        kpMovie!.AlternativeName.Should().Be("Harry Potter and the Sorcerer's Stone");
+        kpMovie.Backdrop.Should().NotBeNull();
+        kpMovie.Backdrop.Url.Should().NotBeNullOrWhiteSpace();
+        kpMovie.Backdrop.PreviewUrl.Should().NotBeNullOrWhiteSpace();
+        kpMovie.Countries.Should().NotBeNull();
+        kpMovie.Countries!.Count.Should().Be(2);
+        kpMovie.Description.Should().Be("Жизнь десятилетнего Гарри Поттера нельзя назвать сладкой: родители умерли, едва ему исполнился год, а от дяди и тёти, взявших сироту на воспитание, достаются лишь тычки да подзатыльники. Но в одиннадцатый день рождения Гарри всё меняется. Странный гость, неожиданно появившийся на пороге, приносит письмо, из которого мальчик узнаёт, что на самом деле он - волшебник и зачислен в школу магии под названием Хогвартс. А уже через пару недель Гарри будет мчаться в поезде Хогвартс-экспресс навстречу новой жизни, где его ждут невероятные приключения, верные друзья и самое главное — ключ к разгадке тайны смерти его родителей.");
+        kpMovie.ExternalId.Should().NotBeNull();
+        kpMovie.ExternalId.Imdb.Should().Be("tt0241527");
+        kpMovie.ExternalId.Tmdb.Should().Be(671);
+        if (isQuerySearch)
+        {
+            kpMovie.Facts.Should().BeNull();
+        }
+        else
+        {
+            kpMovie.Facts.Should().NotBeNull();
+            kpMovie.Facts.Should().NotBeEmpty();
+        }
+        kpMovie.Genres.Should().NotBeNull();
+        kpMovie.Genres.Count.Should().Be(3);
+        kpMovie.Id.Should().Be(689);
+        if (isQuerySearch)
+        {
+            kpMovie.Lists.Should().BeNull();
+        }
+        else
+        {
+            kpMovie.Lists.Should().NotBeNull();
+            kpMovie.Lists.Should().NotBeEmpty();
+        }
+        kpMovie.Logo.Should().NotBeNull();
+        kpMovie.Logo!.Url.Should().NotBeNullOrWhiteSpace();
+        kpMovie.MovieLength.Should().Be(152);
+        kpMovie.Name.Should().Be("Гарри Поттер и философский камень");
+        if (isQuerySearch)
+        {
+            kpMovie.Persons.Should().BeNull();
+        }
+        else
+        {
+            kpMovie.Persons.Should().NotBeNull();
+            kpMovie.Persons.Count.Should().Be(37);
+        }
+        kpMovie.Poster.Should().NotBeNull();
+        kpMovie.Poster!.Url.Should().NotBeNullOrWhiteSpace();
+        kpMovie.Poster!.PreviewUrl.Should().NotBeNullOrWhiteSpace();
+        if (isQuerySearch)
+        {
+            kpMovie.Premiere.Should().BeNull();
+        }
+        else
+        {
+            kpMovie.Premiere.Should().NotBeNull();
+            kpMovie.Premiere!.World.Should().Be("2001-11-04T00:00:00.000Z");
+        }
+        if (isQuerySearch || isUniversalSearch)
+        {
+            kpMovie.ProductionCompanies.Should().BeNull();
+        }
+        else
+        {
+            kpMovie.ProductionCompanies.Should().NotBeNull();
+            kpMovie.ProductionCompanies!.Count.Should().Be(4);
+        }
+        kpMovie.Rating.Should().NotBeNull();
+        kpMovie.Rating!.Kp.Should().NotBeNull();
+        kpMovie.RatingMpaa.Should().Be("pg");
+        kpMovie.Top250.Should().NotBeNull();
+        if (isQuerySearch)
+        {
+            kpMovie.SequelsAndPrequels.Should().BeNull();
+            kpMovie.Slogan.Should().BeNull();
+            kpMovie.Videos.Should().BeNull();
+        }
+        else
+        {
+            kpMovie.SequelsAndPrequels.Should().NotBeNull();
+            kpMovie.SequelsAndPrequels.Count.Should().Be(8);
+            kpMovie.Slogan.Should().Be("Путешествие в твою мечту");
+            kpMovie.Videos.Should().NotBeNull();
+            kpMovie.Videos!.Teasers.Should().BeEmpty();
+            kpMovie.Videos!.Trailers.Should().NotBeEmpty();
+        }
+        kpMovie.Year.Should().Be(2001);
+    }
+
+    private static void VerifyPersonMovie9144(KpPersonMovie? kpPersonMovie)
+    {
+        kpPersonMovie.Should().NotBeNull();
+        kpPersonMovie!.Id.Should().Be(9144);
+        kpPersonMovie.Name.Should().Be("Том Хэнкс");
+        kpPersonMovie.EnName.Should().Be("Tom Hanks");
+        kpPersonMovie.EnProfession.Should().Be("actor");
+        kpPersonMovie.Profession.Should().Be("актеры");
+        kpPersonMovie.Description.Should().Be("Paul Edgecomb");
+        kpPersonMovie.Photo.Should().NotBeNullOrWhiteSpace();
+    }
+
+    private static void VerifyPerson7987(KpPerson? kpPerson, bool isQuerySearch = false)
+    {
+        kpPerson.Should().NotBeNull();
+        kpPerson!.Birthday.Should().Be("1958-10-16T00:00:00.000Z");
+        kpPerson.Death.Should().BeNullOrEmpty();
+        kpPerson.EnName.Should().Be("Tim Robbins");
+        kpPerson.Id.Should().Be(7987);
+        kpPerson.Name.Should().Be("Тим Роббинс");
+        kpPerson.Photo.Should().NotBeNullOrWhiteSpace();
+        if (isQuerySearch)
+        {
+            kpPerson.BirthPlace.Should().BeNull();
+            kpPerson.DeathPlace.Should().BeNull();
+            kpPerson.Facts.Should().BeNull();
+            kpPerson.Movies.Should().BeNull();
+        }
+        else
+        {
+            kpPerson.BirthPlace.Should().NotBeNull();
+            kpPerson.BirthPlace.Should().HaveCount(3);
+            kpPerson.DeathPlace.Should().NotBeNull();
+            kpPerson.DeathPlace.Should().BeEmpty();
+            kpPerson.Facts.Should().NotBeNull();
+            kpPerson.Facts.Should().HaveCountGreaterThanOrEqualTo(4);
+            kpPerson.Movies.Should().NotBeNull();
+            kpPerson.Movies.Should().HaveCountGreaterThanOrEqualTo(233);
+        }
+    }
+
+    private static void VerifySeries77044Season5(KpSeason? kpSeason)
+    {
+        kpSeason.Should().NotBeNull();
+        kpSeason!.AirDate.Should().Be("1998-09-24T00:00:00.000Z");
+        kpSeason.Description.Should().Be("Росс делает глупую ошибку. На своей свадьбе вместо имени своей невесты Емели, он называет имя Рейчел. Свадьба продолжается, но после нее Емели сбегает и просит не преследовать ее. Росс снова впадает в депрессию. Из-за чего у него постоянные нервные срывы и всплески ярости. Моника и Чендлер начинают тайно встречаться, однако делать это в присутствии друзей очень сложно. Тем не менее, их отношения рано или поздно становятся явным. Фиби рожает своему брату Фрэнку тройняшек и одного хочет взять себе. Джо получает роль в хорошем фильме, съемки которого пройдут в Лас-Вегасе. Все друзья отправляются туда и по возвращению двое из них становятся женатыми. Думаете это Чендлер и Моника? Узнаете при просмотре...");
+        kpSeason.Episodes.Should().NotBeNull();
+        kpSeason.Episodes.Should().HaveCount(24);
+        kpSeason.EpisodesCount.Should().Be(24);
+        kpSeason.MovieId.Should().Be(77044);
+        kpSeason.Name.Should().Be("Сезон 5");
+        kpSeason.Number.Should().Be(5);
+        kpSeason.Poster.Should().NotBeNull();
+        kpSeason.Poster.Url.Should().NotBeNullOrWhiteSpace();
+        kpSeason.Poster.PreviewUrl.Should().NotBeNullOrWhiteSpace();
+
+        VerifySeries77044Season5Episode5(kpSeason.Episodes.FirstOrDefault(i => i.Number == 5));
+    }
+
+    private static void VerifySeries77044Season5Episode5(KpEpisode? kpEpisode)
+    {
+        kpEpisode.Should().NotBeNull();
+        kpEpisode!.AirDate.Should().Be("1998-10-29T00:00:00.000Z");
+        kpEpisode.EnName.Should().Be("The One with the Kips");
+        kpEpisode.Description.Should().Be("Чендлер и Моника проводят вместе выходные, но в результате ссорятся. Росс говорит Рэйчел о требовании Эмили. Джо узнает об отношениях между Моникой и Чендлером.");
+        kpEpisode.Number.Should().Be(5);
+        kpEpisode.Name.Should().Be("Эпизод со старым соседом Кипом");
+        kpEpisode.Still.Should().NotBeNull();
+        kpEpisode.Still.PreviewUrl.Should().NotBeEmpty();
+        kpEpisode.Still.Url.Should().NotBeEmpty();
+    }
+
+    #endregion
+
+    #region Utils
     public void Dispose()
     {
         Dispose(true);
@@ -377,4 +508,6 @@ public class ApiTests : IDisposable
         _logger.Info($"Env token length is: {(token != null ? token.Length : 0)}");
         return string.IsNullOrWhiteSpace(token) ? KINOPOISK_DEV_TOKEN : token;
     }
+    #endregion
+
 }

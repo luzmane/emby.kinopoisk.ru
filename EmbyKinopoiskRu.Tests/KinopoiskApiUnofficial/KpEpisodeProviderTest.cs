@@ -42,7 +42,7 @@ public class KpEpisodeProviderTest : BaseTest
         _kpEpisodeProvider.Name.Should().NotBeNullOrWhiteSpace("this is a name of the provider");
 
         HttpResponseInfo response = await _kpEpisodeProvider.GetImageResponse("https://www.google.com", CancellationToken.None);
-        response.StatusCode.Should().Be(HttpStatusCode.OK, "this is status code of the response to google.com");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         _logManager.Verify(lm => lm.GetLogger("KpEpisodeProvider"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
@@ -72,17 +72,17 @@ public class KpEpisodeProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Episode> result = await _kpEpisodeProvider.GetMetadata(episodeInfo, cancellationTokenSource.Token);
 
-        result.HasMetadata.Should().BeTrue("that mean the item was found");
+        result.HasMetadata.Should().BeTrue();
         Episode episode = result.Item;
-        episode.Should().NotBeNull("that mean the episode was found");
-        episode.IndexNumber.Should().Be(2, "requested second episode");
-        episode.MediaType.Should().Be("Video", "this is video");
-        episode.Name.Should().Be("А я сказал — оседлаю!", "this is the name of the episode");
-        episode.OriginalTitle.Should().Be("I Said I'm Gonna Pilot That Thing!!", "this is the original name of the episode");
-        episode.ParentIndexNumber.Should().Be(1, "requested first season");
-        episode.PremiereDate.Should().NotBeNull("episode premier date should have a date");
+        episode.Should().NotBeNull();
+        episode.IndexNumber.Should().Be(2);
+        episode.MediaType.Should().Be("Video");
+        episode.Name.Should().Be("А я сказал — оседлаю!");
+        episode.OriginalTitle.Should().Be("I Said I'm Gonna Pilot That Thing!!");
+        episode.ParentIndexNumber.Should().Be(1);
+        episode.PremiereDate.Should().NotBeNull();
         episode.PremiereDate!.Value.DateTime.Should().HaveYear(2007).And.HaveMonth(4).And.HaveDay(8);
-        episode.SortName.Should().Be(episode.Name, "Emby sorts episode by name");
+        episode.SortName.Should().Be(episode.Name);
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -113,17 +113,17 @@ public class KpEpisodeProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Episode> result = await _kpEpisodeProvider.GetMetadata(episodeInfo, cancellationTokenSource.Token);
 
-        result.HasMetadata.Should().BeTrue("that mean the item was found");
+        result.HasMetadata.Should().BeTrue();
         Episode episode = result.Item;
-        episode.Should().NotBeNull("that mean the episode was found");
-        episode.IndexNumber.Should().Be(2, "requested second episode");
-        episode.MediaType.Should().Be("Video", "this is video");
-        episode.Name.Should().Be("А я сказал — оседлаю!", "this is the name of the episode");
-        episode.OriginalTitle.Should().Be("I Said I'm Gonna Pilot That Thing!!", "this is the original name of the episode");
-        episode.ParentIndexNumber.Should().Be(1, "requested first season");
-        episode.PremiereDate.Should().NotBeNull("episode premier date should have a date");
+        episode.Should().NotBeNull();
+        episode.IndexNumber.Should().Be(2);
+        episode.MediaType.Should().Be("Video");
+        episode.Name.Should().Be("А я сказал — оседлаю!");
+        episode.OriginalTitle.Should().Be("I Said I'm Gonna Pilot That Thing!!");
+        episode.ParentIndexNumber.Should().Be(1);
+        episode.PremiereDate.Should().NotBeNull();
         episode.PremiereDate!.Value.DateTime.Should().HaveYear(2007).And.HaveMonth(4).And.HaveDay(8);
-        episode.SortName.Should().Be(episode.Name, "SortName should be equal to Name");
+        episode.SortName.Should().Be(episode.Name);
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());

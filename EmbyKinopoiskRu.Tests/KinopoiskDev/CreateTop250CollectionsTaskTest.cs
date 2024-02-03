@@ -41,7 +41,7 @@ public class CreateTop250CollectionsTaskTest : BaseTest
 
     #endregion
 
-    [Fact]
+    [Fact(Skip = "task removed")]
     public void CreateTop250CollectionsTaskTest_ForCodeCoverage()
     {
         Logger.Info($"Start '{nameof(CreateTop250CollectionsTaskTest_ForCodeCoverage)}'");
@@ -61,7 +61,7 @@ public class CreateTop250CollectionsTaskTest : BaseTest
         Logger.Info($"Finished '{nameof(CreateTop250CollectionsTaskTest_ForCodeCoverage)}'");
     }
 
-    [Fact]
+    [Fact(Skip = "task removed")]
     public void CreateTop250CollectionsTaskTest_GetTranslation_RU()
     {
         Logger.Info($"Start '{nameof(CreateTop250CollectionsTaskTest_GetTranslation_RU)}'");
@@ -70,9 +70,9 @@ public class CreateTop250CollectionsTaskTest : BaseTest
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration { UICulture = "ru" });
 
-        _CreateTop250CollectionsTaskTest.Name.Should().Be("Создать коллекцию топ 250 Кинопоиска", "this is the name of the task");
-        _CreateTop250CollectionsTaskTest.Description.Should().Be("Создать коллекцию основываясь на топ 250 Кинопоиска. Поддерживает только kinopoisk.dev", "this is the description of the task");
-        _CreateTop250CollectionsTaskTest.Category.Should().Be("Плагин Кинопоиска", "this is the category of the task");
+        _CreateTop250CollectionsTaskTest.Name.Should().Be("Создать коллекцию топ 250 Кинопоиска");
+        _CreateTop250CollectionsTaskTest.Description.Should().Be("Создать коллекцию основываясь на топ 250 Кинопоиска. Поддерживает только kinopoisk.dev");
+        _CreateTop250CollectionsTaskTest.Category.Should().Be("Плагин Кинопоиска");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("CreateTop250CollectionsTask"), Times.Once());
@@ -82,7 +82,7 @@ public class CreateTop250CollectionsTaskTest : BaseTest
         Logger.Info($"Finished '{nameof(CreateTop250CollectionsTaskTest_GetTranslation_RU)}'");
     }
 
-    [Fact]
+    [Fact(Skip = "task removed")]
     public void CreateTop250CollectionsTaskTest_GetTranslation_EnUs()
     {
         Logger.Info($"Start '{nameof(CreateTop250CollectionsTaskTest_GetTranslation_EnUs)}'");
@@ -91,9 +91,9 @@ public class CreateTop250CollectionsTaskTest : BaseTest
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration { UICulture = "en-us" });
 
-        _CreateTop250CollectionsTaskTest.Name.Should().Be("Create Top250 collection from Kinopoisk", "this is the name of the task");
-        _CreateTop250CollectionsTaskTest.Description.Should().Be("Create a collection based on the top 250 list from Kinopoisk.ru. Support kinopoisk.dev only", "this is the description of the task");
-        _CreateTop250CollectionsTaskTest.Category.Should().Be("Kinopoisk Plugin", "this is the category of the task");
+        _CreateTop250CollectionsTaskTest.Name.Should().Be("Create Top250 collection from Kinopoisk");
+        _CreateTop250CollectionsTaskTest.Description.Should().Be("Create a collection based on the top 250 list from Kinopoisk.ru. Support kinopoisk.dev only");
+        _CreateTop250CollectionsTaskTest.Category.Should().Be("Kinopoisk Plugin");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("CreateTop250CollectionsTask"), Times.Once());
@@ -103,7 +103,7 @@ public class CreateTop250CollectionsTaskTest : BaseTest
         Logger.Info($"Finished '{nameof(CreateTop250CollectionsTaskTest_GetTranslation_EnUs)}'");
     }
 
-    [Fact]
+    [Fact(Skip = "task removed")]
     public void CreateTop250CollectionsTaskTest_GetTranslation_UK()
     {
         Logger.Info($"Start '{nameof(CreateTop250CollectionsTaskTest_GetTranslation_UK)}'");
@@ -112,9 +112,9 @@ public class CreateTop250CollectionsTaskTest : BaseTest
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration { UICulture = "uk" });
 
-        _CreateTop250CollectionsTaskTest.Name.Should().Be("Створити колекцію топ 250 Кінопошуку", "this is the name of the task");
-        _CreateTop250CollectionsTaskTest.Description.Should().Be("Створити колекцію ґрунтуючись на топ 250 Кінопошуку. Підтримує лише kinopoisk.dev", "this is the description of the task");
-        _CreateTop250CollectionsTaskTest.Category.Should().Be("Плагін Кінопошуку", "this is the category of the task");
+        _CreateTop250CollectionsTaskTest.Name.Should().Be("Створити колекцію топ 250 Кінопошуку");
+        _CreateTop250CollectionsTaskTest.Description.Should().Be("Створити колекцію ґрунтуючись на топ 250 Кінопошуку. Підтримує лише kinopoisk.dev");
+        _CreateTop250CollectionsTaskTest.Category.Should().Be("Плагін Кінопошуку");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("CreateTop250CollectionsTask"), Times.Once());
@@ -124,7 +124,7 @@ public class CreateTop250CollectionsTaskTest : BaseTest
         Logger.Info($"Finished '{nameof(CreateTop250CollectionsTaskTest_GetTranslation_UK)}'");
     }
 
-    [Fact]
+    [Fact(Skip = "task removed")]
     public void CreateTop250CollectionsTaskTest_GetTranslation_BG()
     {
         Logger.Info($"Start '{nameof(CreateTop250CollectionsTaskTest_GetTranslation_BG)}'");
@@ -133,9 +133,9 @@ public class CreateTop250CollectionsTaskTest : BaseTest
             .SetupGet(scm => scm.Configuration)
             .Returns(new ServerConfiguration { UICulture = "bg" });
 
-        _CreateTop250CollectionsTaskTest.Name.Should().Be("Create Top250 collection from Kinopoisk", "this is the name of the task");
-        _CreateTop250CollectionsTaskTest.Description.Should().Be("Create a collection based on the top 250 list from Kinopoisk.ru. Support kinopoisk.dev only", "this is the description of the task");
-        _CreateTop250CollectionsTaskTest.Category.Should().Be("Kinopoisk Plugin", "this is the category of the task");
+        _CreateTop250CollectionsTaskTest.Name.Should().Be("Create Top250 collection from Kinopoisk");
+        _CreateTop250CollectionsTaskTest.Description.Should().Be("Create a collection based on the top 250 list from Kinopoisk.ru. Support kinopoisk.dev only");
+        _CreateTop250CollectionsTaskTest.Category.Should().Be("Kinopoisk Plugin");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("CreateTop250CollectionsTask"), Times.Once());
@@ -145,7 +145,7 @@ public class CreateTop250CollectionsTaskTest : BaseTest
         Logger.Info($"Finished '{nameof(CreateTop250CollectionsTaskTest_GetTranslation_BG)}'");
     }
 
-    [Fact]
+    [Fact(Skip = "task removed")]
     public async void CreateTop250CollectionsTaskTest_Execute_CollectionExists()
     {
         Logger.Info($"Start '{nameof(CreateTop250CollectionsTaskTest_Execute_CollectionExists)}'");
@@ -289,7 +289,7 @@ public class CreateTop250CollectionsTaskTest : BaseTest
         Logger.Info($"Finish '{nameof(CreateTop250CollectionsTaskTest_Execute_CollectionExists)}'");
     }
 
-    [Fact]
+    [Fact(Skip = "task removed")]
     public async void CreateTop250CollectionsTaskTest_Execute_CollectionNotExists_OneLib()
     {
         Logger.Info($"Start '{nameof(CreateTop250CollectionsTaskTest_Execute_CollectionNotExists_OneLib)}'");
@@ -475,7 +475,7 @@ public class CreateTop250CollectionsTaskTest : BaseTest
         Logger.Info($"Finish '{nameof(CreateTop250CollectionsTaskTest_Execute_CollectionNotExists_OneLib)}'");
     }
 
-    [Fact]
+    [Fact(Skip = "task removed")]
     public async void CreateTop250CollectionsTaskTest_Execute_CollectionNotExists()
     {
         Logger.Info($"Start '{nameof(CreateTop250CollectionsTaskTest_Execute_CollectionNotExists)}'");

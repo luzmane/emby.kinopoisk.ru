@@ -79,71 +79,88 @@ namespace EmbyKinopoiskRu.Helper
             });
             var toReturn = collectionItems.Items.ToList();
             logger.Info($"Internal objects with Kinopoisk ids: {toReturn.Count}");
-
             if (toReturn.Count != choosenItems.Count)
             {
-                logger.Info("Searching for another objects with another metadata providers");
-                foreach (BaseItem item in collectionItems.Items)
-                {
-                    if (long.TryParse(item.GetProviderId(Plugin.PluginKey), out var id))
-                    {
-                        _ = choosenItems.Remove(id);
-                    }
-                }
-                KpSearchResult<KpMovie> kpSearchResult = await api.GetMoviesByIdsAsync(choosenItems.Select(i => i.ToString(CultureInfo.InvariantCulture)).ToList(), cancellationToken);
-                var kpExternalIdist = kpSearchResult.Docs
-                    .Where(m => m.ExternalId != null)
-                    .Select(m => m.ExternalId)
-                    .ToList();
-
-                var imdbList = kpExternalIdist
-                    .Where(e => !string.IsNullOrWhiteSpace(e.Imdb))
-                    .Select(e => e.Imdb)
-                    .ToList();
-                logger.Info($"Found {imdbList.Count} IMDB ids");
-                QueryResult<BaseItem> imdbCollectionItems = imdbList.Any()
-                    ? libraryManager.QueryItems(new InternalItemsQuery
-                    {
-                        IncludeItemTypes = new[] { nameof(Movie), nameof(Series) },
-                        Recursive = false,
-                        IsVirtualItem = false,
-                        AnyProviderIdEquals = imdbList
-                            .Select(id => new KeyValuePair<string, string>(MetadataProviders.Imdb.ToString(), id))
-                            .ToList()
-                    })
-                    : new QueryResult<BaseItem>();
-                logger.Info($"Found {imdbCollectionItems.Items.Length} internal IMDB objects");
-
-                var tmdbList = kpExternalIdist
-                    .Where(e => e.Tmdb != null && e.Tmdb > 0)
-                    .Select(e => e.Tmdb.ToString())
-                    .ToList();
-                logger.Info($"Found {tmdbList.Count} TMDB ids");
-                QueryResult<BaseItem> tmdbCollectionItems = tmdbList.Any()
-                    ? libraryManager.QueryItems(new InternalItemsQuery
-                    {
-                        IncludeItemTypes = new[] { nameof(Movie), nameof(Series) },
-                        Recursive = false,
-                        IsVirtualItem = false,
-                        AnyProviderIdEquals = tmdbList
-                            .Select(id => new KeyValuePair<string, string>(MetadataProviders.Tmdb.ToString(), id))
-                            .ToList()
-                    })
-                    : new QueryResult<BaseItem>();
-                logger.Info($"Found {tmdbCollectionItems.Items.Length} internal TMDB objects");
-
-                var list = new List<BaseItem>(imdbCollectionItems.Items);
-                foreach (BaseItem item in tmdbCollectionItems.Items.Where(x => list.TrueForAll(i => i.InternalId != x.InternalId)))
-                {
-                    list.Add(item);
-                }
-                logger.Info($"Adding {list.Count} additional internal objects");
-                toReturn.AddRange(list);
+                await GetInternalIdWithoutKpOfChoosenListAsync(logger, toReturn, choosenItems, collectionItems, libraryManager, api, cancellationToken);
             }
-
             logger.Info($"Found {toReturn.Count} internal Ids: {string.Join(", ", toReturn.Select(i => i.InternalId))}");
             return toReturn;
         }
+        private static async Task GetInternalIdWithoutKpOfChoosenListAsync(
+            ILogger logger,
+            List<BaseItem> toReturn,
+            List<long> choosenItems,
+            QueryResult<BaseItem> collectionItems,
+            ILibraryManager libraryManager,
+            KinopoiskDevApi api,
+            CancellationToken cancellationToken)
+        {
+            logger.Info("Searching for another objects with another metadata providers");
+            foreach (BaseItem item in collectionItems.Items)
+            {
+                if (long.TryParse(item.GetProviderId(Plugin.PluginKey), out var id))
+                {
+                    _ = choosenItems.Remove(id);
+                }
+            }
+            var movieIds = choosenItems.Select(i => i.ToString(CultureInfo.InvariantCulture));
+            KpSearchResult<KpMovie> kpSearchResult = await api.GetMoviesByIdsAsync(movieIds, cancellationToken);
+            if (kpSearchResult == null)
+            {
+                logger.Error($"Nothing was found for Kp IDs: '{string.Join(",", movieIds)}'");
+                return;
+            }
+            var kpExternalIdist = kpSearchResult.Docs
+                .Where(m => m.ExternalId != null)
+                .Select(m => m.ExternalId)
+                .ToList();
+
+            var imdbList = kpExternalIdist
+                .Where(e => !string.IsNullOrWhiteSpace(e.Imdb))
+                .Select(e => e.Imdb)
+                .ToList();
+            logger.Info($"Found {imdbList.Count} IMDB ids");
+            QueryResult<BaseItem> imdbCollectionItems = imdbList.Any()
+                ? libraryManager.QueryItems(new InternalItemsQuery
+                {
+                    IncludeItemTypes = new[] { nameof(Movie), nameof(Series) },
+                    Recursive = false,
+                    IsVirtualItem = false,
+                    AnyProviderIdEquals = imdbList
+                        .Select(id => new KeyValuePair<string, string>(MetadataProviders.Imdb.ToString(), id))
+                        .ToList()
+                })
+                : new QueryResult<BaseItem>();
+            logger.Info($"Found {imdbCollectionItems.Items.Length} internal IMDB objects");
+
+            var tmdbList = kpExternalIdist
+                .Where(e => e.Tmdb != null && e.Tmdb > 0)
+                .Select(e => e.Tmdb.ToString())
+                .ToList();
+            logger.Info($"Found {tmdbList.Count} TMDB ids");
+            QueryResult<BaseItem> tmdbCollectionItems = tmdbList.Any()
+                ? libraryManager.QueryItems(new InternalItemsQuery
+                {
+                    IncludeItemTypes = new[] { nameof(Movie), nameof(Series) },
+                    Recursive = false,
+                    IsVirtualItem = false,
+                    AnyProviderIdEquals = tmdbList
+                        .Select(id => new KeyValuePair<string, string>(MetadataProviders.Tmdb.ToString(), id))
+                        .ToList()
+                })
+                : new QueryResult<BaseItem>();
+            logger.Info($"Found {tmdbCollectionItems.Items.Length} internal TMDB objects");
+
+            var list = new List<BaseItem>(imdbCollectionItems.Items);
+            var imdbIdList = imdbCollectionItems.Items.Select(x => x.InternalId);
+            foreach (BaseItem item in tmdbCollectionItems.Items.Where(x => !imdbIdList.Contains(x.InternalId)))
+            {
+                list.Add(item);
+            }
+            logger.Info($"Adding {list.Count} additional internal objects");
+            toReturn.AddRange(list);
+        }
+        // TODO: so if video exists in any collection, other will be added the the same one?
         internal static BoxSet SearchExistingCollection(List<long> internalIds, ILibraryManager libraryManager, ILogger logger)
         {
             logger.Info($"Search existing collections for item with ids: '{string.Join(" ,", internalIds)}'");

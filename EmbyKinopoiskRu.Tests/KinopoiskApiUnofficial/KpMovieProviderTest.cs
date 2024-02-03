@@ -43,12 +43,12 @@ public class KpMovieProviderTest : BaseTest
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_ForCodeCoverage)}'");
 
-        _kpMovieProvider.Name.Should().NotBeNull("name is hardcoded");
+        _kpMovieProvider.Name.Should().NotBeNull();
 
         _kpMovieProvider.Features.Should().NotBeEmpty();
 
         HttpResponseInfo response = await _kpMovieProvider.GetImageResponse("https://www.google.com", CancellationToken.None);
-        response.StatusCode.Should().Be(HttpStatusCode.OK, "this is status code of the response to google.com");
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         _logManager.Verify(lm => lm.GetLogger("KpMovieProvider"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
@@ -74,32 +74,32 @@ public class KpMovieProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Movie> result = await _kpMovieProvider.GetMetadata(movieInfo, cancellationTokenSource.Token);
 
-        result.HasMetadata.Should().BeTrue("that mean the item was found");
+        result.HasMetadata.Should().BeTrue();
         Movie movie = result.Item;
-        movie.Should().NotBeNull("that mean the movie was found");
-        movie.GetProviderId(Plugin.PluginKey).Should().Be("326", "id of the requested item");
-        movie.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0111161", "IMDB id of the requested item");
-        movie.MediaType.Should().Be("Video", "this is video");
-        movie.CommunityRating.Should().BeGreaterThan(5, "such value received from API");
-        movie.ExternalId.Should().Be("326", "KP id of requested item");
+        movie.Should().NotBeNull();
+        movie.GetProviderId(Plugin.PluginKey).Should().Be("326");
+        movie.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0111161");
+        movie.MediaType.Should().Be("Video");
+        movie.CommunityRating.Should().BeGreaterThan(5);
+        movie.ExternalId.Should().Be("326");
         movie.Genres.Should().ContainSingle();
-        movie.Genres[0].Should().Be("драма", "the film has only this genre");
-        movie.Name.Should().Be("Побег из Шоушенка", "this is the name of the movie");
-        movie.OfficialRating.Should().Be("r", "this is film's OfficialRating");
-        movie.OriginalTitle.Should().Be("The Shawshank Redemption", "this is the original name of the movie");
-        movie.Overview.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.", "this is film's Overview");
-        movie.ProductionYear.Should().Be(1994, "this is movie ProductionYear");
-        movie.Size.Should().Be(142, "this is movie Size");
-        movie.SortName.Should().Be(movie.Name, "SortName should be equal to Name");
-        movie.Tagline.Should().Be("Страх - это кандалы. Надежда - это свобода", "this is a Tagline of the movie");
+        movie.Genres[0].Should().Be("драма");
+        movie.Name.Should().Be("Побег из Шоушенка");
+        movie.OfficialRating.Should().Be("r");
+        movie.OriginalTitle.Should().Be("The Shawshank Redemption");
+        movie.Overview.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.");
+        movie.ProductionYear.Should().Be(1994);
+        movie.Size.Should().Be(142);
+        movie.SortName.Should().Be(movie.Name);
+        movie.Tagline.Should().Be("Страх - это кандалы. Надежда - это свобода");
 
         result.People.Should().HaveCount(80);
         PersonInfo? person = result.People.FirstOrDefault(p => "Тим Роббинс".Equals(p.Name, StringComparison.Ordinal));
-        person.Should().NotBeNull("that mean the person was found");
-        person.GetProviderId(Plugin.PluginKey).Should().Be("7987", "id of the requested item");
-        person!.Role.Should().Be("Andy Dufresne", "this is person's Role");
-        person.Name.Should().Be("Тим Роббинс", "this is the person's name");
-        person.ImageUrl.Should().NotBeNullOrWhiteSpace("person image exists");
+        person.Should().NotBeNull();
+        person.GetProviderId(Plugin.PluginKey).Should().Be("7987");
+        person!.Role.Should().Be("Andy Dufresne");
+        person.Name.Should().Be("Тим Роббинс");
+        person.ImageUrl.Should().NotBeNullOrWhiteSpace();
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -127,32 +127,32 @@ public class KpMovieProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Movie> result = await _kpMovieProvider.GetMetadata(movieInfo, cancellationTokenSource.Token);
 
-        result.HasMetadata.Should().BeTrue("that mean the item was found");
+        result.HasMetadata.Should().BeTrue();
         Movie movie = result.Item;
-        movie.Should().NotBeNull("that mean the movie was found");
-        movie.GetProviderId(Plugin.PluginKey).Should().Be("326", "id of the requested item");
-        movie.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0111161", "IMDB id of the requested item");
-        movie.MediaType.Should().Be("Video", "this is video");
-        movie.CommunityRating.Should().BeGreaterThan(5, "such value received from API");
-        movie.ExternalId.Should().Be("326", "KP id of requested item");
+        movie.Should().NotBeNull();
+        movie.GetProviderId(Plugin.PluginKey).Should().Be("326");
+        movie.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0111161");
+        movie.MediaType.Should().Be("Video");
+        movie.CommunityRating.Should().BeGreaterThan(5);
+        movie.ExternalId.Should().Be("326");
         movie.Genres.Should().ContainSingle();
-        movie.Genres[0].Should().Be("драма", "the film has only this genre");
-        movie.Name.Should().Be("Побег из Шоушенка", "this is the name of the movie");
-        movie.OfficialRating.Should().Be("r", "this is film's OfficialRating");
-        movie.OriginalTitle.Should().Be("The Shawshank Redemption", "this is the original name of the movie");
-        movie.Overview.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.", "this is film's Overview");
-        movie.ProductionYear.Should().Be(1994, "this is movie ProductionYear");
-        movie.Size.Should().Be(142, "this is movie Size");
-        movie.SortName.Should().Be(movie.Name, "SortName should be equal to Name");
-        movie.Tagline.Should().Be("Страх - это кандалы. Надежда - это свобода", "this is a Tagline of the movie");
+        movie.Genres[0].Should().Be("драма");
+        movie.Name.Should().Be("Побег из Шоушенка");
+        movie.OfficialRating.Should().Be("r");
+        movie.OriginalTitle.Should().Be("The Shawshank Redemption");
+        movie.Overview.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.");
+        movie.ProductionYear.Should().Be(1994);
+        movie.Size.Should().Be(142);
+        movie.SortName.Should().Be(movie.Name);
+        movie.Tagline.Should().Be("Страх - это кандалы. Надежда - это свобода");
 
         result.People.Should().HaveCount(80);
         PersonInfo? person = result.People.FirstOrDefault(p => "Тим Роббинс".Equals(p.Name, StringComparison.Ordinal));
-        person.Should().NotBeNull("that mean the person was found");
-        person.GetProviderId(Plugin.PluginKey).Should().Be("7987", "id of the requested item");
-        person!.Role.Should().Be("Andy Dufresne", "this is person's Role");
-        person.Name.Should().Be("Тим Роббинс", "this is the person's name");
-        person.ImageUrl.Should().NotBeNullOrWhiteSpace("person image exists");
+        person.Should().NotBeNull();
+        person.GetProviderId(Plugin.PluginKey).Should().Be("7987");
+        person!.Role.Should().Be("Andy Dufresne");
+        person.Name.Should().Be("Тим Роббинс");
+        person.ImageUrl.Should().NotBeNullOrWhiteSpace();
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -181,32 +181,32 @@ public class KpMovieProviderTest : BaseTest
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Movie> result = await _kpMovieProvider.GetMetadata(movieInfo, cancellationTokenSource.Token);
 
-        result.HasMetadata.Should().BeTrue("that mean the item was found");
+        result.HasMetadata.Should().BeTrue();
         Movie movie = result.Item;
-        movie.Should().NotBeNull("that mean the movie was found");
-        movie.GetProviderId(Plugin.PluginKey).Should().Be("326", "id of the requested item");
-        movie.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0111161", "IMDB id of the requested item");
-        movie.MediaType.Should().Be("Video", "this is video");
-        movie.CommunityRating.Should().BeGreaterThan(5, "such value received from API");
-        movie.ExternalId.Should().Be("326", "KP id of requested item");
+        movie.Should().NotBeNull();
+        movie.GetProviderId(Plugin.PluginKey).Should().Be("326");
+        movie.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0111161");
+        movie.MediaType.Should().Be("Video");
+        movie.CommunityRating.Should().BeGreaterThan(5);
+        movie.ExternalId.Should().Be("326");
         movie.Genres.Should().ContainSingle();
-        movie.Genres[0].Should().Be("драма", "the film has only this genre");
-        movie.Name.Should().Be("Побег из Шоушенка", "this is the name of the movie");
-        movie.OfficialRating.Should().Be("r", "this is film's OfficialRating");
-        movie.OriginalTitle.Should().Be("The Shawshank Redemption", "this is the original name of the movie");
-        movie.Overview.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.", "this is film's Overview");
-        movie.ProductionYear.Should().Be(1994, "this is movie ProductionYear");
-        movie.Size.Should().Be(142, "this is movie Size");
-        movie.SortName.Should().Be(movie.Name, "SortName should be equal to Name");
-        movie.Tagline.Should().Be("Страх - это кандалы. Надежда - это свобода", "this is a Tagline of the movie");
+        movie.Genres[0].Should().Be("драма");
+        movie.Name.Should().Be("Побег из Шоушенка");
+        movie.OfficialRating.Should().Be("r");
+        movie.OriginalTitle.Should().Be("The Shawshank Redemption");
+        movie.Overview.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.");
+        movie.ProductionYear.Should().Be(1994);
+        movie.Size.Should().Be(142);
+        movie.SortName.Should().Be(movie.Name);
+        movie.Tagline.Should().Be("Страх - это кандалы. Надежда - это свобода");
 
         result.People.Should().HaveCount(80);
         PersonInfo? person = result.People.FirstOrDefault(p => "Тим Роббинс".Equals(p.Name, StringComparison.Ordinal));
-        person.Should().NotBeNull("that mean the person was found");
-        person.GetProviderId(Plugin.PluginKey).Should().Be("7987", "id of the requested item");
-        person!.Role.Should().Be("Andy Dufresne", "this is person's Role");
-        person.Name.Should().Be("Тим Роббинс", "this is the person's name");
-        person.ImageUrl.Should().NotBeNullOrWhiteSpace("person image exists");
+        person.Should().NotBeNull();
+        person.GetProviderId(Plugin.PluginKey).Should().Be("7987");
+        person!.Role.Should().Be("Andy Dufresne");
+        person.Name.Should().Be("Тим Роббинс");
+        person.ImageUrl.Should().NotBeNullOrWhiteSpace();
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -234,13 +234,13 @@ public class KpMovieProviderTest : BaseTest
         IEnumerable<RemoteSearchResult> result = await _kpMovieProvider.GetSearchResults(movieInfo, cancellationTokenSource.Token);
         result.Should().ContainSingle();
         RemoteSearchResult movie = result.First();
-        movie.Should().NotBeNull("that mean the movie was found");
-        movie.GetProviderId(Plugin.PluginKey).Should().Be("326", "id of the requested item");
-        movie.Name.Should().Be("Побег из Шоушенка", "this is the name of the movie");
+        movie.Should().NotBeNull();
+        movie.GetProviderId(Plugin.PluginKey).Should().Be("326");
+        movie.Name.Should().Be("Побег из Шоушенка");
         movie.ImageUrl.Should().NotBeNullOrWhiteSpace("movie image exists");
-        movie.ProductionYear.Should().Be(1994, "this is movie ProductionYear");
+        movie.ProductionYear.Should().Be(1994);
         movie.SearchProviderName.Should().Be(Plugin.PluginKey, "this is movie's SearchProviderName");
-        movie.Overview.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.", "this is film's Overview");
+        movie.Overview.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -267,13 +267,13 @@ public class KpMovieProviderTest : BaseTest
         IEnumerable<RemoteSearchResult> result = await _kpMovieProvider.GetSearchResults(movieInfo, cancellationTokenSource.Token);
         result.Should().ContainSingle();
         RemoteSearchResult movie = result.First();
-        movie.Should().NotBeNull("that mean the movie was found");
-        movie.GetProviderId(Plugin.PluginKey).Should().Be("326", "id of the requested item");
-        movie.Name.Should().Be("Побег из Шоушенка", "this is the name of the movie");
+        movie.Should().NotBeNull();
+        movie.GetProviderId(Plugin.PluginKey).Should().Be("326");
+        movie.Name.Should().Be("Побег из Шоушенка");
         movie.ImageUrl.Should().NotBeNullOrWhiteSpace("movie image exists");
-        movie.ProductionYear.Should().Be(1994, "this is movie ProductionYear");
+        movie.ProductionYear.Should().Be(1994);
         movie.SearchProviderName.Should().Be(Plugin.PluginKey, "this is movie's SearchProviderName");
-        movie.Overview.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.", "this is film's Overview");
+        movie.Overview.Should().Be("Бухгалтер Энди Дюфрейн обвинён в убийстве собственной жены и её любовника. Оказавшись в тюрьме под названием Шоушенк, он сталкивается с жестокостью и беззаконием, царящими по обе стороны решётки. Каждый, кто попадает в эти стены, становится их рабом до конца жизни. Но Энди, обладающий живым умом и доброй душой, находит подход как к заключённым, так и к охранникам, добиваясь их особого к себе расположения.");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
@@ -301,11 +301,11 @@ public class KpMovieProviderTest : BaseTest
         IEnumerable<RemoteSearchResult> result = await _kpMovieProvider.GetSearchResults(movieInfo, cancellationTokenSource.Token);
         result.Should().ContainSingle();
         RemoteSearchResult movie = result.First();
-        movie.Should().NotBeNull("that mean the movie was found");
-        movie.GetProviderId(Plugin.PluginKey).Should().Be("326", "id of the requested item");
-        movie.Name.Should().Be("Побег из Шоушенка", "this is the name of the movie");
+        movie.Should().NotBeNull();
+        movie.GetProviderId(Plugin.PluginKey).Should().Be("326");
+        movie.Name.Should().Be("Побег из Шоушенка");
         movie.ImageUrl.Should().NotBeNullOrWhiteSpace("movie image exists");
-        movie.ProductionYear.Should().Be(1994, "this is movie ProductionYear");
+        movie.ProductionYear.Should().Be(1994);
         movie.SearchProviderName.Should().Be(Plugin.PluginKey, "this is movie's SearchProviderName");
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));

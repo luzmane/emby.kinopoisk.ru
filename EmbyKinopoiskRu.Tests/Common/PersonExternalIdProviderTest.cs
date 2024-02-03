@@ -20,12 +20,12 @@ public class PersonExternalIdProviderTest
 
         PersonExternalIdProvider personExternalIdProvider = new();
 
-        personExternalIdProvider.Name.Should().Be(Plugin.PluginName, "has value of Plugin.PluginName");
-        personExternalIdProvider.Key.Should().Be(Plugin.PluginKey, "has value of Plugin.PluginKey");
-        personExternalIdProvider.UrlFormatString.Should().Be("https://www.kinopoisk.ru/name/{0}/", "this is constant");
+        personExternalIdProvider.Name.Should().Be(Plugin.PluginName);
+        personExternalIdProvider.Key.Should().Be(Plugin.PluginKey);
+        personExternalIdProvider.UrlFormatString.Should().Be("https://www.kinopoisk.ru/name/{0}/");
 
-        personExternalIdProvider.Supports(new Person()).Should().BeTrue("this provider supports only Person");
-        personExternalIdProvider.Supports(new Series()).Should().BeFalse("this provider supports only Person");
+        personExternalIdProvider.Supports(new Person()).Should().BeTrue();
+        personExternalIdProvider.Supports(new Series()).Should().BeFalse();
 
         _logger.Info($"Finished '{nameof(PersonExternalIdProvider_ForCodeCoverage)}'");
     }

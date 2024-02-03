@@ -137,19 +137,14 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 }
                 else
                 {
-                    var imdbList = itemsToUpdateResult.Items
-                        .Where(m => m.HasProviderId(MetadataProviders.Imdb.ToString()))
-                        .Where(m => !string.IsNullOrWhiteSpace(m.GetProviderId(MetadataProviders.Imdb.ToString())))
-                        .ToList();
+                    var imdbList = itemsToUpdateResult.Items.Where(m => !string.IsNullOrWhiteSpace(m.GetProviderId(MetadataProviders.Imdb.ToString())));
                     await UpdateItemsByProviderIdAsync(imdbList, MetadataProviders.Imdb.ToString(), cancellationToken);
                     _log.Info("Finishing update Kinopoisk IDs by Imdb ID");
                     progress.Report(50d);
 
                     var tmdbList = itemsToUpdateResult.Items
-                        .Where(m => !m.HasProviderId(MetadataProviders.Imdb.ToString()))
-                        .Where(m => m.HasProviderId(MetadataProviders.Tmdb.ToString()))
-                        .Where(m => !string.IsNullOrWhiteSpace(m.GetProviderId(MetadataProviders.Tmdb.ToString())))
-                        .ToList();
+                        .Where(m => string.IsNullOrWhiteSpace(m.GetProviderId(MetadataProviders.Imdb.ToString())))
+                        .Where(m => !string.IsNullOrWhiteSpace(m.GetProviderId(MetadataProviders.Tmdb.ToString())));
                     await UpdateItemsByProviderIdAsync(tmdbList, MetadataProviders.Tmdb.ToString(), cancellationToken);
                     _log.Info("Finishing update Kinopoisk IDs by Tmdb ID");
                     progress.Report(100d);
@@ -162,10 +157,11 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             }
         }
 
-        private async Task UpdateItemsByProviderIdAsync(List<BaseItem> itemsToUpdate, string providerId, CancellationToken cancellationToken)
+        private async Task UpdateItemsByProviderIdAsync(IEnumerable<BaseItem> itemsToUpdate, string providerId, CancellationToken cancellationToken)
         {
-            _log.Info($"Requesting KP ID for {itemsToUpdate.Count} items by {providerId} ID from API");
-            var count = (int)Math.Ceiling((double)itemsToUpdate.Count / CHUNK_SIZE);
+            var itemsCount = itemsToUpdate.Count();
+            _log.Info($"Requesting KP ID for {itemsCount} items by {providerId} ID from API");
+            var count = (int)Math.Ceiling((double)itemsCount / CHUNK_SIZE);
             for (var i = 0; i < count; i++)
             {
                 IEnumerable<BaseItem> workingList = itemsToUpdate.Skip(CHUNK_SIZE * i).Take(CHUNK_SIZE);
@@ -174,21 +170,27 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 if (fetchedIds.HasError)
                 {
                     var processed = i == 0 ? workingList.Count() : (CHUNK_SIZE * (i - 1)) + workingList.Count();
-                    _log.Warn($"Unable to fetch data from API. Processed {processed} of {itemsToUpdate.Count}");
-                    break;
+                    _log.Warn($"Unable to fetch data from API. Processed {processed} of {itemsCount}");
                 }
-                foreach (BaseItem item in workingList)
+                else
                 {
-                    var id = item.GetProviderId(providerId);
-                    if (fetchedIds.Item.TryGetValue(id, out var itemId))
-                    {
-                        item.SetProviderId(Plugin.PluginKey, itemId.ToString(CultureInfo.InvariantCulture));
-                        item.UpdateToRepository(ItemUpdateType.MetadataEdit);
-                    }
-                    else
-                    {
-                        _log.Info($"Unable to find Kp id for {item.Name} ({providerId}:{id})");
-                    }
+                    UpdateProviderId(workingList, providerId, fetchedIds.Item);
+                }
+            }
+        }
+        private void UpdateProviderId(IEnumerable<BaseItem> workingList, string providerId, Dictionary<string, long> fetchedIds)
+        {
+            foreach (BaseItem item in workingList)
+            {
+                var id = item.GetProviderId(providerId);
+                if (fetchedIds.TryGetValue(id, out var itemId))
+                {
+                    item.SetProviderId(Plugin.PluginKey, itemId.ToString(CultureInfo.InvariantCulture));
+                    item.UpdateToRepository(ItemUpdateType.MetadataEdit);
+                }
+                else
+                {
+                    _log.Info($"Unable to find Kp id for {item.Name} ({providerId}:{id})");
                 }
             }
         }
