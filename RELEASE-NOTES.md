@@ -1,3 +1,7 @@
+v.1.21.0
+- feature: Move to v.1.4 KinopoiskDev API
+### getMovie return base Person object
+
 v.1.20.0
 - Update "Update Kinopoisk Plugin" task to support new tags name
 
