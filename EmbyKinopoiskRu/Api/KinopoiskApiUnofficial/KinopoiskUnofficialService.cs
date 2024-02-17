@@ -750,15 +750,20 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         #endregion
 
         #region Scheduled Tasks
-        public Task<List<BaseItem>> GetTop250CollectionAsync(CancellationToken cancellationToken)
+        public Task<List<BaseItem>> GetCollectionItemsAsync(string collectionId, CancellationToken cancellationToken)
         {
-            _log.Info("KinopoiskUnofficial doesn't have information about Top250");
+            _log.Info($"KinopoiskUnofficial doesn't have information about items in collection '{collectionId}'");
             return Task.FromResult(new List<BaseItem>());
         }
         public Task<ApiResult<Dictionary<string, long>>> GetKpIdByAnotherIdAsync(string externalIdType, IEnumerable<string> idList, CancellationToken cancellationToken)
         {
             _log.Info("KinopoiskUnofficial unable to search by IMDB nor by TMDB");
             return Task.FromResult(new ApiResult<Dictionary<string, long>>(new Dictionary<string, long>()));
+        }
+        public Task<List<KpLists>> GetKpCollectionsAsync()
+        {
+            _log.Info("KinopoiskUnofficial doesn't have information about Kinopoisk collections");
+            return Task.FromResult(Array.Empty<KpLists>().ToList());
         }
 
         #endregion

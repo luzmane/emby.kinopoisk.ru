@@ -1,0 +1,5 @@
+{
+    "Name": "Create Kinopoisk collections",
+    "Description": "Create collections based on Kinopoisk.ru collections and configuration of the plugin. Support kinopoisk.dev only",
+    "Category": "Kinopoisk Plugin"
+}

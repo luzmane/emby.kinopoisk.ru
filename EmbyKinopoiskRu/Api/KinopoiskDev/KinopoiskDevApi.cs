@@ -99,13 +99,16 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             _log.Info($"Nothing found for name '{name}' alternativeName '{alternativeName}' year '{year}'");
             return new KpSearchResult<KpMovie>();
         }
-        internal async Task<KpSearchResult<KpMovie>> GetTop250CollectionAsync(CancellationToken cancellationToken)
+        internal async Task<KpSearchResult<KpMovie>> GetCollectionItemsAsync(string collectionId, int page, CancellationToken cancellationToken)
         {
-            var request = $"https://api.kinopoisk.dev/v1.3/movie?";
-            request += "limit=1000&top250=!null";
-            request += "&selectFields=alternativeName externalId id name top250 typeNumber";
+            var request = new StringBuilder($"https://api.kinopoisk.dev/v1.4/movie?limit=250&page={page}&lists={collectionId}")
+                .Append("&selectFields=alternativeName&selectFields=externalId&selectFields=id&selectFields=name&selectFields=typeNumber")
+                .ToString();
             var json = await SendRequestAsync(request, cancellationToken);
-            return _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
+            var hasError = json.Length == 0;
+            return hasError
+                ? new KpSearchResult<KpMovie> { HasError = true }
+                : _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
         }
 
         internal async Task<KpPerson> GetPersonByIdAsync(string personId, CancellationToken cancellationToken)
@@ -153,6 +156,16 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             return hasError
                 ? new KpSearchResult<KpMovie> { HasError = true }
                 : _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
+        }
+        internal async Task<KpSearchResult<KpLists>> GetKpCollectionsAsync(CancellationToken cancellationToken)
+        {
+            var request = $"https://api.kinopoisk.dev/v1.4/list?limit=100";
+            request += "&selectFields=name&selectFields=slug&selectFields=moviesCount&selectFields=cover&selectFields=category";
+            var json = await SendRequestAsync(request, cancellationToken);
+            var hasError = json.Length == 0;
+            return hasError
+                ? new KpSearchResult<KpLists> { HasError = true }
+                : _jsonSerializer.DeserializeFromString<KpSearchResult<KpLists>>(json);
         }
 
         private async Task<string> SendRequestAsync(string url, CancellationToken cancellationToken)

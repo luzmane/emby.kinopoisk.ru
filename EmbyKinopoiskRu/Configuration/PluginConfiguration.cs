@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using MediaBrowser.Model.Plugins;
 
@@ -32,15 +34,21 @@ namespace EmbyKinopoiskRu.Configuration
         public bool CreateSeqCollections { get; set; } = true;
 
         /// <summary>
-        /// Gets or sets a value indicating whether Top250InOneLib.
+        /// Available collections from Kinopoisk
         /// </summary>
-        public bool Top250InOneLib { get; set; }
-
-        /// <summary>
-        /// Gets or sets Top250CollectionName.
-        /// </summary>
-        public string Top250CollectionName { get; set; } = DefaultTop250CollectionName;
-
+        public string Collections
+        {
+            get
+            {
+                return Plugin.Instance.JsonSerializer.SerializeToString(CollectionsList);
+            }
+            set
+            {
+                SetCollection(value);
+            }
+        }
+        internal List<CollectionItem> CollectionsList = new List<CollectionItem>();
+        private static bool s_fetchingCollections;
 
         internal string GetCurrentToken()
         {
@@ -54,15 +62,34 @@ namespace EmbyKinopoiskRu.Configuration
         {
             return KinopoiskDev.Equals(ApiType, StringComparison.Ordinal) && CreateSeqCollections;
         }
-        internal bool NeedToCreateTop250InOneLib()
+
+        private void SetCollection(string value)
         {
-            return KinopoiskDev.Equals(ApiType, StringComparison.Ordinal) && Top250InOneLib;
-        }
-        internal string GetCurrentTop250CollectionName()
-        {
-            return !string.IsNullOrWhiteSpace(Top250CollectionName)
-                ? Top250CollectionName
-                : DefaultTop250CollectionName;
+            if (!s_fetchingCollections)
+            {
+                s_fetchingCollections = true;
+                CollectionsList = Plugin.Instance.JsonSerializer.DeserializeFromString<List<CollectionItem>>(value)
+                    ?? new List<CollectionItem>();
+
+                var fetchTask = Plugin.Instance.GetKinopoiskService().GetKpCollectionsAsync();
+                if (fetchTask.Wait(TimeSpan.FromSeconds(10)))
+                {
+                    var fetchedCollections = fetchTask.Result.Select(x => new CollectionItem
+                    {
+                        Category = x.Category,
+                        Id = x.Slug,
+                        IsEnable = false,
+                        Name = x.Name,
+                    });
+                    
+                    CollectionsList = CollectionsList
+                        .Union(fetchedCollections)
+                        .Where(x => fetchedCollections.Contains(x))
+                        .ToList();
+                }
+
+                s_fetchingCollections = false;
+            }
         }
     }
 }

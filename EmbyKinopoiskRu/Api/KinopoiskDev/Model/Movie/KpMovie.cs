@@ -14,6 +14,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
         public List<KpFact> Facts { get; set; }
         public List<KpNamed> Genres { get; set; }
         public long Id { get; set; }
+        public List<string> Lists { get; set; }
         public KpImage Logo { get; set; }
         public int? MovieLength { get; set; }
         public string Name { get; set; }
@@ -30,7 +31,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
         public KpMovieType? TypeNumber { get; set; }
         public KpVideos Videos { get; set; }
         public int? Year { get; set; }
-        public List<string> Lists { get; set; }
 
 
         private string DebuggerDisplay => $"#{Id}, {Name}";

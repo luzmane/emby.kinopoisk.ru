@@ -11,6 +11,7 @@ using MediaBrowser.Controller.Collections;
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
+using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Extensions;
@@ -22,7 +23,7 @@ using MediaBrowser.Model.Tasks;
 namespace EmbyKinopoiskRu.ScheduledTasks
 {
     /// <inheritdoc />
-    public class CreateTop250CollectionsTask// : IScheduledTask, IConfigurableScheduledTask
+    public class CreateKpCollectionsTask : IScheduledTask, IConfigurableScheduledTask
     {
         private static bool s_isScanRunning;
         private static readonly object ScanLock = new object();
@@ -55,18 +56,18 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         public bool IsLogged => true;
 
         /// <inheritdoc />
-        public string Key => "KinopoiskTop250";
+        public string Key => "KinopoiskCollections";
 
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CreateTop250CollectionsTask"/> class.
+        /// Initializes a new instance of the <see cref="CreateKpCollectionsTask"/> class.
         /// </summary>
         /// <param name="logManager">Instance of the <see cref="ILogManager"/> interface.</param>
         /// <param name="libraryManager">Instance of the <see cref="ILibraryManager"/> interface.</param>
         /// <param name="collectionManager">Instance of the <see cref="ICollectionManager"/> interface.</param>
         /// <param name="jsonSerializer">Instance of the <see cref="IJsonSerializer"/> interface.</param>
         /// <param name="serverConfigurationManager">Instance of the <see cref="IServerConfigurationManager"/> interface.</param>
-        public CreateTop250CollectionsTask(
+        public CreateKpCollectionsTask(
                   ILogManager logManager,
                   ILibraryManager libraryManager,
                   ICollectionManager collectionManager,
@@ -108,38 +109,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             }
             try
             {
-                _logger.Info("Fetch top 250 list from API");
-                List<BaseItem> videos = await _plugin.GetKinopoiskService().GetTop250CollectionAsync(cancellationToken);
-                if (videos.Count == 0)
-                {
-                    _logger.Info("Top 250 list was not fetched from API");
-                    return;
-                }
-                _logger.Info($"Received {videos.Count} items from API");
-
-                _logger.Info($"Get all movies libraries");
-                QueryResult<BaseItem> librariesResult = _libraryManager.QueryItems(new InternalItemsQuery
-                {
-                    IncludeItemTypes = new[] { nameof(CollectionFolder) },
-                    HasPath = true,
-                    IsFolder = true,
-                    IsVirtualItem = false
-                });
-                var libraries = librariesResult.Items
-                    .Cast<CollectionFolder>()
-                    .Where(b => "movies".EqualsIgnoreCase(b.CollectionType))
-                    .ToList();
-                _logger.Info($"Found {libraries.Count} libraries: '{string.Join(", ", libraries.Select(i => i.Name))}'");
-
-                var p = 10d;
-                progress.Report(p);
-
-                foreach (CollectionFolder library in libraries)
-                {
-                    await ProcessLibraryAsync(library, videos, _plugin.Configuration.GetCurrentTop250CollectionName());
-                    p += 90d / libraries.Count;
-                    progress.Report(p);
-                }
+                await CreateKpCollectionsAsync(cancellationToken, progress);
             }
             finally
             {
@@ -149,14 +119,127 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         }
 
         /// <summary>
-        /// Gets default triggers 
+        /// Gets default triggers
         /// </summary>
         public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
         {
             return Array.Empty<TaskTriggerInfo>();
         }
 
-        private async Task UpdateLibraryAsync(List<BaseItem> itemsList, string collectionName)
+        private TaskTranslation GetTranslation()
+        {
+            return EmbyHelper.GetTaskTranslation(_translations, _serverConfigurationManager, _jsonSerializer, _availableTranslations);
+        }
+        private async Task CreateKpCollectionsAsync(CancellationToken cancellationToken, IProgress<double> progress)
+        {
+            var collections = _plugin.Configuration.CollectionsList.Where(x => x.IsEnable).ToList();
+            _logger.Info($"{collections.Count} collections were chosen in configuration: '{string.Join("', '", collections.Select(i => i.Name))}'");
+            if (!collections.Any())
+            {
+                _logger.Info($"No collections were chosen");
+                return;
+            }
+
+            var libraries = GetLibraries();
+            var librariesIds = libraries.Select(l => l.InternalId).ToArray();
+            var p = 5d;
+            progress.Report(p);
+            var inc = 95d / collections.Count;
+
+            foreach (var collection in collections)
+            {
+                _logger.Info($"Processing '{collection.Name}', Id '{collection.Id}' collection");
+                List<BaseItem> videos = await _plugin.GetKinopoiskService().GetCollectionItemsAsync(collection.Id, cancellationToken);
+                if (videos.Count == 0)
+                {
+                    _logger.Warn($"No items were found for '{collection.Name}', Id '{collection.Id}'");
+                    p += inc;
+                    progress.Report(p);
+                    continue;
+                }
+                _logger.Info($"Received {videos.Count} items from API");
+
+                await ProcessCollectionAsync(videos, collection.Name, librariesIds);
+
+                p += inc;
+                progress.Report(p);
+            }
+        }
+        private List<CollectionFolder> GetLibraries()
+        {
+            _logger.Info($"Get all movie, tvshow or mixed libraries");
+            QueryResult<BaseItem> librariesResult = _libraryManager.QueryItems(new InternalItemsQuery
+            {
+                IncludeItemTypes = new[] { nameof(CollectionFolder) },
+                HasPath = true,
+                IsFolder = true,
+                IsVirtualItem = false
+            });
+            var libraries = librariesResult.Items
+                .Cast<CollectionFolder>()
+                .Where(b =>
+                    b.CollectionType == null
+                    || "movies".EqualsIgnoreCase(b.CollectionType)
+                    || "tvshows".EqualsIgnoreCase(b.CollectionType)
+                )
+                .ToList();
+            _logger.Info($"Found {libraries.Count} libraries: '{string.Join("', '", libraries.Select(i => i.Name))}'");
+            return libraries;
+        }
+        private async Task ProcessCollectionAsync(List<BaseItem> items, string collectionName, long[] librariesIds)
+        {
+            var providerIdList = items
+                .SelectMany(m =>
+                {
+                    var toReturn = new List<KeyValuePair<string, string>>
+                    {
+                        new KeyValuePair<string, string>(Plugin.PluginKey, m.GetProviderId(Plugin.PluginKey))
+                    };
+                    if (m.HasProviderId(MetadataProviders.Imdb))
+                    {
+                        toReturn.Add(new KeyValuePair<string, string>(MetadataProviders.Imdb.ToString(), m.GetProviderId(MetadataProviders.Imdb)));
+                    }
+                    if (m.HasProviderId(MetadataProviders.Tmdb))
+                    {
+                        toReturn.Add(new KeyValuePair<string, string>(MetadataProviders.Tmdb.ToString(), m.GetProviderId(MetadataProviders.Tmdb)));
+                    }
+                    return toReturn;
+                })
+                .ToList();
+            var videosInLibrary = FetchInternalIds(providerIdList, librariesIds);
+
+            _logger.Info($"Found {videosInLibrary.Count} internal items for '{collectionName}'");
+
+            await UpdateCollectionAsync(videosInLibrary, collectionName);
+            _logger.Info($"Finished creation of '{collectionName}' collection");
+        }
+        private List<BaseItem> FetchInternalIds(List<KeyValuePair<string, string>> providerIdList, long[] librariesIds)
+        {
+            const int requestSize = 100;
+            List<BaseItem> toReturn = new List<BaseItem>();
+            if (providerIdList.Any())
+            {
+                var times = Math.Ceiling((double)providerIdList.Count / requestSize);
+                for (int i = 0; i <= times; i++)
+                {
+                    var queryResult = _libraryManager.QueryItems(new InternalItemsQuery
+                    {
+                        IncludeItemTypes = new[] { nameof(Movie), nameof(Series) },
+                        AnyProviderIdEquals = providerIdList.Skip(i * requestSize).Take(requestSize).ToList(),
+                        Recursive = false,
+                        IsVirtualItem = false,
+                        ParentIds = librariesIds,
+                        HasPath = true,
+                    });
+                    if (queryResult != null && queryResult.Items.Length > 0)
+                    {
+                        toReturn.AddRange(queryResult.Items.Where(j => j.LocationType == LocationType.FileSystem));
+                    }
+                }
+            }
+            return toReturn;
+        }
+        private async Task UpdateCollectionAsync(List<BaseItem> itemsList, string collectionName)
         {
             if (!itemsList.Any())
             {
@@ -194,7 +277,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 CollectionFolder rootCollectionFolder = await EmbyHelper.InsureCollectionLibraryFolderAsync(_libraryManager, _logger);
                 if (rootCollectionFolder == null)
                 {
-                    _logger.Info($"The virtual folder 'Collections' was not found nor created. {collectionName} will not be created");
+                    _logger.Info($"The virtual folder 'Collections' was not found nor created. '{collectionName}' will not be created");
                 }
                 else
                 {
@@ -205,7 +288,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                         ParentId = rootCollectionFolder.InternalId,
                         ItemIdList = itemsList.Select(m => m.InternalId).ToArray()
                     });
-                    _logger.Info("The collection created");
+                    _logger.Info($"The collection '{collectionName}'created");
                 }
             }
             else
@@ -213,56 +296,5 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 _logger.Warn($"Found more collections than expected {existingCollectionResult.TotalRecordCount}, please open a github issue");
             }
         }
-
-        private TaskTranslation GetTranslation()
-        {
-            return EmbyHelper.GetTaskTranslation(_translations, _serverConfigurationManager, _jsonSerializer, _availableTranslations);
-        }
-
-        private async Task ProcessLibraryAsync(CollectionFolder library, List<BaseItem> items, string baseCollectionName)
-        {
-            _logger.Info($"Searching relevant movies in '{library.Name}' library");
-            var top250ProviderIdList = items
-                .SelectMany(m =>
-                {
-                    var toReturn = new List<KeyValuePair<string, string>>
-                    {
-                        new KeyValuePair<string, string>(Plugin.PluginKey, m.GetProviderId(Plugin.PluginKey))
-                    };
-                    if (m.HasProviderId(MetadataProviders.Imdb.ToString()))
-                    {
-                        toReturn.Add(new KeyValuePair<string, string>(MetadataProviders.Imdb.ToString(), m.GetProviderId(MetadataProviders.Imdb.ToString())));
-                    }
-                    if (m.HasProviderId(MetadataProviders.Tmdb.ToString()))
-                    {
-                        toReturn.Add(new KeyValuePair<string, string>(MetadataProviders.Tmdb.ToString(), m.GetProviderId(MetadataProviders.Tmdb.ToString())));
-                    }
-                    return toReturn;
-                })
-                .ToList();
-            QueryResult<BaseItem> videosInLibraryQueryResult = top250ProviderIdList.Any()
-                ? _libraryManager.QueryItems(new InternalItemsQuery
-                {
-                    IncludeItemTypes = new[] { nameof(Movie) },
-                    AnyProviderIdEquals = top250ProviderIdList,
-                    Recursive = false,
-                    IsVirtualItem = false,
-                    ParentIds = new[] { library.InternalId },
-                })
-                : new QueryResult<BaseItem>();
-            var videosInLibrary = videosInLibraryQueryResult.Items
-                            .Where(i => i.LocationType == LocationType.FileSystem)
-                            .Where(i => i.Path != null)
-                            .ToList();
-            _logger.Info($"Found {videosInLibrary.Count} {nameof(Movie)} in '{library.Name}' library");
-
-            string collectionName = _plugin.Configuration.NeedToCreateTop250InOneLib() ?
-                $"{baseCollectionName}" :
-                $"{baseCollectionName} ({library.Name})";
-            await UpdateLibraryAsync(videosInLibrary, collectionName);
-
-            _logger.Info($"Finished with library '{library.Name}'");
-        }
-
     }
 }

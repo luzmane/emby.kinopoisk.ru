@@ -36,8 +36,8 @@ namespace EmbyKinopoiskRu
         public static Plugin Instance { get; private set; }
 
         private readonly Dictionary<string, IKinopoiskRuService> _kinopoiskServiciesDictionary = new Dictionary<string, IKinopoiskRuService>();
-        private readonly IHttpClient _httpClient;
-        private readonly IJsonSerializer _jsonSerializer;
+        internal readonly IHttpClient HttpClient;
+        internal readonly IJsonSerializer JsonSerializer;
         private readonly ILogManager _logManager;
         private readonly ILogger _log;
         private readonly IActivityManager _activityManager;
@@ -78,8 +78,8 @@ namespace EmbyKinopoiskRu
             Instance = this;
             SetId(new Guid(PluginGuid));
 
-            _httpClient = httpClient;
-            _jsonSerializer = jsonSerializer;
+            HttpClient = httpClient;
+            JsonSerializer = jsonSerializer;
             _logManager = logManager;
             _activityManager = activityManager;
             _log = _logManager.GetLogger(PluginKey);
@@ -135,8 +135,8 @@ namespace EmbyKinopoiskRu
                 {
                     result = new KinopoiskDevService(
                         _logManager,
-                        _httpClient,
-                        _jsonSerializer,
+                        HttpClient,
+                        JsonSerializer,
                         _activityManager,
                         _libraryManager,
                         _collectionManager);
@@ -151,8 +151,8 @@ namespace EmbyKinopoiskRu
                 {
                     result = new KinopoiskUnofficialService(
                         _logManager,
-                        _httpClient,
-                        _jsonSerializer,
+                        HttpClient,
+                        JsonSerializer,
                         _activityManager);
                     _kinopoiskServiciesDictionary.Add("KinopoiskUnofficial", result);
                 }

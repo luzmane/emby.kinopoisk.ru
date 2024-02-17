@@ -1,5 +1,0 @@
-{
-    "Name": "Create Top250 collection from Kinopoisk",
-    "Description": "Create a collection based on the top 250 list from Kinopoisk.ru. Support kinopoisk.dev only",
-    "Category": "Kinopoisk Plugin"
-}

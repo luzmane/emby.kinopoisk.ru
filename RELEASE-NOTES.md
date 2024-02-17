@@ -1,6 +1,8 @@
 v.1.21.0
-- feature: Move to v.1.4 KinopoiskDev API
-### getMovie return base Person object
+- feature: Move to v.1.4 KinopoiskDev API.
+- feature: Remove creation of TOP 250 Kinopoisk collection.
+- feature: Add posibility to choose and create all Kinopoisk collections.
+- change: Remove option to create collections based on sequels data from kinopoisk.dev - sometimes the sequel collection incorrectly detected and video added to the wrong collection.
 
 v.1.20.0
 - Update "Update Kinopoisk Plugin" task to support new tags name

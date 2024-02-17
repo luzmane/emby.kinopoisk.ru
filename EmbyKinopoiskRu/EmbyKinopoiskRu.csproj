@@ -63,9 +63,9 @@
     <None Remove="i18n/ScheduledTasks/KinopoiskNewVersion/en-US.json" />
     <None Remove="i18n/ScheduledTasks/KinopoiskNewVersion/uk.json" />
 
-    <None Remove="i18n/ScheduledTasks/KinopoiskTop250/ru.json" />
-    <None Remove="i18n/ScheduledTasks/KinopoiskTop250/en-US.json" />
-    <None Remove="i18n/ScheduledTasks/KinopoiskTop250/uk.json" />
+    <None Remove="i18n/ScheduledTasks/KinopoiskCollections/ru.json" />
+    <None Remove="i18n/ScheduledTasks/KinopoiskCollections/en-US.json" />
+    <None Remove="i18n/ScheduledTasks/KinopoiskCollections/uk.json" />
 
   </ItemGroup>
 
@@ -86,9 +86,9 @@
     <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskNewVersion/en-US.json" />
     <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskNewVersion/uk.json" />
 
-    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250/ru.json" />
-    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250/en-US.json" />
-    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskTop250/uk.json" />
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskCollections/ru.json" />
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskCollections/en-US.json" />
+    <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskCollections/uk.json" />
 
   </ItemGroup>
 

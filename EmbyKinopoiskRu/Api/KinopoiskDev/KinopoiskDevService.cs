@@ -32,11 +32,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 {
     internal sealed class KinopoiskDevService : IKinopoiskRuService
     {
+        private static PluginConfiguration PluginConfig => Plugin.Instance.Configuration;
         private readonly ILogger _log;
         private readonly KinopoiskDevApi _api;
         private readonly ILibraryManager _libraryManager;
         private readonly ICollectionManager _collectionManager;
-        private PluginConfiguration PluginConfig { get; set; }
         private readonly List<KpMovieType?> _movieTypes = new List<KpMovieType?> { KpMovieType.Anime, KpMovieType.Movie, KpMovieType.Cartoon };
 
         internal KinopoiskDevService(
@@ -55,7 +55,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             {
                 throw new NullReferenceException($"Plugin '{Plugin.PluginName}' instance is null");
             }
-            PluginConfig = Plugin.Instance.Configuration;
         }
 
         #region MovieProvider
@@ -285,9 +284,16 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return result;
             }
             KpMovie serial = await _api.GetMovieByIdAsync(relevantSeries[0].Id.ToString(), cancellationToken);
-            result.Item = await CreateSeriesFromKpMovieAsync(serial, cancellationToken);
-            UpdatePersonsList(result, serial.Persons);
-            result.HasMetadata = true;
+            if (serial != null)
+            {
+                result.Item = await CreateSeriesFromKpMovieAsync(serial, cancellationToken);
+                UpdatePersonsList(result, serial.Persons);
+                result.HasMetadata = true;
+            }
+            else
+            {
+                _log.Warn($"Unable to fetch info about valid Kinopoisk ID: '{relevantSeries[0].Id}'");
+            }
             return result;
         }
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResultsAsync(SeriesInfo searchInfo, CancellationToken cancellationToken)
@@ -614,8 +620,15 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return result;
             }
             person = await _api.GetPersonByIdAsync(relevantPersons[0].Id.ToString(), cancellationToken);
-            result.Item = CreatePersonFromKpPerson(person);
-            result.HasMetadata = true;
+            if (person != null)
+            {
+                result.Item = CreatePersonFromKpPerson(person);
+                result.HasMetadata = true;
+            }
+            else
+            {
+                _log.Warn($"Unable to fetch person by valid Kinopoisk id: '{relevantPersons[0].Id}'");
+            }
             return result;
         }
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResultsAsync(PersonLookupInfo searchInfo, CancellationToken cancellationToken)
@@ -867,9 +880,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
             _log.Info($"Added {result.People.Count} persons to the video with id '{itemId}'");
         }
-        private async Task AddMovieToCollectionAsync(BaseItem toReturn, KpMovie movie, CancellationToken cancellationToken)
+        private async Task AddMovieToCollectionAsync(BaseItem embyItem, KpMovie movie, CancellationToken cancellationToken)
         {
-            _log.Info($"Adding '{toReturn.Name}' to collection");
+            _log.Info($"Adding '{embyItem.Name}' to collection");
 
             CollectionFolder rootCollectionFolder = await EmbyHelper.InsureCollectionLibraryFolderAsync(_libraryManager, _log);
             if (rootCollectionFolder == null)
@@ -904,7 +917,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                     ParentId = rootCollectionFolder.InternalId,
                     ItemIdList = internalIdArray.ToArray()
                 });
-                _ = toReturn.AddCollection(collection);
+                _ = embyItem.AddCollection(collection);
             }
             else if (collection != null && internalCollectionItems.Count > 0)
             {
@@ -921,7 +934,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                         _log.Info($"'{item.Name}' already in the collection '{collection.Name}'");
                     }
                 }
-                _ = toReturn.AddCollection(collection);
+                _ = embyItem.AddCollection(collection);
             }
             else
             {
@@ -1022,13 +1035,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         #endregion
 
         #region Scheduled Tasks
-        public async Task<List<BaseItem>> GetTop250CollectionAsync(CancellationToken cancellationToken)
+        public async Task<List<BaseItem>> GetCollectionItemsAsync(string collectionId, CancellationToken cancellationToken)
         {
-            _log.Info("Get Top250 Collection");
+            _log.Info($"Get collection items for '{collectionId}'");
             var toReturn = new List<BaseItem>();
-            KpSearchResult<KpMovie> movies = await _api.GetTop250CollectionAsync(cancellationToken);
-            _log.Info($"Fetched {movies.Docs.Count} items");
-            movies.Docs.ForEach(m =>
+            var movies = await GetAllCollectionItemsAsync(collectionId, cancellationToken);
+            movies.ForEach(m =>
                 {
                     BaseItem item;
                     if (_movieTypes.Contains(m.TypeNumber))
@@ -1039,10 +1051,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                             OriginalTitle = m.AlternativeName
                         };
                         item.SetProviderId(Plugin.PluginKey, m.Id.ToString(CultureInfo.InvariantCulture));
-                        if (!string.IsNullOrWhiteSpace(m.ExternalId?.Imdb))
-                        {
-                            item.SetProviderId(MetadataProviders.Imdb.ToString(), m.ExternalId.Imdb);
-                        }
+                        item.SetProviderId(MetadataProviders.Imdb.ToString(), m.ExternalId?.Imdb);
                         if (m.ExternalId?.Tmdb != null && m.ExternalId.Tmdb > 0)
                         {
                             item.SetProviderId(MetadataProviders.Tmdb.ToString(), m.ExternalId.Tmdb.ToString());
@@ -1056,10 +1065,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                             OriginalTitle = m.AlternativeName
                         };
                         item.SetProviderId(Plugin.PluginKey, m.Id.ToString(CultureInfo.InvariantCulture));
-                        if (!string.IsNullOrWhiteSpace(m.ExternalId?.Imdb))
-                        {
-                            item.SetProviderId(MetadataProviders.Imdb.ToString(), m.ExternalId.Imdb);
-                        }
+                        item.SetProviderId(MetadataProviders.Imdb.ToString(), m.ExternalId?.Imdb);
                         if (m.ExternalId?.Tmdb != null && m.ExternalId.Tmdb > 0)
                         {
                             item.SetProviderId(MetadataProviders.Tmdb.ToString(), m.ExternalId.Tmdb.ToString());
@@ -1067,14 +1073,13 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                     }
                     toReturn.Add(item);
                 });
-
+            _log.Info($"Return {toReturn.Count} items for collection '{collectionId}");
             return toReturn;
         }
         public async Task<ApiResult<Dictionary<string, long>>> GetKpIdByAnotherIdAsync(string externalIdType, IEnumerable<string> idList, CancellationToken cancellationToken)
         {
             _log.Info($"Search Kinopoisk ID for {idList.Count()} items by {externalIdType} provider");
             KpSearchResult<KpMovie> movies = await _api.GetKpIdByAnotherIdAsync(externalIdType, idList, cancellationToken);
-            _log.Info($"Found {movies.Docs.Count} Kinopoisk IDs for {idList.Count()} items by {externalIdType} provider");
             if (movies.HasError)
             {
                 _log.Info($"Failed to get Kinopoisk ID by {externalIdType} provider");
@@ -1083,6 +1088,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                     HasError = true
                 };
             }
+            _log.Info($"Found {movies.Docs.Count} Kinopoisk IDs for {idList.Count()} items by {externalIdType} provider");
             if (MetadataProviders.Imdb.ToString() == externalIdType)
             {
                 return new ApiResult<Dictionary<string, long>>(movies.Docs
@@ -1111,7 +1117,50 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 HasError = true
             };
         }
+        public async Task<List<KpLists>> GetKpCollectionsAsync()
+        {
+            _log.Info($"Fetch Kinopoisk collections");
+            KpSearchResult<KpLists> collections = await _api.GetKpCollectionsAsync(CancellationToken.None);
+            if (collections.HasError)
+            {
+                _log.Info($"Failed to fetch Kinopoisk collections");
+                return Enumerable.Empty<KpLists>().ToList();
+            }
+            _log.Info($"Found {collections.Docs.Count} collections");
+            return collections.Docs.Where(x => x.MoviesCount > 0).ToList();
+        }
 
+        private async Task<List<KpMovie>> GetAllCollectionItemsAsync(string collectionId, CancellationToken cancellationToken)
+        {
+            List<KpMovie> movies = new List<KpMovie>();
+            KpSearchResult<KpMovie> tmp = await _api.GetCollectionItemsAsync(collectionId, 1, cancellationToken);
+            if (tmp.HasError)
+            {
+                _log.Error($"Failed to fetch items list from API for collection '{collectionId}'");
+                return movies;
+            }
+            else if (tmp.Docs.Count == 0)
+            {
+                _log.Info($"No items found for collection '{collectionId}'");
+                return movies;
+            }
+            var pages = Math.Ceiling((double)tmp.Total / tmp.Limit);
+            movies.AddRange(tmp.Docs);
+            _log.Info($"Fetched page {tmp.Page} of {pages} pages ({movies.Count} of {tmp.Total} items) for collection '{collectionId}'");
+            for (int i = 2; i <= pages; i++)
+            {
+                _log.Info($"Requesting page {i} of {pages} pages for collection '{collectionId}'");
+                tmp = await _api.GetCollectionItemsAsync(collectionId, i, cancellationToken);
+                if (tmp.HasError)
+                {
+                    _log.Warn($"Failed to fetch page {i} for collection '{collectionId}");
+                    continue;
+                }
+                movies.AddRange(tmp.Docs);
+                _log.Info($"Fetched page {i} of {pages} pages ({movies.Count} of {tmp.Total} items) for collection '{collectionId}'");
+            }
+            return movies;
+        }
         #endregion
     }
 }

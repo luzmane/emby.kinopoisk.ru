@@ -2,6 +2,7 @@ using System.Text.Json;
 
 using FluentAssertions;
 
+using EmbyKinopoiskRu.Api;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Person;
@@ -11,7 +12,7 @@ using NLog;
 namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
 
 /// <summary>
-/// Swagger documentation: 
+/// Swagger documentation:
 ///     https://api.kinopoisk.dev/v1/documentation-json
 ///     https://api.kinopoisk.dev/v1/documentation-yaml
 ///     https://api.kinopoisk.dev/v1/documentation#/
@@ -219,8 +220,8 @@ public class ApiTests : IDisposable
     [Fact]
     public async Task GetAllKinopoiskLists()
     {
-        var request = $"https://api.kinopoisk.dev/v1.4/list?limit={REQUEST_LIMIT}";
-        request += "&selectFields=name&selectFields=category&selectFields=slug&selectFields=moviesCount&selectFields=cover";
+        var request = $"https://api.kinopoisk.dev/v1.4/list?limit=200";
+        request += "&selectFields=name&selectFields=slug&selectFields=moviesCount&selectFields=cover&selectFields=category";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
@@ -229,7 +230,6 @@ public class ApiTests : IDisposable
         lists.Should().NotBeNull();
         lists!.Docs.Should().NotBeEmpty();
     }
-
 
     #endregion
 
@@ -437,17 +437,15 @@ public class ApiTests : IDisposable
         kpPerson.Id.Should().Be(7987);
         kpPerson.Name.Should().Be("Тим Роббинс");
         kpPerson.Photo.Should().NotBeNullOrWhiteSpace();
+        kpPerson.BirthPlace.Should().NotBeNull();
+        kpPerson.BirthPlace.Should().HaveCount(3);
         if (isQuerySearch)
         {
-            kpPerson.BirthPlace.Should().BeNull();
-            kpPerson.DeathPlace.Should().BeNull();
             kpPerson.Facts.Should().BeNull();
             kpPerson.Movies.Should().BeNull();
         }
         else
         {
-            kpPerson.BirthPlace.Should().NotBeNull();
-            kpPerson.BirthPlace.Should().HaveCount(3);
             kpPerson.DeathPlace.Should().NotBeNull();
             kpPerson.DeathPlace.Should().BeEmpty();
             kpPerson.Facts.Should().NotBeNull();
@@ -460,10 +458,10 @@ public class ApiTests : IDisposable
     private static void VerifySeries77044Season5(KpSeason? kpSeason)
     {
         kpSeason.Should().NotBeNull();
-        kpSeason!.AirDate.Should().Be("1998-09-24T00:00:00.000Z");
+        kpSeason!.AirDate.Should().Be("1998-09-24");
         kpSeason.Description.Should().Be("Росс делает глупую ошибку. На своей свадьбе вместо имени своей невесты Емели, он называет имя Рейчел. Свадьба продолжается, но после нее Емели сбегает и просит не преследовать ее. Росс снова впадает в депрессию. Из-за чего у него постоянные нервные срывы и всплески ярости. Моника и Чендлер начинают тайно встречаться, однако делать это в присутствии друзей очень сложно. Тем не менее, их отношения рано или поздно становятся явным. Фиби рожает своему брату Фрэнку тройняшек и одного хочет взять себе. Джо получает роль в хорошем фильме, съемки которого пройдут в Лас-Вегасе. Все друзья отправляются туда и по возвращению двое из них становятся женатыми. Думаете это Чендлер и Моника? Узнаете при просмотре...");
         kpSeason.Episodes.Should().NotBeNull();
-        kpSeason.Episodes.Should().HaveCount(24);
+        kpSeason.Episodes.Should().HaveCount(23);
         kpSeason.EpisodesCount.Should().Be(24);
         kpSeason.MovieId.Should().Be(77044);
         kpSeason.Name.Should().Be("Сезон 5");
@@ -478,7 +476,7 @@ public class ApiTests : IDisposable
     private static void VerifySeries77044Season5Episode5(KpEpisode? kpEpisode)
     {
         kpEpisode.Should().NotBeNull();
-        kpEpisode!.AirDate.Should().Be("1998-10-29T00:00:00.000Z");
+        kpEpisode!.AirDate.Should().Be("1998-10-29");
         kpEpisode.EnName.Should().Be("The One with the Kips");
         kpEpisode.Description.Should().Be("Чендлер и Моника проводят вместе выходные, но в результате ссорятся. Росс говорит Рэйчел о требовании Эмили. Джо узнает об отношениях между Моникой и Чендлером.");
         kpEpisode.Number.Should().Be(5);
