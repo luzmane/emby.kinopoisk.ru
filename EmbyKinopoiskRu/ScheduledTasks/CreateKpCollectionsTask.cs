@@ -274,7 +274,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             else if (existingCollectionResult.TotalRecordCount == 0)
             {
                 _logger.Info($"Creating '{collectionName}' collection with following items: '{string.Join("', '", itemsList.Select(m => m.Name))}'");
-                CollectionFolder rootCollectionFolder = await EmbyHelper.InsureCollectionLibraryFolderAsync(_libraryManager, _logger);
+                CollectionFolder rootCollectionFolder = EmbyHelper.InsureCollectionLibraryFolderAsync(_libraryManager, _logger);
                 if (rootCollectionFolder == null)
                 {
                     _logger.Info($"The virtual folder 'Collections' was not found nor created. '{collectionName}' will not be created");

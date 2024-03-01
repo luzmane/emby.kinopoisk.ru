@@ -32,7 +32,6 @@ public class KpLocalMetadataTest : BaseTest
             ImportCollections = true,
             MetadataCountryCode = "RU",
             MinCollectionItems = 1,
-            Name = "Movies",
             PathInfos = new[]{
                 new MediaPathInfo
                 {

@@ -27,7 +27,15 @@ public class EmbyJsonSerializer : IJsonSerializer
     {
         throw new NotSupportedException();
     }
+    public void DeserializePartialJsonInto(string json, object obj)
+    {
+        throw new NotSupportedException();
+    }
     public T DeserializeFromFile<T>(string file) where T : class
+    {
+        throw new NotSupportedException();
+    }
+    public void SerializeToFile(object obj, string file, JsonSerializerOptions options)
     {
         throw new NotSupportedException();
     }
@@ -63,7 +71,15 @@ public class EmbyJsonSerializer : IJsonSerializer
     {
         throw new NotSupportedException();
     }
+    public void SerializeToStream(object obj, Stream stream, JsonSerializerOptions options)
+    {
+        throw new NotSupportedException();
+    }
     public void SerializeToFile(object obj, string file)
+    {
+        throw new NotSupportedException();
+    }
+    public string SerializeToString(object obj, JsonSerializerOptions options)
     {
         throw new NotSupportedException();
     }

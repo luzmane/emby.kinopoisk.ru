@@ -39,7 +39,7 @@ namespace EmbyKinopoiskRu.Helper
                 .Where(i => MemoryExtensions.Equals(i.CollectionType.AsSpan(), CollectionType.BoxSets.Span, StringComparison.OrdinalIgnoreCase))
                 .ToList();
         }
-        internal static async Task<CollectionFolder> InsureCollectionLibraryFolderAsync(ILibraryManager libraryManager, ILogger logger)
+        internal static CollectionFolder InsureCollectionLibraryFolderAsync(ILibraryManager libraryManager, ILogger logger)
         {
             List<CollectionFolder> folders = FindCollectionFolders(libraryManager);
             CollectionFolder toReturn = folders.FirstOrDefault(f => "Collections".Equals(f.Name, StringComparison.Ordinal));
@@ -54,7 +54,7 @@ namespace EmbyKinopoiskRu.Helper
                 SaveLocalMetadata = true,
                 ContentType = CollectionType.BoxSets.ToString()
             };
-            await libraryManager.AddVirtualFolder("Collections", options, true);
+            libraryManager.AddVirtualFolder("Collections", options, true);
             return FindCollectionFolders(libraryManager).FirstOrDefault(f => "Collections".Equals(f.Name, StringComparison.Ordinal));
         }
         internal static async Task<List<BaseItem>> GetSequenceInternalIdsAsync(

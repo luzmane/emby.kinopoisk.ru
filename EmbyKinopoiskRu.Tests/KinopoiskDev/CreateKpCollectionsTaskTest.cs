@@ -181,7 +181,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("CreateKpCollectionsTaskTest_Execute_CollectionExists");
 
-
         _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
                 true.Equals(query.HasPath)
@@ -227,7 +226,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
                 ContentType = CollectionType.TvShows.ToString(),
                 MetadataCountryCode = "RU",
                 MinCollectionItems = 1,
-                Name = "My Series",
                 PathInfos = new[]{
                     new MediaPathInfo
                     {
@@ -245,7 +243,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
                 ContentType = CollectionType.Movies.ToString(),
                 MetadataCountryCode = "RU",
                 MinCollectionItems = 1,
-                Name = "My Movies",
                 PathInfos = new[]{
                     new MediaPathInfo
                     {
@@ -263,7 +260,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
                 ContentType = null,
                 MetadataCountryCode = "RU",
                 MinCollectionItems = 1,
-                Name = "My Mix",
                 PathInfos = new[]{
                     new MediaPathInfo
                     {
@@ -281,7 +277,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
                 ContentType = CollectionType.AudioBooks.ToString(),
                 MetadataCountryCode = "RU",
                 MinCollectionItems = 1,
-                Name = "My Audio",
                 PathInfos = new[]{
                     new MediaPathInfo
                     {
@@ -437,7 +432,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
                 ContentType = CollectionType.TvShows.ToString(),
                 MetadataCountryCode = "RU",
                 MinCollectionItems = 1,
-                Name = "My Series",
                 PathInfos = new[]{
                     new MediaPathInfo
                     {
@@ -455,7 +449,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
                 ContentType = CollectionType.Movies.ToString(),
                 MetadataCountryCode = "RU",
                 MinCollectionItems = 1,
-                Name = "My Movies",
                 PathInfos = new[]{
                     new MediaPathInfo
                     {
@@ -473,7 +466,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
                 ContentType = null,
                 MetadataCountryCode = "RU",
                 MinCollectionItems = 1,
-                Name = "My Mix",
                 PathInfos = new[]{
                     new MediaPathInfo
                     {
@@ -491,7 +483,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
                 ContentType = CollectionType.AudioBooks.ToString(),
                 MetadataCountryCode = "RU",
                 MinCollectionItems = 1,
-                Name = "My Audio",
                 PathInfos = new[]{
                     new MediaPathInfo
                     {
@@ -579,7 +570,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
                 ContentType = CollectionType.BoxSets.ToString(),
                 MetadataCountryCode = "RU",
                 MinCollectionItems = 1,
-                Name = "Collections",
                 PathInfos = new[]{
                             new MediaPathInfo
                             {

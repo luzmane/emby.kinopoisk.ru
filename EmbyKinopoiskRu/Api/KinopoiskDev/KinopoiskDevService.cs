@@ -884,7 +884,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             _log.Info($"Adding '{embyItem.Name}' to collection");
 
-            CollectionFolder rootCollectionFolder = await EmbyHelper.InsureCollectionLibraryFolderAsync(_libraryManager, _log);
+            CollectionFolder rootCollectionFolder = EmbyHelper.InsureCollectionLibraryFolderAsync(_libraryManager, _log);
             if (rootCollectionFolder == null)
             {
                 _log.Info($"The virtual folder 'Collections' was not found nor created");

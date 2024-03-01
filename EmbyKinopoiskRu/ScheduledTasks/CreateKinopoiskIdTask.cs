@@ -35,7 +35,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         private readonly IServerConfigurationManager _serverConfigurationManager;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly Dictionary<string, TaskTranslation> _translations = new Dictionary<string, TaskTranslation>();
-        private readonly Dictionary<string, string> _availableTranslations = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _availableTranslations;
         private Plugin Plugin { get; set; }
 
         /// <inheritdoc />

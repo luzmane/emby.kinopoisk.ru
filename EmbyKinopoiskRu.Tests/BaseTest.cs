@@ -10,8 +10,8 @@ using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
-using MediaBrowser.Controller.Extensions;
 using MediaBrowser.Controller.Library;
+using MediaBrowser.Controller.Persistence;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Configuration;
@@ -47,6 +47,7 @@ public abstract class BaseTest
     protected readonly Mock<ILocalizationManager> _localizationManager = new();
     protected readonly Mock<IServerConfigurationManager> _serverConfigurationManager = new();
     protected readonly Mock<IServerApplicationHost> _serverApplicationHost = new();
+    protected readonly Mock<IItemRepository> _itemRepository = new();
 
     #endregion
 
@@ -88,9 +89,10 @@ public abstract class BaseTest
         BaseItem.ConfigurationManager = _serverConfigurationManager.Object;
         BaseItem.FileSystem = _fileSystem.Object;
         BaseItem.LibraryManager = _libraryManager.Object;
+        BaseItem.LocalizationManager = _localizationManager.Object;
+        BaseItem.ItemRepository = _itemRepository.Object;
         CollectionFolder.XmlSerializer = _xmlSerializer.Object;
         CollectionFolder.ApplicationHost = _serverApplicationHost.Object;
-        StringExtensions.LocalizationManager = _localizationManager.Object;
 
         _ = new Plugin(
             _applicationPaths.Object,
@@ -177,8 +179,8 @@ public abstract class BaseTest
     }
     private void PrintMockInvocations(Mock mock)
     {
-        _logger.Info($"Name: {mock?.Object.GetType().Name}");
-        foreach (IInvocation? invocation in mock!.Invocations)
+        _logger.Info($"Name: {mock.Object.GetType().Name}");
+        foreach (IInvocation? invocation in mock.Invocations)
         {
             _logger.Info(invocation);
         }
@@ -204,13 +206,13 @@ public abstract class BaseTest
     protected string GetKinopoiskDevToken()
     {
         var token = Environment.GetEnvironmentVariable("KINOPOISK_DEV_TOKEN");
-        _logger.Info($"Env token length is: {(token != null ? token.Length : 0)}");
+        _logger.Info($"Env token length is: {token?.Length ?? 0}");
         return string.IsNullOrWhiteSpace(token) ? KINOPOISK_DEV_TOKEN : token;
     }
     protected string GetKinopoiskUnofficialToken()
     {
         var token = Environment.GetEnvironmentVariable("KINOPOISK_UNOFFICIAL_TOKEN");
-        _logger.Info($"Env token length is: {(token != null ? token.Length : 0)}");
+        _logger.Info($"Env token length is: {token?.Length ?? 0}");
         return string.IsNullOrWhiteSpace(token) ? KINOPOISK_UNOFFICIAL_TOKEN : token;
     }
 
@@ -464,7 +466,7 @@ public abstract class BaseTest
         VerifySeriesCommon(series);
     }
 
-    protected static void VerifyMovieCommon(Movie movie)
+    private static void VerifyMovieCommon(Movie movie)
     {
         movie.Album.Should().BeNull();
         movie.AlbumId.Should().Be(0);
@@ -501,7 +503,6 @@ public abstract class BaseTest
         movie.IsTopParent.Should().BeFalse();
         movie.IsVirtualItem.Should().BeFalse();
         movie.LocationType.Should().Be(LocationType.FileSystem);
-        movie.OwnerId.Should().Be(0);
         movie.Parent.Should().BeNull();
         movie.ParentId.Should().Be(0);
         movie.Path.Should().BeNull();
@@ -509,7 +510,7 @@ public abstract class BaseTest
         movie.PrimaryImagePath.Should().BeNull();
     }
 
-    protected static void VerifySeriesCommon(Series series)
+    private static void VerifySeriesCommon(Series series)
     {
         series.Album.Should().BeNull();
         series.AlbumId.Should().Be(0);
@@ -544,7 +545,6 @@ public abstract class BaseTest
         series.IsTopParent.Should().BeFalse();
         series.IsVirtualItem.Should().BeFalse();
         series.LocationType.Should().Be(LocationType.FileSystem);
-        series.OwnerId.Should().Be(0);
         series.Parent.Should().BeNull();
         series.ParentId.Should().Be(0);
         series.Path.Should().BeNull();

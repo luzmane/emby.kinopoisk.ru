@@ -527,7 +527,6 @@ public class KpMovieProviderTest : BaseTest
             ContentType = CollectionType.BoxSets.ToString(),
             MetadataCountryCode = "RU",
             MinCollectionItems = 1,
-            Name = "Collections",
             PathInfos = new[]{
                         new MediaPathInfo
                         {
@@ -620,7 +619,6 @@ public class KpMovieProviderTest : BaseTest
             ContentType = CollectionType.BoxSets.ToString(),
             MetadataCountryCode = "RU",
             MinCollectionItems = 1,
-            Name = "Collections",
             PathInfos = new[]{
                         new MediaPathInfo
                         {
