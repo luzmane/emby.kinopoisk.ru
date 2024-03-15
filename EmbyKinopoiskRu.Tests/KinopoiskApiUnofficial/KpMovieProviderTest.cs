@@ -27,7 +27,7 @@ public class KpMovieProviderTest : BaseTest
     public KpMovieProviderTest() : base(Logger)
     {
         _pluginConfiguration.Token = GetKinopoiskUnofficialToken();
-        _pluginConfiguration.ApiType = PluginConfiguration.KinopoiskAPIUnofficialTech;
+        _pluginConfiguration.ApiType = PluginConfiguration.KinopoiskApiUnofficialTech;
 
         ConfigLibraryManager();
 

@@ -13,9 +13,8 @@ namespace EmbyKinopoiskRu.Configuration
     {
         private const string DefaultUnofficialToken = "0f162131-81c1-4979-b46c-3eea4263fb11";
         private const string DefaultDevToken = "8DA0EV2-KTP4A5Q-G67QP3K-S2VFBX7";
-        internal const string DefaultTop250CollectionName = "Кинопоиск Топ 250";
         internal const string KinopoiskDev = "kinopoisk.dev";
-        internal const string KinopoiskAPIUnofficialTech = "kinopoiskapiunofficial.tech";
+        internal const string KinopoiskApiUnofficialTech = "kinopoiskapiunofficial.tech";
 
 
         /// <summary>
@@ -47,6 +46,7 @@ namespace EmbyKinopoiskRu.Configuration
                 SetCollection(value);
             }
         }
+
         internal List<CollectionItem> CollectionsList = new List<CollectionItem>();
         private static bool s_fetchingCollections;
 
@@ -54,10 +54,11 @@ namespace EmbyKinopoiskRu.Configuration
         {
             return !string.IsNullOrWhiteSpace(Token)
                 ? Token
-                : KinopoiskAPIUnofficialTech.Equals(ApiType, StringComparison.Ordinal)
+                : KinopoiskApiUnofficialTech.Equals(ApiType, StringComparison.Ordinal)
                     ? DefaultUnofficialToken
                     : DefaultDevToken;
         }
+
         internal bool NeedToCreateSequenceCollection()
         {
             return KinopoiskDev.Equals(ApiType, StringComparison.Ordinal) && CreateSeqCollections;
@@ -65,31 +66,36 @@ namespace EmbyKinopoiskRu.Configuration
 
         private void SetCollection(string value)
         {
-            if (!s_fetchingCollections)
+            if (s_fetchingCollections)
             {
-                s_fetchingCollections = true;
-                CollectionsList = Plugin.Instance.JsonSerializer.DeserializeFromString<List<CollectionItem>>(value)
-                    ?? new List<CollectionItem>();
+                return;
+            }
 
-                var fetchTask = Plugin.Instance.GetKinopoiskService().GetKpCollectionsAsync();
-                if (fetchTask.Wait(TimeSpan.FromSeconds(10)))
-                {
-                    var fetchedCollections = fetchTask.Result.Select(x => new CollectionItem
+            s_fetchingCollections = true;
+            CollectionsList = Plugin.Instance.JsonSerializer.DeserializeFromString<List<CollectionItem>>(value)
+                              ?? new List<CollectionItem>();
+
+            var fetchTask = Plugin.Instance.GetKinopoiskService().GetKpCollectionsAsync();
+            if (fetchTask.Wait(TimeSpan.FromSeconds(10)))
+            {
+                var fetchedCollections = fetchTask.Result
+                    .Select(x => new CollectionItem
                     {
                         Category = x.Category,
                         Id = x.Slug,
                         IsEnable = false,
                         Name = x.Name,
-                    });
-                    
-                    CollectionsList = CollectionsList
-                        .Union(fetchedCollections)
-                        .Where(x => fetchedCollections.Contains(x))
-                        .ToList();
-                }
+                        MovieCount = x.MoviesCount
+                    })
+                    .ToList();
 
-                s_fetchingCollections = false;
+                CollectionsList = CollectionsList
+                    .Union(fetchedCollections)
+                    .Where(x => fetchedCollections.Contains(x))
+                    .ToList();
             }
+
+            s_fetchingCollections = false;
         }
     }
 }

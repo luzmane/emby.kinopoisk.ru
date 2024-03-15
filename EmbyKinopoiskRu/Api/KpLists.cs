@@ -4,7 +4,7 @@ using System.Diagnostics;
 
 namespace EmbyKinopoiskRu.Api
 {
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("{Name} ({MoviesCount})")]
     internal sealed class KpLists
     {
         public string Category { get; set; }
@@ -12,8 +12,6 @@ namespace EmbyKinopoiskRu.Api
         public int MoviesCount { get; set; }
         public string Name { get; set; }
         public string Slug { get; set; }
-
-        private string DebuggerDisplay => $"{Name} ({MoviesCount})";
 
     }
 }

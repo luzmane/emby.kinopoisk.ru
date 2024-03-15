@@ -144,9 +144,9 @@ namespace EmbyKinopoiskRu
                 }
                 return result;
             }
-            if (PluginConfiguration.KinopoiskAPIUnofficialTech.Equals(Configuration.ApiType, StringComparison.Ordinal))
+            if (PluginConfiguration.KinopoiskApiUnofficialTech.Equals(Configuration.ApiType, StringComparison.Ordinal))
             {
-                _log.Info($"Fetching {PluginConfiguration.KinopoiskAPIUnofficialTech} service");
+                _log.Info($"Fetching {PluginConfiguration.KinopoiskApiUnofficialTech} service");
                 if (!_kinopoiskServicesDictionary.TryGetValue("KinopoiskUnofficial", out IKinopoiskRuService result))
                 {
                     result = new KinopoiskUnofficialService(

@@ -35,7 +35,7 @@
                         input.setAttribute('category', v.Category);
                         input.checked = v.IsEnable;
                         const span = label.querySelector('span.checkboxButtonLabel');
-                        span.textContent = v.Name;
+                        span.textContent = v.Name + ' (' + v.MovieCount + ' фильмов)';
                     });
                 });
         }
@@ -62,15 +62,22 @@
             config.ApiType = form.querySelector('input[name="radioAPI"]:checked').value;
             const list = form.querySelectorAll('div.pluginConfigurationPage:not(.hide) label.kpCollectionList');
             const tmp = [];
+            const fetchMovieCount = /^(.+) \((\d+) фильмов\)$/;
             list.forEach(label => {
                 const input = label.querySelector('input[is="emby-checkbox"]');
                 const IsEnable = input.checked;
                 const Category = input.getAttribute('category');
                 const span = label.querySelector('span.checkboxButtonLabel');
-                const Name = span.textContent;
+                const match = span.textContent.match(fetchMovieCount);
+                if (match == null) {
+                    console.warn("Collection name was not matched: '" + span.textContent + "'");
+                    return;
+                }
+                const Name = match[1];
+                const MovieCount = match[2];
                 let Id = '';
                 for (const i of input.classList) if (i.startsWith('kp-')) Id = i.substring(3);
-                if (Id) tmp.push({ Id, Name, IsEnable, Category });
+                if (Id) tmp.push({ Id, Name, IsEnable, Category, MovieCount });
             });
             config.Collections = JSON.stringify(tmp);
             ApiClient.updatePluginConfiguration('0417364b-5a93-4ad0-a5f0-b8756957cf80', config)

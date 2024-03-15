@@ -23,7 +23,7 @@ public class KpEpisodeProviderTest : BaseTest
     public KpEpisodeProviderTest() : base(Logger)
     {
         _pluginConfiguration.Token = GetKinopoiskUnofficialToken();
-        _pluginConfiguration.ApiType = PluginConfiguration.KinopoiskAPIUnofficialTech;
+        _pluginConfiguration.ApiType = PluginConfiguration.KinopoiskApiUnofficialTech;
 
         ConfigLibraryManager();
 
