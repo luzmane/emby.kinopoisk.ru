@@ -1,7 +1,11 @@
+v.1.22.0
+- feature: Update supported Emby version to 4.8.2
+- feature: Add number of items in each collection
+
 v.1.21.0
 - feature: Move to v.1.4 KinopoiskDev API.
 - feature: Remove creation of TOP 250 Kinopoisk collection.
-- feature: Add posibility to choose and create all Kinopoisk collections.
+- feature: Add possibility to choose and create all Kinopoisk collections.
 - change: Remove option to create collections based on sequels data from kinopoisk.dev - sometimes the sequel collection incorrectly detected and video added to the wrong collection.
 
 v.1.20.0
