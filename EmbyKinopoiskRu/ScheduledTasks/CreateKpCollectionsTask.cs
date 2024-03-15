@@ -22,14 +22,16 @@ using MediaBrowser.Model.Tasks;
 
 namespace EmbyKinopoiskRu.ScheduledTasks
 {
-    /// <inheritdoc />
+    /// <summary>
+    /// Task to create Kinopoisk collections
+    /// </summary>
     public class CreateKpCollectionsTask : IScheduledTask, IConfigurableScheduledTask
     {
         private static bool s_isScanRunning;
         private static readonly object ScanLock = new object();
 
         private readonly Dictionary<string, TaskTranslation> _translations = new Dictionary<string, TaskTranslation>();
-        private readonly Dictionary<string, string> _availableTranslations = new Dictionary<string, string>();
+        private readonly Dictionary<string, string> _availableTranslations;
         private readonly IServerConfigurationManager _serverConfigurationManager;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly ILogger _logger;
@@ -68,11 +70,11 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         /// <param name="jsonSerializer">Instance of the <see cref="IJsonSerializer"/> interface.</param>
         /// <param name="serverConfigurationManager">Instance of the <see cref="IServerConfigurationManager"/> interface.</param>
         public CreateKpCollectionsTask(
-                  ILogManager logManager,
-                  ILibraryManager libraryManager,
-                  ICollectionManager collectionManager,
-                  IJsonSerializer jsonSerializer,
-                  IServerConfigurationManager serverConfigurationManager)
+            ILogManager logManager,
+            ILibraryManager libraryManager,
+            ICollectionManager collectionManager,
+            IJsonSerializer jsonSerializer,
+            IServerConfigurationManager serverConfigurationManager)
         {
             _logger = logManager.GetLogger(GetType().Name);
             if (Plugin.Instance == null)
@@ -165,16 +167,10 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 progress.Report(p);
             }
         }
-        private List<CollectionFolder> GetLibraries()
+        private IEnumerable<CollectionFolder> GetLibraries()
         {
-            _logger.Info($"Get all movie, tvshow or mixed libraries");
-            QueryResult<BaseItem> librariesResult = _libraryManager.QueryItems(new InternalItemsQuery
-            {
-                IncludeItemTypes = new[] { nameof(CollectionFolder) },
-                HasPath = true,
-                IsFolder = true,
-                IsVirtualItem = false
-            });
+            _logger.Info($"Get all movies, tvshows or mixed libraries");
+            QueryResult<BaseItem> librariesResult = _libraryManager.QueryItems(new InternalItemsQuery { IncludeItemTypes = new[] { nameof(CollectionFolder) }, HasPath = true, IsFolder = true, IsVirtualItem = false });
             var libraries = librariesResult.Items
                 .Cast<CollectionFolder>()
                 .Where(b =>
@@ -186,15 +182,12 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             _logger.Info($"Found {libraries.Count} libraries: '{string.Join("', '", libraries.Select(i => i.Name))}'");
             return libraries;
         }
-        private async Task ProcessCollectionAsync(List<BaseItem> items, string collectionName, long[] librariesIds)
+        private async Task ProcessCollectionAsync(IEnumerable<BaseItem> items, string collectionName, long[] librariesIds)
         {
             var providerIdList = items
                 .SelectMany(m =>
                 {
-                    var toReturn = new List<KeyValuePair<string, string>>
-                    {
-                        new KeyValuePair<string, string>(Plugin.PluginKey, m.GetProviderId(Plugin.PluginKey))
-                    };
+                    var toReturn = new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>(Plugin.PluginKey, m.GetProviderId(Plugin.PluginKey)) };
                     if (m.HasProviderId(MetadataProviders.Imdb))
                     {
                         toReturn.Add(new KeyValuePair<string, string>(MetadataProviders.Imdb.ToString(), m.GetProviderId(MetadataProviders.Imdb)));
@@ -213,28 +206,30 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             await UpdateCollectionAsync(videosInLibrary, collectionName);
             _logger.Info($"Finished creation of '{collectionName}' collection");
         }
-        private List<BaseItem> FetchInternalIds(List<KeyValuePair<string, string>> providerIdList, long[] librariesIds)
+        private List<BaseItem> FetchInternalIds(IReadOnlyCollection<KeyValuePair<string, string>> providerIdList, long[] librariesIds)
         {
             const int requestSize = 100;
             List<BaseItem> toReturn = new List<BaseItem>();
-            if (providerIdList.Any())
+            if (!providerIdList.Any())
             {
-                var times = Math.Ceiling((double)providerIdList.Count / requestSize);
-                for (int i = 0; i <= times; i++)
+                return toReturn;
+            }
+
+            var times = Math.Ceiling((double)providerIdList.Count / requestSize);
+            for (int i = 0; i <= times; i++)
+            {
+                var queryResult = _libraryManager.QueryItems(new InternalItemsQuery
                 {
-                    var queryResult = _libraryManager.QueryItems(new InternalItemsQuery
-                    {
-                        IncludeItemTypes = new[] { nameof(Movie), nameof(Series) },
-                        AnyProviderIdEquals = providerIdList.Skip(i * requestSize).Take(requestSize).ToList(),
-                        Recursive = false,
-                        IsVirtualItem = false,
-                        ParentIds = librariesIds,
-                        HasPath = true,
-                    });
-                    if (queryResult != null && queryResult.Items.Length > 0)
-                    {
-                        toReturn.AddRange(queryResult.Items.Where(j => j.LocationType == LocationType.FileSystem));
-                    }
+                    IncludeItemTypes = new[] { nameof(Movie), nameof(Series) },
+                    AnyProviderIdEquals = providerIdList.Skip(i * requestSize).Take(requestSize).ToList(),
+                    Recursive = false,
+                    IsVirtualItem = false,
+                    ParentIds = librariesIds,
+                    HasPath = true,
+                });
+                if (queryResult != null && queryResult.Items.Length > 0)
+                {
+                    toReturn.AddRange(queryResult.Items.Where(j => j.LocationType == LocationType.FileSystem));
                 }
             }
             return toReturn;
@@ -247,53 +242,42 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             }
             _logger.Info($"Adding {itemsList.Count} items to '{collectionName}'");
             _logger.Info($"Check if '{collectionName}' already exists");
-            QueryResult<BaseItem> existingCollectionResult = _libraryManager.QueryItems(new InternalItemsQuery
-            {
-                IncludeItemTypes = new[] { "BoxSet" },
-                Recursive = false,
-                Name = collectionName
-            });
+            QueryResult<BaseItem> existingCollectionResult = _libraryManager.QueryItems(new InternalItemsQuery { IncludeItemTypes = new[] { "BoxSet" }, Recursive = false, Name = collectionName });
             _logger.Info($"Found {existingCollectionResult.TotalRecordCount} collections: '{string.Join("', '", existingCollectionResult.Items.Select(m => m.Name))}'");
-            if (existingCollectionResult.TotalRecordCount == 1)
+            switch (existingCollectionResult.TotalRecordCount)
             {
-                var existingCollection = (BoxSet)existingCollectionResult.Items[0];
-                _logger.Info($"Updating collection with name '{existingCollection.Name}' with following internal ids: '{string.Join(", ", itemsList.Select(m => m.InternalId))}'");
-                foreach (BaseItem item in itemsList)
-                {
-                    if (item.AddCollection(existingCollection))
+                case 0:
+                    _logger.Info($"Creating '{collectionName}' collection with following items: '{string.Join("', '", itemsList.Select(m => m.Name))}'");
+                    CollectionFolder rootCollectionFolder = EmbyHelper.InsureCollectionLibraryFolderAsync(_libraryManager, _logger);
+                    if (rootCollectionFolder == null)
                     {
-                        _logger.Info($"Adding '{item.Name}' (internalId '{item.InternalId}') to collection '{existingCollection.Name}'");
-                        item.UpdateToRepository(ItemUpdateType.MetadataEdit);
+                        _logger.Info($"The virtual folder 'Collections' was not found nor created. '{collectionName}' will not be created");
                     }
                     else
                     {
-                        _logger.Info($"'{item.Name}' (internalId '{item.InternalId}') already in the collection '{existingCollection.Name}'");
+                        _ = await _collectionManager.CreateCollection(new CollectionCreationOptions { IsLocked = false, Name = collectionName, ParentId = rootCollectionFolder.InternalId, ItemIdList = itemsList.Select(m => m.InternalId).ToArray() });
+                        _logger.Info($"The collection '{collectionName}'created");
                     }
-                }
-            }
-            else if (existingCollectionResult.TotalRecordCount == 0)
-            {
-                _logger.Info($"Creating '{collectionName}' collection with following items: '{string.Join("', '", itemsList.Select(m => m.Name))}'");
-                CollectionFolder rootCollectionFolder = EmbyHelper.InsureCollectionLibraryFolderAsync(_libraryManager, _logger);
-                if (rootCollectionFolder == null)
-                {
-                    _logger.Info($"The virtual folder 'Collections' was not found nor created. '{collectionName}' will not be created");
-                }
-                else
-                {
-                    _ = await _collectionManager.CreateCollection(new CollectionCreationOptions
+                    break;
+                case 1:
+                    var existingCollection = (BoxSet)existingCollectionResult.Items[0];
+                    _logger.Info($"Updating collection with name '{existingCollection.Name}' with following internal ids: '{string.Join(", ", itemsList.Select(m => m.InternalId))}'");
+                    foreach (BaseItem item in itemsList)
                     {
-                        IsLocked = false,
-                        Name = collectionName,
-                        ParentId = rootCollectionFolder.InternalId,
-                        ItemIdList = itemsList.Select(m => m.InternalId).ToArray()
-                    });
-                    _logger.Info($"The collection '{collectionName}'created");
-                }
-            }
-            else
-            {
-                _logger.Warn($"Found more collections than expected {existingCollectionResult.TotalRecordCount}, please open a github issue");
+                        if (item.AddCollection(existingCollection))
+                        {
+                            _logger.Info($"Adding '{item.Name}' (internalId '{item.InternalId}') to collection '{existingCollection.Name}'");
+                            item.UpdateToRepository(ItemUpdateType.MetadataEdit);
+                        }
+                        else
+                        {
+                            _logger.Info($"'{item.Name}' (internalId '{item.InternalId}') already in the collection '{existingCollection.Name}'");
+                        }
+                    }
+                    break;
+                default:
+                    _logger.Warn($"Found more collections than expected {existingCollectionResult.TotalRecordCount}, please open a github issue");
+                    break;
             }
         }
     }

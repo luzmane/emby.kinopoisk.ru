@@ -219,75 +219,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
                 }
             });
 
-        _ = _xmlSerializer
-            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "/emby/series_library/options.xml"))
-            .Returns(new LibraryOptions()
-            {
-                ContentType = CollectionType.TvShows.ToString(),
-                MetadataCountryCode = "RU",
-                MinCollectionItems = 1,
-                PathInfos = new[]{
-                    new MediaPathInfo
-                    {
-                        NetworkPath = null,
-                        Path = "/emby/series_library"
-                    }
-                },
-                PreferredImageLanguage = "ru",
-                PreferredMetadataLanguage = "ru",
-            });
-        _ = _xmlSerializer
-            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "/emby/film_library/options.xml"))
-            .Returns(new LibraryOptions()
-            {
-                ContentType = CollectionType.Movies.ToString(),
-                MetadataCountryCode = "RU",
-                MinCollectionItems = 1,
-                PathInfos = new[]{
-                    new MediaPathInfo
-                    {
-                        NetworkPath = null,
-                        Path = "/emby/film_library"
-                    }
-                },
-                PreferredImageLanguage = "ru",
-                PreferredMetadataLanguage = "ru",
-            });
-        _ = _xmlSerializer
-            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "/emby/mix_library/options.xml"))
-            .Returns(new LibraryOptions()
-            {
-                ContentType = null,
-                MetadataCountryCode = "RU",
-                MinCollectionItems = 1,
-                PathInfos = new[]{
-                    new MediaPathInfo
-                    {
-                        NetworkPath = null,
-                        Path = "/emby/mix_library"
-                    }
-                },
-                PreferredImageLanguage = "ru",
-                PreferredMetadataLanguage = "ru",
-            });
-        _ = _xmlSerializer
-            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "/emby/audio_library/options.xml"))
-            .Returns(new LibraryOptions()
-            {
-                ContentType = CollectionType.AudioBooks.ToString(),
-                MetadataCountryCode = "RU",
-                MinCollectionItems = 1,
-                PathInfos = new[]{
-                    new MediaPathInfo
-                    {
-                        NetworkPath = null,
-                        Path = "/emby/audio_library"
-                    }
-                },
-                PreferredImageLanguage = "ru",
-                PreferredMetadataLanguage = "ru",
-            });
-
         _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
                 false.Equals(query.Recursive)
@@ -296,8 +227,8 @@ public class CreateKpCollectionsTaskTest : BaseTest
                 && query.IncludeItemTypes.Length == 2
                 && "Movie".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
                 && "Series".Equals(query.IncludeItemTypes[1], StringComparison.Ordinal)
-                && query.ParentIds.Length == 3
-                && query.ParentIds.All(x => x >= 123 && x <= 125)
+                && query.ParentIds.Length == 4
+                && query.ParentIds.All(x => x >= 123 && x <= 126)
                 && query.AnyProviderIdEquals.Count == 100
                 && query.AnyProviderIdEquals.Contains(new KeyValuePair<string, string>(Plugin.PluginKey, "689"))
                 )))
@@ -360,17 +291,9 @@ public class CreateKpCollectionsTaskTest : BaseTest
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
         _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "CreateKpCollectionsTaskTest_Execute_CollectionExists/EmbyKinopoiskRu.xml"), Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "/emby/film_library/options.xml"), Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "/emby/series_library/options.xml"), Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "/emby/mix_library/options.xml"), Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "/emby/audio_library/options.xml"), Times.Once());
         _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(13));
         _libraryManager.Verify(lm => lm.GetItemLinks(It.IsInRange(103L, 104L, Moq.Range.Inclusive), It.IsAny<List<ItemLinkType>>()), Times.Exactly(2));
         _libraryManager.Verify(lm => lm.UpdateItem(It.IsAny<BaseItem>(), It.IsAny<BaseItem>(), ItemUpdateType.MetadataEdit, null), Times.Exactly(2));
-        _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/film_library"), Times.Once());
-        _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/series_library"), Times.Once());
-        _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/mix_library"), Times.Once());
-        _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/audio_library"), Times.Once());
 
         VerifyNoOtherCalls();
 
@@ -385,7 +308,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
             .Returns("CreateKpCollectionsTaskTest_Execute_CollectionNotExists");
-
 
         _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
@@ -425,75 +347,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
                 }
             });
 
-        _ = _xmlSerializer
-            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "/emby/series_library_ext/options.xml"))
-            .Returns(new LibraryOptions()
-            {
-                ContentType = CollectionType.TvShows.ToString(),
-                MetadataCountryCode = "RU",
-                MinCollectionItems = 1,
-                PathInfos = new[]{
-                    new MediaPathInfo
-                    {
-                        NetworkPath = null,
-                        Path = "/emby/series_library_ext"
-                    }
-                },
-                PreferredImageLanguage = "ru",
-                PreferredMetadataLanguage = "ru",
-            });
-        _ = _xmlSerializer
-            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "/emby/film_library_ext/options.xml"))
-            .Returns(new LibraryOptions()
-            {
-                ContentType = CollectionType.Movies.ToString(),
-                MetadataCountryCode = "RU",
-                MinCollectionItems = 1,
-                PathInfos = new[]{
-                    new MediaPathInfo
-                    {
-                        NetworkPath = null,
-                        Path = "/emby/film_library_ext"
-                    }
-                },
-                PreferredImageLanguage = "ru",
-                PreferredMetadataLanguage = "ru",
-            });
-        _ = _xmlSerializer
-            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "/emby/mix_library_ext/options.xml"))
-            .Returns(new LibraryOptions()
-            {
-                ContentType = null,
-                MetadataCountryCode = "RU",
-                MinCollectionItems = 1,
-                PathInfos = new[]{
-                    new MediaPathInfo
-                    {
-                        NetworkPath = null,
-                        Path = "/emby/mix_library_ext"
-                    }
-                },
-                PreferredImageLanguage = "ru",
-                PreferredMetadataLanguage = "ru",
-            });
-        _ = _xmlSerializer
-            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "/emby/audio_library_ext/options.xml"))
-            .Returns(new LibraryOptions()
-            {
-                ContentType = CollectionType.AudioBooks.ToString(),
-                MetadataCountryCode = "RU",
-                MinCollectionItems = 1,
-                PathInfos = new[]{
-                    new MediaPathInfo
-                    {
-                        NetworkPath = null,
-                        Path = "/emby/audio_library_ext"
-                    }
-                },
-                PreferredImageLanguage = "ru",
-                PreferredMetadataLanguage = "ru",
-            });
-
         _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
                 false.Equals(query.Recursive)
@@ -502,8 +355,8 @@ public class CreateKpCollectionsTaskTest : BaseTest
                 && query.IncludeItemTypes.Length == 2
                 && "Movie".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
                 && "Series".Equals(query.IncludeItemTypes[1], StringComparison.Ordinal)
-                && query.ParentIds.Length == 3
-                && query.ParentIds.All(x => x >= 123 && x <= 125)
+                && query.ParentIds.Length == 4
+                && query.ParentIds.All(x => x >= 123 && x <= 126)
                 && query.AnyProviderIdEquals.Count == 100
                 && query.AnyProviderIdEquals.Contains(new KeyValuePair<string, string>(Plugin.PluginKey, "689"))
                 )))
@@ -563,23 +416,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
                 Name = "Collections",
                 Path = "CreateKpCollectionsTaskTest_Execute_CollectionNotExists"
             });
-        _ = _xmlSerializer
-            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "CreateKpCollectionsTaskTest_Execute_CollectionNotExists/options.xml"))
-            .Returns(new LibraryOptions()
-            {
-                ContentType = CollectionType.BoxSets.ToString(),
-                MetadataCountryCode = "RU",
-                MinCollectionItems = 1,
-                PathInfos = new[]{
-                            new MediaPathInfo
-                            {
-                                NetworkPath = null,
-                                Path = "/emby/CreateKpCollectionsTaskTest_Execute_CollectionNotExists"
-                            }
-                    },
-                PreferredImageLanguage = "ru",
-                PreferredMetadataLanguage = "ru",
-            });
 
         _ = _collectionManager
             .Setup(m => m.CreateCollection(It.IsAny<CollectionCreationOptions>()))
@@ -596,24 +432,15 @@ public class CreateKpCollectionsTaskTest : BaseTest
         await _createKpCollectionsTaskTest.Execute(cancellationTokenSource.Token, new EmbyProgress());
 
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _collectionManager.Verify(cm => cm.CreateCollection(It.IsAny<CollectionCreationOptions>()), Times.Once());
         _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(10));
-        _libraryManager.Verify(lm => lm.GetUserRootFolder(), Times.Once());
-        _libraryManager.Verify(lm => lm.GetLibraryOptions(It.IsAny<UserRootFolder>()), Times.Once());
-        _libraryManager.Verify(lm => lm.GetInternalItemIds(It.IsAny<InternalItemsQuery>()), Times.Exactly(2));
+        _libraryManager.Verify(lm => lm.GetUserRootFolder(), Times.Exactly(2));
+        _libraryManager.Verify(lm => lm.GetCollectionFolders(It.IsAny<UserRootFolder>()), Times.Exactly(2));
+        _libraryManager.Verify(lm => lm.GetLibraryOptions(It.IsAny<UserRootFolder>(), It.IsAny<BaseItem[]>()), Times.Exactly(2));
+        _libraryManager.Verify(lm => lm.GetInternalItemIds(It.IsAny<InternalItemsQuery>()), Times.Once());
         _libraryManager.Verify(lm => lm.GetItemById(1L), Times.Once());
+        _libraryManager.Verify(lm => lm.AddVirtualFolder("Collections", It.IsAny<LibraryOptions>(), true), Times.Once());
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
-        _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/film_library_ext"), Times.Once());
-        _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/series_library_ext"), Times.Once());
-        _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/mix_library_ext"), Times.Once());
-        _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/audio_library_ext"), Times.Once());
-        _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/CreateKpCollectionsTaskTest_Execute_CollectionNotExists"), Times.Once());
         _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "CreateKpCollectionsTaskTest_Execute_CollectionNotExists/EmbyKinopoiskRu.xml"), Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "/emby/film_library_ext/options.xml"), Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "/emby/series_library_ext/options.xml"), Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "/emby/mix_library_ext/options.xml"), Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "/emby/audio_library_ext/options.xml"), Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "CreateKpCollectionsTaskTest_Execute_CollectionNotExists/options.xml"), Times.Once());
 
         VerifyNoOtherCalls();
 

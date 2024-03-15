@@ -35,8 +35,8 @@ namespace EmbyKinopoiskRu
         /// </summary>
         public static Plugin Instance { get; private set; }
 
-        private readonly Dictionary<string, IKinopoiskRuService> _kinopoiskServiciesDictionary = new Dictionary<string, IKinopoiskRuService>();
-        internal readonly IHttpClient HttpClient;
+        private readonly Dictionary<string, IKinopoiskRuService> _kinopoiskServicesDictionary = new Dictionary<string, IKinopoiskRuService>();
+        private readonly IHttpClient _httpClient;
         internal readonly IJsonSerializer JsonSerializer;
         private readonly ILogManager _logManager;
         private readonly ILogger _log;
@@ -78,7 +78,7 @@ namespace EmbyKinopoiskRu
             Instance = this;
             SetId(new Guid(PluginGuid));
 
-            HttpClient = httpClient;
+            _httpClient = httpClient;
             JsonSerializer = jsonSerializer;
             _logManager = logManager;
             _activityManager = activityManager;
@@ -131,30 +131,30 @@ namespace EmbyKinopoiskRu
             if (PluginConfiguration.KinopoiskDev.Equals(Configuration.ApiType, StringComparison.Ordinal))
             {
                 _log.Info($"Fetching {PluginConfiguration.KinopoiskDev} service");
-                if (!_kinopoiskServiciesDictionary.TryGetValue("KinopoiskDev", out IKinopoiskRuService result))
+                if (!_kinopoiskServicesDictionary.TryGetValue("KinopoiskDev", out IKinopoiskRuService result))
                 {
                     result = new KinopoiskDevService(
                         _logManager,
-                        HttpClient,
+                        _httpClient,
                         JsonSerializer,
                         _activityManager,
                         _libraryManager,
                         _collectionManager);
-                    _kinopoiskServiciesDictionary.Add("KinopoiskDev", result);
+                    _kinopoiskServicesDictionary.Add("KinopoiskDev", result);
                 }
                 return result;
             }
             if (PluginConfiguration.KinopoiskAPIUnofficialTech.Equals(Configuration.ApiType, StringComparison.Ordinal))
             {
                 _log.Info($"Fetching {PluginConfiguration.KinopoiskAPIUnofficialTech} service");
-                if (!_kinopoiskServiciesDictionary.TryGetValue("KinopoiskUnofficial", out IKinopoiskRuService result))
+                if (!_kinopoiskServicesDictionary.TryGetValue("KinopoiskUnofficial", out IKinopoiskRuService result))
                 {
                     result = new KinopoiskUnofficialService(
                         _logManager,
-                        HttpClient,
+                        _httpClient,
                         JsonSerializer,
                         _activityManager);
-                    _kinopoiskServiciesDictionary.Add("KinopoiskUnofficial", result);
+                    _kinopoiskServicesDictionary.Add("KinopoiskUnofficial", result);
                 }
                 return result;
             }

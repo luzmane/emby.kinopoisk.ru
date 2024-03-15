@@ -1,7 +1,7 @@
 ﻿<div data-role="page" class="page type-interior libraryFileOrganizerLogPage pluginConfigurationPage fullWidthContent"
   data-controller="__plugin/kinopoiskrujs" data-title="${Kinopoisk.Ru}">
   <div class="content-primary padded-top">
-    <form lass="kinopoiskRuConfigurationForm">
+    <form class="kinopoiskRuConfigurationForm">
       <div class="paperList checkboxList checkboxList-paperList">
         <h3 class="checkboxListLabel">${Token configuration}</h3>
         <div class="inputContainer">
@@ -24,8 +24,8 @@
           </label>
         </div>
       </div>
-      <div class="paperList checkboxList checkboxList-paperList">
-        <h3 class="checkboxListLabel">List of Kinopoisk collections</h3>
+      <div class="paperList checkboxList checkboxList-paperList kinopoiskDevOnly">
+        <h3 class="checkboxListLabel">${List of Kinopoisk collections}</h3>
         <label class="checkboxContainer kpCollectionTemplate" style="display: none;">
           <input is="emby-checkbox" type="checkbox">
           <span class="checkboxButtonLabel"></span>

@@ -19,13 +19,13 @@ namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
 /// </summary>
 public class ApiTests : IDisposable
 {
-    private const string KINOPOISK_DEV_TOKEN = "8DA0EV2-KTP4A5Q-G67QP3K-S2VFBX7";
-    private const int REQUEST_LIMIT = 250;
+    private const string KinopoiskDevToken = "8DA0EV2-KTP4A5Q-G67QP3K-S2VFBX7";
+    private const int RequestLimit = 250;
 
     // doesn't have "productionCompanies" in the result
-    private static readonly IList<string> Movie_Universal_SelectFields = new List<string> { "alternativeName", "backdrop", "countries", "description", "enName", "externalId", "genres", "id", "logo", "movieLength", "name", "persons", "poster", "premiere", "rating", "ratingMpaa", "slogan", "videos", "year", "sequelsAndPrequels", "top250", "facts", "releaseYears", "seasonsInfo", "lists" }.AsReadOnly();
-    private static readonly IList<string> Person_Universal_SelectFields = new List<string> { "birthday", "birthPlace", "death", "deathPlace", "enName", "facts", "id", "movies", "name", "photo" }.AsReadOnly();
-    private static readonly IList<string> Season_Universal_SelectFields = new List<string> { "airDate", "description", "episodes", "episodesCount", "movieId", "name", "number", "poster" }.AsReadOnly();
+    private static readonly IList<string> MovieUniversalSelectFields = new List<string> { "alternativeName", "backdrop", "countries", "description", "enName", "externalId", "genres", "id", "logo", "movieLength", "name", "persons", "poster", "premiere", "rating", "ratingMpaa", "slogan", "videos", "year", "sequelsAndPrequels", "top250", "facts", "releaseYears", "seasonsInfo", "lists" }.AsReadOnly();
+    private static readonly IList<string> PersonUniversalSelectFields = new List<string> { "birthday", "birthPlace", "death", "deathPlace", "enName", "facts", "id", "movies", "name", "photo" }.AsReadOnly();
+    private static readonly IList<string> SeasonUniversalSelectFields = new List<string> { "airDate", "description", "episodes", "episodesCount", "movieId", "name", "number", "poster" }.AsReadOnly();
 
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
@@ -58,8 +58,8 @@ public class ApiTests : IDisposable
     public async Task GetMovies_Universal_Ids()
     {
         var request = $"https://api.kinopoisk.dev/v1.4/movie?";
-        request += $"limit={REQUEST_LIMIT}";
-        request += $"&selectFields={string.Join("&selectFields=", Movie_Universal_SelectFields)}";
+        request += $"limit={RequestLimit}";
+        request += $"&selectFields={string.Join("&selectFields=", MovieUniversalSelectFields)}";
         request += "&id=689&id=435";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
@@ -76,7 +76,7 @@ public class ApiTests : IDisposable
     public async Task GetMovies_Query_Name_Year()
     {
         var request = $"https://api.kinopoisk.dev/v1.4/movie/search?";
-        request += $"limit={REQUEST_LIMIT}";
+        request += $"limit={RequestLimit}";
         request += "&query=Гарри Поттер и философский камень 2001"; // 689
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
@@ -92,7 +92,7 @@ public class ApiTests : IDisposable
     public async Task GetMovies_Query_AlternativeName_Year()
     {
         var request = $"https://api.kinopoisk.dev/v1.4/movie/search?";
-        request += $"limit={REQUEST_LIMIT}";
+        request += $"limit={RequestLimit}";
         request += "&query=Harry Potter and the Sorcerer's Stone 2001"; // 689
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
@@ -108,15 +108,15 @@ public class ApiTests : IDisposable
     public async Task GetMovies_Universal_List_Top500()
     {
         var request = $"https://api.kinopoisk.dev/v1.4/movie?";
-        request += $"limit={REQUEST_LIMIT}";
-        request += $"&selectFields={string.Join("&selectFields=", Movie_Universal_SelectFields)}";
+        request += $"limit={RequestLimit}";
+        request += $"&selectFields={string.Join("&selectFields=", MovieUniversalSelectFields)}";
         request += "&lists=top500";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
         KpSearchResult<KpMovie>? kpMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, _jsonOptions);
         kpMovie.Should().NotBeNull();
-        kpMovie!.Docs.Count.Should().Be(REQUEST_LIMIT);
+        kpMovie!.Docs.Count.Should().Be(RequestLimit);
         kpMovie.Pages.Should().Be(2);
     }
 
@@ -124,8 +124,8 @@ public class ApiTests : IDisposable
     public async Task GetMovies_Universal_ExternalIds()
     {
         var request = $"https://api.kinopoisk.dev/v1.4/movie?";
-        request += $"limit={REQUEST_LIMIT}";
-        request += $"&selectFields={string.Join("&selectFields=", Movie_Universal_SelectFields)}";
+        request += $"limit={RequestLimit}";
+        request += $"&selectFields={string.Join("&selectFields=", MovieUniversalSelectFields)}";
         request += "&externalId.imdb=tt0241527&externalId.imdb=tt0120689";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
@@ -153,14 +153,14 @@ public class ApiTests : IDisposable
     public async Task GetPersons_Query_Name()
     {
         var request = $"https://api.kinopoisk.dev/v1.4/person/search?";
-        request += $"limit={REQUEST_LIMIT}";
+        request += $"limit={RequestLimit}";
         request += "&query=Тим Роббинс";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
         KpSearchResult<KpPerson>? searchResultKpPerson = JsonSerializer.Deserialize<KpSearchResult<KpPerson>>(response, _jsonOptions);
         searchResultKpPerson.Should().NotBeNull();
-        searchResultKpPerson!.Docs.Count.Should().Be(REQUEST_LIMIT);
+        searchResultKpPerson!.Docs.Count.Should().Be(RequestLimit);
 
         VerifyPerson7987(searchResultKpPerson.Docs.FirstOrDefault(x => x.Id == 7987), isQuerySearch: true);
     }
@@ -169,8 +169,8 @@ public class ApiTests : IDisposable
     public async Task GetPersons_Universal_MoviesId()
     {
         var request = $"https://api.kinopoisk.dev/v1.4/person?";
-        request += $"limit={REQUEST_LIMIT}";
-        request += $"&selectFields={string.Join("&selectFields=", Person_Universal_SelectFields)}";
+        request += $"limit={RequestLimit}";
+        request += $"&selectFields={string.Join("&selectFields=", PersonUniversalSelectFields)}";
         request += "&movies.id=326";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
@@ -186,8 +186,8 @@ public class ApiTests : IDisposable
     public async Task GetEpisodes_Universal_MovieId()
     {
         var request = $"https://api.kinopoisk.dev/v1.4/season?";
-        request += $"limit={REQUEST_LIMIT}";
-        request += $"&selectFields={string.Join("&selectFields=", Season_Universal_SelectFields)}";
+        request += $"limit={RequestLimit}";
+        request += $"&selectFields={string.Join("&selectFields=", SeasonUniversalSelectFields)}";
         request += "&movieId=77044";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
@@ -204,8 +204,8 @@ public class ApiTests : IDisposable
     public async Task GetEpisodes_Universal_MovieId_Season()
     {
         var request = $"https://api.kinopoisk.dev/v1.4/season?";
-        request += $"limit={REQUEST_LIMIT}";
-        request += $"&selectFields={string.Join("&selectFields=", Season_Universal_SelectFields)}";
+        request += $"limit={RequestLimit}";
+        request += $"&selectFields={string.Join("&selectFields=", SeasonUniversalSelectFields)}";
         request += "&movieId=77044&number=5";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
@@ -458,7 +458,7 @@ public class ApiTests : IDisposable
     private static void VerifySeries77044Season5(KpSeason? kpSeason)
     {
         kpSeason.Should().NotBeNull();
-        kpSeason!.AirDate.Should().Be("1998-09-24");
+        kpSeason!.AirDate.Should().Be("1998-09-24T00:00:00.000Z");
         kpSeason.Description.Should().Be("Росс делает глупую ошибку. На своей свадьбе вместо имени своей невесты Емели, он называет имя Рейчел. Свадьба продолжается, но после нее Емели сбегает и просит не преследовать ее. Росс снова впадает в депрессию. Из-за чего у него постоянные нервные срывы и всплески ярости. Моника и Чендлер начинают тайно встречаться, однако делать это в присутствии друзей очень сложно. Тем не менее, их отношения рано или поздно становятся явным. Фиби рожает своему брату Фрэнку тройняшек и одного хочет взять себе. Джо получает роль в хорошем фильме, съемки которого пройдут в Лас-Вегасе. Все друзья отправляются туда и по возвращению двое из них становятся женатыми. Думаете это Чендлер и Моника? Узнаете при просмотре...");
         kpSeason.Episodes.Should().NotBeNull();
         kpSeason.Episodes.Should().HaveCount(23);
@@ -476,7 +476,7 @@ public class ApiTests : IDisposable
     private static void VerifySeries77044Season5Episode5(KpEpisode? kpEpisode)
     {
         kpEpisode.Should().NotBeNull();
-        kpEpisode!.AirDate.Should().Be("1998-10-29");
+        kpEpisode!.AirDate.Should().Be("1998-10-29T00:00:00.000Z");
         kpEpisode.EnName.Should().Be("The One with the Kips");
         kpEpisode.Description.Should().Be("Чендлер и Моника проводят вместе выходные, но в результате ссорятся. Росс говорит Рэйчел о требовании Эмили. Джо узнает об отношениях между Моникой и Чендлером.");
         kpEpisode.Number.Should().Be(5);
@@ -503,8 +503,8 @@ public class ApiTests : IDisposable
     private string GetKinopoiskDevToken()
     {
         var token = Environment.GetEnvironmentVariable("KINOPOISK_DEV_TOKEN");
-        _logger.Info($"Env token length is: {(token != null ? token.Length : 0)}");
-        return string.IsNullOrWhiteSpace(token) ? KINOPOISK_DEV_TOKEN : token;
+        _logger.Info($"Env token length is: {token?.Length ?? 0}");
+        return string.IsNullOrWhiteSpace(token) ? KinopoiskDevToken : token;
     }
     #endregion
 
