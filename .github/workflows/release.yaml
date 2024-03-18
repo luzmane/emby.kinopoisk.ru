@@ -29,24 +29,24 @@ jobs:
         id: release_notes
         shell: bash
         run: |
-          tags=$(awk '/^v.*/ {print}' ./RELEASE-NOTES.txt)
+          tags=$(awk '/^v.*/ {print}' ./RELEASE-NOTES.md)
           tags_array=($tags)
           len=${#tags_array[@]}
           echo "release_tag=${tags_array[0]}" >> $GITHUB_OUTPUT
           if [ ${len} -ge 2 ]
           then
             prev_tag=${tags_array[1]};
-            notes=$(awk "BEGIN{ found=1 } /$prev_tag/{found=0}  {if (found) print }" ./RELEASE-NOTES.txt)
-            echo "${notes}" > ./RELEASE-NOTES.txt
-            echo "" >> ./RELEASE-NOTES.txt
-            echo "**Full Changelog**: https://github.com/luzmane/emby.kinopoisk.ru/compare/${tags_array[1]}...${tags_array[0]}" >> ./RELEASE-NOTES.txt
+            notes=$(awk "BEGIN{ found=1 } /$prev_tag/{found=0}  {if (found) print }" ./RELEASE-NOTES.md)
+            echo "${notes}" > ./RELEASE-NOTES.md
+            echo "" >> ./RELEASE-NOTES.md
+            echo "**Full Changelog**: https://github.com/luzmane/emby.kinopoisk.ru/compare/${tags_array[1]}...${tags_array[0]}" >> ./RELEASE-NOTES.md
           fi
 
       - name: Create release
         uses: "softprops/action-gh-release@v1"
         with:
           files: ./EmbyKinopoiskRu/bin/Release/*/EmbyKinopoiskRu.dll
-          body_path: ./RELEASE-NOTES.txt
+          body_path: ./RELEASE-NOTES.md
           fail_on_unmatched_files: true
           name: "EmbyKinopoiskRu ${{ steps.release_notes.outputs.release_tag }}"
           tag_name: "${{ steps.release_notes.outputs.release_tag }}"
