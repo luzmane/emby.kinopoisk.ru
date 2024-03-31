@@ -102,7 +102,7 @@ namespace EmbyKinopoiskRu
                 new PluginPageInfo
                 {
                     Name = "kinopoiskru",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.kinopoiskru.html",
+                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.kinopoiskru.html"
                 },
                 new PluginPageInfo
                 {
@@ -126,6 +126,7 @@ namespace EmbyKinopoiskRu
                     })
                 .ToArray();
         }
+
         internal IKinopoiskRuService GetKinopoiskService()
         {
             if (PluginConfiguration.KinopoiskDev.Equals(Configuration.ApiType, StringComparison.Ordinal))
@@ -142,8 +143,10 @@ namespace EmbyKinopoiskRu
                         _collectionManager);
                     _kinopoiskServicesDictionary.Add("KinopoiskDev", result);
                 }
+
                 return result;
             }
+
             if (PluginConfiguration.KinopoiskApiUnofficialTech.Equals(Configuration.ApiType, StringComparison.Ordinal))
             {
                 _log.Info($"Fetching {PluginConfiguration.KinopoiskApiUnofficialTech} service");
@@ -156,8 +159,10 @@ namespace EmbyKinopoiskRu
                         _activityManager);
                     _kinopoiskServicesDictionary.Add("KinopoiskUnofficial", result);
                 }
+
                 return result;
             }
+
             throw new Exception($"Unable to recognize provided API type '{Configuration.ApiType}'");
         }
     }

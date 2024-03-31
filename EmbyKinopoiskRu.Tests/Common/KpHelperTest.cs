@@ -9,32 +9,32 @@ public class KpHelperTest
     [Fact]
     public void KpHelper_DetectYearFromMoviePath_WithYear()
     {
-        var fileName = "/mnt/share2/video_child_vault/Летучий корабль.1979.WEBRip 720p.mkv";
-        var movieName = "Летучий корабль";
+        const string fileName = "/mnt/share2/video_child_vault/Летучий корабль.1979.WEBRip 720p.mkv";
+        const string movieName = "Летучий корабль";
         KpHelper.DetectYearFromMoviePath(fileName, movieName).Should().Be(1979);
     }
 
     [Fact]
     public void KpHelper_DetectYearFromMoviePath_WithoutYear()
     {
-        var fileName = "/mnt/share2/video_child_vault/Леди и бродяга.mkv";
-        var movieName = "Леди и бродяга";
+        const string fileName = "/mnt/share2/video_child_vault/Леди и бродяга.mkv";
+        const string movieName = "Леди и бродяга";
         KpHelper.DetectYearFromMoviePath(fileName, movieName).Should().BeNull();
     }
 
     [Fact]
     public void KpHelper_DetectYearFromMoviePath_IncorrectYear_1700()
     {
-        var fileName = "/mnt/share2/video_child_vault/Леди и бродяга_1700.mkv";
-        var movieName = "Леди и бродяга";
+        const string fileName = "/mnt/share2/video_child_vault/Леди и бродяга_1700.mkv";
+        const string movieName = "Леди и бродяга";
         KpHelper.DetectYearFromMoviePath(fileName, movieName).Should().BeNull();
     }
 
     [Fact]
     public void KpHelper_DetectYearFromMoviePath_IncorrectYear_3000()
     {
-        var fileName = "/mnt/share2/video_child_vault/Леди и бродяга_3000.mkv";
-        var movieName = "Леди и бродяга";
+        const string fileName = "/mnt/share2/video_child_vault/Леди и бродяга_3000.mkv";
+        const string movieName = "Леди и бродяга";
         KpHelper.DetectYearFromMoviePath(fileName, movieName).Should().BeNull();
     }
 

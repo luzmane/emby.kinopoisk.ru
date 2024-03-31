@@ -6,13 +6,14 @@ using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model;
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Film;
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Person;
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Season;
+
 using NLog;
 
 namespace EmbyKinopoiskRu.Tests.KinopoiskApiUnofficial;
 
 public class ApiTests : IDisposable
 {
-    private const string KINOPOISK_UNOFFICIAL_TOKEN = "0f162131-81c1-4979-b46c-3eea4263fb11";
+    private const string KinopoiskUnofficialToken = "0f162131-81c1-4979-b46c-3eea4263fb11";
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
     private readonly ILogger _logger;
@@ -21,10 +22,13 @@ public class ApiTests : IDisposable
     {
         _logger = LogManager.GetCurrentClassLogger();
 
-        _httpClient = new();
+        _httpClient = new HttpClient();
         _httpClient.DefaultRequestHeaders.Add("X-API-KEY", GetKinopoiskUnofficialToken());
 
-        _jsonOptions = new() { PropertyNameCaseInsensitive = true };
+        _jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
     }
 
     #region Tests
@@ -32,11 +36,11 @@ public class ApiTests : IDisposable
     [Fact]
     public async Task GetFilmById()
     {
-        var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/326";
+        const string request = "https://kinopoiskapiunofficial.tech/api/v2.2/films/326";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
-        KpFilm? film = JsonSerializer.Deserialize<KpFilm>(response, _jsonOptions);
+        var film = JsonSerializer.Deserialize<KpFilm>(response, _jsonOptions);
 
         VerifyKpFilm326(film);
     }
@@ -44,7 +48,7 @@ public class ApiTests : IDisposable
     [Fact]
     public async Task SearchFilmByName()
     {
-        var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films?keyword=Побег из Шоушенка";
+        const string request = "https://kinopoiskapiunofficial.tech/api/v2.2/films?keyword=Побег из Шоушенка";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
@@ -58,7 +62,7 @@ public class ApiTests : IDisposable
     [Fact]
     public async Task SearchFilmByNameAndYear()
     {
-        var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films?keyword=Побег из Шоушенка&yearFrom=1994&yearTo=1994";
+        const string request = "https://kinopoiskapiunofficial.tech/api/v2.2/films?keyword=Побег из Шоушенка&yearFrom=1994&yearTo=1994";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
@@ -72,7 +76,7 @@ public class ApiTests : IDisposable
     [Fact]
     public async Task GetSeasons()
     {
-        var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/77044/seasons";
+        const string request = "https://kinopoiskapiunofficial.tech/api/v2.2/films/77044/seasons";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
@@ -92,7 +96,7 @@ public class ApiTests : IDisposable
     [Fact]
     public async Task GetVideos()
     {
-        var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/77044/videos";
+        const string request = "https://kinopoiskapiunofficial.tech/api/v2.2/films/77044/videos";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
@@ -106,11 +110,11 @@ public class ApiTests : IDisposable
     [Fact]
     public async Task GetStaffById()
     {
-        var request = $"https://kinopoiskapiunofficial.tech/api/v1/staff/7987";
+        const string request = "https://kinopoiskapiunofficial.tech/api/v1/staff/7987";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
-        KpPerson? kpPerson = JsonSerializer.Deserialize<KpPerson>(response, _jsonOptions);
+        var kpPerson = JsonSerializer.Deserialize<KpPerson>(response, _jsonOptions);
         kpPerson.Should().NotBeNull();
         kpPerson!.Birthday.Should().Be("1958-10-16");
         kpPerson.BirthPlace.Should().Be("Уэст-Ковина, Калифорния, США");
@@ -126,7 +130,7 @@ public class ApiTests : IDisposable
     [Fact]
     public async Task GetStaffByFilmId()
     {
-        var request = $"https://kinopoiskapiunofficial.tech/api/v1/staff?filmId=326";
+        const string request = "https://kinopoiskapiunofficial.tech/api/v1/staff?filmId=326";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
@@ -145,7 +149,7 @@ public class ApiTests : IDisposable
     [Fact]
     public async Task SearchStaffByName()
     {
-        var request = $"https://kinopoiskapiunofficial.tech/api/v1/persons?name=Тим Роббинс";
+        const string request = "https://kinopoiskapiunofficial.tech/api/v1/persons?name=Тим Роббинс";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
@@ -176,6 +180,7 @@ public class ApiTests : IDisposable
         film.PosterUrl.Should().NotBeNullOrWhiteSpace();
         film.PosterUrlPreview.Should().NotBeNullOrWhiteSpace();
         film.RatingKinopoisk.Should().BeGreaterThan(9);
+        film.Type.Should().Be("FILM");
         film.Year.Should().Be(1994);
         if (isSearch)
         {
@@ -212,13 +217,12 @@ public class ApiTests : IDisposable
         _httpClient.Dispose();
     }
 
-    protected string GetKinopoiskUnofficialToken()
+    private string GetKinopoiskUnofficialToken()
     {
         var token = Environment.GetEnvironmentVariable("KINOPOISK_UNOFFICIAL_TOKEN");
-        _logger.Info($"Env token length is: {(token != null ? token.Length : 0)}");
-        return string.IsNullOrWhiteSpace(token) ? KINOPOISK_UNOFFICIAL_TOKEN : token;
+        _logger.Info($"Env token length is: {token?.Length ?? 0}");
+        return string.IsNullOrWhiteSpace(token) ? KinopoiskUnofficialToken : token;
     }
 
     #endregion
-
 }

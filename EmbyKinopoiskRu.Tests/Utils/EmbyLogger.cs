@@ -18,38 +18,47 @@ public class EmbyLogger : ILogger
     {
         _logger.Debug(message.ToString());
     }
+
     public void Debug(string message, params object[] paramList)
     {
         _logger.Debug(CultureInfo.InvariantCulture, message, paramList);
     }
+
     public void Error(ReadOnlyMemory<char> message)
     {
         _logger.Error(message.ToString());
     }
+
     public void Error(string message, params object[] paramList)
     {
         _logger.Error(CultureInfo.InvariantCulture, message, paramList);
     }
+
     public void ErrorException(string message, Exception exception, params object[] paramList)
     {
         _logger.Error(exception, message, paramList);
     }
+
     public void Fatal(string message, params object[] paramList)
     {
         _logger.Fatal(CultureInfo.InvariantCulture, message, paramList);
     }
+
     public void FatalException(string message, Exception exception, params object[] paramList)
     {
         _logger.Fatal(exception, message, paramList);
     }
+
     public void Info(ReadOnlyMemory<char> message)
     {
         _logger.Info(message.ToString());
     }
+
     public void Info(string message, params object[] paramList)
     {
         _logger.Info(CultureInfo.InvariantCulture, message, paramList);
     }
+
     public void Log(LogSeverity severity, string message, params object[] paramList)
     {
         switch (severity)
@@ -71,6 +80,7 @@ public class EmbyLogger : ILogger
                 break;
         }
     }
+
     public void Log(LogSeverity severity, ReadOnlyMemory<char> message)
     {
         switch (severity)
@@ -92,6 +102,7 @@ public class EmbyLogger : ILogger
                 break;
         }
     }
+
     public void LogMultiline(string message, LogSeverity severity, StringBuilder additionalContent)
     {
         if (additionalContent == null)
@@ -101,10 +112,12 @@ public class EmbyLogger : ILogger
 
         Log(severity, additionalContent.Insert(0, message + "\n").ToString());
     }
+
     public void Warn(ReadOnlyMemory<char> message)
     {
         _logger.Warn(message.ToString());
     }
+
     public void Warn(string message, params object[] paramList)
     {
         _logger.Warn(CultureInfo.InvariantCulture, message, paramList);

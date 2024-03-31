@@ -19,6 +19,5 @@ namespace EmbyKinopoiskRu.ScheduledTasks.Model
         /// Gets and set the Category
         /// </summary>
         public string Category { get; set; } = string.Empty;
-
     }
 }

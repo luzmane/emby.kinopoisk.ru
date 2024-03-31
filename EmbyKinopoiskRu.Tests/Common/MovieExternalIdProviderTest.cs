@@ -29,5 +29,4 @@ public class MovieExternalIdProviderTest
 
         _logger.Info($"Finished '{nameof(MovieExternalIdProvider_ForCodeCoverage)}'");
     }
-
 }

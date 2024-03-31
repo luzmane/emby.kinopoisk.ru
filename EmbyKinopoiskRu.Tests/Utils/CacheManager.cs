@@ -7,23 +7,26 @@ namespace EmbyKinopoiskRu.Tests.Utils;
 
 public static class CacheManager
 {
-    private const string CACHE_NAME = "http";
-    private const string SERIALIZER_NAME = "json";
+    private const string CacheName = "http";
+    private const string SerializerName = "json";
 
 
     private static readonly IEasyCachingProvider? HttpCache = new ServiceCollection()
-            .AddEasyCaching(option =>
-                _ = option
-                    .WithJson(jsonSerializerSettingsConfigure: x => x.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.None,
-                        SERIALIZER_NAME)
-                    .UseDisk(cfg =>
-                        {
-                            cfg.DBConfig = new DiskDbOptions { BasePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache") };
-                            cfg.SerializerName = SERIALIZER_NAME;
-                        }, CACHE_NAME))
-            .BuildServiceProvider()
-            .GetService<IEasyCachingProviderFactory>()?
-            .GetCachingProvider(CACHE_NAME);
+        .AddEasyCaching(option =>
+            _ = option
+                .WithJson(jsonSerializerSettingsConfigure: x => x.TypeNameHandling = Newtonsoft.Json.TypeNameHandling.None,
+                    SerializerName)
+                .UseDisk(cfg =>
+                {
+                    cfg.DBConfig = new DiskDbOptions
+                    {
+                        BasePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Cache")
+                    };
+                    cfg.SerializerName = SerializerName;
+                }, CacheName))
+        .BuildServiceProvider()
+        .GetService<IEasyCachingProviderFactory>()?
+        .GetCachingProvider(CacheName);
 
     public static void AddToCache(string key, string value)
     {
@@ -31,6 +34,7 @@ public static class CacheManager
         {
             throw new FieldAccessException("HttpCache is null");
         }
+
         HttpCache.Set(key, value, TimeSpan.FromDays(30));
     }
 
@@ -40,6 +44,7 @@ public static class CacheManager
         {
             throw new FieldAccessException("HttpCache is null");
         }
+
         return HttpCache.Get<string>(key);
     }
 }

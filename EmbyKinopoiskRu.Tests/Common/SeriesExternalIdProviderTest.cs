@@ -29,5 +29,4 @@ public class SeriesExternalIdProviderTest
 
         _logger.Info($"Finished '{nameof(SeriesExternalIdProvider_ForCodeCoverage)}'");
     }
-
 }

@@ -24,6 +24,7 @@ public class KpMovieProviderTest : BaseTest
 
 
     #region Test configs
+
     public KpMovieProviderTest() : base(Logger)
     {
         _pluginConfiguration.Token = GetKinopoiskUnofficialToken();
@@ -33,7 +34,7 @@ public class KpMovieProviderTest : BaseTest
 
         ConfigXmlSerializer();
 
-        _kpMovieProvider = new(_httpClient, _logManager.Object);
+        _kpMovieProvider = new KpMovieProvider(_httpClient, _logManager.Object);
     }
 
     #endregion
@@ -64,7 +65,10 @@ public class KpMovieProviderTest : BaseTest
 
         var movieInfo = new MovieInfo
         {
-            ProviderIds = new(new() { { Plugin.PluginKey, "326" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { Plugin.PluginKey, "326" }
+            })
         };
 
         _ = _applicationPaths
@@ -117,7 +121,10 @@ public class KpMovieProviderTest : BaseTest
 
         var movieInfo = new MovieInfo
         {
-            ProviderIds = new(new() { { MetadataProviders.Imdb.ToString(), "tt0111161" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { MetadataProviders.Imdb.ToString(), "tt0111161" }
+            })
         };
 
         _ = _applicationPaths
@@ -228,7 +235,10 @@ public class KpMovieProviderTest : BaseTest
 
         var movieInfo = new MovieInfo
         {
-            ProviderIds = new(new() { { Plugin.PluginKey, "326" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { Plugin.PluginKey, "326" }
+            })
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         IEnumerable<RemoteSearchResult> result = await _kpMovieProvider.GetSearchResults(movieInfo, cancellationTokenSource.Token);
@@ -261,7 +271,10 @@ public class KpMovieProviderTest : BaseTest
 
         var movieInfo = new MovieInfo
         {
-            ProviderIds = new(new() { { Plugin.PluginKey, "326" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { Plugin.PluginKey, "326" }
+            })
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         IEnumerable<RemoteSearchResult> result = await _kpMovieProvider.GetSearchResults(movieInfo, cancellationTokenSource.Token);
@@ -315,5 +328,4 @@ public class KpMovieProviderTest : BaseTest
 
         Logger.Info($"Finished '{nameof(KpMovieProvider_GetSearchResults_NameAndYear)}'");
     }
-
 }

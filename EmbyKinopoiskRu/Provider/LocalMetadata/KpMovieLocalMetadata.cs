@@ -13,6 +13,5 @@ namespace EmbyKinopoiskRu.Provider.LocalMetadata
         public KpMovieLocalMetadata(ILogManager logManager) : base(logManager)
         {
         }
-
     }
 }

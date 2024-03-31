@@ -12,6 +12,5 @@ namespace EmbyKinopoiskRu.Api
         public int MoviesCount { get; set; }
         public string Name { get; set; }
         public string Slug { get; set; }
-
     }
 }

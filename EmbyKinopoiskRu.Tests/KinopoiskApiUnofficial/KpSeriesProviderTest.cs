@@ -23,6 +23,7 @@ public class KpSeriesProviderTest : BaseTest
 
 
     #region Test configs
+
     public KpSeriesProviderTest() : base(Logger)
     {
         _pluginConfiguration.Token = GetKinopoiskUnofficialToken();
@@ -32,7 +33,7 @@ public class KpSeriesProviderTest : BaseTest
 
         ConfigXmlSerializer();
 
-        _kpSeriesProvider = new(_httpClient, _logManager.Object);
+        _kpSeriesProvider = new KpSeriesProvider(_httpClient, _logManager.Object);
     }
 
     #endregion
@@ -65,7 +66,10 @@ public class KpSeriesProviderTest : BaseTest
 
         var seriesInfo = new SeriesInfo
         {
-            ProviderIds = new(new() { { Plugin.PluginKey, "452973" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { Plugin.PluginKey, "452973" }
+            })
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Series> result = await _kpSeriesProvider.GetMetadata(seriesInfo, cancellationTokenSource.Token);
@@ -170,7 +174,10 @@ public class KpSeriesProviderTest : BaseTest
 
         var seriesInfo = new SeriesInfo
         {
-            ProviderIds = new(new() { { Plugin.PluginKey, "452973" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { Plugin.PluginKey, "452973" }
+            })
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         IEnumerable<RemoteSearchResult> result = await _kpSeriesProvider.GetSearchResults(seriesInfo, cancellationTokenSource.Token);
@@ -226,5 +233,4 @@ public class KpSeriesProviderTest : BaseTest
 
         Logger.Info($"Finished '{nameof(KpSeriesProvider_GetSearchResults_NameAndYear)}'");
     }
-
 }

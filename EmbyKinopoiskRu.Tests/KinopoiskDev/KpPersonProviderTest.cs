@@ -22,6 +22,7 @@ public class KpPersonProviderTest : BaseTest
 
 
     #region Test configs
+
     public KpPersonProviderTest() : base(Logger)
     {
         _pluginConfiguration.Token = GetKinopoiskDevToken();
@@ -30,7 +31,7 @@ public class KpPersonProviderTest : BaseTest
 
         ConfigXmlSerializer();
 
-        _kpPersonProvider = new(_httpClient, _logManager.Object);
+        _kpPersonProvider = new KpPersonProvider(_httpClient, _logManager.Object);
     }
 
     #endregion
@@ -146,7 +147,10 @@ public class KpPersonProviderTest : BaseTest
 
         var personInfo = new PersonLookupInfo
         {
-            ProviderIds = new(new() { { Plugin.PluginKey, "29855" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { Plugin.PluginKey, "29855" }
+            })
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         IEnumerable<RemoteSearchResult> result = await _kpPersonProvider.GetSearchResults(personInfo, cancellationTokenSource.Token);
@@ -212,5 +216,4 @@ public class KpPersonProviderTest : BaseTest
 
         Logger.Info($"Finish '{nameof(KpPersonProvider_GetSearchResults_ByEnName)}'");
     }
-
 }

@@ -20,7 +20,7 @@ namespace EmbyKinopoiskRu.Configuration
         public string Id { get; set; }
 
         /// <summary>
-        /// Is the collection shoud be created flag
+        /// Is the collection should be created flag
         /// </summary>
         public bool IsEnable { get; set; }
 
@@ -45,6 +45,5 @@ namespace EmbyKinopoiskRu.Configuration
         {
             return Id.GetHashCode();
         }
-
     }
 }

@@ -10,6 +10,5 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Season
         public string Name { get; set; }
         public int Number { get; set; }
         public KpImage Still { get; set; }
-
     }
 }

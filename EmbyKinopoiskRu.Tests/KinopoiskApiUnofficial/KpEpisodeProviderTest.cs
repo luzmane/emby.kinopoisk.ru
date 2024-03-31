@@ -8,6 +8,7 @@ using FluentAssertions;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Providers;
+using MediaBrowser.Model.Entities;
 
 namespace EmbyKinopoiskRu.Tests.KinopoiskApiUnofficial;
 
@@ -20,6 +21,7 @@ public class KpEpisodeProviderTest : BaseTest
 
 
     #region Test configs
+
     public KpEpisodeProviderTest() : base(Logger)
     {
         _pluginConfiguration.Token = GetKinopoiskUnofficialToken();
@@ -29,7 +31,7 @@ public class KpEpisodeProviderTest : BaseTest
 
         ConfigXmlSerializer();
 
-        _kpEpisodeProvider = new(_httpClient, _logManager.Object);
+        _kpEpisodeProvider = new KpEpisodeProvider(_httpClient, _logManager.Object);
     }
 
     #endregion
@@ -62,7 +64,10 @@ public class KpEpisodeProviderTest : BaseTest
             SeriesProviderIds = null,
             IndexNumber = 2,
             ParentIndexNumber = 1,
-            ProviderIds = new(new() { { Plugin.PluginKey, "452973" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { Plugin.PluginKey, "452973" }
+            })
         };
 
         _ = _applicationPaths
@@ -103,7 +108,10 @@ public class KpEpisodeProviderTest : BaseTest
         {
             IndexNumber = 2,
             ParentIndexNumber = 1,
-            SeriesProviderIds = new() { { Plugin.PluginKey, "452973" } }
+            SeriesProviderIds = new Dictionary<string, string>
+            {
+                { Plugin.PluginKey, "452973" }
+            }
         };
 
         _ = _applicationPaths
@@ -134,5 +142,4 @@ public class KpEpisodeProviderTest : BaseTest
 
         Logger.Info($"Finish '{nameof(KpEpisodeProvider_GetMetadata_SeriesProviderIds)}'");
     }
-
 }

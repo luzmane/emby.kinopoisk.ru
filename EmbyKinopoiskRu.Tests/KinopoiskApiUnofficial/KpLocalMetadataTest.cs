@@ -20,6 +20,7 @@ public class KpLocalMetadataTest : BaseTest
 
 
     #region Test configs
+
     public KpLocalMetadataTest() : base(Logger)
     {
         _pluginConfiguration.Token = GetKinopoiskUnofficialToken();
@@ -36,7 +37,8 @@ public class KpLocalMetadataTest : BaseTest
             ImportCollections = true,
             MetadataCountryCode = "RU",
             MinCollectionItems = 1,
-            PathInfos = new[]{
+            PathInfos = new[]
+            {
                 new MediaPathInfo
                 {
                     NetworkPath = null,
@@ -47,7 +49,8 @@ public class KpLocalMetadataTest : BaseTest
             PreferredMetadataLanguage = "ru",
             SkipSubtitlesIfEmbeddedSubtitlesPresent = true,
             SkipSubtitlesIfAudioTrackMatches = true,
-            TypeOptions = new[]{
+            TypeOptions = new[]
+            {
                 new TypeOptions
                 {
                     Type = "Movie"
@@ -130,5 +133,4 @@ public class KpLocalMetadataTest : BaseTest
 
         Logger.Info($"Finish '{nameof(KpLocalMetadata_ForCodeCoverage)}'");
     }
-
 }

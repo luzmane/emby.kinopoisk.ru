@@ -23,6 +23,7 @@ public class CreateKinopoiskIdTaskTest : BaseTest
 
 
     #region Test configs
+
     public CreateKinopoiskIdTaskTest() : base(Logger)
     {
         _pluginConfiguration.Token = GetKinopoiskDevToken();
@@ -31,7 +32,7 @@ public class CreateKinopoiskIdTaskTest : BaseTest
 
         ConfigXmlSerializer();
 
-        _createKinopoiskIdTask = new(
+        _createKinopoiskIdTask = new CreateKinopoiskIdTask(
             _logManager.Object,
             _libraryManager.Object,
             _serverConfigurationManager.Object,
@@ -67,7 +68,10 @@ public class CreateKinopoiskIdTaskTest : BaseTest
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
-            .Returns(new ServerConfiguration { UICulture = "ru" });
+            .Returns(new ServerConfiguration
+            {
+                UICulture = "ru"
+            });
 
         _createKinopoiskIdTask.Name.Should().Be("Добавить ID Кинопоиска по ключам IMDB, TMDB");
         _createKinopoiskIdTask.Description.Should().Be("Добавить ID Кинопоиска, ища через API по ID IMDB и TMDB. Поддерживает только kinopoisk.dev");
@@ -88,7 +92,10 @@ public class CreateKinopoiskIdTaskTest : BaseTest
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
-            .Returns(new ServerConfiguration { UICulture = "en-us" });
+            .Returns(new ServerConfiguration
+            {
+                UICulture = "en-us"
+            });
 
         _createKinopoiskIdTask.Name.Should().Be("Add KinopoiskId based on IMDB, TMDB");
         _createKinopoiskIdTask.Description.Should().Be("Add KinopoiskId searching them by IMDB and TMDB ids. Support kinopoisk.dev only");
@@ -109,7 +116,10 @@ public class CreateKinopoiskIdTaskTest : BaseTest
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
-            .Returns(new ServerConfiguration { UICulture = "uk" });
+            .Returns(new ServerConfiguration
+            {
+                UICulture = "uk"
+            });
 
         _createKinopoiskIdTask.Name.Should().Be("Додати ID Кінопошуку за ключами IMDB, TMDB");
         _createKinopoiskIdTask.Description.Should().Be("Додати ID Кінопошуку, шукаючи через API за ID IMDB та TMDB. Підтримує лише kinopoisk.dev");
@@ -130,7 +140,10 @@ public class CreateKinopoiskIdTaskTest : BaseTest
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
-            .Returns(new ServerConfiguration { UICulture = "bg" });
+            .Returns(new ServerConfiguration
+            {
+                UICulture = "bg"
+            });
 
         _createKinopoiskIdTask.Name.Should().Be("Add KinopoiskId based on IMDB, TMDB");
         _createKinopoiskIdTask.Description.Should().Be("Add KinopoiskId searching them by IMDB and TMDB ids. Support kinopoisk.dev only");
@@ -155,7 +168,10 @@ public class CreateKinopoiskIdTaskTest : BaseTest
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
-            .Returns(new ServerConfiguration { UICulture = "ru" });
+            .Returns(new ServerConfiguration
+            {
+                UICulture = "ru"
+            });
 
         _ = _libraryManager // Search for items to update
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
@@ -170,30 +186,34 @@ public class CreateKinopoiskIdTaskTest : BaseTest
             .Returns(new QueryResult<BaseItem>
             {
                 TotalRecordCount = 3,
-                Items = new BaseItem[] {
-                    new Movie {
+                Items = new BaseItem[]
+                {
+                    new Movie
+                    {
                         Name = "Гарри Поттер и Тайная комната",
                         InternalId = 101L,
-                        ProviderIds = new(new Dictionary<string, string>
+                        ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
                             { MetadataProviders.Imdb.ToString(), "tt0295297" },
                             { MetadataProviders.Tmdb.ToString(), "672" }
                         })
                     },
-                    new Movie {
+                    new Movie
+                    {
                         Name = "Гарри Поттер и узник Азкабана",
                         InternalId = 102L,
-                        ProviderIds = new(new Dictionary<string, string>
+                        ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
                             { MetadataProviders.Tmdb.ToString(), "673" }
-                        }),
+                        })
                     },
-                    new Movie {
+                    new Movie
+                    {
                         Name = "Гарри Поттер и Кубок огня",
                         InternalId = 103L,
-                        ProviderIds = new(new Dictionary<string, string>
+                        ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
-                            { MetadataProviders.Imdb.ToString(), "tt0330373" },
+                            { MetadataProviders.Imdb.ToString(), "tt0330373" }
                         })
                     }
                 }
@@ -212,6 +232,4 @@ public class CreateKinopoiskIdTaskTest : BaseTest
 
         Logger.Info($"Finished '{nameof(CreateKinopoiskIdTask_Execute)}'");
     }
-
-
 }

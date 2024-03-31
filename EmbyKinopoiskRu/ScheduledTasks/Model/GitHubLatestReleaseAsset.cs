@@ -7,7 +7,6 @@ namespace EmbyKinopoiskRu.ScheduledTasks.Model
         internal string name { get; set; }
         internal string browser_download_url { get; set; }
         internal string content_type { get; set; }
-
     }
 #pragma warning restore IDE1006
 }

@@ -21,8 +21,9 @@ namespace EmbyKinopoiskRu.Provider.RemoteMetadata
         public string Name => Plugin.PluginName;
 
         /// <inheritdoc />
-        public MetadataFeatures[] Features => FEATURES;
-        private static readonly MetadataFeatures[] FEATURES = new[] { MetadataFeatures.Collections, MetadataFeatures.Adult, MetadataFeatures.RequiredSetup };
+        public MetadataFeatures[] Features => FeaturesArray;
+
+        private static readonly MetadataFeatures[] FeaturesArray = { MetadataFeatures.Collections, MetadataFeatures.Adult, MetadataFeatures.RequiredSetup };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KpMovieProvider"/> class.

@@ -48,6 +48,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         }
 
         #region MovieProvider
+
         public async Task<MetadataResult<Movie>> GetMetadataAsync(MovieInfo info, CancellationToken cancellationToken)
         {
             var result = new MetadataResult<Movie>
@@ -68,10 +69,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 await CreateMovieAsync(result, movie, cancellationToken);
                 return result;
             }
-            _log.Info($"Movie not found by provider IDs");
+
+            _log.Info("Movie not found by provider IDs or no provider IDs exist");
 
             // no name cleanup - search 'as is', otherwise doesn't work
-            _log.Info($"Searching movies by name '{info.Name}' and year '{info.Year}'");
+            var name = info.Name?.Trim();
+            _log.Info($"Searching movies by name '{name}' and year '{info.Year}'");
             KpSearchResult<KpFilm> movies = await _api.GetFilmsByNameAndYearAsync(info.Name, info.Year, cancellationToken);
             List<KpFilm> relevantMovies = FilterRelevantItems(movies.Items, info.Name, info.Year);
             if (relevantMovies.Count != 1)
@@ -79,10 +82,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 _log.Error($"Found {relevantMovies.Count} movies, skipping movie update");
                 return result;
             }
+
             KpFilm film = await _api.GetFilmByIdAsync(relevantMovies[0].KinopoiskId.ToString(), cancellationToken);
             await CreateMovieAsync(result, film, cancellationToken);
             return result;
         }
+
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResultsAsync(MovieInfo searchInfo, CancellationToken cancellationToken)
         {
             var result = new List<RemoteSearchResult>();
@@ -103,18 +108,20 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     ImageUrl = imageUrl,
                     SearchProviderName = Plugin.PluginKey,
                     ProductionYear = movie.Year,
-                    Overview = movie.Description,
+                    Overview = movie.Description
                 };
                 item.SetProviderId(Plugin.PluginKey, movie.KinopoiskId.ToString());
                 if (!string.IsNullOrWhiteSpace(movie.ImdbId))
                 {
                     item.SetProviderId(MetadataProviders.Imdb, movie.ImdbId);
                 }
+
                 result.Add(item);
                 _log.Info($"Found a movie with name '{movie.NameRu}' and id {movie.KinopoiskId}");
                 return result;
             }
-            _log.Info($"Movie not found by provider IDs");
+
+            _log.Info("Movie not found by provider IDs or no provider IDs exist");
 
             // no name cleanup - search 'as is', otherwise doesn't work
             _log.Info($"Searching movies by name '{searchInfo.Name}' and year '{searchInfo.Year}'");
@@ -128,15 +135,17 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     ImageUrl = imageUrl,
                     SearchProviderName = Plugin.PluginKey,
                     ProductionYear = m.Year,
-                    Overview = m.Description,
+                    Overview = m.Description
                 };
                 item.SetProviderId(Plugin.PluginKey, m.KinopoiskId.ToString(CultureInfo.InvariantCulture));
                 if (!string.IsNullOrWhiteSpace(m.ImdbId))
                 {
                     item.SetProviderId(MetadataProviders.Imdb, m.ImdbId);
                 }
+
                 result.Add(item);
             }
+
             _log.Info($"By name '{searchInfo.Name}' found {result.Count} movies");
             return result;
         }
@@ -155,19 +164,19 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             }
 
             KpSearchResult<KpVideo> videosList = await _api.GetVideosByFilmIdAsync(movieId, cancellationToken);
-            if (result.HasMetadata && videosList != null && videosList.Items.Count > 0)
+            if (result.HasMetadata && !videosList.HasError && videosList.Items.Count > 0)
             {
                 videosList.Items
-                    .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains(Constants.YOUTUBE))
+                    .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains(Constants.Youtube))
                     .Select(i => i.Url
-                        .Replace(Constants.YOUTUBE_EMBED, Constants.YOUTUBE_WATCH)
-                        .Replace(Constants.YOUTUBE_V, Constants.YOUTUBE_WATCH))
+                        .Replace(Constants.YoutubeEmbed, Constants.YoutubeWatch)
+                        .Replace(Constants.YoutubeV, Constants.YoutubeWatch))
                     .Reverse()
                     .ToList()
                     .ForEach(v => result.Item.AddTrailerUrl(v));
             }
-
         }
+
         private Movie CreateMovieFromKpFilm(KpFilm movie)
         {
             _log.Info($"Movie '{movie.NameRu}' with {Plugin.PluginName} id '{movie.KinopoiskId}' found");
@@ -209,6 +218,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
 
             return toReturn;
         }
+
         #endregion
 
         #region MovieImagesProvider
@@ -234,6 +244,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                         UpdateRemoteImageInfoList(movie, result);
                         return result;
                     }
+
                     _log.Info($"Images by movie id '{movieId}' not found");
                 }
             }
@@ -247,6 +258,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 _log.Error($"Found {relevantMovies.Count} movies, skipping image update");
                 return result;
             }
+
             KpFilm film = await _api.GetFilmByIdAsync(relevantMovies[0].KinopoiskId.ToString(), cancellationToken);
             UpdateRemoteImageInfoList(film, result);
             return result;
@@ -265,6 +277,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     Type = ImageType.Backdrop
                 });
             }
+
             if (!string.IsNullOrWhiteSpace(movie.PosterUrl))
             {
                 result.Add(new RemoteImageInfo
@@ -277,6 +290,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     Type = ImageType.Primary
                 });
             }
+
             if (!string.IsNullOrWhiteSpace(movie.LogoUrl))
             {
                 result.Add(new RemoteImageInfo
@@ -288,11 +302,14 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     Type = ImageType.Logo
                 });
             }
+
             _log.Info($"By movie id '{movie.KinopoiskId}' found '{string.Join(", ", result.Select(i => i.Type).ToList())}' image types");
         }
+
         #endregion
 
         #region SeriesProvider
+
         public async Task<MetadataResult<Series>> GetMetadataAsync(SeriesInfo info, CancellationToken cancellationToken)
         {
             var result = new MetadataResult<Series>
@@ -313,7 +330,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 await CreateSeriesAsync(result, movie, cancellationToken);
                 return result;
             }
-            _log.Info($"Series was not found by provider ID");
+
+            _log.Info("Series was not found by provider ID");
 
             // no name cleanup - search 'as is', otherwise doesn't work
             _log.Info($"Searching series by name '{info.Name}' and year '{info.Year}'");
@@ -324,10 +342,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 _log.Error($"Found {relevantSeries.Count} series, skipping series update");
                 return result;
             }
+
             KpFilm s = await _api.GetFilmByIdAsync(relevantSeries[0].KinopoiskId.ToString(), cancellationToken);
             await CreateSeriesAsync(result, s, cancellationToken);
             return result;
         }
+
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResultsAsync(SeriesInfo searchInfo, CancellationToken cancellationToken)
         {
             var result = new List<RemoteSearchResult>();
@@ -348,18 +368,21 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     ImageUrl = imageUrl,
                     SearchProviderName = Plugin.PluginKey,
                     ProductionYear = series.Year,
-                    Overview = series.Description,
+                    Overview = series.Description
                 };
                 item.SetProviderId(Plugin.PluginKey, series.KinopoiskId.ToString());
                 if (!string.IsNullOrWhiteSpace(series.ImdbId))
                 {
                     item.SetProviderId(MetadataProviders.Imdb, series.ImdbId);
                 }
+
                 result.Add(item);
                 _log.Info($"Found a series with name {series.NameRu} and id {series.KinopoiskId}");
                 return result;
             }
             _log.Info($"Series not found by provider ID");
+
+            _log.Info("Series not found by provider ID");
 
             // no name cleanup - search 'as is', otherwise doesn't work
             _log.Info($"Searching series by name '{searchInfo.Name}' and year '{searchInfo.Year}'");
@@ -373,15 +396,17 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     ImageUrl = imageUrl,
                     SearchProviderName = Plugin.PluginKey,
                     ProductionYear = s.Year,
-                    Overview = s.Description,
+                    Overview = s.Description
                 };
                 item.SetProviderId(Plugin.PluginKey, s.KinopoiskId.ToString(CultureInfo.InvariantCulture));
                 if (!string.IsNullOrWhiteSpace(s.ImdbId))
                 {
                     item.SetProviderId(MetadataProviders.Imdb, s.ImdbId);
                 }
+
                 result.Add(item);
             }
+
             _log.Info($"By name '{searchInfo.Name}' found {result.Count} series");
             return result;
         }
@@ -400,18 +425,19 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             }
 
             KpSearchResult<KpVideo> videosList = await _api.GetVideosByFilmIdAsync(seriesId, cancellationToken);
-            if (result.HasMetadata && videosList != null && videosList.Items.Count > 0)
+            if (result.HasMetadata && !videosList.HasError && videosList.Items.Count > 0)
             {
                 videosList.Items
-                    .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains(Constants.YOUTUBE))
+                    .Where(i => !string.IsNullOrWhiteSpace(i.Url) && i.Url.Contains(Constants.Youtube))
                     .Select(i => i.Url
-                        .Replace(Constants.YOUTUBE_EMBED, Constants.YOUTUBE_WATCH)
-                        .Replace(Constants.YOUTUBE_V, Constants.YOUTUBE_WATCH))
+                        .Replace(Constants.YoutubeEmbed, Constants.YoutubeWatch)
+                        .Replace(Constants.YoutubeV, Constants.YoutubeWatch))
                     .Reverse()
                     .ToList()
                     .ForEach(v => result.Item.AddTrailerUrl(v));
             }
         }
+
         private Series CreateSeriesFromKpFilm(KpFilm series)
         {
             _log.Info($"Series '{series.NameRu}' with {Plugin.PluginName} id '{series.KinopoiskId}' found");
@@ -428,7 +454,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 ProductionLocations = series.Countries?.Select(i => i.Country).ToArray(),
                 ProductionYear = series.Year,
                 SortName = string.IsNullOrWhiteSpace(series.NameRu) ? series.NameOriginal : series.NameRu,
-                Tagline = series.Slogan,
+                Tagline = series.Slogan
             };
 
             toReturn.SetProviderId(Plugin.PluginKey, seriesId);
@@ -453,9 +479,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
 
             return toReturn;
         }
+
         #endregion
 
         #region EpisodeProvider
+
         public async Task<MetadataResult<Episode>> GetMetadataAsync(EpisodeInfo info, CancellationToken cancellationToken)
         {
             var result = new MetadataResult<Episode>
@@ -475,11 +503,13 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 _log.Debug($"SeriesProviderId not exists for {Plugin.PluginName}, checking ProviderId");
                 seriesId = info.GetProviderId(Plugin.PluginKey);
             }
+
             if (string.IsNullOrWhiteSpace(seriesId))
             {
                 _log.Info($"The episode doesn't have series id for {Plugin.PluginName}");
                 return result;
             }
+
             if (info.IndexNumber == null || info.ParentIndexNumber == null)
             {
                 _log.Warn($"Not enough parameters. Season index '{info.ParentIndexNumber}', episode index '{info.IndexNumber}'");
@@ -488,25 +518,28 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
 
             _log.Info($"Searching episode by series id '{seriesId}', season index '{info.ParentIndexNumber}' and episode index '{info.IndexNumber}'");
             KpSearchResult<KpSeason> item = await _api.GetEpisodesBySeriesIdAsync(seriesId, cancellationToken);
-            if (item == null)
+            if (item.HasError)
             {
                 _log.Info($"Episodes by series id '{seriesId}' not found");
                 return result;
             }
+
             KpSeason kpSeason = item.Items.FirstOrDefault(s => s.Number == info.ParentIndexNumber);
             if (kpSeason == null)
             {
                 _log.Info($"Season with index '{info.ParentIndexNumber}' not found");
                 return result;
             }
+
             KpEpisode kpEpisode = kpSeason.Episodes.FirstOrDefault(e =>
                 e.EpisodeNumber == info.IndexNumber
-                    && e.SeasonNumber == info.ParentIndexNumber);
+                && e.SeasonNumber == info.ParentIndexNumber);
             if (kpEpisode == null)
             {
                 _log.Info($"Episode with index '{info.IndexNumber}' not found");
                 return result;
             }
+
             _ = DateTimeOffset.TryParseExact(
                 kpEpisode.ReleaseDate,
                 "yyyy-MM-dd",
@@ -520,12 +553,13 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 Overview = kpEpisode.Synopsis,
                 IndexNumber = info.IndexNumber,
                 ParentIndexNumber = info.ParentIndexNumber,
-                PremiereDate = premiereDate,
+                PremiereDate = premiereDate
             };
             result.HasMetadata = true;
             _log.Info($"Episode {info.IndexNumber} of season {info.ParentIndexNumber} of series {seriesId} updated");
             return result;
         }
+
         public Task<IEnumerable<RemoteSearchResult>> GetSearchResultsAsync(EpisodeInfo searchInfo, CancellationToken cancellationToken)
         {
             _log.Info("KinopoiskUnofficial unable to search episodes");
@@ -535,6 +569,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         #endregion
 
         #region PersonProvider
+
         public async Task<MetadataResult<Person>> GetMetadataAsync(PersonLookupInfo info, CancellationToken cancellationToken)
         {
             var result = new MetadataResult<Person>
@@ -558,22 +593,31 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     result.HasMetadata = true;
                     return result;
                 }
+
                 _log.Info($"Person by person id '{personId}' not found");
             }
 
             _log.Info($"Searching person by name '{info.Name}'");
             KpSearchResult<KpStaff> persons = await _api.GetPersonsByNameAsync(info.Name, cancellationToken);
+            if (persons.HasError)
+            {
+                _log.Info($"Error searching person by name '{info.Name}'. Nothing found");
+                return result;
+            }
+
             persons.Items = FilterPersonsByName(info.Name, persons.Items);
             if (persons.Items.Count != 1)
             {
                 _log.Error($"Found {persons.Items.Count} persons, skipping person update");
                 return result;
             }
+
             KpPerson p = await _api.GetPersonByIdAsync(persons.Items[0].KinopoiskId.ToString(), cancellationToken);
             result.Item = CreatePersonFromKpPerson(p);
             result.HasMetadata = true;
             return result;
         }
+
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResultsAsync(PersonLookupInfo searchInfo, CancellationToken cancellationToken)
         {
             var result = new List<RemoteSearchResult>();
@@ -600,11 +644,18 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     result.Add(item);
                     return result;
                 }
+
                 _log.Info($"Person by id '{personId}' not found");
             }
 
             _log.Info($"Searching persons by name '{searchInfo.Name}'");
             KpSearchResult<KpStaff> persons = await _api.GetPersonsByNameAsync(searchInfo.Name, cancellationToken);
+            if (persons.HasError)
+            {
+                _log.Info($"Error searching person by name '{searchInfo.Name}'. Nothing found");
+                return result;
+            }
+
             foreach (KpStaff person in persons.Items)
             {
                 var item = new RemoteSearchResult
@@ -616,6 +667,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 item.SetProviderId(Plugin.PluginKey, person.KinopoiskId.ToString(CultureInfo.InvariantCulture));
                 result.Add(item);
             }
+
             _log.Info($"By name '{searchInfo.Name}' found {result.Count} persons");
             return result;
         }
@@ -630,31 +682,39 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 SortName = person.NameRu,
                 OriginalTitle = person.NameEn,
                 ProviderIds = new ProviderIdDictionary(
-                    new Dictionary<string, string> { { Plugin.PluginKey, person.PersonId.ToString() } })
+                    new Dictionary<string, string>
+                    {
+                        { Plugin.PluginKey, person.PersonId.ToString() }
+                    })
             };
             if (DateTimeOffset.TryParse(person.Birthday, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTimeOffset birthDay))
             {
                 toReturn.PremiereDate = birthDay;
             }
+
             if (DateTimeOffset.TryParse(person.Death, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTimeOffset deathDay))
             {
                 toReturn.EndDate = deathDay;
             }
+
             if (!string.IsNullOrWhiteSpace(person.BirthPlace))
             {
                 toReturn.ProductionLocations = new[] { person.BirthPlace };
             }
+
             var facts = person.Facts?.ToArray();
             if (facts?.Length > 0)
             {
                 toReturn.Overview = string.Join("\n", facts);
             }
+
             return toReturn;
         }
 
         #endregion
 
         #region Common
+
         private void UpdatePersonsList<T>(MetadataResult<T> result, List<KpFilmStaff> staffList, string movieName)
             where T : BaseItem
         {
@@ -678,13 +738,14 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                         Name = name,
                         ImageUrl = staff.PosterUrl,
                         Type = (PersonType)personType,
-                        Role = staff.Description,
+                        Role = staff.Description
                     };
                     person.SetProviderId(Plugin.PluginKey, staff.StaffId.ToString(CultureInfo.InvariantCulture));
 
                     result.AddPerson(person);
                 }
             }
+
             _log.Info($"Added {result.People.Count} persons to the movie with id '{result.Item.GetProviderId(Plugin.PluginKey)}'");
         }
         private List<KpFilm> FilterRelevantItems(List<KpFilm> list, string name, int? year)
@@ -692,7 +753,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             _log.Info("Filtering out irrelevant items");
             if (list.Count > 1)
             {
-                var toReturn = list
+                IEnumerable<KpFilm> toReturn = list
                     .Where(m => (!string.IsNullOrWhiteSpace(name)
                         && (KpHelper.CleanName(m.NameRu) == KpHelper.CleanName(name)))
                             || KpHelper.CleanName(m.NameOriginal) == KpHelper.CleanName(name))
@@ -744,6 +805,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 return await _api.GetFilmByIdAsync(kpSearchResult.Items[0].KinopoiskId.ToString(), cancellationToken);
             }
 
+            _log.Info($"Nothing was found by IMDB '{imdbMovieId}'. Skip search by IMDB ID");
             return null;
         }
 

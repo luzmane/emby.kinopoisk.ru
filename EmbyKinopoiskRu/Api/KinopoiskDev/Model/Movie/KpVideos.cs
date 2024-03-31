@@ -7,5 +7,4 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
         public List<KpVideo> Trailers { get; set; } = new List<KpVideo>();
         public List<KpVideo> Teasers { get; set; } = new List<KpVideo>();
     }
-
 }

@@ -53,8 +53,8 @@ namespace EmbyKinopoiskRu.Provider.RemoteMetadata
         public async Task<IEnumerable<RemoteSearchResult>> GetSearchResults(EpisodeInfo searchInfo, CancellationToken cancellationToken)
         {
             _log.Info($"GetSearchResults by EpisodeInfo:[Name='{searchInfo.Name}', Year='{searchInfo.Year}', " +
-                    $"IndexNumber='{searchInfo.IndexNumber}', ParentIndexNumber='{searchInfo.ParentIndexNumber}', " +
-                    $"ProviderIds='{string.Join(",", searchInfo.ProviderIds.Select(x => x.Key))}', ProviderIds='{string.Join(",", searchInfo.SeriesProviderIds.Select(x => x.Key))}']");
+                      $"IndexNumber='{searchInfo.IndexNumber}', ParentIndexNumber='{searchInfo.ParentIndexNumber}', " +
+                      $"ProviderIds='{string.Join(",", searchInfo.ProviderIds.Select(x => x.Key))}', ProviderIds='{string.Join(",", searchInfo.SeriesProviderIds.Select(x => x.Key))}']");
             return await Plugin.Instance.GetKinopoiskService().GetSearchResultsAsync(searchInfo, cancellationToken);
         }
     }

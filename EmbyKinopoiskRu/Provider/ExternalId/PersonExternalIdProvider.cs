@@ -5,7 +5,7 @@ using MediaBrowser.Model.Entities;
 namespace EmbyKinopoiskRu.Provider.ExternalId
 {
     /// <summary>
-    /// Add link on kinopoisk page to metadate of the Person
+    /// Add link on kinopoisk page to metadata of the Person
     /// </summary>
     public class PersonExternalIdProvider : IExternalId
     {

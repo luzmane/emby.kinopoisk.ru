@@ -1,7 +1,6 @@
 using System.Net;
 
 using EmbyKinopoiskRu.Api.KinopoiskDev;
-
 using EmbyKinopoiskRu.Configuration;
 using EmbyKinopoiskRu.Provider.RemoteMetadata;
 
@@ -24,6 +23,7 @@ public class KpSeriesProviderTest : BaseTest
 
 
     #region Test configs
+
     public KpSeriesProviderTest() : base(Logger)
     {
         _pluginConfiguration.Token = GetKinopoiskDevToken();
@@ -32,7 +32,7 @@ public class KpSeriesProviderTest : BaseTest
 
         ConfigXmlSerializer();
 
-        _kpSeriesProvider = new(_httpClient, _logManager.Object);
+        _kpSeriesProvider = new KpSeriesProvider(_httpClient, _logManager.Object);
     }
 
     #endregion
@@ -65,7 +65,10 @@ public class KpSeriesProviderTest : BaseTest
 
         var seriesInfo = new SeriesInfo
         {
-            ProviderIds = new(new() { { Plugin.PluginKey, "502838" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { Plugin.PluginKey, "502838" }
+            })
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Series> result = await _kpSeriesProvider.GetMetadata(seriesInfo, cancellationTokenSource.Token);
@@ -96,7 +99,10 @@ public class KpSeriesProviderTest : BaseTest
 
         var seriesInfo = new SeriesInfo
         {
-            ProviderIds = new(new() { { MetadataProviders.Imdb.ToString(), "tt1475582" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { MetadataProviders.Imdb.ToString(), "tt1475582" }
+            })
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Series> result = await _kpSeriesProvider.GetMetadata(seriesInfo, cancellationTokenSource.Token);
@@ -127,7 +133,10 @@ public class KpSeriesProviderTest : BaseTest
 
         var seriesInfo = new SeriesInfo
         {
-            ProviderIds = new(new() { { MetadataProviders.Tmdb.ToString(), "19885" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { MetadataProviders.Tmdb.ToString(), "19885" }
+            })
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Series> result = await _kpSeriesProvider.GetMetadata(seriesInfo, cancellationTokenSource.Token);
@@ -190,7 +199,10 @@ public class KpSeriesProviderTest : BaseTest
 
         var seriesInfo = new SeriesInfo
         {
-            ProviderIds = new(new() { { Plugin.PluginKey, "502838" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { Plugin.PluginKey, "502838" }
+            })
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         IEnumerable<RemoteSearchResult> result = await _kpSeriesProvider.GetSearchResults(seriesInfo, cancellationTokenSource.Token);
@@ -216,7 +228,10 @@ public class KpSeriesProviderTest : BaseTest
 
         var seriesInfo = new SeriesInfo
         {
-            ProviderIds = new(new() { { MetadataProviders.Imdb.ToString(), "tt1475582" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { MetadataProviders.Imdb.ToString(), "tt1475582" }
+            })
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         IEnumerable<RemoteSearchResult> result = await _kpSeriesProvider.GetSearchResults(seriesInfo, cancellationTokenSource.Token);
@@ -247,7 +262,7 @@ public class KpSeriesProviderTest : BaseTest
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         IEnumerable<RemoteSearchResult> result = await _kpSeriesProvider.GetSearchResults(seriesInfo, cancellationTokenSource.Token);
-        result.Should().HaveCountLessThanOrEqualTo(KinopoiskDevApi.API_RESPONSE_LIMIT);
+        result.Should().HaveCountLessThanOrEqualTo(KinopoiskDevApi.ApiResponseLimit);
         VerifyRemoteSearchResult502838(result.First(x => x.ProviderIds[Plugin.PluginKey] == "502838"));
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
@@ -257,5 +272,4 @@ public class KpSeriesProviderTest : BaseTest
 
         Logger.Info($"Finished '{nameof(KpSeriesProvider_GetSearchResults_NameAndYear)}'");
     }
-
 }

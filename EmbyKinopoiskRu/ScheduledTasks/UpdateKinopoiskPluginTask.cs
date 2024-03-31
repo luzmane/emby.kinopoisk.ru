@@ -23,9 +23,9 @@ namespace EmbyKinopoiskRu.ScheduledTasks
     /// <inheritdoc />
     public class UpdateKinopoiskPluginTask : IScheduledTask, IConfigurableScheduledTask
     {
-        private static readonly Regex Version = new Regex(".*(?<version>\\d+\\.\\d+\\.\\d+).*", RegexOptions.Compiled);
+        private static readonly Regex Version = new Regex(@".*(?<version>\d+\.\d+\.\d+).*", RegexOptions.Compiled);
 
-        private const string DLL_NAME = "EmbyKinopoiskRu.dll";
+        private const string DllName = "EmbyKinopoiskRu.dll";
 
         /// <inheritdoc />
         public bool IsHidden => false;
@@ -65,11 +65,11 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         /// <param name="installationManager">Instance of the <see cref="IInstallationManager"/> interface.</param>
         /// <param name="serverConfigurationManager">Instance of the <see cref="IServerConfigurationManager"/> interface.</param>
         public UpdateKinopoiskPluginTask(
-                 IHttpClient httpClient,
-                 IJsonSerializer jsonSerializer,
-                 ILogManager logManager,
-                 IInstallationManager installationManager,
-                 IServerConfigurationManager serverConfigurationManager)
+            IHttpClient httpClient,
+            IJsonSerializer jsonSerializer,
+            ILogManager logManager,
+            IInstallationManager installationManager,
+            IServerConfigurationManager serverConfigurationManager)
         {
             _httpClient = httpClient;
             _jsonSerializer = jsonSerializer;
@@ -125,13 +125,13 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                     description = release.body,
                     requiredVersionStr = "4.7.9",
                     sourceUrl = release.assets[0].browser_download_url,
-                    targetFilename = DLL_NAME,
+                    targetFilename = DllName,
                     infoUrl = release.html_url,
                     runtimes = "netcore"
                 };
                 try
                 {
-                    await _installationManager.InstallPackage(package, isPlugin: true, new SimpleProgress<double>(), cancellationToken).ConfigureAwait(continueOnCapturedContext: false);
+                    await _installationManager.InstallPackage(package, true, new SimpleProgress<double>(), cancellationToken).ConfigureAwait(false);
                     _logger.Info("Plugin installed successfully");
                     progress.Report(100d);
                 }
@@ -139,7 +139,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {
-                        _logger.Info("Cancelation was requested");
+                        _logger.Info("Cancellation was requested");
                         throw;
                     }
                 }
@@ -164,7 +164,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 CacheLength = TimeSpan.FromHours(12),
                 CacheMode = CacheMode.Unconditional,
                 TimeoutMs = 180000,
-                EnableDefaultUserAgent = true,
+                EnableDefaultUserAgent = true
             };
             using (var reader = new StreamReader((await _httpClient.GetResponse(options)).Content))
             {
@@ -174,10 +174,12 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 return gitResponse;
             }
         }
+
         private TaskTranslation GetTranslation()
         {
             return EmbyHelper.GetTaskTranslation(_translations, _serverConfigurationManager, _jsonSerializer, _availableTranslations);
         }
+
         private string PrepareTagName(string tagName)
         {
             Match match = Version.Match(tagName);
@@ -187,11 +189,9 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 _logger.Info("Converting tag '{0}' to '{1}'", tagName, version);
                 return version;
             }
-            else
-            {
-                _logger.Info("Unable to parse tag: '{0}'", tagName);
-                return string.Empty;
-            }
+
+            _logger.Info("Unable to parse tag: '{0}'", tagName);
+            return string.Empty;
         }
     }
 }

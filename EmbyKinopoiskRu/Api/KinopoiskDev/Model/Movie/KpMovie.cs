@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
 {
-    [DebuggerDisplay("{DebuggerDisplay,nq}")]
+    [DebuggerDisplay("#{Id}, {Name}")]
     internal sealed class KpMovie
     {
         public string AlternativeName { get; set; }
@@ -31,9 +31,5 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie
         public KpMovieType? TypeNumber { get; set; }
         public KpVideos Videos { get; set; }
         public int? Year { get; set; }
-
-
-        private string DebuggerDisplay => $"#{Id}, {Name}";
-
     }
 }

@@ -14,6 +14,5 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev.Model.Person
         public string Name { get; set; }
         public string EnName { get; set; }
         public string Photo { get; set; }
-
     }
 }

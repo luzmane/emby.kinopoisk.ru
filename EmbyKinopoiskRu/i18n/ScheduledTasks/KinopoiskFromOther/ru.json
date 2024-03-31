@@ -1,5 +1,5 @@
 {
-    "Name": "Добавить ID Кинопоиска по ключам IMDB, TMDB",
-    "Description": "Добавить ID Кинопоиска, ища через API по ID IMDB и TMDB. Поддерживает только kinopoisk.dev",
-    "Category": "Плагин Кинопоиска"
+  "Name": "Добавить ID Кинопоиска по ключам IMDB, TMDB",
+  "Description": "Добавить ID Кинопоиска, ища через API по ID IMDB и TMDB. Поддерживает только kinopoisk.dev",
+  "Category": "Плагин Кинопоиска"
 }

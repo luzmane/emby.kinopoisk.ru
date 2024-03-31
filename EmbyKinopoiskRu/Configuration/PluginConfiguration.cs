@@ -37,14 +37,8 @@ namespace EmbyKinopoiskRu.Configuration
         /// </summary>
         public string Collections
         {
-            get
-            {
-                return Plugin.Instance.JsonSerializer.SerializeToString(CollectionsList);
-            }
-            set
-            {
-                SetCollection(value);
-            }
+            get => Plugin.Instance.JsonSerializer.SerializeToString(CollectionsList);
+            set => SetCollection(value);
         }
 
         internal List<CollectionItem> CollectionsList = new List<CollectionItem>();
@@ -75,23 +69,19 @@ namespace EmbyKinopoiskRu.Configuration
             CollectionsList = Plugin.Instance.JsonSerializer.DeserializeFromString<List<CollectionItem>>(value)
                               ?? new List<CollectionItem>();
 
-            var fetchTask = Plugin.Instance.GetKinopoiskService().GetKpCollectionsAsync();
+            Task<List<KpLists>> fetchTask = Plugin.Instance.GetKinopoiskService().GetKpCollectionsAsync();
             if (fetchTask.Wait(TimeSpan.FromSeconds(10)))
             {
-                var fetchedCollections = fetchTask.Result
-                    .Select(x => new CollectionItem
-                    {
-                        Category = x.Category,
-                        Id = x.Slug,
-                        IsEnable = false,
-                        Name = x.Name,
-                        MovieCount = x.MoviesCount
-                    })
-                    .ToList();
-
-                CollectionsList = CollectionsList
-                    .Union(fetchedCollections)
-                    .Where(x => fetchedCollections.Contains(x))
+                CollectionsList = (from i in fetchTask.Result
+                        from j in CollectionsList.Where(j => j.Id == i.Slug).DefaultIfEmpty()
+                        select new CollectionItem
+                        {
+                            Id = i.Slug,
+                            Category = i.Category,
+                            Name = i.Name,
+                            IsEnable = j?.IsEnable ?? false,
+                            MovieCount = (j?.MovieCount ?? 0) == 0 ? i.MoviesCount : j.MovieCount
+                        })
                     .ToList();
             }
 

@@ -44,7 +44,10 @@ public class KpImageProviderTest : BaseTest
             Name = "Побег из Шоушенка",
             OriginalTitle = "The Shawshank Redemption",
             ProductionYear = 1994,
-            ProviderIds = new(new() { { Plugin.PluginKey, "326" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { Plugin.PluginKey, "326" }
+            })
         };
         LibraryOptions options = new();
 
@@ -96,7 +99,7 @@ public class KpImageProviderTest : BaseTest
         Movie item = new()
         {
             Name = string.Empty,
-            OriginalTitle = "The Shawshank Redemption",
+            OriginalTitle = "The Shawshank Redemption"
         };
         LibraryOptions options = new();
 
@@ -149,7 +152,7 @@ public class KpImageProviderTest : BaseTest
         {
             Name = string.Empty,
             OriginalTitle = "The Shawshank Redemption",
-            ProductionYear = 1994,
+            ProductionYear = 1994
         };
         LibraryOptions options = new();
 
@@ -201,7 +204,7 @@ public class KpImageProviderTest : BaseTest
         Movie item = new()
         {
             Name = string.Empty,
-            OriginalTitle = "Shawshank Redemption",
+            OriginalTitle = "Shawshank Redemption"
         };
         LibraryOptions options = new();
 
@@ -242,5 +245,4 @@ public class KpImageProviderTest : BaseTest
 
         Logger.Info($"Finished '{nameof(KpImageProviderTest_ForCodeCoverage)}'");
     }
-
 }

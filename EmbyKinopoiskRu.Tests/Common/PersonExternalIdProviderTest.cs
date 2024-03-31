@@ -29,5 +29,4 @@ public class PersonExternalIdProviderTest
 
         _logger.Info($"Finished '{nameof(PersonExternalIdProvider_ForCodeCoverage)}'");
     }
-
 }

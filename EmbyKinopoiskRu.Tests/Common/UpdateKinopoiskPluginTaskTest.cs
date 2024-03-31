@@ -26,15 +26,17 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
 
 
     #region Test configs
+
     public UpdateKinopoiskPluginTaskTest() : base(Logger)
     {
-        _updateKinopoiskPluginTask = new(
+        _updateKinopoiskPluginTask = new UpdateKinopoiskPluginTask(
             _httpClient,
             _jsonSerializer,
             _logManager.Object,
             _installationManager.Object,
             _serverConfigurationManager.Object);
     }
+
     #endregion
 
     [Fact]
@@ -63,7 +65,10 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
-            .Returns(new ServerConfiguration { UICulture = "ru" });
+            .Returns(new ServerConfiguration
+            {
+                UICulture = "ru"
+            });
 
         _updateKinopoiskPluginTask.Name.Should().Be("Обновить плагин Кинопоиска");
         _updateKinopoiskPluginTask.Description.Should().Be("Скачать и установить новую версию плагина Кинопоиска с GitHub");
@@ -84,7 +89,10 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
-            .Returns(new ServerConfiguration { UICulture = "en-us" });
+            .Returns(new ServerConfiguration
+            {
+                UICulture = "en-us"
+            });
 
         _updateKinopoiskPluginTask.Name.Should().Be("Update Kinopoisk Plugin");
         _updateKinopoiskPluginTask.Description.Should().Be("Update Kinopoisk Plugin from GitHub");
@@ -105,7 +113,10 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
-            .Returns(new ServerConfiguration { UICulture = "uk" });
+            .Returns(new ServerConfiguration
+            {
+                UICulture = "uk"
+            });
 
         _updateKinopoiskPluginTask.Name.Should().Be("Оновити плагін Кінопошуку");
         _updateKinopoiskPluginTask.Description.Should().Be("Завантажити та встановити нову версію плагіна Кінопошуку з GitHub");
@@ -126,7 +137,10 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
-            .Returns(new ServerConfiguration { UICulture = "bg" });
+            .Returns(new ServerConfiguration
+            {
+                UICulture = "bg"
+            });
 
         _updateKinopoiskPluginTask.Name.Should().Be("Update Kinopoisk Plugin");
         _updateKinopoiskPluginTask.Description.Should().Be("Update Kinopoisk Plugin from GitHub");
@@ -148,11 +162,9 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
         Version version = typeof(UpdateKinopoiskPluginTask).Assembly.GetName().Version ?? throw new Exception("Unable to get dll version");
         var currentVersion = $"{version.Major}.{version.Minor}.{version.Build}";
 
-        using HttpResponseInfo response = new()
-        {
-            Content = new MemoryStream(Encoding.UTF8.GetBytes(/*lang=json,strict*/ $"{{\"html_url\":\"https://\",\"tag_name\":\"{currentVersion}\",\"assets\":[{{\"name\":\"EmbyKinopoiskRu.dll\",\"content_type\":\"program\",\"browser_download_url\":\"https://\"}}],\"body\":\"description\"}}")),
-            StatusCode = HttpStatusCode.OK
-        };
+        using HttpResponseInfo response = new();
+        response.Content = new MemoryStream(Encoding.UTF8.GetBytes( /*lang=json,strict*/ $"{{\"html_url\":\"https://\",\"tag_name\":\"{currentVersion}\",\"assets\":[{{\"name\":\"EmbyKinopoiskRu.dll\",\"content_type\":\"program\",\"browser_download_url\":\"https://\"}}],\"body\":\"description\"}}"));
+        response.StatusCode = HttpStatusCode.OK;
         _httpClient.ReturnResponse = response;
 
         using var cancellationTokenSource = new CancellationTokenSource();
@@ -169,11 +181,9 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
     {
         Logger.Info($"Start '{nameof(UpdateKinopoiskPluginTask_Execute_Updated_OldTag)}'");
 
-        using HttpResponseInfo response = new()
-        {
-            Content = new MemoryStream(Encoding.UTF8.GetBytes(/*lang=json,strict*/ "{\"html_url\":\"https://\",\"tag_name\":\"1.0.0\",\"assets\":[{\"name\":\"EmbyKinopoiskRu.dll\",\"content_type\":\"program\",\"browser_download_url\":\"https://\"}],\"body\":\"description\"}")),
-            StatusCode = HttpStatusCode.OK
-        };
+        using HttpResponseInfo response = new();
+        response.Content = new MemoryStream(Encoding.UTF8.GetBytes( /*lang=json,strict*/ "{\"html_url\":\"https://\",\"tag_name\":\"1.0.0\",\"assets\":[{\"name\":\"EmbyKinopoiskRu.dll\",\"content_type\":\"program\",\"browser_download_url\":\"https://\"}],\"body\":\"description\"}"));
+        response.StatusCode = HttpStatusCode.OK;
         _httpClient.ReturnResponse = response;
 
         using var cancellationTokenSource = new CancellationTokenSource();
@@ -192,16 +202,15 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
 
         Logger.Info($"Finished '{nameof(UpdateKinopoiskPluginTask_Execute_Updated_OldTag)}'");
     }
+
     [Fact]
     public async void UpdateKinopoiskPluginTask_Execute_Updated_NewTag()
     {
         Logger.Info($"Start '{nameof(UpdateKinopoiskPluginTask_Execute_Updated_NewTag)}'");
 
-        using HttpResponseInfo response = new()
-        {
-            Content = new MemoryStream(Encoding.UTF8.GetBytes(/*lang=json,strict*/ "{\"html_url\":\"https://\",\"tag_name\":\"v.1.0.0\",\"assets\":[{\"name\":\"EmbyKinopoiskRu.dll\",\"content_type\":\"program\",\"browser_download_url\":\"https://\"}],\"body\":\"description\"}")),
-            StatusCode = HttpStatusCode.OK
-        };
+        using HttpResponseInfo response = new();
+        response.Content = new MemoryStream(Encoding.UTF8.GetBytes( /*lang=json,strict*/ "{\"html_url\":\"https://\",\"tag_name\":\"v.1.0.0\",\"assets\":[{\"name\":\"EmbyKinopoiskRu.dll\",\"content_type\":\"program\",\"browser_download_url\":\"https://\"}],\"body\":\"description\"}"));
+        response.StatusCode = HttpStatusCode.OK;
         _httpClient.ReturnResponse = response;
 
         using var cancellationTokenSource = new CancellationTokenSource();

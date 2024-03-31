@@ -33,7 +33,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         private readonly IActivityManager _activityManager;
 
         internal KinopoiskDevApi(
-              ILogManager logManager
+            ILogManager logManager
             , IHttpClient httpClient
             , IJsonSerializer jsonSerializer
             , IActivityManager activityManager)
@@ -49,6 +49,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             var json = await SendRequestAsync($"https://api.kinopoisk.dev/v1.4/movie/{movieId}", cancellationToken);
             return _jsonSerializer.DeserializeFromString<KpMovie>(json);
         }
+
         internal async Task<KpSearchResult<KpMovie>> GetMoviesByIdsAsync(IEnumerable<string> movieIdList, CancellationToken cancellationToken)
         {
             if (!movieIdList.Any())
@@ -56,26 +57,29 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 _log.Info("GetMoviesByIds - received empty id's list");
                 return new KpSearchResult<KpMovie>();
             }
-            var url = new StringBuilder($"https://api.kinopoisk.dev/v1.4/movie?limit={API_RESPONSE_LIMIT}")
+
+            var url = new StringBuilder($"https://api.kinopoisk.dev/v1.4/movie?limit={ApiResponseLimit}")
                 .Append($"&id={string.Join("&id=", movieIdList)}")
                 .Append($"&selectFields={string.Join("&selectFields=", MoviePropertiesList)}")
                 .ToString();
             var json = await SendRequestAsync(url, cancellationToken);
             return _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
         }
+
         internal async Task<KpSearchResult<KpMovie>> GetMoviesByMovieDetailsAsync(string name, int? year, CancellationToken cancellationToken)
         {
             return await GetMoviesByMovieDetailsAsync(name, name, year, cancellationToken);
         }
+
         internal async Task<KpSearchResult<KpMovie>> GetMoviesByMovieDetailsAsync(string name, string alternativeName, int? year, CancellationToken cancellationToken)
         {
-            string url = $"https://api.kinopoisk.dev/v1.4/movie/search?limit={API_RESPONSE_LIMIT}";
+            var url = $"https://api.kinopoisk.dev/v1.4/movie/search?limit={ApiResponseLimit}";
             if (!string.IsNullOrWhiteSpace(name))
             {
                 var query = KpHelper.MultiWhitespace.Replace($"&query={name} {year}", "");
                 var request = url + query;
                 var json = await SendRequestAsync(request, cancellationToken);
-                KpSearchResult<KpMovie> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
+                var toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
                 if (toReturn != null && toReturn.Docs.Count > 0)
                 {
                     _log.Info($"Found {toReturn.Docs.Count} items for name '{name}' year '{year}'");
@@ -88,7 +92,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 var query = KpHelper.MultiWhitespace.Replace($"&query={alternativeName} {year}", "");
                 var request = url + query;
                 var json = await SendRequestAsync(request, cancellationToken);
-                KpSearchResult<KpMovie> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
+                var toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
                 if (toReturn != null)
                 {
                     _log.Info($"Found {toReturn.Docs.Count} items for alternativeName '{alternativeName}' year '{year}'");
@@ -99,6 +103,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             _log.Info($"Nothing found for name '{name}' alternativeName '{alternativeName}' year '{year}'");
             return new KpSearchResult<KpMovie>();
         }
+
         internal async Task<KpSearchResult<KpMovie>> GetCollectionItemsAsync(string collectionId, int page, CancellationToken cancellationToken)
         {
             var request = new StringBuilder($"https://api.kinopoisk.dev/v1.4/movie?limit=250&page={page}&lists={collectionId}")
@@ -107,7 +112,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             var json = await SendRequestAsync(request, cancellationToken);
             var hasError = json.Length == 0;
             return hasError
-                ? new KpSearchResult<KpMovie> { HasError = true }
+                ? new KpSearchResult<KpMovie>
+                {
+                    HasError = true
+                }
                 : _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
         }
 
@@ -116,22 +124,24 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             var json = await SendRequestAsync($"https://api.kinopoisk.dev/v1.4/person/{personId}", cancellationToken);
             return _jsonSerializer.DeserializeFromString<KpPerson>(json);
         }
+
         internal async Task<KpSearchResult<KpPerson>> GetPersonsByNameAsync(string name, CancellationToken cancellationToken)
         {
-            var url = $"https://api.kinopoisk.dev/v1.4/person/search?limit={API_RESPONSE_LIMIT}&query={name}";
+            var url = $"https://api.kinopoisk.dev/v1.4/person/search?limit={ApiResponseLimit}&query={name}";
             var json = await SendRequestAsync(url, cancellationToken);
-            KpSearchResult<KpPerson> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpPerson>>(json);
-            if (toReturn != null)
+            var toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpPerson>>(json);
+            if (toReturn == null)
             {
-                _log.Info($"Found {toReturn.Docs.Count} persons by '{name}'");
-                return toReturn;
+                return new KpSearchResult<KpPerson>();
             }
-            return new KpSearchResult<KpPerson>();
+
+            _log.Info($"Found {toReturn.Docs.Count} persons by '{name}'");
+            return toReturn;
         }
 
         internal async Task<KpSearchResult<KpSeason>> GetSeasonBySeriesIdAsync(string seriesId, int parentIndexNumber, CancellationToken cancellationToken)
         {
-            var url = new StringBuilder($"https://api.kinopoisk.dev/v1.4/season?limit={API_RESPONSE_LIMIT}")
+            var url = new StringBuilder($"https://api.kinopoisk.dev/v1.4/season?limit={ApiResponseLimit}")
                 .Append($"&selectFields={string.Join("&selectFields=", FullSeasonPropertiesList)}")
                 .Append($"&movieId={seriesId}&number={parentIndexNumber}")
                 .ToString();
@@ -146,25 +156,33 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 _log.Info("Received ids list is empty");
                 return new KpSearchResult<KpMovie>();
             }
+
             externalIdType = externalIdType.ToLowerInvariant();
-            var request = $"https://api.kinopoisk.dev/v1.4/movie?limit={API_RESPONSE_LIMIT}";
-            request += $"&selectFields=externalId&selectFields=id";
-            var delimeter = $"&externalId.{externalIdType}=";
-            request += $"{delimeter}{string.Join(delimeter, idList)}";
+            var request = $"https://api.kinopoisk.dev/v1.4/movie?limit={ApiResponseLimit}";
+            request += "&selectFields=externalId&selectFields=id";
+            var delimiter = $"&externalId.{externalIdType}=";
+            request += $"{delimiter}{string.Join(delimiter, idList)}";
             var json = await SendRequestAsync(request, cancellationToken);
             var hasError = json.Length == 0;
             return hasError
-                ? new KpSearchResult<KpMovie> { HasError = true }
+                ? new KpSearchResult<KpMovie>
+                {
+                    HasError = true
+                }
                 : _jsonSerializer.DeserializeFromString<KpSearchResult<KpMovie>>(json);
         }
+
         internal async Task<KpSearchResult<KpLists>> GetKpCollectionsAsync(CancellationToken cancellationToken)
         {
-            var request = $"https://api.kinopoisk.dev/v1.4/list?limit=100";
+            var request = "https://api.kinopoisk.dev/v1.4/list?limit=100";
             request += "&selectFields=name&selectFields=slug&selectFields=moviesCount&selectFields=cover&selectFields=category";
             var json = await SendRequestAsync(request, cancellationToken);
             var hasError = json.Length == 0;
             return hasError
-                ? new KpSearchResult<KpLists> { HasError = true }
+                ? new KpSearchResult<KpLists>
+                {
+                    HasError = true
+                }
                 : _jsonSerializer.DeserializeFromString<KpSearchResult<KpLists>>(json);
         }
 
@@ -177,6 +195,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 _log.Error("The token is empty. Skip request");
                 return string.Empty;
             }
+
             var options = new HttpRequestOptions
             {
                 CancellationToken = cancellationToken,
@@ -187,7 +206,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 TimeoutMs = 180000,
                 DecompressionMethod = CompressionMethod.Gzip,
                 EnableHttpCompression = true,
-                EnableDefaultUserAgent = true,
+                EnableDefaultUserAgent = true
             };
             options.RequestHeaders.Add("X-API-KEY", token);
             options.RequestHeaders.Add("accept", "application/json");
@@ -205,7 +224,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                                 _log.Info($"Received response: '{result}'");
                                 return result;
                             case 400:
-                                KpErrorResponse error = _jsonSerializer.DeserializeFromString<KpErrorResponse>(result);
+                                var error = _jsonSerializer.DeserializeFromString<KpErrorResponse>(result);
                                 var msg = $"{error.Error}: {error.Message.FirstOrDefault()}";
                                 _log.Error(msg);
                                 AddToActivityLog(msg, $"{error.Error}");
@@ -246,6 +265,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                         _log.Error($"Received '{ex.StatusCode}' from API: Message-'{ex.Message}'", ex);
                         break;
                 }
+
                 return string.Empty;
             }
             catch (Exception ex)

@@ -13,8 +13,8 @@ namespace EmbyKinopoiskRu.Helper
         public int GetHashCode(KeyValuePair<string, long> obj)
         {
             return obj.Key == null
-            ? 0
-            : obj.Key.GetHashCode();
+                ? 0
+                : obj.Key.GetHashCode();
         }
     }
 }
