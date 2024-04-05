@@ -36,10 +36,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             ILogManager logManager
             , IHttpClient httpClient
             , IJsonSerializer jsonSerializer
-            , IActivityManager activityManager)
+            , IActivityManager activityManager
+            , INotificationManager notificationManager)
         {
             _log = logManager.GetLogger(GetType().Name);
-            _api = new KinopoiskUnofficialApi(logManager, httpClient, jsonSerializer, activityManager);
+            _api = new KinopoiskUnofficialApi(logManager, httpClient, jsonSerializer, activityManager, notificationManager);
             if (Plugin.Instance == null)
             {
                 throw new NullReferenceException($"Plugin '{Plugin.PluginName}' instance is null");

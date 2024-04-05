@@ -6,6 +6,8 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Emby.Notifications;
+
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Person;
@@ -13,6 +15,7 @@ using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Season;
 using EmbyKinopoiskRu.Helper;
 
 using MediaBrowser.Common.Net;
+using MediaBrowser.Controller.Notifications;
 using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Net;
@@ -22,26 +25,67 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 {
     internal class KinopoiskDevApi
     {
-        internal const int API_RESPONSE_LIMIT = 20;
-        private static readonly IList<string> FullSeasonPropertiesList = new List<string> { "airDate", "description", "episodes", "episodesCount", "movieId", "name", "number", "poster" }.AsReadOnly();
-        private static readonly IList<string> MoviePropertiesList = new List<string> { "alternativeName", "backdrop", "countries", "description", "enName", "externalId", "genres", "id", "logo", "movieLength", "name", "persons", "poster", "premiere", "rating", "ratingMpaa", "slogan", "videos", "year", "sequelsAndPrequels", "top250", "facts", "releaseYears", "seasonsInfo" }.AsReadOnly();
+        internal const int ApiResponseLimit = 20;
+
+        private static readonly IList<string> FullSeasonPropertiesList = new List<string>
+        {
+            "airDate",
+            "description",
+            "episodes",
+            "episodesCount",
+            "movieId",
+            "name",
+            "number",
+            "poster"
+        }.AsReadOnly();
+
+        private static readonly IList<string> MoviePropertiesList = new List<string>
+        {
+            "alternativeName",
+            "backdrop",
+            "countries",
+            "description",
+            "enName",
+            "externalId",
+            "genres",
+            "id",
+            "logo",
+            "movieLength",
+            "name",
+            "persons",
+            "poster",
+            "premiere",
+            "rating",
+            "ratingMpaa",
+            "slogan",
+            "videos",
+            "year",
+            "sequelsAndPrequels",
+            "top250",
+            "facts",
+            "releaseYears",
+            "seasonsInfo"
+        }.AsReadOnly();
 
 
         private readonly IHttpClient _httpClient;
         private readonly ILogger _log;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IActivityManager _activityManager;
+        private readonly INotificationManager _notificationManager;
 
         internal KinopoiskDevApi(
             ILogManager logManager
             , IHttpClient httpClient
             , IJsonSerializer jsonSerializer
-            , IActivityManager activityManager)
+            , IActivityManager activityManager
+            , INotificationManager notificationManager)
         {
             _httpClient = httpClient;
             _log = logManager.GetLogger(GetType().Name);
             _jsonSerializer = jsonSerializer;
             _activityManager = activityManager;
+            _notificationManager = notificationManager;
         }
 
         internal async Task<KpMovie> GetMovieByIdAsync(string movieId, CancellationToken cancellationToken)
@@ -227,21 +271,23 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                                 var error = _jsonSerializer.DeserializeFromString<KpErrorResponse>(result);
                                 var msg = $"{error.Error}: {error.Message.FirstOrDefault()}";
                                 _log.Error(msg);
-                                AddToActivityLog(msg, $"{error.Error}");
+                                NotifyUser(msg, $"{error.Error}");
                                 return string.Empty;
                             case 401:
                                 msg = $"Token is invalid: '{token}'";
                                 _log.Error(msg);
-                                AddToActivityLog(msg, "Token is invalid");
+                                NotifyUser(msg, "Token is invalid");
                                 return string.Empty;
                             case 403:
                                 msg = "Request limit exceeded (either daily or total) for current token";
                                 _log.Warn(msg);
-                                AddToActivityLog(msg, "Request limit exceeded");
+                                NotifyUser(msg, "Request limit exceeded");
                                 return string.Empty;
                             default:
                                 error = _jsonSerializer.DeserializeFromString<KpErrorResponse>(result);
-                                _log.Error($"Received '{response.StatusCode}' from API: Error-'{error.Error}', Message-'{error.Message.FirstOrDefault()}'");
+                                msg = $"Received '{response.StatusCode}' from API: Error-'{error.Error}', Message-'{error.Message.FirstOrDefault()}'";
+                                _log.Error(msg);
+                                NotifyUser(msg, "API request issue");
                                 return string.Empty;
                         }
                     }
@@ -254,15 +300,17 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                     case 401:
                         var msg = $"Token is invalid: '{token}'";
                         _log.Error(msg);
-                        AddToActivityLog(msg, "Token is invalid");
+                        NotifyUser(msg, "Token is invalid");
                         break;
                     case 403:
                         msg = "Request limit exceeded (either daily or total) for current token";
                         _log.Warn(msg);
-                        AddToActivityLog(msg, "Request limit exceeded");
+                        NotifyUser(msg, "Request limit exceeded");
                         break;
                     default:
-                        _log.Error($"Received '{ex.StatusCode}' from API: Message-'{ex.Message}'", ex);
+                        msg = $"Received '{ex.StatusCode}' from API: Message-'{ex.Message}'";
+                        _log.Error(msg, ex);
+                        NotifyUser(msg, "General error");
                         break;
                 }
 
@@ -270,14 +318,29 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
             catch (Exception ex)
             {
-                _log.ErrorException($"Unable to fetch data from URL '{url}' due to {ex.Message}", ex);
+                var msg = $"Unable to fetch data from URL '{url}' due to {ex.Message}";
+                _log.ErrorException(msg, ex);
+                NotifyUser(msg, "General error");
                 return string.Empty;
             }
         }
-        private void AddToActivityLog(string overview, string shortOverview)
-        {
-            KpHelper.AddToActivityLog(_activityManager, overview, shortOverview);
-        }
 
+        private void NotifyUser(string overview, string shortOverview)
+        {
+            _activityManager.Create(new ActivityLogEntry
+            {
+                Name = Plugin.PluginKey,
+                Type = "PluginError",
+                Overview = overview,
+                ShortOverview = shortOverview,
+                Severity = LogSeverity.Error
+            });
+
+            _notificationManager.SendNotification(new NotificationRequest
+            {
+                Description = overview,
+                Title = shortOverview
+            });
+        }
     }
 }

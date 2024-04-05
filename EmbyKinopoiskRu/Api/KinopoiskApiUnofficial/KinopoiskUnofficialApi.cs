@@ -4,13 +4,15 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Emby.Notifications;
+
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model;
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Film;
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Person;
 using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial.Model.Season;
-using EmbyKinopoiskRu.Helper;
 
 using MediaBrowser.Common.Net;
+using MediaBrowser.Controller.Notifications;
 using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Net;
@@ -24,17 +26,20 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
         private readonly ILogger _log;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IActivityManager _activityManager;
+        private readonly INotificationManager _notificationManager;
 
         internal KinopoiskUnofficialApi(
             ILogManager logManager
             , IHttpClient httpClient
             , IJsonSerializer jsonSerializer
-            , IActivityManager activityManager)
+            , IActivityManager activityManager
+            , INotificationManager notificationManager)
         {
             _httpClient = httpClient;
             _log = logManager.GetLogger(GetType().Name);
             _jsonSerializer = jsonSerializer;
             _activityManager = activityManager;
+            _notificationManager = notificationManager;
         }
 
         internal async Task<KpFilm> GetFilmByIdAsync(string movieId, CancellationToken cancellationToken)
@@ -43,6 +48,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             var response = await SendRequestAsync(url, cancellationToken);
             return string.IsNullOrEmpty(response) ? null : _jsonSerializer.DeserializeFromString<KpFilm>(response);
         }
+
         internal async Task<KpSearchResult<KpFilm>> GetFilmsByNameAndYearAsync(string name, int? year, CancellationToken cancellationToken)
         {
             var hasName = !string.IsNullOrWhiteSpace(name);
@@ -137,15 +143,29 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             if (hasImdb)
             {
                 var response = await SendRequestAsync(request, cancellationToken);
-                KpSearchResult<KpFilm> toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpFilm>>(response);
-                if (toReturn != null && toReturn.Items.Count > 0)
-                {
-                    _log.Info($"Found {toReturn.Items.Count} items");
-                    return toReturn;
-                }
+                return _jsonSerializer.DeserializeFromString<KpSearchResult<KpFilm>>(response)
+                       ?? new KpSearchResult<KpFilm>
+                       {
+                           HasError = true
+                       };
             }
 
-            return new KpSearchResult<KpFilm>();
+            _log.Warn("IMDB ID was not provided");
+            return new KpSearchResult<KpFilm>
+            {
+                HasError = true
+            };
+        }
+
+        internal async Task<KpSearchResult<KpFilm>> GetCollectionItemsAsync(string collectionId, int page, CancellationToken cancellationToken)
+        {
+            var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/collections?page={page}&type={collectionId}";
+            var response = await SendRequestAsync(request, cancellationToken);
+            return _jsonSerializer.DeserializeFromString<KpSearchResult<KpFilm>>(response)
+                   ?? new KpSearchResult<KpFilm>
+                   {
+                       HasError = true
+                   };
         }
 
         private async Task<string> SendRequestAsync(string url, CancellationToken cancellationToken)
@@ -202,7 +222,9 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                                 await Task.Delay(2000, cancellationToken);
                                 return await SendRequestAsync(url, cancellationToken);
                             default:
-                                _log.Error($"Received '{response.StatusCode}' from API: {result}");
+                                msg = $"Received '{response.StatusCode}' from API: '{result}'";
+                                _log.Error(msg);
+                                NotifyUser(msg, "API request issue");
                                 return string.Empty;
                         }
                     }
@@ -215,15 +237,17 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     case 401:
                         var msg = $"Token is invalid: '{token}'";
                         _log.Error(msg);
-                        AddToActivityLog(msg, "Token is invalid");
+                        NotifyUser(msg, "Token is invalid");
                         break;
                     case 402:
                         msg = "Request limit exceeded (either daily or total) for current token";
                         _log.Warn(msg);
-                        AddToActivityLog(msg, "Request limit exceeded");
+                        NotifyUser(msg, "Request limit exceeded");
                         break;
                     default:
-                        _log.Error($"Received '{ex.StatusCode}' from API: Message-'{ex.Message}'", ex);
+                        msg = $"Received '{ex.StatusCode}' from API: Message-'{ex.Message}'";
+                        _log.Error(msg, ex);
+                        NotifyUser(msg, "General error");
                         break;
                 }
 
@@ -231,15 +255,29 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             }
             catch (Exception ex)
             {
-                _log.ErrorException($"Unable to fetch data from URL '{url}' due to {ex.Message}", ex);
+                var msg = $"Unable to fetch data from URL '{url}' due to {ex.Message}";
+                _log.ErrorException(msg, ex);
+                NotifyUser(msg, "General error");
                 return string.Empty;
             }
         }
 
-        private void AddToActivityLog(string overview, string shortOverview)
+        private void NotifyUser(string overview, string shortOverview)
         {
-            KpHelper.AddToActivityLog(_activityManager, overview, shortOverview);
-        }
+            _activityManager.Create(new ActivityLogEntry
+            {
+                Name = Plugin.PluginKey,
+                Type = "PluginError",
+                Overview = overview,
+                ShortOverview = shortOverview,
+                Severity = LogSeverity.Error
+            });
 
+            _notificationManager.SendNotification(new NotificationRequest
+            {
+                Description = overview,
+                Title = shortOverview
+            });
+        }
     }
 }

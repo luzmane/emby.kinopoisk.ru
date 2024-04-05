@@ -19,9 +19,9 @@ using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Library;
+using MediaBrowser.Controller.Notifications;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Activity;
-using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Providers;
@@ -45,10 +45,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             , IJsonSerializer jsonSerializer
             , IActivityManager activityManager
             , ILibraryManager libraryManager
-            , ICollectionManager collectionManager)
+            , ICollectionManager collectionManager
+            , INotificationManager notificationManager)
         {
             _log = logManager.GetLogger(GetType().Name);
-            _api = new KinopoiskDevApi(logManager, httpClient, jsonSerializer, activityManager);
+            _api = new KinopoiskDevApi(logManager, httpClient, jsonSerializer, activityManager, notificationManager);
             _libraryManager = libraryManager;
             _collectionManager = collectionManager;
             if (Plugin.Instance == null)

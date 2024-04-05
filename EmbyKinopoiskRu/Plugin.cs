@@ -13,6 +13,7 @@ using MediaBrowser.Common.Net;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Controller.Collections;
 using MediaBrowser.Controller.Library;
+using MediaBrowser.Controller.Notifications;
 using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Drawing;
 using MediaBrowser.Model.Logging;
@@ -43,6 +44,7 @@ namespace EmbyKinopoiskRu
         private readonly IActivityManager _activityManager;
         private readonly ILibraryManager _libraryManager;
         private readonly ICollectionManager _collectionManager;
+        private readonly INotificationManager _notificationManager;
 
         /// <inheritdoc />
         public override string Name => PluginName;
@@ -64,6 +66,7 @@ namespace EmbyKinopoiskRu
         /// <param name="activityManager">Instance of the <see cref="IActivityManager"/> interface.</param>
         /// <param name="libraryManager">Instance of the <see cref="ILibraryManager"/> interface.</param>
         /// <param name="collectionManager">Instance of the <see cref="ICollectionManager"/> interface.</param>
+        /// <param name="notificationManager">Instance of the <see cref="INotificationManager"/> interface.</param>
         public Plugin(
             IApplicationPaths applicationPaths,
             IXmlSerializer xmlSerializer,
@@ -72,7 +75,8 @@ namespace EmbyKinopoiskRu
             IJsonSerializer jsonSerializer,
             IActivityManager activityManager,
             ILibraryManager libraryManager,
-            ICollectionManager collectionManager)
+            ICollectionManager collectionManager,
+            INotificationManager notificationManager)
             : base(applicationPaths, xmlSerializer)
         {
             Instance = this;
@@ -85,6 +89,7 @@ namespace EmbyKinopoiskRu
             _log = _logManager.GetLogger(PluginKey);
             _libraryManager = libraryManager;
             _collectionManager = collectionManager;
+            _notificationManager = notificationManager;
         }
 
         /// <inheritdoc />
@@ -140,7 +145,8 @@ namespace EmbyKinopoiskRu
                         JsonSerializer,
                         _activityManager,
                         _libraryManager,
-                        _collectionManager);
+                        _collectionManager,
+                        _notificationManager);
                     _kinopoiskServicesDictionary.Add("KinopoiskDev", result);
                 }
 
@@ -156,7 +162,8 @@ namespace EmbyKinopoiskRu
                         _logManager,
                         _httpClient,
                         JsonSerializer,
-                        _activityManager);
+                        _activityManager,
+                        _notificationManager);
                     _kinopoiskServicesDictionary.Add("KinopoiskUnofficial", result);
                 }
 
