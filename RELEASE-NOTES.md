@@ -1,3 +1,10 @@
+v.1.23.0
+- feature: add notification, in case any problems with token (API access)
+- improvement: take into account a type of video, filtering the API search response
+- feature: create KP collections for kinopoiskapiunofficial.tech API
+- refactoring
+- small fixes
+
 v.1.22.0
 - feature: Update supported Emby version to 4.8.2
 - feature: Add number of items in each collection
