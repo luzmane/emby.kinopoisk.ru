@@ -92,7 +92,6 @@ dotnet_diagnostic.CA1819.severity = none
 dotnet_diagnostic.CA1308.severity = none
 
 
-
 #### Core EditorConfig Options ####
 
 # Indentation and spacing
@@ -334,7 +333,6 @@ dotnet_naming_symbols.local_constants.required_modifiers = const
 
 dotnet_naming_symbols.local_functions.applicable_accessibilities = *
 dotnet_naming_symbols.local_functions.applicable_kinds = local_function
-dotnet_naming_symbols.local_functions.applicable_kinds = local_function
 dotnet_naming_symbols.local_functions.required_modifiers =
 
 dotnet_naming_symbols.local_variables.applicable_accessibilities = local
@@ -430,15 +428,13 @@ csharp_style_prefer_pattern_matching = true:silent
 csharp_style_prefer_switch_expression = true:suggestion
 
 # Null-checking preferences
-csharp_style_throw_expression = true:suggestion
 csharp_style_conditional_delegate_call = true:suggestion
 
 # Modifier preferences
 csharp_prefer_static_local_function = true:warning
-csharp_preferred_modifier_order = public,private,protected,internal,static,extern,new,virtual,abstract,sealed,override,readonly,unsafe,volatile,async:suggestion
+csharp_preferred_modifier_order = public, private, protected, internal, static, extern, new, virtual, abstract, sealed, override, readonly, unsafe, volatile, async:suggestion
 
 # Code-block preferences
-csharp_prefer_braces = true:silent
 csharp_prefer_simple_using_statement = true:suggestion
 
 # Expression-level preferences
@@ -506,3 +502,9 @@ csharp_space_between_square_brackets = false
 # Wrapping preferences
 csharp_preserve_single_line_blocks = true
 csharp_preserve_single_line_statements = true
+
+###############################
+# ReSharper properties        #
+###############################
+resharper_wrap_array_initializer_style = chop_if_long
+resharper_wrap_object_and_collection_initializer_style = chop_always

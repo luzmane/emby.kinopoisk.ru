@@ -1,0 +1,28 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Run Emby" type="RunExe" factoryName=".NET Executable" focusToolWindowBeforeRun="true">
+    <option name="EXE_PATH" value="$PROJECT_DIR$/../emby/server/emby-server/system/EmbyServer" />
+    <option name="PROGRAM_PARAMETERS" value="-programdata $PROJECT_DIR$/../emby/server/emby-data -ffdetect $PROJECT_DIR$/../emby/server/emby-server/bin/ffdetect -ffmpeg $PROJECT_DIR$/../emby/server/emby-server/bin/ffmpeg -ffprobe $PROJECT_DIR$/../emby/server/emby-server/bin/ffprobe" />
+    <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/../emby/server/emby-server/system" />
+    <option name="PASS_PARENT_ENVS" value="1" />
+    <envs>
+      <env name="PCI_IDS_PATH" value="$PROJECT_DIR$/../emby/server/emby-server/share/hwdata/pci.ids" />
+      <env name="SSL_CERT_FILE" value="$PROJECT_DIR$/../emby/server/emby-server/etc/ssl/certs/ca-certificates.crt" />
+      <env name="XDG_CACHE_HOME" value="$PROJECT_DIR$/../emby/server/emby-data/cache" />
+      <env name="APP_DIR" value="$PROJECT_DIR$/../emby/server/emby-server" />
+      <env name="FONTCONFIG_PATH" value="$PROJECT_DIR$/../emby/server/emby-server/etc/fonts" />
+      <env name="LD_LIBRARY_PATH" value="$PROJECT_DIR$/../emby/server/emby-server/lib:$PROJECT_DIR$/../emby/server/emby-server/extra/lib" />
+      <env name="LIBVA_DRIVERS_PATH" value="$PROJECT_DIR$/../emby/server/emby-server/extra/lib/dri" />
+      <env name="EMBY_DATA" value="$PROJECT_DIR$/../emby/server/emby-data" />
+      <env name="OCL_ICD_VENDORS" value="$PROJECT_DIR$/../emby/server/emby-server/extra/etc/OpenCL/vendors" />
+      <env name="AMDGPU_IDS" value="$PROJECT_DIR$/../emby/server/emby-server/extra/share/libdrm/amdgpu.ids" />
+    </envs>
+    <option name="USE_EXTERNAL_CONSOLE" value="0" />
+    <option name="USE_MONO" value="0" />
+    <option name="RUNTIME_ARGUMENTS" value="" />
+    <option name="RUNTIME_TYPE" value="coreclr" />
+    <method v="2">
+      <option name="Build" default="false" projectName="EmbyKinopoiskRu" projectPath="$PROJECT_DIR$/EmbyKinopoiskRu/EmbyKinopoiskRu.csproj" />
+      <option name="RunConfigurationTask" enabled="true" run_configuration_name="UpdatePluginOnServer" run_configuration_type="ShConfigurationType" />
+    </method>
+  </configuration>
+</component>
