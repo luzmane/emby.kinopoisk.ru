@@ -1,16 +1,23 @@
 ﻿define(['loading', 'globalize', 'emby-input', 'emby-button', 'emby-radio', 'emby-checkbox'], function (loading) {
     'use strict';
     function loadPage(page, config) {
+        function showWarning(page) {
+            page.querySelector("p#list-warning").style.backgroundColor = 'red';
+            page.querySelector("p#list-warning").style.display = '';
+        }
         const groupBy = (x, f) => x.reduce((a, b, i) => ((a[f(b, i, x)] ||= []).push(b), a), {});
         page.querySelector('.txtToken').value = config.Token || '';
-        //page.querySelector('.chkCreateSeqCollections').checked = (config.ApiType == "kinopoisk.dev" && config.CreateSeqCollections);
+        page.querySelector('.chkCreateSeqCollections').checked = (config.ApiType === "kinopoisk.dev" && config.CreateSeqCollections);
+        if (config.ApiType === "kinopoisk.dev") page.querySelectorAll('.kinopoiskDevOnly').forEach(item => item.style.display = '');
         page.querySelector('.kinopoiskUnofficial').checked = (config.ApiType === "kinopoiskapiunofficial.tech");
         page.querySelector('.kinopoiskUnofficial').addEventListener('change', (event) => {
             if (event.currentTarget.checked) page.querySelectorAll('.kinopoiskDevOnly').forEach(item => item.style.display = 'none');
+            showWarning(page);
         });
         page.querySelector('.kinopoiskDev').checked = (config.ApiType === "kinopoisk.dev");
         page.querySelector('.kinopoiskDev').addEventListener('change', (event) => {
             if (event.currentTarget.checked) page.querySelectorAll('.kinopoiskDevOnly').forEach(item => item.style.display = '');
+            showWarning(page);
         });
         const result = JSON.parse(config.Collections);
         const template = page.querySelector('div.pluginConfigurationPage:not(.hide) label.kpCollectionTemplate');
@@ -35,11 +42,14 @@
                         input.setAttribute('category', v.Category);
                         input.checked = v.IsEnable;
                         const span = label.querySelector('span.checkboxButtonLabel');
-                        span.textContent = v.Name + ' (' + v.MovieCount + ' фильмов)';
+                        let count = '';
+                        if (v.MovieCount !== 0) {
+                            count = ' (' + v.MovieCount + ' фильмов)';
+                        }
+                        span.textContent = v.Name + count;
                     });
                 });
-        }
-        else {
+        } else {
             let div = document.createElement("div");
             div.textContent = 'Сохраните конфигурацию (кнопка "Сохранить") и обновите страницу чтоб показать список коллекций Кинопоиска';
             template.parentNode.appendChild(div);
@@ -58,7 +68,7 @@
         const form = this;
         getConfig().then(function (config) {
             config.Token = form.querySelector('.txtToken').value;
-            //config.CreateSeqCollections = form.querySelector('.chkCreateSeqCollections').checked;
+            config.CreateSeqCollections = form.querySelector('.chkCreateSeqCollections').checked;
             config.ApiType = form.querySelector('input[name="radioAPI"]:checked').value;
             const list = form.querySelectorAll('div.pluginConfigurationPage:not(.hide) label.kpCollectionList');
             const tmp = [];
@@ -69,15 +79,15 @@
                 const Category = input.getAttribute('category');
                 const span = label.querySelector('span.checkboxButtonLabel');
                 const match = span.textContent.match(fetchMovieCount);
-                if (match == null) {
-                    console.warn("Collection name was not matched: '" + span.textContent + "'");
-                    return;
+                let Name = span.textContent;
+                let MovieCount = 0;
+                if (match != null) {
+                    Name = match[1];
+                    MovieCount = match[2];
                 }
-                const Name = match[1];
-                const MovieCount = match[2];
                 let Id = '';
                 for (const i of input.classList) if (i.startsWith('kp-')) Id = i.substring(3);
-                if (Id) tmp.push({ Id, Name, IsEnable, Category, MovieCount });
+                if (Id) tmp.push({Id, Name, IsEnable, Category, MovieCount});
             });
             config.Collections = JSON.stringify(tmp);
             ApiClient.updatePluginConfiguration('0417364b-5a93-4ad0-a5f0-b8756957cf80', config)

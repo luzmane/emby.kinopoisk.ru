@@ -6,7 +6,6 @@ using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Providers;
-using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Providers;
 
 namespace EmbyKinopoiskRu.Api
@@ -25,7 +24,7 @@ namespace EmbyKinopoiskRu.Api
         Task<MetadataResult<Person>> GetMetadataAsync(PersonLookupInfo info, CancellationToken cancellationToken);
         Task<IEnumerable<RemoteSearchResult>> GetSearchResultsAsync(PersonLookupInfo searchInfo, CancellationToken cancellationToken);
 
-        Task<IEnumerable<RemoteImageInfo>> GetImagesAsync(BaseItem item, LibraryOptions libraryOptions, CancellationToken cancellationToken);
+        Task<IEnumerable<RemoteImageInfo>> GetImagesAsync(BaseItem item, CancellationToken cancellationToken);
 
         Task<List<KpLists>> GetKpCollectionsAsync();
         Task<List<BaseItem>> GetCollectionItemsAsync(string collectionId, CancellationToken cancellationToken);

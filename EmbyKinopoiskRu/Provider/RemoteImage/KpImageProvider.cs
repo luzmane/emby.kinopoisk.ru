@@ -43,7 +43,7 @@ namespace EmbyKinopoiskRu.Provider.RemoteImage
             {
                 ImageType.Primary,
                 ImageType.Backdrop,
-                ImageType.Logo,
+                ImageType.Logo
             };
         }
 
@@ -61,7 +61,7 @@ namespace EmbyKinopoiskRu.Provider.RemoteImage
         /// <inheritdoc />
         public async Task<IEnumerable<RemoteImageInfo>> GetImages(BaseItem item, LibraryOptions libraryOptions, CancellationToken cancellationToken)
         {
-            return await Plugin.Instance.GetKinopoiskService().GetImagesAsync(item, libraryOptions, cancellationToken);
+            return await Plugin.Instance.GetKinopoiskService().GetImagesAsync(item, cancellationToken);
         }
     }
 }

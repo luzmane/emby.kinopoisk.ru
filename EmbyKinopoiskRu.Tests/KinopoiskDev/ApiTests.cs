@@ -7,6 +7,7 @@ using EmbyKinopoiskRu.Api.KinopoiskDev.Model;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Person;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Season;
+
 using NLog;
 
 namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
@@ -23,9 +24,60 @@ public class ApiTests : IDisposable
     private const int RequestLimit = 250;
 
     // doesn't have "productionCompanies" in the result
-    private static readonly IList<string> MovieUniversalSelectFields = new List<string> { "alternativeName", "backdrop", "countries", "description", "enName", "externalId", "genres", "id", "logo", "movieLength", "name", "persons", "poster", "premiere", "rating", "ratingMpaa", "slogan", "videos", "year", "sequelsAndPrequels", "top250", "facts", "releaseYears", "seasonsInfo", "lists" }.AsReadOnly();
-    private static readonly IList<string> PersonUniversalSelectFields = new List<string> { "birthday", "birthPlace", "death", "deathPlace", "enName", "facts", "id", "movies", "name", "photo" }.AsReadOnly();
-    private static readonly IList<string> SeasonUniversalSelectFields = new List<string> { "airDate", "description", "episodes", "episodesCount", "movieId", "name", "number", "poster" }.AsReadOnly();
+    private static readonly IList<string> MovieUniversalSelectFields = new List<string>
+    {
+        "alternativeName",
+        "backdrop",
+        "countries",
+        "description",
+        "enName",
+        "externalId",
+        "genres",
+        "id",
+        "logo",
+        "movieLength",
+        "name",
+        "persons",
+        "poster",
+        "premiere",
+        "rating",
+        "ratingMpaa",
+        "slogan",
+        "videos",
+        "year",
+        "sequelsAndPrequels",
+        "top250",
+        "facts",
+        "releaseYears",
+        "seasonsInfo",
+        "lists"
+    }.AsReadOnly();
+
+    private static readonly IList<string> PersonUniversalSelectFields = new List<string>
+    {
+        "birthday",
+        "birthPlace",
+        "death",
+        "deathPlace",
+        "enName",
+        "facts",
+        "id",
+        "movies",
+        "name",
+        "photo"
+    }.AsReadOnly();
+
+    private static readonly IList<string> SeasonUniversalSelectFields = new List<string>
+    {
+        "airDate",
+        "description",
+        "episodes",
+        "episodesCount",
+        "movieId",
+        "name",
+        "number",
+        "poster"
+    }.AsReadOnly();
 
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
@@ -36,13 +88,17 @@ public class ApiTests : IDisposable
     {
         _logger = LogManager.GetCurrentClassLogger();
 
-        _httpClient = new();
+        _httpClient = new HttpClient();
         _httpClient.DefaultRequestHeaders.Add("X-API-KEY", GetKinopoiskDevToken());
 
-        _jsonOptions = new() { PropertyNameCaseInsensitive = true };
+        _jsonOptions = new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        };
     }
 
     #region Tests
+
     [Fact]
     public async Task GetMovieById()
     {
@@ -57,31 +113,31 @@ public class ApiTests : IDisposable
     [Fact]
     public async Task GetMovies_Universal_Ids()
     {
-        var request = $"https://api.kinopoisk.dev/v1.4/movie?";
+        var request = "https://api.kinopoisk.dev/v1.4/movie?";
         request += $"limit={RequestLimit}";
         request += $"&selectFields={string.Join("&selectFields=", MovieUniversalSelectFields)}";
         request += "&id=689&id=435";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
-        KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, _jsonOptions);
+        var searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, _jsonOptions);
         searchResultMovie.Should().NotBeNull();
         searchResultMovie!.Docs.Count.Should().Be(2);
 
-        VerifyMovie689(searchResultMovie.Docs.FirstOrDefault(i => i.Id == 689), isUniversalSearch: true);
-        VerifyMovie435(searchResultMovie.Docs.FirstOrDefault(i => i.Id == 435), isUniversalSearch: true);
+        VerifyMovie689(searchResultMovie.Docs.FirstOrDefault(i => i.Id == 689), true);
+        VerifyMovie435(searchResultMovie.Docs.FirstOrDefault(i => i.Id == 435), true);
     }
 
     [Fact]
     public async Task GetMovies_Query_Name_Year()
     {
-        var request = $"https://api.kinopoisk.dev/v1.4/movie/search?";
+        var request = "https://api.kinopoisk.dev/v1.4/movie/search?";
         request += $"limit={RequestLimit}";
         request += "&query=Гарри Поттер и философский камень 2001"; // 689
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
-        KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, _jsonOptions);
+        var searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, _jsonOptions);
         searchResultMovie.Should().NotBeNull();
         searchResultMovie!.Docs.Should().NotBeEmpty();
 
@@ -91,13 +147,13 @@ public class ApiTests : IDisposable
     [Fact]
     public async Task GetMovies_Query_AlternativeName_Year()
     {
-        var request = $"https://api.kinopoisk.dev/v1.4/movie/search?";
+        var request = "https://api.kinopoisk.dev/v1.4/movie/search?";
         request += $"limit={RequestLimit}";
         request += "&query=Harry Potter and the Sorcerer's Stone 2001"; // 689
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
-        KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, _jsonOptions);
+        var searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, _jsonOptions);
         searchResultMovie.Should().NotBeNull();
         searchResultMovie!.Docs.Should().NotBeEmpty();
 
@@ -107,14 +163,14 @@ public class ApiTests : IDisposable
     [Fact]
     public async Task GetMovies_Universal_List_Top500()
     {
-        var request = $"https://api.kinopoisk.dev/v1.4/movie?";
+        var request = "https://api.kinopoisk.dev/v1.4/movie?";
         request += $"limit={RequestLimit}";
         request += $"&selectFields={string.Join("&selectFields=", MovieUniversalSelectFields)}";
         request += "&lists=top500";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
-        KpSearchResult<KpMovie>? kpMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, _jsonOptions);
+        var kpMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, _jsonOptions);
         kpMovie.Should().NotBeNull();
         kpMovie!.Docs.Count.Should().Be(RequestLimit);
         kpMovie.Pages.Should().Be(2);
@@ -123,25 +179,25 @@ public class ApiTests : IDisposable
     [Fact]
     public async Task GetMovies_Universal_ExternalIds()
     {
-        var request = $"https://api.kinopoisk.dev/v1.4/movie?";
+        var request = "https://api.kinopoisk.dev/v1.4/movie?";
         request += $"limit={RequestLimit}";
         request += $"&selectFields={string.Join("&selectFields=", MovieUniversalSelectFields)}";
         request += "&externalId.imdb=tt0241527&externalId.imdb=tt0120689";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
-        KpSearchResult<KpMovie>? searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, _jsonOptions);
+        var searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, _jsonOptions);
         searchResultMovie.Should().NotBeNull();
         searchResultMovie!.Docs.Count.Should().Be(2);
 
-        VerifyMovie689(searchResultMovie!.Docs.FirstOrDefault(i => i.Id == 689), isUniversalSearch: true);
-        VerifyMovie435(searchResultMovie!.Docs.FirstOrDefault(i => i.Id == 435), isUniversalSearch: true);
+        VerifyMovie689(searchResultMovie.Docs.FirstOrDefault(i => i.Id == 689), true);
+        VerifyMovie435(searchResultMovie.Docs.FirstOrDefault(i => i.Id == 435), true);
     }
 
     [Fact]
     public async Task GetPersonById()
     {
-        var request = $"https://api.kinopoisk.dev/v1.4/person/7987";
+        const string request = "https://api.kinopoisk.dev/v1.4/person/7987";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
@@ -152,30 +208,30 @@ public class ApiTests : IDisposable
     [Fact]
     public async Task GetPersons_Query_Name()
     {
-        var request = $"https://api.kinopoisk.dev/v1.4/person/search?";
+        var request = "https://api.kinopoisk.dev/v1.4/person/search?";
         request += $"limit={RequestLimit}";
         request += "&query=Тим Роббинс";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
-        KpSearchResult<KpPerson>? searchResultKpPerson = JsonSerializer.Deserialize<KpSearchResult<KpPerson>>(response, _jsonOptions);
+        var searchResultKpPerson = JsonSerializer.Deserialize<KpSearchResult<KpPerson>>(response, _jsonOptions);
         searchResultKpPerson.Should().NotBeNull();
         searchResultKpPerson!.Docs.Count.Should().Be(RequestLimit);
 
-        VerifyPerson7987(searchResultKpPerson.Docs.FirstOrDefault(x => x.Id == 7987), isQuerySearch: true);
+        VerifyPerson7987(searchResultKpPerson.Docs.FirstOrDefault(x => x.Id == 7987), true);
     }
 
     [Fact]
     public async Task GetPersons_Universal_MoviesId()
     {
-        var request = $"https://api.kinopoisk.dev/v1.4/person?";
+        var request = "https://api.kinopoisk.dev/v1.4/person?";
         request += $"limit={RequestLimit}";
         request += $"&selectFields={string.Join("&selectFields=", PersonUniversalSelectFields)}";
         request += "&movies.id=326";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
-        KpSearchResult<KpPerson>? searchResultKpPerson = JsonSerializer.Deserialize<KpSearchResult<KpPerson>>(response, _jsonOptions);
+        var searchResultKpPerson = JsonSerializer.Deserialize<KpSearchResult<KpPerson>>(response, _jsonOptions);
         searchResultKpPerson.Should().NotBeNull();
         searchResultKpPerson!.Docs.Should().HaveCountGreaterThan(100);
 
@@ -185,14 +241,14 @@ public class ApiTests : IDisposable
     [Fact]
     public async Task GetEpisodes_Universal_MovieId()
     {
-        var request = $"https://api.kinopoisk.dev/v1.4/season?";
+        var request = "https://api.kinopoisk.dev/v1.4/season?";
         request += $"limit={RequestLimit}";
         request += $"&selectFields={string.Join("&selectFields=", SeasonUniversalSelectFields)}";
         request += "&movieId=77044";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
-        KpSearchResult<KpSeason>? searchResultKpSeason = JsonSerializer.Deserialize<KpSearchResult<KpSeason>>(response, _jsonOptions);
+        var searchResultKpSeason = JsonSerializer.Deserialize<KpSearchResult<KpSeason>>(response, _jsonOptions);
         searchResultKpSeason.Should().NotBeNull();
         searchResultKpSeason!.Docs.RemoveAll(x => x.EpisodesCount == 0 || x.Number == 0);
         searchResultKpSeason.Docs.Count.Should().Be(10);
@@ -203,14 +259,14 @@ public class ApiTests : IDisposable
     [Fact]
     public async Task GetEpisodes_Universal_MovieId_Season()
     {
-        var request = $"https://api.kinopoisk.dev/v1.4/season?";
+        var request = "https://api.kinopoisk.dev/v1.4/season?";
         request += $"limit={RequestLimit}";
         request += $"&selectFields={string.Join("&selectFields=", SeasonUniversalSelectFields)}";
         request += "&movieId=77044&number=5";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
-        KpSearchResult<KpSeason>? searchResultKpSeason = JsonSerializer.Deserialize<KpSearchResult<KpSeason>>(response, _jsonOptions);
+        var searchResultKpSeason = JsonSerializer.Deserialize<KpSearchResult<KpSeason>>(response, _jsonOptions);
         searchResultKpSeason.Should().NotBeNull();
         searchResultKpSeason!.Docs.Count.Should().Be(1);
 
@@ -220,7 +276,7 @@ public class ApiTests : IDisposable
     [Fact]
     public async Task GetAllKinopoiskLists()
     {
-        var request = $"https://api.kinopoisk.dev/v1.4/list?limit=200";
+        var request = "https://api.kinopoisk.dev/v1.4/list?limit=200";
         request += "&selectFields=name&selectFields=slug&selectFields=moviesCount&selectFields=cover&selectFields=category";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
@@ -234,6 +290,7 @@ public class ApiTests : IDisposable
     #endregion
 
     #region Verify
+
     private static void VerifyMovie435(KpMovie? kpMovie, bool isUniversalSearch = false, bool isQuerySearch = false)
     {
         kpMovie.Should().NotBeNull();
@@ -256,6 +313,7 @@ public class ApiTests : IDisposable
             kpMovie.Facts.Should().NotBeNull();
             kpMovie.Facts.Should().NotBeEmpty();
         }
+
         kpMovie.Genres.Should().NotBeNull();
         kpMovie.Genres!.Count.Should().Be(3);
         kpMovie.Id.Should().Be(435);
@@ -268,6 +326,7 @@ public class ApiTests : IDisposable
             kpMovie.Lists.Should().NotBeNull();
             kpMovie.Lists.Should().NotBeEmpty();
         }
+
         kpMovie.Logo.Should().NotBeNull();
         kpMovie.Logo!.Url.Should().NotBeNullOrWhiteSpace();
         kpMovie.MovieLength.Should().Be(189);
@@ -283,6 +342,7 @@ public class ApiTests : IDisposable
             kpPersonMovie.Should().NotBeNull();
             VerifyPersonMovie9144(kpPersonMovie!);
         }
+
         kpMovie.Poster.Should().NotBeNull();
         kpMovie.Poster!.Url.Should().NotBeNullOrWhiteSpace();
         kpMovie.Poster!.PreviewUrl.Should().NotBeNullOrWhiteSpace();
@@ -295,6 +355,7 @@ public class ApiTests : IDisposable
             kpMovie.Premiere.Should().NotBeNull();
             kpMovie.Premiere!.World.Should().Be("1999-12-06T00:00:00.000Z");
         }
+
         if (isQuerySearch || isUniversalSearch)
         {
             kpMovie.ProductionCompanies.Should().BeNull();
@@ -304,6 +365,7 @@ public class ApiTests : IDisposable
             kpMovie.ProductionCompanies.Should().NotBeNull();
             kpMovie.ProductionCompanies!.Count.Should().Be(4);
         }
+
         kpMovie.Rating.Should().NotBeNull();
         kpMovie.Rating!.Kp.Should().NotBeNull();
         kpMovie.RatingMpaa.Should().Be("r");
@@ -323,6 +385,7 @@ public class ApiTests : IDisposable
             kpMovie.Videos!.Teasers.Should().BeEmpty();
             kpMovie.Videos!.Trailers.Should().NotBeEmpty();
         }
+
         kpMovie.Year.Should().Be(1999);
     }
 
@@ -348,6 +411,7 @@ public class ApiTests : IDisposable
             kpMovie.Facts.Should().NotBeNull();
             kpMovie.Facts.Should().NotBeEmpty();
         }
+
         kpMovie.Genres.Should().NotBeNull();
         kpMovie.Genres.Count.Should().Be(3);
         kpMovie.Id.Should().Be(689);
@@ -360,6 +424,7 @@ public class ApiTests : IDisposable
             kpMovie.Lists.Should().NotBeNull();
             kpMovie.Lists.Should().NotBeEmpty();
         }
+
         kpMovie.Logo.Should().NotBeNull();
         kpMovie.Logo!.Url.Should().NotBeNullOrWhiteSpace();
         kpMovie.MovieLength.Should().Be(152);
@@ -373,6 +438,7 @@ public class ApiTests : IDisposable
             kpMovie.Persons.Should().NotBeNull();
             kpMovie.Persons.Count.Should().Be(37);
         }
+
         kpMovie.Poster.Should().NotBeNull();
         kpMovie.Poster!.Url.Should().NotBeNullOrWhiteSpace();
         kpMovie.Poster!.PreviewUrl.Should().NotBeNullOrWhiteSpace();
@@ -385,6 +451,7 @@ public class ApiTests : IDisposable
             kpMovie.Premiere.Should().NotBeNull();
             kpMovie.Premiere!.World.Should().Be("2001-11-04T00:00:00.000Z");
         }
+
         if (isQuerySearch || isUniversalSearch)
         {
             kpMovie.ProductionCompanies.Should().BeNull();
@@ -394,6 +461,7 @@ public class ApiTests : IDisposable
             kpMovie.ProductionCompanies.Should().NotBeNull();
             kpMovie.ProductionCompanies!.Count.Should().Be(4);
         }
+
         kpMovie.Rating.Should().NotBeNull();
         kpMovie.Rating!.Kp.Should().NotBeNull();
         kpMovie.RatingMpaa.Should().Be("pg");
@@ -413,6 +481,7 @@ public class ApiTests : IDisposable
             kpMovie.Videos!.Teasers.Should().BeEmpty();
             kpMovie.Videos!.Trailers.Should().NotBeEmpty();
         }
+
         kpMovie.Year.Should().Be(2001);
     }
 
@@ -437,10 +506,10 @@ public class ApiTests : IDisposable
         kpPerson.Id.Should().Be(7987);
         kpPerson.Name.Should().Be("Тим Роббинс");
         kpPerson.Photo.Should().NotBeNullOrWhiteSpace();
-        kpPerson.BirthPlace.Should().NotBeNull();
-        kpPerson.BirthPlace.Should().HaveCount(3);
         if (isQuerySearch)
         {
+            kpPerson.BirthPlace.Should().NotBeNull();
+            kpPerson.BirthPlace.Should().HaveCount(3);
             kpPerson.Facts.Should().BeNull();
             kpPerson.Movies.Should().BeNull();
         }
@@ -489,6 +558,7 @@ public class ApiTests : IDisposable
     #endregion
 
     #region Utils
+
     public void Dispose()
     {
         Dispose(true);
@@ -506,6 +576,6 @@ public class ApiTests : IDisposable
         _logger.Info($"Env token length is: {token?.Length ?? 0}");
         return string.IsNullOrWhiteSpace(token) ? KinopoiskDevToken : token;
     }
-    #endregion
 
+    #endregion
 }

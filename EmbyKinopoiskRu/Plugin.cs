@@ -102,19 +102,7 @@ namespace EmbyKinopoiskRu
         /// <inheritdoc />
         public IEnumerable<PluginPageInfo> GetPages()
         {
-            return new[]
-            {
-                new PluginPageInfo
-                {
-                    Name = "kinopoiskru",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.kinopoiskru.html"
-                },
-                new PluginPageInfo
-                {
-                    Name = "kinopoiskrujs",
-                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.kinopoiskru.js"
-                }
-            };
+            return new[] { new PluginPageInfo { Name = "kinopoiskru", EmbeddedResourcePath = GetType().Namespace + ".Configuration.kinopoiskru.html" }, new PluginPageInfo { Name = "kinopoiskrujs", EmbeddedResourcePath = GetType().Namespace + ".Configuration.kinopoiskru.js" } };
         }
 
         /// <inheritdoc />
@@ -124,11 +112,7 @@ namespace EmbyKinopoiskRu
             return GetType().Assembly.GetManifestResourceNames()
                 .Where(i => i.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
                 .Select(i =>
-                    new TranslationInfo
-                    {
-                        Locale = Path.GetFileNameWithoutExtension(i.Substring(basePath.Length)),
-                        EmbeddedResourcePath = i
-                    })
+                    new TranslationInfo { Locale = Path.GetFileNameWithoutExtension(i.Substring(basePath.Length)), EmbeddedResourcePath = i })
                 .ToArray();
         }
 
@@ -137,40 +121,42 @@ namespace EmbyKinopoiskRu
             if (PluginConfiguration.KinopoiskDev.Equals(Configuration.ApiType, StringComparison.Ordinal))
             {
                 _log.Info($"Fetching {PluginConfiguration.KinopoiskDev} service");
-                if (!_kinopoiskServicesDictionary.TryGetValue("KinopoiskDev", out IKinopoiskRuService result))
+                if (_kinopoiskServicesDictionary.TryGetValue("KinopoiskDev", out IKinopoiskRuService devService))
                 {
-                    result = new KinopoiskDevService(
-                        _logManager,
-                        _httpClient,
-                        JsonSerializer,
-                        _activityManager,
-                        _libraryManager,
-                        _collectionManager,
-                        _notificationManager);
-                    _kinopoiskServicesDictionary.Add("KinopoiskDev", result);
+                    return devService;
                 }
 
-                return result;
+                devService = new KinopoiskDevService(
+                    _logManager,
+                    _httpClient,
+                    JsonSerializer,
+                    _activityManager,
+                    _libraryManager,
+                    _collectionManager,
+                    _notificationManager);
+                _kinopoiskServicesDictionary.Add("KinopoiskDev", devService);
+                return devService;
             }
 
-            if (PluginConfiguration.KinopoiskApiUnofficialTech.Equals(Configuration.ApiType, StringComparison.Ordinal))
+            if (!PluginConfiguration.KinopoiskApiUnofficialTech.Equals(Configuration.ApiType, StringComparison.Ordinal))
             {
-                _log.Info($"Fetching {PluginConfiguration.KinopoiskApiUnofficialTech} service");
-                if (!_kinopoiskServicesDictionary.TryGetValue("KinopoiskUnofficial", out IKinopoiskRuService result))
-                {
-                    result = new KinopoiskUnofficialService(
-                        _logManager,
-                        _httpClient,
-                        JsonSerializer,
-                        _activityManager,
-                        _notificationManager);
-                    _kinopoiskServicesDictionary.Add("KinopoiskUnofficial", result);
-                }
-
-                return result;
+                throw new Exception($"Unable to recognize provided API type '{Configuration.ApiType}'");
             }
 
-            throw new Exception($"Unable to recognize provided API type '{Configuration.ApiType}'");
+            _log.Info($"Fetching {PluginConfiguration.KinopoiskApiUnofficialTech} service");
+            if (_kinopoiskServicesDictionary.TryGetValue("KinopoiskUnofficial", out IKinopoiskRuService unOfficialService))
+            {
+                return unOfficialService;
+            }
+
+            unOfficialService = new KinopoiskUnofficialService(
+                _logManager,
+                _httpClient,
+                JsonSerializer,
+                _activityManager,
+                _notificationManager);
+            _kinopoiskServicesDictionary.Add("KinopoiskUnofficial", unOfficialService);
+            return unOfficialService;
         }
     }
 }

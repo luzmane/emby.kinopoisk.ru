@@ -24,13 +24,21 @@
           </label>
         </div>
       </div>
-      <div class="paperList checkboxList checkboxList-paperList kinopoiskDevOnly">
-        <h3 class="checkboxListLabel">${List of Kinopoisk collections}</h3>
-        <label class="checkboxContainer kpCollectionTemplate" style="display: none;">
-          <input is="emby-checkbox" type="checkbox">
-          <span class="checkboxButtonLabel"></span>
-        </label>
-      </div>
+      <div class="paperList checkboxList checkboxList-paperList kinopoiskDevOnly" style="display: none;">
+            <h3 class="checkboxListLabel">${KinopoiskDev API configuration}</h3>
+            <label class="checkboxContainer">
+                <input is="emby-checkbox" type="checkbox" class="chkCreateSeqCollections">
+                <span class="checkboxButtonLabel">${Group sequels and prequels into a collection}</span>
+            </label>
+        </div>
+      <div class="paperList checkboxList checkboxList-paperList">
+            <h3 class="checkboxListLabel">${List of Kinopoisk collections}</h3>
+            <p id="list-warning" style="display: none;">Please save the configuration 2 times and refresh the page to see updated the list of collections<br/><br/>Пожалуйста сохрание конфигурацию 2 раза и обновите страницу, чтоб увидеть обновлённый список коллекций</p>
+            <label class="checkboxContainer kpCollectionTemplate" style="display: none;">
+                <input is="emby-checkbox" type="checkbox">
+                <span class="checkboxButtonLabel"></span>
+            </label>
+        </div>
       <div>
         <button is="emby-button" type="submit" class="raised button-submit block"><span>${Save}</span></button>
       </div>

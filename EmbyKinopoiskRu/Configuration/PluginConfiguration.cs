@@ -1,6 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+
+using EmbyKinopoiskRu.Api;
 
 using MediaBrowser.Model.Plugins;
 
@@ -30,7 +33,7 @@ namespace EmbyKinopoiskRu.Configuration
         /// <summary>
         /// Gets or sets a value indicating whether Token.
         /// </summary>
-        public bool CreateSeqCollections { get; set; } = true;
+        public bool CreateSeqCollections { get; set; }
 
         /// <summary>
         /// Available collections from Kinopoisk

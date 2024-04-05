@@ -1,12 +1,12 @@
 {
-    "Kinopoisk.Ru": "Kinopoisk.Ru",
-    "Token configuration": "Token configuration",
-    "Get Token From Here": "Get token from here",
-    "Token": "Token",
-    "Sequels collection creation configuration": "Sequels collection creation configuration",
-    "Group sequels and prequels into a collection": "Group sequels and prequels into a collection",
-    "Top 250 collection creation configuration": "Top 250 collection creation configuration",
-    "Add items to a collection from all libraries": "Add items to a collection from all libraries",
-    "Top 250 Collection Name": "Top 250 Collection Name",
-    "List of Kinopoisk collections": "List of Kinopoisk collections"
+  "Kinopoisk.Ru": "Kinopoisk.Ru",
+  "Token configuration": "Token configuration",
+  "Get Token From Here": "Get token from here",
+  "Token": "Token",
+  "KinopoiskDev API configuration": "KinopoiskDev API configuration",
+  "Group sequels and prequels into a collection": "Group sequels and prequels into a collection",
+  "Top 250 collection creation configuration": "Top 250 collection creation configuration",
+  "Add items to a collection from all libraries": "Add items to a collection from all libraries",
+  "Top 250 Collection Name": "Top 250 Collection Name",
+  "List of Kinopoisk collections": "List of Kinopoisk collections"
 }

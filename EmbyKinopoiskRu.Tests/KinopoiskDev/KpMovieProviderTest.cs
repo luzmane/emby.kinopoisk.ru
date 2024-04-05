@@ -1,6 +1,8 @@
 using System.Net;
 using System.Globalization;
 
+using Emby.Notifications;
+
 using EmbyKinopoiskRu.Configuration;
 using EmbyKinopoiskRu.Provider.RemoteMetadata;
 
@@ -17,6 +19,7 @@ using MediaBrowser.Model.Providers;
 using MediaBrowser.Model.Querying;
 using MediaBrowser.Controller.Collections;
 using MediaBrowser.Controller.Library;
+using MediaBrowser.Model.Activity;
 
 namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
 
@@ -26,10 +29,10 @@ public class KpMovieProviderTest : BaseTest
     private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpMovieProviderTest));
 
     private readonly KpMovieProvider _kpMovieProvider;
-    private readonly long[] _internalIdPotterSequence = new long[] { 101, 102, 103, 104, 105, 106, 107, 108 };
 
 
     #region Test configs
+
     public KpMovieProviderTest() : base(Logger)
     {
         _pluginConfiguration.Token = GetKinopoiskDevToken();
@@ -38,19 +41,20 @@ public class KpMovieProviderTest : BaseTest
 
         ConfigXmlSerializer();
 
-        _kpMovieProvider = new(_httpClient, _logManager.Object);
+        _kpMovieProvider = new KpMovieProvider(_httpClient, _logManager.Object);
     }
+
     private void SetupLibraryManager()
     {
         ConfigLibraryManager();
 
-        var potterSequences = new long[] { 688, 322, 8_408, 48_356, 89_515, 276_762, 407_636, 4_716_622 }
+        List<KeyValuePair<string, string>> potterSequences = new long[] { 688, 322, 8_408, 48_356, 89_515, 276_762, 407_636, 4_716_622 }
             .Select(id => new KeyValuePair<string, string>(Plugin.PluginKey, id.ToString(CultureInfo.InvariantCulture)))
             .ToList();
-        var imdbPotterSequences = new[] { "tt1201607", "tt0330373", "tt0373889", "tt0417741", "tt0926084", "tt16116174" }
+        List<KeyValuePair<string, string>> imdbPotterSequences = new[] { "tt1201607", "tt0330373", "tt0373889", "tt0417741", "tt0926084", "tt16116174" }
             .Select(id => new KeyValuePair<string, string>(MetadataProviders.Imdb.ToString(), id.ToString(CultureInfo.InvariantCulture)))
             .ToList();
-        var tmdbPotterSequences = new[] { "12445", "674", "675", "767", "12444", "899082" }
+        List<KeyValuePair<string, string>> tmdbPotterSequences = new[] { "12445", "674", "675", "767", "12444", "899082" }
             .Select(id => new KeyValuePair<string, string>(MetadataProviders.Tmdb.ToString(), id.ToString(CultureInfo.InvariantCulture)))
             .ToList();
 
@@ -65,27 +69,30 @@ public class KpMovieProviderTest : BaseTest
                 && query.AnyProviderIdEquals.All(item => potterSequences.Contains(item)))))
             .Returns(new QueryResult<BaseItem>
             {
-                Items = new BaseItem[] {
-                    new Movie {
+                Items = new BaseItem[]
+                {
+                    new Movie
+                    {
                         Name = "Гарри Поттер и Тайная комната",
                         InternalId = 101L,
-                        ProviderIds = new(new Dictionary<string, string>
+                        ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
                             { Plugin.PluginKey, "688" },
                             { MetadataProviders.Imdb.ToString(), "tt0295297" },
                             { MetadataProviders.Tmdb.ToString(), "672" }
                         })
                     },
-                    new Movie {
+                    new Movie
+                    {
                         Name = "Гарри Поттер и узник Азкабана",
                         InternalId = 102L,
-                        ProviderIds = new(new Dictionary<string, string>
+                        ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
                             { Plugin.PluginKey, "322" },
                             { MetadataProviders.Imdb.ToString(), "tt0304141" },
                             { MetadataProviders.Tmdb.ToString(), "673" }
-                        }),
-                    },
+                        })
+                    }
                 }
             });
 
@@ -101,47 +108,52 @@ public class KpMovieProviderTest : BaseTest
             )))
             .Returns(new QueryResult<BaseItem>
             {
-                Items = new BaseItem[] {
-                    new Movie {
+                Items = new BaseItem[]
+                {
+                    new Movie
+                    {
                         Name = "Гарри Поттер и Кубок огня",
                         InternalId = 103L,
-                        ProviderIds = new(new Dictionary<string, string>
+                        ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
                             { Plugin.PluginKey, "8408" },
                             { MetadataProviders.Imdb.ToString(), "tt0330373" },
                             { MetadataProviders.Tmdb.ToString(), "674" }
                         })
                     },
-                    new Movie {
+                    new Movie
+                    {
                         Name = "Гарри Поттер и Орден Феникса",
                         InternalId = 104L,
-                        ProviderIds = new(new Dictionary<string, string>
+                        ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
                             { Plugin.PluginKey, "48356" },
                             { MetadataProviders.Tmdb.ToString(), "675" },
                             { MetadataProviders.Imdb.ToString(), "tt0373889" }
                         })
                     },
-                    new Movie {
+                    new Movie
+                    {
                         Name = "Гарри Поттер и Принц-полукровка",
                         InternalId = 105L,
-                        ProviderIds = new(new Dictionary<string, string>
+                        ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
                             { Plugin.PluginKey, "89515" },
                             { MetadataProviders.Tmdb.ToString(), "767" },
                             { MetadataProviders.Imdb.ToString(), "tt0417741" }
                         })
                     },
-                    new Movie {
+                    new Movie
+                    {
                         Name = "Гарри Поттер и Дары Смерти: Часть I",
                         InternalId = 106L,
-                        ProviderIds = new(new Dictionary<string, string>
+                        ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
                             { Plugin.PluginKey, "276762" },
                             { MetadataProviders.Tmdb.ToString(), "12444" },
                             { MetadataProviders.Imdb.ToString(), "tt0926084" }
-                        }),
-                    },
+                        })
+                    }
                 }
             });
 
@@ -157,30 +169,32 @@ public class KpMovieProviderTest : BaseTest
             )))
             .Returns(new QueryResult<BaseItem>
             {
-                Items = new BaseItem[] {
-                    new Movie {
+                Items = new BaseItem[]
+                {
+                    new Movie
+                    {
                         Name = "Гарри Поттер и Дары Смерти: Часть II",
                         InternalId = 107L,
-                        ProviderIds = new(new Dictionary<string, string>
+                        ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
                             { Plugin.PluginKey, "407636" },
                             { MetadataProviders.Imdb.ToString(), "tt1201607" },
                             { MetadataProviders.Tmdb.ToString(), "12445" }
                         })
                     },
-                    new Movie {
+                    new Movie
+                    {
                         Name = "Гарри Поттер 20 лет спустя: Возвращение в Хогвартс",
                         InternalId = 108L,
-                        ProviderIds = new(new Dictionary<string, string>
+                        ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
                             { Plugin.PluginKey, "4716622" },
                             { MetadataProviders.Tmdb.ToString(), "899082" },
                             { MetadataProviders.Imdb.ToString(), "tt16116174" }
                         })
-                    },
+                    }
                 }
             });
-
     }
 
     #endregion
@@ -211,7 +225,10 @@ public class KpMovieProviderTest : BaseTest
 
         var movieInfo = new MovieInfo
         {
-            ProviderIds = new(new() { { Plugin.PluginKey, "326" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { Plugin.PluginKey, "326" }
+            })
         };
 
         _ = _applicationPaths
@@ -244,7 +261,10 @@ public class KpMovieProviderTest : BaseTest
 
         var movieInfo = new MovieInfo
         {
-            ProviderIds = new(new() { { MetadataProviders.Imdb.ToString(), "tt0111161" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { MetadataProviders.Imdb.ToString(), "tt0111161" }
+            })
         };
 
         _ = _applicationPaths
@@ -277,7 +297,10 @@ public class KpMovieProviderTest : BaseTest
 
         var movieInfo = new MovieInfo
         {
-            ProviderIds = new(new() { { MetadataProviders.Tmdb.ToString(), "278" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { MetadataProviders.Tmdb.ToString(), "278" }
+            })
         };
 
         _ = _applicationPaths
@@ -348,7 +371,10 @@ public class KpMovieProviderTest : BaseTest
 
         var movieInfo = new MovieInfo
         {
-            ProviderIds = new(new() { { Plugin.PluginKey, "326" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { Plugin.PluginKey, "326" }
+            })
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         IEnumerable<RemoteSearchResult> result = await _kpMovieProvider.GetSearchResults(movieInfo, cancellationTokenSource.Token);
@@ -374,7 +400,10 @@ public class KpMovieProviderTest : BaseTest
 
         var movieInfo = new MovieInfo
         {
-            ProviderIds = new(new() { { MetadataProviders.Imdb.ToString(), "tt0111161" } })
+            ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
+            {
+                { MetadataProviders.Imdb.ToString(), "tt0111161" }
+            })
         };
         using var cancellationTokenSource = new CancellationTokenSource();
         IEnumerable<RemoteSearchResult> result = await _kpMovieProvider.GetSearchResults(movieInfo, cancellationTokenSource.Token);
@@ -448,98 +477,118 @@ public class KpMovieProviderTest : BaseTest
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_WithNameYearAndAddToExistingCollection)}'");
 
+        #region KpMovieProvider_WithNameYearAndAddToExistingCollection config
+
         _ = _libraryManager
             .Setup(m => m.GetInternalItemIds(It.Is<InternalItemsQuery>(q => Equals(true, q.IsFolder))))
             .Returns(new[] { 1L });
 
-        _ = _libraryManager // EmbyHelper.SearchExistingCollection(). Search boxset contains all sequence movies
+        // EmbyHelper.FindCollectionFolders
+        _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
-                Array.TrueForAll(query.IncludeItemTypes, item => "boxset".Equals(item, StringComparison.Ordinal))
-            )))
+                "Collections".Equals(query.Name, StringComparison.Ordinal)
+                && true.Equals(query.Recursive)
+                && true.Equals(query.IsFolder)
+                && query.IncludeItemTypes.Length == 1
+                && "CollectionFolder".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))
+            ))
             .Returns(new QueryResult<BaseItem>
             {
-                Items = new BaseItem[] {
-                    new BoxSet {
-                        InternalId = 201L,
-                        Name = "Гарри Поттер"
+                TotalRecordCount = 0,
+                Items = new BaseItem[]
+                {
+                    new CollectionFolder
+                    {
+                        Name = "Collections",
+                        Path = "/CreateKpCollectionsTaskTest_Execute_CollectionNotExists",
+                        InternalId = 2L
                     }
                 }
             });
 
-        _ = _libraryManager // EmbyHelper.SearchExistingCollection(). Search movies in boxset
+        // EmbyHelper.GetItemsByProviderIds
+        _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
-                !query.Recursive
-                && query.IsVirtualItem == false
+                true.Equals(query.Recursive)
+                && false.Equals(query.IsVirtualItem)
+                && true.Equals(query.HasPath)
                 && query.IncludeItemTypes.Length == 2
-                && nameof(Movie).Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
-                && nameof(Series).Equals(query.IncludeItemTypes[1], StringComparison.Ordinal)
-                && query.CollectionIds.Length == 1
-                && Array.TrueForAll(query.CollectionIds, item => item == 201L))))
+                && "Movie".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
+                && "Series".Equals(query.IncludeItemTypes[1], StringComparison.Ordinal)
+                && query.AnyProviderIdEquals.Any())
+            ))
             .Returns(new QueryResult<BaseItem>
             {
-                TotalRecordCount = 4,
-                Items = new BaseItem[] {
-                    new Movie {
-                        Name = "Гарри Поттер и Дары Смерти: Часть II",
-                        InternalId = 107L,
-                        ProviderIds = new(new Dictionary<string, string>
-                        {
-                            { Plugin.PluginKey, "407636" },
-                            { MetadataProviders.Imdb.ToString(), "tt1201607" },
-                            { MetadataProviders.Tmdb.ToString(), "12445" }
-                        })
-                    },
-                    new Movie {
-                        Name = "Гарри Поттер и Кубок огня",
+                Items = Array.Empty<BaseItem>()
+            });
+
+        // EmbyHelper.GetItemsByProviderIds
+        _ = _libraryManager
+            .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
+                true.Equals(query.Recursive)
+                && false.Equals(query.IsVirtualItem)
+                && query.IncludeItemTypes.Length == 2
+                && "Movie".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
+                && "Series".Equals(query.IncludeItemTypes[1], StringComparison.Ordinal)
+                && query.AnyProviderIdEquals.Contains(new KeyValuePair<string, string>(Plugin.PluginKey, "688"))
+            )))
+            .Returns(new QueryResult<BaseItem>
+            {
+                Items = new BaseItem[]
+                {
+                    new Movie
+                    {
+                        Name = "Гарри Поттер и Тайная комната",
                         InternalId = 103L,
-                        ProviderIds = new(new Dictionary<string, string>
+                        Path = "/tmp/103",
+                        ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
-                            { Plugin.PluginKey, "8408" },
-                            { MetadataProviders.Imdb.ToString(), "tt0330373" },
-                            { MetadataProviders.Tmdb.ToString(), "674" }
+                            { Plugin.PluginKey, "688" }
                         })
-                    },
-                    new Movie {
-                        Name = "Гарри Поттер и Орден Феникса",
-                        InternalId = 104L,
-                        ProviderIds = new(new Dictionary<string, string>
-                        {
-                            { Plugin.PluginKey, "48356" },
-                            { MetadataProviders.Tmdb.ToString(), "675" },
-                            { MetadataProviders.Imdb.ToString(), "tt0373889" }
-                        })
-                    },
-                    new Movie {
-                        Name = "Гарри Поттер и Дары Смерти: Часть I",
-                        InternalId = 106L,
-                        ProviderIds = new(new Dictionary<string, string>
-                        {
-                            { Plugin.PluginKey, "276762" },
-                            { MetadataProviders.Tmdb.ToString(), "12444" },
-                            { MetadataProviders.Imdb.ToString(), "tt0926084" }
-                        }),
-                    },
+                    }
                 }
             });
 
-        LibraryOptions boxsetLibraryOptions = new()
-        {
-            ContentType = CollectionType.BoxSets.ToString(),
-            MetadataCountryCode = "RU",
-            MinCollectionItems = 1,
-            PathInfos = new[]{
-                        new MediaPathInfo
-                        {
-                            NetworkPath = null,
-                            Path = "/emby/movie_library"
-                        }
-                    },
-            PreferredImageLanguage = "ru",
-            PreferredMetadataLanguage = "ru",
-        };
+        // EmbyHelper.GetCollectionByName
+        _ = _libraryManager
+            .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
+                "Гарри Поттер и философский камень".Equals(query.Name, StringComparison.Ordinal)
+                && true.Equals(query.Recursive)
+                && query.IncludeItemTypes.Length == 1
+                && "BoxSet".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))
+            ))
+            .Returns(new QueryResult<BaseItem>
+            {
+                TotalRecordCount = 1,
+                Items = new BaseItem[]
+                {
+                    new BoxSet
+                    {
+                        Name = "Гарри Поттер и философский камень",
+                        Path = "/emby/harry_potter_exists",
+                        InternalId = 567L
+                    }
+                }
+            });
+
         _ = _xmlSerializer
             .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "KpMovieProvider_WithNameYearAndAddToExistingCollection/options.xml"))
-            .Returns(boxsetLibraryOptions);
+            .Returns(new LibraryOptions
+            {
+                ContentType = CollectionType.BoxSets.ToString(),
+                MetadataCountryCode = "RU",
+                MinCollectionItems = 1,
+                PathInfos = new[]
+                {
+                    new MediaPathInfo
+                    {
+                        NetworkPath = null,
+                        Path = "/emby/movie_library"
+                    }
+                },
+                PreferredImageLanguage = "ru",
+                PreferredMetadataLanguage = "ru"
+            });
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
@@ -557,6 +606,9 @@ public class KpMovieProviderTest : BaseTest
         movieInfo.SetProviderId(Plugin.PluginKey, "689");
         using var cancellationTokenSource = new CancellationTokenSource();
         _pluginConfiguration.CreateSeqCollections = true;
+
+        #endregion
+
         MetadataResult<Movie> result = await _kpMovieProvider.GetMetadata(movieInfo, cancellationTokenSource.Token);
 
         result.HasMetadata.Should().BeTrue();
@@ -566,19 +618,18 @@ public class KpMovieProviderTest : BaseTest
         result.People.Should().HaveCountGreaterThanOrEqualTo(18);
         VerifyPersonInfo40779(result.People.FirstOrDefault(p => "Эмма Уотсон".Equals(p.Name, StringComparison.Ordinal)));
 
-        _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
+        // check that no errors in API
+        _activityManager.Verify(a => a.Create(It.IsAny<ActivityLogEntry>()), Times.Never());
+        _notificationManager.Verify(n => n.SendNotification(It.IsAny<NotificationRequest>()), Times.Never());
+
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_WithNameYearAndAddToExistingCollection/EmbyKinopoiskRu.xml"), Times.Once());
-        //_xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "KpMovieProvider_WithNameYearAndAddToExistingCollection/options.xml"), Times.Once());
+        _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(3));
+        _libraryManager.Verify(lm => lm.GetItemLinks(103L, It.IsAny<List<ItemLinkType>>()), Times.Once());
+        _libraryManager.Verify(lm => lm.UpdateItem(It.IsAny<BaseItem>(), It.IsAny<BaseItem>(), ItemUpdateType.MetadataEdit, null), Times.Once());
         _localizationManager.Verify(lm => lm.RemoveDiacritics("Гарри Поттер и философский камень"), Times.Once());
-        //_libraryManager.Verify(lm => lm.GetUserRootFolder(), Times.Once());
-        //_libraryManager.Verify(lm => lm.GetLibraryOptions(It.IsAny<UserRootFolder>()), Times.Once());
-        //_libraryManager.Verify(lm => lm.GetInternalItemIds(It.IsAny<InternalItemsQuery>()), Times.Exactly(2));
-        //_libraryManager.Verify(lm => lm.GetItemById(1L), Times.Once());
-        //_libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(5));
-        //_libraryManager.Verify(lm => lm.GetItemLinks(It.IsInRange(101L, 108L, Moq.Range.Inclusive), It.IsAny<List<ItemLinkType>>()), Times.Exactly(8));
-        //_libraryManager.Verify(lm => lm.UpdateItem(It.IsAny<BaseItem>(), It.IsAny<BaseItem>(), ItemUpdateType.MetadataEdit, null), Times.Exactly(8));
-        //_serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/movie_library"), Times.Once());
+        _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_WithNameYearAndAddToExistingCollection/EmbyKinopoiskRu.xml"), Times.Once());
+
         VerifyNoOtherCalls();
 
         Logger.Info($"Finished '{nameof(KpMovieProvider_WithNameYearAndAddToExistingCollection)}'");
@@ -590,48 +641,120 @@ public class KpMovieProviderTest : BaseTest
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_WithNameYearAndAddToNewCollection)}'");
 
+        #region KpMovieProvider_WithNameYearAndAddToNewCollection config
+
         _ = _libraryManager
             .SetupSequence(m => m.GetInternalItemIds(It.Is<InternalItemsQuery>(q => Equals(true, q.IsFolder))))
             .Returns(Array.Empty<long>())
             .Returns(new[] { 1L });
 
-        _ = _libraryManager // EmbyHelper.SearchExistingCollection(). Search boxset contains all sequence movies
-            .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
-                query.IncludeItemTypes.Length == 1
-                && Array.TrueForAll(query.IncludeItemTypes, item => "boxset".Equals(item, StringComparison.Ordinal))
-                && query.ListItemIds.Length == _internalIdPotterSequence.Length
-                && Array.TrueForAll(query.ListItemIds, item => _internalIdPotterSequence.Contains(item))
-            )))
-            .Returns(new QueryResult<BaseItem> { Items = Array.Empty<BaseItem>() });
-
         _ = _collectionManager
             .Setup(m => m.CreateCollection(It.IsAny<CollectionCreationOptions>()))
-            .Returns((CollectionCreationOptions options) =>
-                Task.FromResult(new BoxSet
-                {
-                    Name = options.Name,
-                    ParentId = options.ParentId,
-                    InternalId = 201L,
-                }));
+            .Returns((CollectionCreationOptions options) => Task.FromResult(new BoxSet
+            {
+                Name = options.Name,
+                ParentId = options.ParentId,
+                InternalId = 201L
+            }));
 
-        LibraryOptions boxsetLibraryOptions = new()
-        {
-            ContentType = CollectionType.BoxSets.ToString(),
-            MetadataCountryCode = "RU",
-            MinCollectionItems = 1,
-            PathInfos = new[]{
-                        new MediaPathInfo
+        // EmbyHelper.FindCollectionFolders
+        _ = _libraryManager
+            .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
+                "Collections".Equals(query.Name, StringComparison.Ordinal)
+                && true.Equals(query.Recursive)
+                && true.Equals(query.IsFolder)
+                && query.IncludeItemTypes.Length == 1
+                && "CollectionFolder".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))
+            ))
+            .Returns(new QueryResult<BaseItem>
+            {
+                TotalRecordCount = 0,
+                Items = new BaseItem[]
+                {
+                    new CollectionFolder
+                    {
+                        Name = "Collections",
+                        Path = "/CreateKpCollectionsTaskTest_Execute_CollectionNotExists",
+                        InternalId = 2L
+                    }
+                }
+            });
+
+        // EmbyHelper.GetItemsByProviderIds
+        _ = _libraryManager
+            .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
+                true.Equals(query.Recursive)
+                && false.Equals(query.IsVirtualItem)
+                && true.Equals(query.HasPath)
+                && query.IncludeItemTypes.Length == 2
+                && "Movie".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
+                && "Series".Equals(query.IncludeItemTypes[1], StringComparison.Ordinal)
+                && query.AnyProviderIdEquals.Any())
+            ))
+            .Returns(new QueryResult<BaseItem>
+            {
+                Items = Array.Empty<BaseItem>()
+            });
+
+        // EmbyHelper.GetItemsByProviderIds
+        _ = _libraryManager
+            .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
+                true.Equals(query.Recursive)
+                && false.Equals(query.IsVirtualItem)
+                && query.IncludeItemTypes.Length == 2
+                && "Movie".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
+                && "Series".Equals(query.IncludeItemTypes[1], StringComparison.Ordinal)
+                && query.AnyProviderIdEquals.Contains(new KeyValuePair<string, string>(Plugin.PluginKey, "688"))
+            )))
+            .Returns(new QueryResult<BaseItem>
+            {
+                Items = new BaseItem[]
+                {
+                    new Movie
+                    {
+                        Name = "Гарри Поттер и Тайная комната",
+                        InternalId = 103L,
+                        Path = "/tmp/103",
+                        ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
-                            NetworkPath = null,
-                            Path = "/emby/movie_library"
-                        }
-                    },
-            PreferredImageLanguage = "ru",
-            PreferredMetadataLanguage = "ru",
-        };
+                            { Plugin.PluginKey, "688" }
+                        })
+                    }
+                }
+            });
+
+        // EmbyHelper.GetCollectionByName
+        _ = _libraryManager
+            .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
+                "Гарри Поттер и философский камень".Equals(query.Name, StringComparison.Ordinal)
+                && true.Equals(query.Recursive)
+                && query.IncludeItemTypes.Length == 1
+                && "BoxSet".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))
+            ))
+            .Returns(new QueryResult<BaseItem>
+            {
+                TotalRecordCount = 0,
+                Items = Array.Empty<BaseItem>()
+            });
+
         _ = _xmlSerializer
             .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "KpMovieProvider_WithNameYearAndAddToNewCollection/options.xml"))
-            .Returns(boxsetLibraryOptions);
+            .Returns(new LibraryOptions
+            {
+                ContentType = CollectionType.BoxSets.ToString(),
+                MetadataCountryCode = "RU",
+                MinCollectionItems = 1,
+                PathInfos = new[]
+                {
+                    new MediaPathInfo
+                    {
+                        NetworkPath = null,
+                        Path = "/emby/movie_library"
+                    }
+                },
+                PreferredImageLanguage = "ru",
+                PreferredMetadataLanguage = "ru"
+            });
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
@@ -649,6 +772,9 @@ public class KpMovieProviderTest : BaseTest
         movieInfo.SetProviderId(Plugin.PluginKey, "689");
         using var cancellationTokenSource = new CancellationTokenSource();
         _pluginConfiguration.CreateSeqCollections = true;
+
+        #endregion
+
         MetadataResult<Movie> result = await _kpMovieProvider.GetMetadata(movieInfo, cancellationTokenSource.Token);
 
         result.HasMetadata.Should().BeTrue();
@@ -658,22 +784,19 @@ public class KpMovieProviderTest : BaseTest
         result.People.Should().HaveCountGreaterThanOrEqualTo(18);
         VerifyPersonInfo40779(result.People.FirstOrDefault(p => "Эмма Уотсон".Equals(p.Name, StringComparison.Ordinal)));
 
-        _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
+        // check that no errors in API
+        _activityManager.Verify(a => a.Create(It.IsAny<ActivityLogEntry>()), Times.Never());
+        _notificationManager.Verify(n => n.SendNotification(It.IsAny<NotificationRequest>()), Times.Never());
+
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_WithNameYearAndAddToNewCollection/EmbyKinopoiskRu.xml"), Times.Once());
-        //_xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(LibraryOptions), "KpMovieProvider_WithNameYearAndAddToNewCollection/options.xml"), Times.Once());
+        _collectionManager.Verify(cm => cm.CreateCollection(It.IsAny<CollectionCreationOptions>()), Times.Once());
+        _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(3));
         _localizationManager.Verify(lm => lm.RemoveDiacritics("Гарри Поттер и философский камень"), Times.Once());
-        // _libraryManager.Verify(lm => lm.GetUserRootFolder(), Times.Exactly(2));
-        // _libraryManager.Verify(lm => lm.GetLibraryOptions(It.IsAny<UserRootFolder>()), Times.Exactly(2));
-        // _libraryManager.Verify(lm => lm.GetInternalItemIds(It.IsAny<InternalItemsQuery>()), Times.Exactly(3));
-        // _libraryManager.Verify(lm => lm.AddVirtualFolder("Collections", It.IsAny<LibraryOptions>(), true), Times.Once());
-        // _libraryManager.Verify(lm => lm.GetItemById(1L), Times.Once());
-        // _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(4));
-        // _collectionManager.Verify(cm => cm.CreateCollection(It.IsAny<CollectionCreationOptions>()), Times.Once());
-        // _serverApplicationHost.Verify(sah => sah.ExpandVirtualPath("/emby/movie_library"), Times.Once());
+        _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_WithNameYearAndAddToNewCollection/EmbyKinopoiskRu.xml"), Times.Once());
+
         VerifyNoOtherCalls();
 
         Logger.Info($"Finished '{nameof(KpMovieProvider_WithNameYearAndAddToNewCollection)}'");
     }
-
 }
