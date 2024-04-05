@@ -1,3 +1,6 @@
+v.1.23.1
+- fix: incorrect description for Create Kinopoisk Collections Task
+
 v.1.23.0
 - feature: add notification, in case any problems with token (API access)
 - improvement: take into account a type of video, filtering the API search response
