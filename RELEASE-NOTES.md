@@ -1,3 +1,6 @@
+v.1.24.0
+- feature: add task "KinopoiskId by IMDB" for kinopoiskapiunofficial.tech
+
 v.1.23.1
 - fix: incorrect description for Create Kinopoisk Collections Task
 
