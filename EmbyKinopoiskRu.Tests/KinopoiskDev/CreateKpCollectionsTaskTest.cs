@@ -23,7 +23,7 @@ namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
 [Collection("Sequential")]
 public class CreateKpCollectionsTaskTest : BaseTest
 {
-    private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpEpisodeProviderTest));
+    private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(CreateKpCollectionsTaskTest));
 
     private readonly CreateKpCollectionsTask _createKpCollectionsTaskTest;
 

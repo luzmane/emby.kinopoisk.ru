@@ -74,6 +74,20 @@ public class ApiTests : IDisposable
     }
 
     [Fact]
+    public async Task SearchFilmByImdb()
+    {
+        const string request = "https://kinopoiskapiunofficial.tech/api/v2.2/films?imdbId=tt0111161";
+        using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
+        _ = responseMessage.EnsureSuccessStatusCode();
+        var response = await responseMessage.Content.ReadAsStringAsync();
+        KpSearchResult<KpFilm>? filmSearchResult = JsonSerializer.Deserialize<KpSearchResult<KpFilm>>(response, _jsonOptions);
+        filmSearchResult.Should().NotBeNull();
+        filmSearchResult!.Items.Should().ContainSingle();
+
+        VerifyKpFilm326(filmSearchResult.Items.First(x => x.KinopoiskId == 326), true);
+    }
+
+    [Fact]
     public async Task GetSeasons()
     {
         const string request = "https://kinopoiskapiunofficial.tech/api/v2.2/films/77044/seasons";

@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using EmbyKinopoiskRu.Api;
-using EmbyKinopoiskRu.Api.KinopoiskApiUnofficial;
+using EmbyKinopoiskRu.Configuration;
 using EmbyKinopoiskRu.Helper;
 using EmbyKinopoiskRu.ScheduledTasks.Model;
 
@@ -109,13 +109,6 @@ namespace EmbyKinopoiskRu.ScheduledTasks
 
             try
             {
-                IKinopoiskRuService kinopoiskRuService = Plugin.Instance.GetKinopoiskService();
-                if (kinopoiskRuService is KinopoiskUnofficialService)
-                {
-                    _log.Error("KinopoiskUnofficial doesn't support this task. Exit");
-                    return;
-                }
-
                 _log.Info("Searching for movies/series without KP id, but with IMDB or TMDB");
                 BaseItem[] itemsToUpdateResult = EmbyHelper.GetVideoWithoutKpWithImdbTmdb(_libraryManager);
                 _log.Info($"Found {itemsToUpdateResult.Length} items");
@@ -132,11 +125,20 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                     _log.Info("Finishing update Kinopoisk IDs by Imdb ID");
                     progress.Report(50d);
 
-                    IEnumerable<BaseItem> tmdbList = itemsToUpdateResult
-                        .Where(m => string.IsNullOrWhiteSpace(m.GetProviderId(MetadataProviders.Imdb.ToString())))
-                        .Where(m => !string.IsNullOrWhiteSpace(m.GetProviderId(MetadataProviders.Tmdb.ToString())));
-                    await UpdateItemsByProviderIdAsync(tmdbList, MetadataProviders.Tmdb.ToString(), cancellationToken);
-                    _log.Info("Finishing update Kinopoisk IDs by Tmdb ID");
+                    if (PluginConfiguration.KinopoiskDev.Equals(Plugin.Instance.Configuration.ApiType))
+                    {
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            _log.Info("Cancelation was requested. Skip update by Tmdb");
+                            return;
+                        }
+
+                        IEnumerable<BaseItem> tmdbList = itemsToUpdateResult
+                            .Where(m => string.IsNullOrWhiteSpace(m.GetProviderId(MetadataProviders.Imdb.ToString())))
+                            .Where(m => !string.IsNullOrWhiteSpace(m.GetProviderId(MetadataProviders.Tmdb.ToString())));
+                        await UpdateItemsByProviderIdAsync(tmdbList, MetadataProviders.Tmdb.ToString(), cancellationToken);
+                        _log.Info("Finishing update Kinopoisk IDs by Tmdb ID");
+                    }
                     progress.Report(100d);
                 }
             }

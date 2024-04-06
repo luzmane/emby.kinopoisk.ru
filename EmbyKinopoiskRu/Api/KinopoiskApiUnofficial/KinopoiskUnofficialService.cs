@@ -859,10 +859,43 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             return toReturn;
         }
 
-        public Task<ApiResult<Dictionary<string, long>>> GetKpIdByAnotherIdAsync(string externalIdType, IEnumerable<string> idList, CancellationToken cancellationToken)
+        public async Task<ApiResult<Dictionary<string, long>>> GetKpIdByAnotherIdAsync(string externalIdType, IEnumerable<string> idList, CancellationToken cancellationToken)
         {
-            _log.Info("KinopoiskUnofficial unable to search by IMDB nor by TMDB");
-            return Task.FromResult(new ApiResult<Dictionary<string, long>>(new Dictionary<string, long>()));
+            if (!"imdb".Equals(externalIdType, StringComparison.InvariantCultureIgnoreCase))
+            {
+                _log.Info($"Not supported provider: '{externalIdType}'");
+                return new ApiResult<Dictionary<string, long>>(new Dictionary<string, long>()) { HasError = true };
+            }
+
+            _log.Info($"Search Kinopoisk ID for {idList.Count()} items by {externalIdType} provider");
+            var toReturn = new ApiResult<Dictionary<string, long>>(new Dictionary<string, long>());
+            int errorCount = 0;
+            const int errorThreshold = 10;
+            foreach (var imdb in idList)
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    _log.Info("Cancelation was requested. Return founded items");
+                    break;
+                }
+
+                if (errorCount > errorThreshold)
+                {
+                    _log.Warn("Too much errors during KP IDs search by IMDB. Return founded items");
+                    break;
+                }
+
+                KpSearchResult<KpFilm> movies = await _api.GetKpIdByImdbAsync(imdb, cancellationToken);
+                if (movies.HasError || movies.Items.Count == 0)
+                {
+                    _log.Info($"Failed to get Kinopoisk ID by IMDB '{externalIdType}'");
+                    errorCount++;
+                    continue;
+                }
+                toReturn.Item.Add(movies.Items[0].ImdbId, movies.Items[0].KinopoiskId);
+            }
+
+            return toReturn;
         }
 
         public Task<List<KpLists>> GetKpCollectionsAsync()

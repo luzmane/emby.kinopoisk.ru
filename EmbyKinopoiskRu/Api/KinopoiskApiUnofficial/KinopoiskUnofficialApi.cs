@@ -88,6 +88,24 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             };
         }
 
+        internal async Task<KpSearchResult<KpFilm>> GetKpIdByImdbAsync(string imdbId, CancellationToken cancellationToken)
+        {
+            if (string.IsNullOrWhiteSpace(imdbId))
+            {
+                _log.Info("Received id is empty");
+                return new KpSearchResult<KpFilm>();
+            }
+
+            var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films?imdbId={imdbId}";
+            var json = await SendRequestAsync(request, cancellationToken);
+            return json.Length == 0
+                ? new KpSearchResult<KpFilm>
+                {
+                    HasError = true
+                }
+                : _jsonSerializer.DeserializeFromString<KpSearchResult<KpFilm>>(json);
+        }
+
         internal async Task<List<KpFilmStaff>> GetStaffByFilmIdAsync(string movieId, CancellationToken cancellationToken)
         {
             var url = $"https://kinopoiskapiunofficial.tech/api/v1/staff?filmId={movieId}";

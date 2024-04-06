@@ -12,7 +12,7 @@ using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Entities;
 using MediaBrowser.Model.Querying;
 
-namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
+namespace EmbyKinopoiskRu.Tests.KinopoiskApiUnofficial;
 
 [Collection("Sequential")]
 public class CreateKinopoiskIdTaskTest : BaseTest
@@ -26,7 +26,8 @@ public class CreateKinopoiskIdTaskTest : BaseTest
 
     public CreateKinopoiskIdTaskTest() : base(Logger)
     {
-        _pluginConfiguration.Token = GetKinopoiskDevToken();
+        _pluginConfiguration.Token = GetKinopoiskUnofficialToken();
+        _pluginConfiguration.ApiType = PluginConfiguration.KinopoiskApiUnofficialTech;
 
         ConfigLibraryManager();
 
@@ -74,7 +75,7 @@ public class CreateKinopoiskIdTaskTest : BaseTest
             });
 
         _createKinopoiskIdTask.Name.Should().Be("Добавить ID Кинопоиска по ключам IMDB, TMDB");
-        _createKinopoiskIdTask.Description.Should().Be("Добавить ID Кинопоиска, ища через API по ID IMDB и TMDB. Поддерживает только kinopoisk.dev");
+        _createKinopoiskIdTask.Description.Should().Be("Добавить ID Кинопоиска, ища через API по ID IMDB и TMDB");
         _createKinopoiskIdTask.Category.Should().Be("Плагин Кинопоиска");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
@@ -98,7 +99,7 @@ public class CreateKinopoiskIdTaskTest : BaseTest
             });
 
         _createKinopoiskIdTask.Name.Should().Be("Add KinopoiskId based on IMDB, TMDB");
-        _createKinopoiskIdTask.Description.Should().Be("Add KinopoiskId searching them by IMDB and TMDB ids. Support kinopoisk.dev only");
+        _createKinopoiskIdTask.Description.Should().Be("Add KinopoiskId searching them by IMDB and TMDB ids");
         _createKinopoiskIdTask.Category.Should().Be("Kinopoisk Plugin");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
@@ -122,7 +123,7 @@ public class CreateKinopoiskIdTaskTest : BaseTest
             });
 
         _createKinopoiskIdTask.Name.Should().Be("Додати ID Кінопошуку за ключами IMDB, TMDB");
-        _createKinopoiskIdTask.Description.Should().Be("Додати ID Кінопошуку, шукаючи через API за ID IMDB та TMDB. Підтримує лише kinopoisk.dev");
+        _createKinopoiskIdTask.Description.Should().Be("Додати ID Кінопошуку, шукаючи через API за ID IMDB та TMDB");
         _createKinopoiskIdTask.Category.Should().Be("Плагін Кінопошуку");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
@@ -146,7 +147,7 @@ public class CreateKinopoiskIdTaskTest : BaseTest
             });
 
         _createKinopoiskIdTask.Name.Should().Be("Add KinopoiskId based on IMDB, TMDB");
-        _createKinopoiskIdTask.Description.Should().Be("Add KinopoiskId searching them by IMDB and TMDB ids. Support kinopoisk.dev only");
+        _createKinopoiskIdTask.Description.Should().Be("Add KinopoiskId searching them by IMDB and TMDB ids");
         _createKinopoiskIdTask.Category.Should().Be("Kinopoisk Plugin");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
@@ -200,20 +201,20 @@ public class CreateKinopoiskIdTaskTest : BaseTest
                     },
                     new Movie
                     {
-                        Name = "Гарри Поттер и узник Азкабана",
+                        Name = "Гарри Поттер и Кубок огня",
                         InternalId = 102L,
                         ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
-                            { MetadataProviders.Tmdb.ToString(), "673" }
+                            { MetadataProviders.Imdb.ToString(), "tt0330373" }
                         })
                     },
                     new Movie
                     {
-                        Name = "Гарри Поттер и Кубок огня",
+                        Name = "Гарри Поттер и узник Азкабана",
                         InternalId = 103L,
                         ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
-                            { MetadataProviders.Imdb.ToString(), "tt0330373" }
+                            { MetadataProviders.Tmdb.ToString(), "673" }
                         })
                     }
                 }
@@ -226,8 +227,8 @@ public class CreateKinopoiskIdTaskTest : BaseTest
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
         _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "CreateKinopoiskIdTask_Execute/EmbyKinopoiskRu.xml"), Times.Once());
         _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Once());
-        _libraryManager.Verify(lm => lm.GetItemLinks(It.IsInRange(101L, 103L, Moq.Range.Inclusive), It.IsAny<List<ItemLinkType>>()), Times.Exactly(3));
-        _libraryManager.Verify(lm => lm.UpdateItem(It.IsAny<BaseItem>(), It.IsAny<BaseItem>(), ItemUpdateType.MetadataEdit, null), Times.Exactly(3));
+        _libraryManager.Verify(lm => lm.GetItemLinks(It.IsInRange(101L, 102L, Moq.Range.Inclusive), It.IsAny<List<ItemLinkType>>()), Times.Exactly(2));
+        _libraryManager.Verify(lm => lm.UpdateItem(It.IsAny<BaseItem>(), It.IsAny<BaseItem>(), ItemUpdateType.MetadataEdit, null), Times.Exactly(2));
         VerifyNoOtherCalls();
 
         Logger.Info($"Finished '{nameof(CreateKinopoiskIdTask_Execute)}'");
