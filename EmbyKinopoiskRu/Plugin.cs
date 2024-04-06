@@ -158,5 +158,14 @@ namespace EmbyKinopoiskRu
             _kinopoiskServicesDictionary.Add("KinopoiskUnofficial", unOfficialService);
             return unOfficialService;
         }
+
+        /// <inheritdoc />
+        public override void UpdateConfiguration(BasePluginConfiguration configuration)
+        {
+            var config = (PluginConfiguration)configuration;
+            var collections = config.Collections;
+            base.UpdateConfiguration(configuration);
+            config.SetCollection(collections);
+        }
     }
 }

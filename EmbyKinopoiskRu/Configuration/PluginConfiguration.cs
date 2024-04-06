@@ -61,7 +61,7 @@ namespace EmbyKinopoiskRu.Configuration
             return KinopoiskDev.Equals(ApiType, StringComparison.Ordinal) && CreateSeqCollections;
         }
 
-        private void SetCollection(string value)
+        internal void SetCollection(string value)
         {
             if (s_fetchingCollections)
             {
