@@ -123,7 +123,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                     versionStr = release.tag_name,
                     classification = PackageVersionClass.Release,
                     description = release.body,
-                    requiredVersionStr = "4.7.9",
+                    requiredVersionStr = "4.8.0",
                     sourceUrl = release.assets[0].browser_download_url,
                     targetFilename = DllName,
                     infoUrl = release.html_url,
