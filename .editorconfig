@@ -31,65 +31,65 @@ indent_size = 2
 #      .NET Diagnostic        #
 ###############################
 # CA1001: Types that own disposable fields should be disposable
-dotnet_diagnostic.CA1001.severity = error
+dotnet_diagnostic.ca1001.severity = error
 # CA1012: Abstract types should not have public constructors
-dotnet_diagnostic.CA1012.severity = error
+dotnet_diagnostic.ca1012.severity = error
 # CA1031: Do not catch general exception types
-dotnet_diagnostic.CA1031.severity = none
+dotnet_diagnostic.ca1031.severity = none
 # CA1040: Avoid empty interfaces
-dotnet_diagnostic.CA1040.severity = suggestion
+dotnet_diagnostic.ca1040.severity = suggestion
 # CA1062: Validate arguments of public methods
-dotnet_diagnostic.CA1062.severity = suggestion
+dotnet_diagnostic.ca1062.severity = suggestion
 # CA1063: Implement IDisposable correctly
-dotnet_diagnostic.CA1063.severity = error
+dotnet_diagnostic.ca1063.severity = error
 # CA1305: Specify IFormatProvider
-dotnet_diagnostic.CA1305.severity = suggestion
+dotnet_diagnostic.ca1305.severity = suggestion
 # CA1307: Specify StringComparison for clarity
-dotnet_diagnostic.CA1307.severity = suggestion
+dotnet_diagnostic.ca1307.severity = suggestion
 # CA1308: Normalize strings to uppercase
-dotnet_diagnostic.CA1308.severity = suggestion
+dotnet_diagnostic.ca1308.severity = suggestion
 # CA1309: Use ordinal StringComparison
-dotnet_diagnostic.CA1309.severity = suggestion
+dotnet_diagnostic.ca1309.severity = suggestion
 # CA1508: Avoid dead conditional code
-dotnet_diagnostic.CA1508.severity = warning
+dotnet_diagnostic.ca1508.severity = warning
 # CA1725: Parameter names should match base declaration
-dotnet_diagnostic.CA1725.severity = warning
+dotnet_diagnostic.ca1725.severity = warning
 # CA1727: Use PascalCase for named placeholders
-dotnet_diagnostic.CA1727.severity = warning
+dotnet_diagnostic.ca1727.severity = warning
 # CA1812: Avoid uninstantiated internal classes
-dotnet_diagnostic.CA1812.severity = none
+dotnet_diagnostic.ca1812.severity = none
 # CA1845: Use span-based 'string.Concat'
-dotnet_diagnostic.CA1845.severity = warning
+dotnet_diagnostic.ca1845.severity = warning
 # CA1848: Use the LoggerMessage delegates
-dotnet_diagnostic.CA1848.severity = none
+dotnet_diagnostic.ca1848.severity = none
 # CA1849: Call async methods when in an async method
-dotnet_diagnostic.CA1849.severity = warning
+dotnet_diagnostic.ca1849.severity = warning
 # CA2007: Do not directly await a Task
-dotnet_diagnostic.CA2007.severity = none
+dotnet_diagnostic.ca2007.severity = none
 # CA2201: Do not raise reserved exception types
-dotnet_diagnostic.CA2201.severity = none
+dotnet_diagnostic.ca2201.severity = none
 # CA2016: Forward the CancellationToken parameter to methods that take one
-dotnet_diagnostic.CA2016.severity = warning
+dotnet_diagnostic.ca2016.severity = warning
 # CA2215: Dispose methods should call base class dispose
-dotnet_diagnostic.CA2215.severity = warning
+dotnet_diagnostic.ca2215.severity = warning
 # CA2254: Template should be a static expression
-dotnet_diagnostic.CA2254.severity = warning
+dotnet_diagnostic.ca2254.severity = warning
 
 # IDE0005: Remove unnecessary using directives
-dotnet_diagnostic.IDE0005.severity = warning
+dotnet_diagnostic.ide0005.severity = warning
 
 #### Local rules ####
 
 # CA1002: Do not expose generic lists
-dotnet_diagnostic.CA1002.severity = none
+dotnet_diagnostic.ca1002.severity = none
 # CA1054: URI parameters should not be strings
-dotnet_diagnostic.CA1054.severity = none
+dotnet_diagnostic.ca1054.severity = none
 # CA1056: URI properties should not be strings
-dotnet_diagnostic.CA1056.severity = none
+dotnet_diagnostic.ca1056.severity = none
 # CA1819: Properties should not return arrays
-dotnet_diagnostic.CA1819.severity = none
+dotnet_diagnostic.ca1819.severity = none
 # CA1308: Normalize strings to uppercase
-dotnet_diagnostic.CA1308.severity = none
+dotnet_diagnostic.ca1308.severity = none
 
 
 #### Core EditorConfig Options ####
@@ -508,3 +508,4 @@ csharp_preserve_single_line_statements = true
 ###############################
 resharper_wrap_array_initializer_style = chop_if_long
 resharper_wrap_object_and_collection_initializer_style = chop_always
+resharper_place_accessorholder_attribute_on_same_line = false
