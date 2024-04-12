@@ -1,3 +1,6 @@
+v.1.24.1
+- fix: issue#12 - unable to update the plugin
+
 v.1.24.0
 - feature: add task "KinopoiskId by IMDB" for kinopoiskapiunofficial.tech
 
