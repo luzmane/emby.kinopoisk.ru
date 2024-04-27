@@ -203,7 +203,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 LogResponse = true,
                 CacheLength = TimeSpan.FromHours(12),
                 CacheMode = CacheMode.Unconditional,
-                TimeoutMs = 180000,
+                TimeoutMs = 30_000,
                 DecompressionMethod = CompressionMethod.Gzip,
                 EnableHttpCompression = true,
                 EnableDefaultUserAgent = true

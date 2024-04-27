@@ -163,7 +163,6 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 LogResponse = true,
                 CacheLength = TimeSpan.FromHours(12),
                 CacheMode = CacheMode.Unconditional,
-                TimeoutMs = 180000,
                 EnableDefaultUserAgent = true
             };
             using (var reader = new StreamReader((await _httpClient.GetResponse(options)).Content))
