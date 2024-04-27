@@ -1,3 +1,9 @@
+v.1.25.0
+- feature: add Kinopoisk ID to trailers (same as for movie)
+- feature: add Kinopoisk trailers channel
+- feature: add Kinopoisk Intro provider (used in CinemaMode)
+- feature: add a task to remove redundant downloaded trailers
+
 v.1.24.1
 - fix: issue#12 - unable to update the plugin
 
