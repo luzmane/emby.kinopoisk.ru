@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using EmbyKinopoiskRu.Api;
 using EmbyKinopoiskRu.Configuration;
 using EmbyKinopoiskRu.Helper;
-using EmbyKinopoiskRu.ScheduledTasks.Model;
 
 using MediaBrowser.Controller.Configuration;
 using MediaBrowser.Controller.Entities;
@@ -24,24 +23,21 @@ namespace EmbyKinopoiskRu.ScheduledTasks
     /// Task to run through whole libraries and add Kinopoisk Id to videos without.
     /// Bases on IMDB and TMDB ids
     /// </summary>
-    public class CreateKinopoiskIdTask : IScheduledTask, IConfigurableScheduledTask
+    public class CreateKinopoiskIdTask : BaseTask, IScheduledTask, IConfigurableScheduledTask
     {
         private readonly ILogger _log;
         private static bool s_isScanRunning;
         private static readonly object ScanLock = new object();
         private const int ChunkSize = 150;
+        private const string TaskKey = "KinopoiskFromOther";
 
         private readonly ILibraryManager _libraryManager;
-        private readonly IServerConfigurationManager _serverConfigurationManager;
-        private readonly IJsonSerializer _jsonSerializer;
-        private readonly Dictionary<string, TaskTranslation> _translations = new Dictionary<string, TaskTranslation>();
-        private readonly Dictionary<string, string> _availableTranslations;
 
         /// <inheritdoc />
         public string Name => GetTranslation().Name;
 
         /// <inheritdoc />
-        public string Key => "KinopoiskFromOther";
+        public string Key => TaskKey;
 
         /// <inheritdoc />
         public string Description => GetTranslation().Description;
@@ -70,12 +66,10 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             ILibraryManager libraryManager,
             IServerConfigurationManager serverConfigurationManager,
             IJsonSerializer jsonSerializer)
+            : base(TaskKey, jsonSerializer, serverConfigurationManager)
         {
             _log = logManager.GetLogger(GetType().Name);
             _libraryManager = libraryManager;
-            _serverConfigurationManager = serverConfigurationManager;
-            _jsonSerializer = jsonSerializer;
-            _availableTranslations = EmbyHelper.GetAvailableTransactions($"ScheduledTasks.{Key}");
         }
 
         /// <inheritdoc />
@@ -129,7 +123,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                     {
                         if (cancellationToken.IsCancellationRequested)
                         {
-                            _log.Info("Cancelation was requested. Skip update by Tmdb");
+                            _log.Info("Cancellation was requested. Skip update by Tmdb");
                             return;
                         }
 
@@ -139,6 +133,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                         await UpdateItemsByProviderIdAsync(tmdbList, MetadataProviders.Tmdb.ToString(), cancellationToken);
                         _log.Info("Finishing update Kinopoisk IDs by Tmdb ID");
                     }
+
                     progress.Report(100d);
                 }
             }
@@ -186,11 +181,6 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                     _log.Info($"Unable to find Kp id for {item.Name} ({providerId}:{id})");
                 }
             }
-        }
-
-        private TaskTranslation GetTranslation()
-        {
-            return EmbyHelper.GetTaskTranslation(_translations, _serverConfigurationManager, _jsonSerializer, _availableTranslations);
         }
     }
 }

@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 
 using EmbyKinopoiskRu.Configuration;
 using EmbyKinopoiskRu.Helper;
-using EmbyKinopoiskRu.ScheduledTasks.Model;
 
 using MediaBrowser.Controller.Collections;
 using MediaBrowser.Controller.Configuration;
@@ -24,15 +23,12 @@ namespace EmbyKinopoiskRu.ScheduledTasks
     /// <summary>
     /// Task to create Kinopoisk collections
     /// </summary>
-    public class CreateKpCollectionsTask : IScheduledTask, IConfigurableScheduledTask
+    public class CreateKpCollectionsTask : BaseTask, IScheduledTask, IConfigurableScheduledTask
     {
         private static bool s_isScanRunning;
         private static readonly object ScanLock = new object();
+        private const string TaskKey = "KinopoiskCollections";
 
-        private readonly Dictionary<string, TaskTranslation> _translations = new Dictionary<string, TaskTranslation>();
-        private readonly Dictionary<string, string> _availableTranslations;
-        private readonly IServerConfigurationManager _serverConfigurationManager;
-        private readonly IJsonSerializer _jsonSerializer;
         private readonly ILogger _logger;
         private readonly ILibraryManager _libraryManager;
         private readonly ICollectionManager _collectionManager;
@@ -73,13 +69,11 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             ICollectionManager collectionManager,
             IJsonSerializer jsonSerializer,
             IServerConfigurationManager serverConfigurationManager)
+            : base(TaskKey, jsonSerializer, serverConfigurationManager)
         {
             _logger = logManager.GetLogger(GetType().Name);
             _collectionManager = collectionManager;
             _libraryManager = libraryManager;
-            _jsonSerializer = jsonSerializer;
-            _serverConfigurationManager = serverConfigurationManager;
-            _availableTranslations = EmbyHelper.GetAvailableTransactions($"ScheduledTasks.{Key}");
         }
 
         /// <inheritdoc />
@@ -122,11 +116,6 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         public IEnumerable<TaskTriggerInfo> GetDefaultTriggers()
         {
             return Array.Empty<TaskTriggerInfo>();
-        }
-
-        private TaskTranslation GetTranslation()
-        {
-            return EmbyHelper.GetTaskTranslation(_translations, _serverConfigurationManager, _jsonSerializer, _availableTranslations);
         }
 
         private async Task CreateKpCollectionsAsync(CancellationToken cancellationToken, IProgress<double> progress)

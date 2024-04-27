@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-using EmbyKinopoiskRu.Helper;
 using EmbyKinopoiskRu.ScheduledTasks.Model;
 
 using MediaBrowser.Common.Net;
@@ -20,12 +19,15 @@ using MediaBrowser.Model.Updates;
 
 namespace EmbyKinopoiskRu.ScheduledTasks
 {
-    /// <inheritdoc />
-    public class UpdateKinopoiskPluginTask : IScheduledTask, IConfigurableScheduledTask
+    /// <summary>
+    /// Task to update the Kinopoisk plugin
+    /// </summary>
+    public class UpdateKinopoiskPluginTask : BaseTask, IScheduledTask, IConfigurableScheduledTask
     {
         private static readonly Regex Version = new Regex(@".*(?<version>\d+\.\d+\.\d+).*", RegexOptions.Compiled);
 
         private const string DllName = "EmbyKinopoiskRu.dll";
+        private const string TaskKey = "KinopoiskNewVersion";
 
         /// <inheritdoc />
         public bool IsHidden => false;
@@ -40,7 +42,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         public string Name => GetTranslation().Name;
 
         /// <inheritdoc />
-        public string Key => "KinopoiskNewVersion";
+        public string Key => TaskKey;
 
         /// <inheritdoc />
         public string Description => GetTranslation().Description;
@@ -49,12 +51,8 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         public string Category => GetTranslation().Category;
 
         private readonly IHttpClient _httpClient;
-        private readonly IJsonSerializer _jsonSerializer;
         private readonly ILogger _logger;
         private readonly IInstallationManager _installationManager;
-        private readonly IServerConfigurationManager _serverConfigurationManager;
-        private readonly Dictionary<string, TaskTranslation> _translations = new Dictionary<string, TaskTranslation>();
-        private readonly Dictionary<string, string> _availableTranslations;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UpdateKinopoiskPluginTask"/> class.
@@ -70,14 +68,11 @@ namespace EmbyKinopoiskRu.ScheduledTasks
             ILogManager logManager,
             IInstallationManager installationManager,
             IServerConfigurationManager serverConfigurationManager)
+            : base(TaskKey, jsonSerializer, serverConfigurationManager)
         {
             _httpClient = httpClient;
-            _jsonSerializer = jsonSerializer;
             _logger = logManager.GetLogger(GetType().Name);
             _installationManager = installationManager;
-            _serverConfigurationManager = serverConfigurationManager;
-
-            _availableTranslations = EmbyHelper.GetAvailableTransactions($"ScheduledTasks.{Key}");
         }
 
         /// <inheritdoc />
@@ -172,11 +167,6 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 gitResponse.tag_name = PrepareTagName(gitResponse.tag_name);
                 return gitResponse;
             }
-        }
-
-        private TaskTranslation GetTranslation()
-        {
-            return EmbyHelper.GetTaskTranslation(_translations, _serverConfigurationManager, _jsonSerializer, _availableTranslations);
         }
 
         private string PrepareTagName(string tagName)
