@@ -1,0 +1,5 @@
+{
+  "Name": "Clean downloaded Kinopoisk trailers",
+  "Description": "Delete downloaded Kinopoisk trailers used as intros in CinemaMode",
+  "Category": "Kinopoisk Plugin"
+}
