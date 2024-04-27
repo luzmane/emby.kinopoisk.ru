@@ -38,7 +38,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         private readonly ILibraryManager _libraryManager;
         private readonly ICollectionManager _collectionManager;
 
-        private static readonly List<KpMovieType?> MovieTypes = new List<KpMovieType?> { KpMovieType.Anime, KpMovieType.Movie, KpMovieType.Cartoon };
+        private static readonly List<KpMovieType?> MovieTypes = new List<KpMovieType?>
+        {
+            KpMovieType.Anime,
+            KpMovieType.Movie,
+            KpMovieType.Cartoon
+        };
 
         internal KinopoiskDevService(
             ILogManager logManager
@@ -59,7 +64,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         public async Task<MetadataResult<Movie>> GetMetadataAsync(MovieInfo info, CancellationToken cancellationToken)
         {
-            var result = new MetadataResult<Movie> { ResultLanguage = "ru" };
+            var result = new MetadataResult<Movie>
+            {
+                ResultLanguage = "ru"
+            };
 
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
@@ -252,7 +260,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         public async Task<MetadataResult<Series>> GetMetadataAsync(SeriesInfo info, CancellationToken cancellationToken)
         {
-            var result = new MetadataResult<Series> { ResultLanguage = "ru" };
+            var result = new MetadataResult<Series>
+            {
+                ResultLanguage = "ru"
+            };
 
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
@@ -433,7 +444,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         public async Task<MetadataResult<Episode>> GetMetadataAsync(EpisodeInfo info, CancellationToken cancellationToken)
         {
-            var result = new MetadataResult<Episode> { ResultLanguage = "ru" };
+            var result = new MetadataResult<Episode>
+            {
+                ResultLanguage = "ru"
+            };
 
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
@@ -597,7 +611,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         public async Task<MetadataResult<Person>> GetMetadataAsync(PersonLookupInfo info, CancellationToken cancellationToken)
         {
-            var result = new MetadataResult<Person> { ResultLanguage = "ru" };
+            var result = new MetadataResult<Person>
+            {
+                ResultLanguage = "ru"
+            };
 
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
@@ -678,7 +695,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         {
             _log.Info($"Person '{person.Name}' with KinopoiskId '{person.Id}' found");
 
-            var toReturn = new Person { Name = person.Name, SortName = person.Name, OriginalTitle = person.EnName };
+            var toReturn = new Person
+            {
+                Name = person.Name,
+                SortName = person.Name,
+                OriginalTitle = person.EnName
+            };
             toReturn.ProviderIds.Add(Plugin.PluginKey, person.Id.ToString());
             if (DateTimeOffset.TryParse(person.Birthday, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTimeOffset birthDay))
             {
@@ -730,7 +752,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         private static RemoteSearchResult CreateRemoteSearchResultFromKpPerson(KpPerson person)
         {
-            var item = new RemoteSearchResult { Name = person.Name, ImageUrl = person.Photo, SearchProviderName = Plugin.PluginKey };
+            var item = new RemoteSearchResult
+            {
+                Name = person.Name,
+                ImageUrl = person.Photo,
+                SearchProviderName = Plugin.PluginKey
+            };
             item.SetProviderId(Plugin.PluginKey, person.Id.ToString());
             if (DateTimeOffset.TryParseExact(
                     person.Birthday,
@@ -886,7 +913,13 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 else
                 {
                     _log.Debug($"Adding '{personName}' as '{personType}' to '{result.Item.Name}'");
-                    var person = new PersonInfo { Name = personName, ImageUrl = kpPerson.Photo, Type = (PersonType)personType, Role = kpPerson.Description };
+                    var person = new PersonInfo
+                    {
+                        Name = personName,
+                        ImageUrl = kpPerson.Photo,
+                        Type = (PersonType)personType,
+                        Role = kpPerson.Description
+                    };
                     person.SetProviderId(Plugin.PluginKey, kpPerson.Id.ToString(CultureInfo.InvariantCulture));
 
                     result.AddPerson(person);
@@ -911,7 +944,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             List<KeyValuePair<string, string>> providerIds = sequels.Docs
                 .SelectMany(m =>
                 {
-                    var list = new List<KeyValuePair<string, string>> { new KeyValuePair<string, string>(Plugin.PluginKey, m.Id.ToString(CultureInfo.InvariantCulture)) };
+                    var list = new List<KeyValuePair<string, string>>
+                    {
+                        new KeyValuePair<string, string>(Plugin.PluginKey, m.Id.ToString(CultureInfo.InvariantCulture))
+                    };
                     if (m.ExternalId.Tmdb != null)
                     {
                         list.Add(new KeyValuePair<string, string>(MetadataProviders.Tmdb.ToString(), m.ExternalId.Tmdb.ToString()));
@@ -945,7 +981,13 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             if (currentCollection == null)
             {
                 _log.Info($"Creating '{collectionName}' collection with following items: '{string.Join("', '", internalCollectionItems.Select(m => m.Name))}'");
-                currentCollection = await _collectionManager.CreateCollection(new CollectionCreationOptions { IsLocked = false, Name = collectionName, ParentId = rootCollectionFolder.InternalId, ItemIdList = internalCollectionItems.Select(i => i.InternalId).ToArray() });
+                currentCollection = await _collectionManager.CreateCollection(new CollectionCreationOptions
+                {
+                    IsLocked = false,
+                    Name = collectionName,
+                    ParentId = rootCollectionFolder.InternalId,
+                    ItemIdList = internalCollectionItems.Select(i => i.InternalId).ToArray()
+                });
                 if (currentCollection == null)
                 {
                     _log.Error($"Unable to create new collection '{collectionName}'");
@@ -1030,7 +1072,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             if (!string.IsNullOrWhiteSpace(providerId))
             {
                 _log.Info($"Searching Kp movie by {MetadataProviders.Imdb} id '{providerId}'");
-                ApiResult<Dictionary<string, long>> kpDictionary = await GetKpIdByAnotherIdAsync(MetadataProviders.Imdb.ToString(), new List<string> { providerId }, cancellationToken);
+                ApiResult<Dictionary<string, long>> kpDictionary = await GetKpIdByAnotherIdAsync(MetadataProviders.Imdb.ToString(), new List<string>
+                {
+                    providerId
+                }, cancellationToken);
                 if (kpDictionary.HasError || kpDictionary.Item.Count != 1)
                 {
                     _log.Info($"Failed to get Kinopoisk ID by {MetadataProviders.Imdb} ID '{providerId}'");
@@ -1050,7 +1095,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             _log.Info($"Searching Kp movie by {MetadataProviders.Tmdb} id '{providerId}'");
-            ApiResult<Dictionary<string, long>> apiResult = await GetKpIdByAnotherIdAsync(MetadataProviders.Tmdb.ToString(), new List<string> { providerId }, cancellationToken);
+            ApiResult<Dictionary<string, long>> apiResult = await GetKpIdByAnotherIdAsync(MetadataProviders.Tmdb.ToString(), new List<string>
+            {
+                providerId
+            }, cancellationToken);
             if (apiResult.HasError || apiResult.Item.Count != 1)
             {
                 _log.Info($"Failed to get Kinopoisk ID by {MetadataProviders.Tmdb} ID '{providerId}'");
@@ -1061,6 +1109,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 _log.Info($"Kinopoisk ID is '{movieId}' for {MetadataProviders.Tmdb} ID '{providerId}'");
                 return await _api.GetMovieByIdAsync(movieId, cancellationToken);
             }
+
             return null;
         }
 
@@ -1078,7 +1127,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 BaseItem item;
                 if (MovieTypes.Contains(m.TypeNumber))
                 {
-                    item = new Movie { Name = m.Name, OriginalTitle = m.AlternativeName };
+                    item = new Movie
+                    {
+                        Name = m.Name,
+                        OriginalTitle = m.AlternativeName
+                    };
                     item.SetProviderId(Plugin.PluginKey, m.Id.ToString(CultureInfo.InvariantCulture));
                     item.SetProviderId(MetadataProviders.Imdb.ToString(), m.ExternalId?.Imdb);
                     if (m.ExternalId?.Tmdb != null && m.ExternalId.Tmdb > 0)
@@ -1088,7 +1141,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 }
                 else
                 {
-                    item = new Series { Name = m.Name, OriginalTitle = m.AlternativeName };
+                    item = new Series
+                    {
+                        Name = m.Name,
+                        OriginalTitle = m.AlternativeName
+                    };
                     item.SetProviderId(Plugin.PluginKey, m.Id.ToString(CultureInfo.InvariantCulture));
                     item.SetProviderId(MetadataProviders.Imdb.ToString(), m.ExternalId?.Imdb);
                     if (m.ExternalId?.Tmdb != null && m.ExternalId.Tmdb > 0)
@@ -1110,7 +1167,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             if (movies.HasError)
             {
                 _log.Info($"Failed to get Kinopoisk ID by {externalIdType} provider");
-                return new ApiResult<Dictionary<string, long>>(new Dictionary<string, long>()) { HasError = true };
+                return new ApiResult<Dictionary<string, long>>(new Dictionary<string, long>())
+                {
+                    HasError = true
+                };
             }
 
             _log.Info($"Found {movies.Docs.Count} Kinopoisk IDs for {idList.Count()} items by {externalIdType} provider");
@@ -1139,13 +1199,16 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             _log.Info($"Not supported provider: '{externalIdType}'");
-            return new ApiResult<Dictionary<string, long>>(new Dictionary<string, long>()) { HasError = true };
+            return new ApiResult<Dictionary<string, long>>(new Dictionary<string, long>())
+            {
+                HasError = true
+            };
         }
 
-        public async Task<List<KpLists>> GetKpCollectionsAsync()
+        public async Task<List<KpLists>> GetKpCollectionsAsync(CancellationToken cancellationToken)
         {
             _log.Info("Fetch Kinopoisk collections");
-            KpSearchResult<KpLists> collections = await _api.GetKpCollectionsAsync(CancellationToken.None);
+            KpSearchResult<KpLists> collections = await _api.GetKpCollectionsAsync(cancellationToken);
             if (collections.HasError)
             {
                 _log.Info("Failed to fetch Kinopoisk collections");
@@ -1159,6 +1222,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         private async Task<List<KpMovie>> GetAllCollectionItemsAsync(string collectionId, CancellationToken cancellationToken)
         {
             var movies = new List<KpMovie>();
+            // used to get total number of items
             KpSearchResult<KpMovie> tmp = await _api.GetCollectionItemsAsync(collectionId, 1, cancellationToken);
             if (tmp.HasError)
             {
@@ -1189,6 +1253,56 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             return movies;
+        }
+
+        public async Task<List<KpTrailer>> GetTrailersFromCollectionAsync(string collectionId, CancellationToken cancellationToken)
+        {
+            _log.Info($"Get collection items for '{collectionId}'");
+            var toReturn = new HashSet<KpTrailer>(new KpTrailerComparer());
+            List<KpMovie> movies = await GetAllCollectionItemsAsync(collectionId, cancellationToken);
+            movies.ForEach(m =>
+            {
+                ProviderIdDictionary providerIdDictionary = new ProviderIdDictionary
+                {
+                    { Plugin.PluginKey, m.Id.ToString() }
+                };
+                if (!string.IsNullOrWhiteSpace(m.ExternalId?.Imdb))
+                {
+                    providerIdDictionary.Add(MetadataProviders.Imdb.ToString(), m.ExternalId.Imdb);
+                }
+
+                if (m.ExternalId?.Tmdb != null)
+                {
+                    providerIdDictionary.Add(MetadataProviders.Tmdb.ToString(), m.ExternalId.Tmdb.ToString());
+                }
+                m.Videos?.Trailers?.ForEach(t => _ = toReturn.Add(new KpTrailer
+                {
+                    ImageUrl = m.Poster.PreviewUrl ?? m.Poster.Url,
+                    VideoName = m.Name,
+                    TrailerName = t.Name,
+                    Overview = m.Description,
+                    PremierDate = KpHelper.GetPremierDate(m.Premiere),
+                    ProviderIds = providerIdDictionary,
+                    Url = t.Url
+                        .Replace(Constants.YoutubeEmbed, Constants.YoutubeWatch)
+                        .Replace(Constants.YoutubeV, Constants.YoutubeWatch),
+                }));
+                m.Videos?.Teasers?.ForEach(t => _ = toReturn.Add(new KpTrailer
+                {
+                    ImageUrl = m.Poster.PreviewUrl ?? m.Poster.Url,
+                    VideoName = m.Name,
+                    TrailerName = t.Name,
+                    Overview = m.Description,
+                    PremierDate = KpHelper.GetPremierDate(m.Premiere),
+                    ProviderIds = providerIdDictionary,
+                    Url = t.Url
+                        .Replace(Constants.YoutubeEmbed, Constants.YoutubeWatch)
+                        .Replace(Constants.YoutubeV, Constants.YoutubeWatch),
+                }));
+            });
+            _log.Info($"Return {toReturn.Count} items for collection '{collectionId}'");
+
+            return toReturn.ToList();
         }
 
         #endregion

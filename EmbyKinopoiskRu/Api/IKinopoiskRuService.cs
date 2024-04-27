@@ -26,8 +26,9 @@ namespace EmbyKinopoiskRu.Api
 
         Task<IEnumerable<RemoteImageInfo>> GetImagesAsync(BaseItem item, CancellationToken cancellationToken);
 
-        Task<List<KpLists>> GetKpCollectionsAsync();
+        Task<List<KpLists>> GetKpCollectionsAsync(CancellationToken cancellationToken);
         Task<List<BaseItem>> GetCollectionItemsAsync(string collectionId, CancellationToken cancellationToken);
         Task<ApiResult<Dictionary<string, long>>> GetKpIdByAnotherIdAsync(string externalIdType, IEnumerable<string> idList, CancellationToken cancellationToken);
+        Task<List<KpTrailer>> GetTrailersFromCollectionAsync(string collectionId, CancellationToken cancellationToken);
     }
 }

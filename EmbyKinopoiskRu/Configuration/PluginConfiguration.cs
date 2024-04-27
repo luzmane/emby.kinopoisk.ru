@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 using EmbyKinopoiskRu.Api;
@@ -44,6 +45,26 @@ namespace EmbyKinopoiskRu.Configuration
             set => SetCollection(value);
         }
 
+        /// <summary>
+        /// Base folder to download trailers
+        /// </summary>
+        public string IntrosPath { get; set; }
+
+        /// <summary>
+        /// Preferable quality of downloaded trailers
+        /// </summary>
+        public int IntrosQuality { get; set; } = 480;
+
+        /// <summary>
+        /// API from https://apilayer.com/marketplace/user_agent-api
+        /// </summary>
+        public string UserAgentApiKey { get; set; }
+
+        /// <summary>
+        /// Download only trailers in Russian
+        /// </summary>
+        public bool OnlyRussianTrailers { get; set; }
+
         internal List<CollectionItem> CollectionsList = new List<CollectionItem>();
         private static bool s_fetchingCollections;
 
@@ -72,7 +93,7 @@ namespace EmbyKinopoiskRu.Configuration
             CollectionsList = Plugin.Instance.JsonSerializer.DeserializeFromString<List<CollectionItem>>(value)
                               ?? new List<CollectionItem>();
 
-            Task<List<KpLists>> fetchTask = Plugin.Instance.GetKinopoiskService().GetKpCollectionsAsync();
+            Task<List<KpLists>> fetchTask = Plugin.Instance.GetKinopoiskService().GetKpCollectionsAsync(CancellationToken.None);
             if (fetchTask.Wait(TimeSpan.FromSeconds(10)))
             {
                 CollectionsList = (from i in fetchTask.Result

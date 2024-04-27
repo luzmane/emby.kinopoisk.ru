@@ -67,6 +67,18 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             "seasonsInfo"
         }.AsReadOnly();
 
+        private static readonly IList<string> TrailerPropertiesList = new List<string>
+        {
+            "alternativeName",
+            "externalId",
+            "id",
+            "name",
+            "typeNumber",
+            "videos",
+            "premiere",
+            "description",
+            "poster",
+        }.AsReadOnly();
 
         private readonly IHttpClient _httpClient;
         private readonly ILogger _log;
@@ -151,7 +163,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
         internal async Task<KpSearchResult<KpMovie>> GetCollectionItemsAsync(string collectionId, int page, CancellationToken cancellationToken)
         {
             var request = new StringBuilder($"https://api.kinopoisk.dev/v1.4/movie?limit=250&page={page}&lists={collectionId}")
-                .Append("&selectFields=alternativeName&selectFields=externalId&selectFields=id&selectFields=name&selectFields=typeNumber")
+                .Append($"&selectFields={string.Join("&selectFields=", TrailerPropertiesList)}")
                 .ToString();
             var json = await SendRequestAsync(request, cancellationToken);
             var hasError = json.Length == 0;

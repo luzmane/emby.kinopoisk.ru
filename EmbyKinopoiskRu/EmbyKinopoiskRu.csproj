@@ -44,6 +44,7 @@
   <ItemGroup>
     <PackageReference Include="mediabrowser.server.core" Version="4.8.2"/>
     <PackageReference Include="System.Memory" Version="4.5.5"/>
+    <PackageReference Include="System.Text.Json" Version="6.0.9" />
   </ItemGroup>
 
   <ItemGroup>
@@ -70,6 +71,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Include="i18n\KpTrailerChannel\en-US.json" />
+    <EmbeddedResource Include="i18n\KpTrailerChannel\ru.json" />
+    <EmbeddedResource Include="i18n\KpTrailerChannel\uk.json" />
+    <EmbeddedResource Include="i18n\ScheduledTasks\KinopoiskCleanIntros\en-US.json" />
+    <EmbeddedResource Include="i18n\ScheduledTasks\KinopoiskCleanIntros\ru.json" />
+    <EmbeddedResource Include="i18n\ScheduledTasks\KinopoiskCleanIntros\uk.json" />
     <EmbeddedResource Include="thumb.png"/>
     <EmbeddedResource Include="Configuration/kinopoiskru.html"/>
     <EmbeddedResource Include="Configuration/kinopoiskru.js"/>

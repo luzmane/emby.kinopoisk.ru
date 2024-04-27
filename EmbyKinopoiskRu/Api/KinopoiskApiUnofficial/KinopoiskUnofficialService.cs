@@ -875,7 +875,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    _log.Info("Cancelation was requested. Return founded items");
+                    _log.Info("Cancellation was requested. Return founded items");
                     break;
                 }
 
@@ -898,7 +898,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             return toReturn;
         }
 
-        public Task<List<KpLists>> GetKpCollectionsAsync()
+        public Task<List<KpLists>> GetKpCollectionsAsync(CancellationToken cancellationToken)
         {
             _log.Info("KinopoiskUnofficial doesn't have method to fetch collection, so list is hardcoded");
             return Task.FromResult(KpCollections);
@@ -936,6 +936,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             }
 
             return movies;
+        }
+
+        public Task<List<KpTrailer>> GetTrailersFromCollectionAsync(string collectionId, CancellationToken cancellationToken)
+        {
+            _log.Info($"Not supported by kinopoiskapiunofficial.tech");
+            return Task.FromResult(new List<KpTrailer>());
         }
 
         #endregion
