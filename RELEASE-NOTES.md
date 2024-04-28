@@ -1,3 +1,6 @@
+v.1.25.1
+- fix: set default values for IntroPath and UserAgentAPI config parameters
+
 v.1.25.0
 - feature: add Kinopoisk ID to trailers (same as for movie)
 - feature: add Kinopoisk trailers channel
