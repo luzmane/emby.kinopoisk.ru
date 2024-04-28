@@ -48,7 +48,7 @@ namespace EmbyKinopoiskRu.Configuration
         /// <summary>
         /// Base folder to download trailers
         /// </summary>
-        public string IntrosPath { get; set; }
+        public string IntrosPath { get; set; } = string.Empty;
 
         /// <summary>
         /// Preferable quality of downloaded trailers
@@ -58,7 +58,7 @@ namespace EmbyKinopoiskRu.Configuration
         /// <summary>
         /// API from https://apilayer.com/marketplace/user_agent-api
         /// </summary>
-        public string UserAgentApiKey { get; set; }
+        public string UserAgentApiKey { get; set; } = string.Empty;
 
         /// <summary>
         /// Download only trailers in Russian
