@@ -200,7 +200,8 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             {
                 CancellationToken = cancellationToken,
                 Url = url,
-                LogResponse = true,
+                LogRequest = false,
+                LogResponse = false,
                 CacheLength = TimeSpan.FromHours(12),
                 CacheMode = CacheMode.Unconditional,
                 TimeoutMs = 30_000,
