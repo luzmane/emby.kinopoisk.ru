@@ -1,3 +1,6 @@
+v.1.25.2
+- fix: radio button didn't switch the API
+
 v.1.25.1
 - fix: set default values for IntroPath and UserAgentAPI config parameters
 
