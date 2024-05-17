@@ -1,12 +1,14 @@
 # emby.kinopoisk.ru
 
-Fetches metadata from [kinopoisk.ru](https://www.kinopoisk.ru). This site is popular in the Russian-speaking community and contains almost no English-language information, so further description will be in Russian.
+Fetches metadata from [kinopoisk.ru](https://www.kinopoisk.ru). This site is popular in the Russian-speaking community and contains almost no English-language information so further description will be in Russian.
 
 Плагин для Emby для загрузки метаданных фильмов, сериалов с сайта [kinopoisk.ru](https://www.kinopoisk.ru) используя сторонние API:
 - [kinopoiskapiunofficial.tech](https://kinopoiskapiunofficial.tech)
 - [kinopoisk.dev](https://kinopoisk.dev)
 
 Если что-то не работает - смело создавай новый issue. Я не пользуюсь плагином 24/7 - могу и не знать о сломавшейся функциональности.
+
+Альтернатива для Jellyfin - [LinFor/jellyfin-plugin-kinopoisk](https://github.com/LinFor/jellyfin-plugin-kinopoisk)
 
 ### Благодарность
 * Спасибо [svyaznoy362](https://github.com/svyaznoy362) за тестирования версий.
