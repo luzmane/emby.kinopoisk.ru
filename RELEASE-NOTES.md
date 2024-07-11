@@ -1,3 +1,8 @@
+v.1.26.0
+- feature: support download intro (trailer) from Kinopoisk
+- feature: support trailers info from kinopoiskapiunofficial.tech
+- feature: add filter of maximum duration of an intro
+
 v.1.25.2
 - fix: radio button didn't switch the API
 
