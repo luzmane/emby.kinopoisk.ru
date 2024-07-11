@@ -61,7 +61,7 @@ public class KpPersonProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpPersonProvider_GetMetadata_Provider_Kp");
+            .Returns(nameof(KpPersonProvider_GetMetadata_Provider_Kp));
 
         var personInfo = new PersonLookupInfo();
         personInfo.SetProviderId(Plugin.PluginKey, "29855");
@@ -73,7 +73,7 @@ public class KpPersonProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpPersonProvider_GetMetadata_Provider_Kp/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpPersonProvider_GetMetadata_Provider_Kp)}/EmbyKinopoiskRu.xml"), Times.Once());
         _localizationManager.Verify(lm => lm.RemoveDiacritics("Джеки Чан"), Times.Once());
         VerifyNoOtherCalls();
 
@@ -87,7 +87,7 @@ public class KpPersonProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpPersonProvider_GetMetadata_ByName");
+            .Returns(nameof(KpPersonProvider_GetMetadata_ByName));
 
         var personInfo = new PersonLookupInfo
         {
@@ -101,7 +101,7 @@ public class KpPersonProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpPersonProvider_GetMetadata_ByName/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpPersonProvider_GetMetadata_ByName)}/EmbyKinopoiskRu.xml"), Times.Once());
         _localizationManager.Verify(lm => lm.RemoveDiacritics("Джеки Чан"), Times.Once());
         VerifyNoOtherCalls();
 
@@ -115,7 +115,7 @@ public class KpPersonProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpPersonProvider_GetMetadata_ByEnName");
+            .Returns(nameof(KpPersonProvider_GetMetadata_ByEnName));
 
         var personInfo = new PersonLookupInfo
         {
@@ -129,7 +129,7 @@ public class KpPersonProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpPersonProvider_GetMetadata_ByEnName/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpPersonProvider_GetMetadata_ByEnName)}/EmbyKinopoiskRu.xml"), Times.Once());
         _localizationManager.Verify(lm => lm.RemoveDiacritics("Джеки Чан"), Times.Once());
         VerifyNoOtherCalls();
 
@@ -143,7 +143,7 @@ public class KpPersonProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpPersonProvider_GetSearchResults_Provider_Kp");
+            .Returns(nameof(KpPersonProvider_GetSearchResults_Provider_Kp));
 
         var personInfo = new PersonLookupInfo
         {
@@ -159,7 +159,7 @@ public class KpPersonProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpPersonProvider_GetSearchResults_Provider_Kp/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpPersonProvider_GetSearchResults_Provider_Kp)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
         Logger.Info($"Finish '{nameof(KpPersonProvider_GetSearchResults_Provider_Kp)}'");
@@ -172,7 +172,7 @@ public class KpPersonProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpPersonProvider_GetSearchResults_ByName");
+            .Returns(nameof(KpPersonProvider_GetSearchResults_ByName));
 
         var personInfo = new PersonLookupInfo
         {
@@ -185,7 +185,7 @@ public class KpPersonProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpPersonProvider_GetSearchResults_ByName/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpPersonProvider_GetSearchResults_ByName)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
         Logger.Info($"Finish '{nameof(KpPersonProvider_GetSearchResults_ByName)}'");
@@ -198,7 +198,7 @@ public class KpPersonProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpPersonProvider_GetSearchResults_ByEnName");
+            .Returns(nameof(KpPersonProvider_GetSearchResults_ByEnName));
 
         var personInfo = new PersonLookupInfo
         {
@@ -211,7 +211,7 @@ public class KpPersonProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpPersonProvider_GetSearchResults_ByEnName/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpPersonProvider_GetSearchResults_ByEnName)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
         Logger.Info($"Finish '{nameof(KpPersonProvider_GetSearchResults_ByEnName)}'");

@@ -53,7 +53,7 @@ public class KpImageProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpImageProviderTest_GetImages_ByProviderId");
+            .Returns(nameof(KpImageProviderTest_GetImages_ByProviderId));
 
         IEnumerable<RemoteImageInfo> imageInfos = await _kpImageProvider.GetImages(item, options, cancellationTokenSource.Token);
 
@@ -84,7 +84,7 @@ public class KpImageProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(3));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpImageProviderTest_GetImages_ByProviderId/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpImageProviderTest_GetImages_ByProviderId)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
         Logger.Info($"Finished '{nameof(KpImageProviderTest_GetImages_ByProviderId)}'");
@@ -105,7 +105,7 @@ public class KpImageProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpImageProviderTest_GetImages_ByOriginalTitle");
+            .Returns(nameof(KpImageProviderTest_GetImages_ByOriginalTitle));
 
         IEnumerable<RemoteImageInfo> imageInfos = await _kpImageProvider.GetImages(item, options, cancellationTokenSource.Token);
 
@@ -136,7 +136,7 @@ public class KpImageProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(3));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpImageProviderTest_GetImages_ByOriginalTitle/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpImageProviderTest_GetImages_ByOriginalTitle)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
         Logger.Info($"Finished '{nameof(KpImageProviderTest_GetImages_ByOriginalTitle)}'");
@@ -158,7 +158,7 @@ public class KpImageProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpImageProviderTest_GetImages_ByOriginalTitleAndYear");
+            .Returns(nameof(KpImageProviderTest_GetImages_ByOriginalTitleAndYear));
 
         IEnumerable<RemoteImageInfo> imageInfos = await _kpImageProvider.GetImages(item, options, cancellationTokenSource.Token);
 
@@ -189,7 +189,7 @@ public class KpImageProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(3));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpImageProviderTest_GetImages_ByOriginalTitleAndYear/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpImageProviderTest_GetImages_ByOriginalTitleAndYear)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
         Logger.Info($"Finished '{nameof(KpImageProviderTest_GetImages_ByOriginalTitleAndYear)}'");
@@ -210,7 +210,7 @@ public class KpImageProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpImageProviderTest_GetImages_NothingFound");
+            .Returns(nameof(KpImageProviderTest_GetImages_NothingFound));
 
         IEnumerable<RemoteImageInfo> imageInfos = await _kpImageProvider.GetImages(item, options, cancellationTokenSource.Token);
 
@@ -218,7 +218,7 @@ public class KpImageProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(3));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpImageProviderTest_GetImages_NothingFound/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpImageProviderTest_GetImages_NothingFound)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
         Logger.Info($"Finished '{nameof(KpImageProviderTest_GetImages_NothingFound)}'");

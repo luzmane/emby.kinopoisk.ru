@@ -1221,6 +1221,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         private async Task<List<KpMovie>> GetAllCollectionItemsAsync(string collectionId, CancellationToken cancellationToken)
         {
+            _log.Info($"Get all collection items for '{collectionId}'");
             var movies = new List<KpMovie>();
             // used to get total number of items
             KpSearchResult<KpMovie> tmp = await _api.GetCollectionItemsAsync(collectionId, 1, cancellationToken);
@@ -1257,7 +1258,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         public async Task<List<KpTrailer>> GetTrailersFromCollectionAsync(string collectionId, CancellationToken cancellationToken)
         {
-            _log.Info($"Get collection items for '{collectionId}'");
+            _log.Info($"Get trailers for '{collectionId}'");
             var toReturn = new HashSet<KpTrailer>(new KpTrailerComparer());
             List<KpMovie> movies = await GetAllCollectionItemsAsync(collectionId, cancellationToken);
             movies.ForEach(m =>
@@ -1275,6 +1276,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 {
                     providerIdDictionary.Add(MetadataProviders.Tmdb.ToString(), m.ExternalId.Tmdb.ToString());
                 }
+
                 m.Videos?.Trailers?.ForEach(t => _ = toReturn.Add(new KpTrailer
                 {
                     ImageUrl = m.Poster.PreviewUrl ?? m.Poster.Url,

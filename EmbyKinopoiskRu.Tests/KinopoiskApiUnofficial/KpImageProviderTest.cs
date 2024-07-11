@@ -35,9 +35,9 @@ public class KpImageProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpImageProviderTest_GetImages_ByProviderId()
+    public async void UN_KpImageProviderTest_GetImages_ByProviderId()
     {
-        Logger.Info($"Started '{nameof(KpImageProviderTest_GetImages_ByProviderId)}'");
+        Logger.Info($"Started '{nameof(UN_KpImageProviderTest_GetImages_ByProviderId)}'");
 
         using var cancellationTokenSource = new CancellationTokenSource();
         Movie item = new()
@@ -54,7 +54,7 @@ public class KpImageProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("UN_KpImageProviderTest_GetImages_ByProviderId");
+            .Returns(nameof(UN_KpImageProviderTest_GetImages_ByProviderId));
 
         IEnumerable<RemoteImageInfo> imageInfos = await _kpImageProvider.GetImages(item, options, cancellationTokenSource.Token);
 
@@ -85,16 +85,16 @@ public class KpImageProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(3));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "UN_KpImageProviderTest_GetImages_ByProviderId/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(UN_KpImageProviderTest_GetImages_ByProviderId)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(KpImageProviderTest_GetImages_ByProviderId)}'");
+        Logger.Info($"Finished '{nameof(UN_KpImageProviderTest_GetImages_ByProviderId)}'");
     }
 
     [Fact]
-    public async void KpImageProviderTest_GetImages_ByName()
+    public async void UN_KpImageProviderTest_GetImages_ByName()
     {
-        Logger.Info($"Started '{nameof(KpImageProviderTest_GetImages_ByName)}'");
+        Logger.Info($"Started '{nameof(UN_KpImageProviderTest_GetImages_ByName)}'");
 
         using var cancellationTokenSource = new CancellationTokenSource();
         Movie item = new()
@@ -105,7 +105,7 @@ public class KpImageProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("UN_KpImageProviderTest_GetImages_ByName");
+            .Returns(nameof(UN_KpImageProviderTest_GetImages_ByName));
 
         IEnumerable<RemoteImageInfo> imageInfos = await _kpImageProvider.GetImages(item, options, cancellationTokenSource.Token);
 
@@ -136,16 +136,16 @@ public class KpImageProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(3));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "UN_KpImageProviderTest_GetImages_ByName/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(UN_KpImageProviderTest_GetImages_ByName)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(KpImageProviderTest_GetImages_ByName)}'");
+        Logger.Info($"Finished '{nameof(UN_KpImageProviderTest_GetImages_ByName)}'");
     }
 
     [Fact]
-    public async void KpImageProviderTest_GetImages_ByNameAndYear()
+    public async void UN_KpImageProviderTest_GetImages_ByNameAndYear()
     {
-        Logger.Info($"Started '{nameof(KpImageProviderTest_GetImages_ByNameAndYear)}'");
+        Logger.Info($"Started '{nameof(UN_KpImageProviderTest_GetImages_ByNameAndYear)}'");
 
         using var cancellationTokenSource = new CancellationTokenSource();
         Movie item = new()
@@ -157,7 +157,7 @@ public class KpImageProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("UN_KpImageProviderTest_GetImages_ByNameAndYear");
+            .Returns(nameof(UN_KpImageProviderTest_GetImages_ByNameAndYear));
 
         IEnumerable<RemoteImageInfo> imageInfos = await _kpImageProvider.GetImages(item, options, cancellationTokenSource.Token);
 
@@ -188,16 +188,16 @@ public class KpImageProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(3));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "UN_KpImageProviderTest_GetImages_ByNameAndYear/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(UN_KpImageProviderTest_GetImages_ByNameAndYear)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(KpImageProviderTest_GetImages_ByNameAndYear)}'");
+        Logger.Info($"Finished '{nameof(UN_KpImageProviderTest_GetImages_ByNameAndYear)}'");
     }
 
     [Fact]
-    public async void KpImageProviderTest_GetImages_NothingFound()
+    public async void UN_KpImageProviderTest_GetImages_NothingFound()
     {
-        Logger.Info($"Started '{nameof(KpImageProviderTest_GetImages_NothingFound)}'");
+        Logger.Info($"Started '{nameof(UN_KpImageProviderTest_GetImages_NothingFound)}'");
 
         using var cancellationTokenSource = new CancellationTokenSource();
         Movie item = new()
@@ -208,7 +208,7 @@ public class KpImageProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("UN_KpImageProviderTest_GetImages_NothingFound");
+            .Returns(nameof(UN_KpImageProviderTest_GetImages_NothingFound));
 
         IEnumerable<RemoteImageInfo> imageInfos = await _kpImageProvider.GetImages(item, options, cancellationTokenSource.Token);
 
@@ -216,16 +216,16 @@ public class KpImageProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(3));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "UN_KpImageProviderTest_GetImages_NothingFound/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(UN_KpImageProviderTest_GetImages_NothingFound)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(KpImageProviderTest_GetImages_NothingFound)}'");
+        Logger.Info($"Finished '{nameof(UN_KpImageProviderTest_GetImages_NothingFound)}'");
     }
 
     [Fact]
-    public async void KpImageProviderTest_ForCodeCoverage()
+    public async void UN_KpImageProviderTest_ForCodeCoverage()
     {
-        Logger.Info($"Started '{nameof(KpImageProviderTest_ForCodeCoverage)}'");
+        Logger.Info($"Started '{nameof(UN_KpImageProviderTest_ForCodeCoverage)}'");
 
         _kpImageProvider.Supports(new Movie()).Should().BeTrue();
         _kpImageProvider.Supports(new Series()).Should().BeTrue();
@@ -241,6 +241,6 @@ public class KpImageProviderTest : BaseTest
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(KpImageProviderTest_ForCodeCoverage)}'");
+        Logger.Info($"Finished '{nameof(UN_KpImageProviderTest_ForCodeCoverage)}'");
     }
 }

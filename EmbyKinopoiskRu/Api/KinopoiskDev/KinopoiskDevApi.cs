@@ -244,7 +244,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         private async Task<string> SendRequestAsync(string url, CancellationToken cancellationToken)
         {
-            _log.Info($"Sending request to {url}");
+            _log.Debug($"Sending request to {url}");
             var token = Plugin.Instance?.Configuration.GetCurrentToken();
             if (string.IsNullOrWhiteSpace(token))
             {
@@ -256,8 +256,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             {
                 CancellationToken = cancellationToken,
                 Url = url,
-                LogRequest = false,
-                LogResponse = false,
                 CacheLength = TimeSpan.FromHours(12),
                 CacheMode = CacheMode.Unconditional,
                 TimeoutMs = 30_000,
@@ -268,9 +266,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             options.RequestHeaders.Add("X-API-KEY", token);
             options.RequestHeaders.Add("accept", "application/json");
             options.Sanitation.SanitizeDefaultParams = false;
+
+            HttpResponseInfo response = null;
             try
             {
-                using (HttpResponseInfo response = await _httpClient.GetResponse(options))
+                using (response = await _httpClient.GetResponse(options))
                 {
                     using (var reader = new StreamReader(response.Content))
                     {
@@ -278,11 +278,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                         switch ((int)response.StatusCode)
                         {
                             case int n when n >= 200 && n < 300:
-                                _log.Info($"Received response: '{result}'");
+                                _log.Debug($"Received response: '{result}'");
                                 return result;
                             case 400:
                                 var error = _jsonSerializer.DeserializeFromString<KpErrorResponse>(result);
-                                var msg = $"{error.Error}: {error.Message.FirstOrDefault()}";
+                                var msg = $"{error.Error}: {error.Message.FirstOrDefault()} for URL: '{url}'";
                                 _log.Error(msg);
                                 NotifyUser(msg, $"{error.Error}");
                                 return string.Empty;
@@ -298,7 +298,15 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                                 return string.Empty;
                             default:
                                 error = _jsonSerializer.DeserializeFromString<KpErrorResponse>(result);
-                                msg = $"Received '{response.StatusCode}' from API: Error-'{error.Error}', Message-'{error.Message.FirstOrDefault()}'";
+                                msg = $"Received '{response.StatusCode}' from API";
+                                if (error == null)
+                                {
+                                    msg += $": '{result}' for URL: '{url}'";
+                                }
+                                else
+                                {
+                                    msg += $" - Error:'{error.Error}', Message:'{error.Message.FirstOrDefault()}' for URL: '{url}'";
+                                }
                                 _log.Error(msg);
                                 NotifyUser(msg, "API request issue");
                                 return string.Empty;
@@ -308,20 +316,29 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
             catch (HttpException ex)
             {
-                switch ((int)ex.StatusCode)
+                var content = string.Empty;
+                if (response?.Content != null)
+                {
+                    using (var reader = new StreamReader(response.Content))
+                    {
+                        content = await reader.ReadToEndAsync();
+                    }
+                }
+
+                switch ((int?)ex.StatusCode)
                 {
                     case 401:
-                        var msg = $"Token is invalid: '{token}'";
+                        var msg = $"Token is invalid: '{token}'.{(string.IsNullOrWhiteSpace(content) ? string.Empty : " Message: '" + content + "'")}";
                         _log.Error(msg);
                         NotifyUser(msg, "Token is invalid");
                         break;
                     case 403:
-                        msg = "Request limit exceeded (either daily or total) for current token";
+                        msg = $"Request limit exceeded (either daily or total) for current token.{(string.IsNullOrWhiteSpace(content) ? string.Empty : " Message: '" + content + "'")}";
                         _log.Warn(msg);
                         NotifyUser(msg, "Request limit exceeded");
                         break;
                     default:
-                        msg = $"Received '{ex.StatusCode}' from API: Message-'{ex.Message}'";
+                        msg = $"Received '{ex.StatusCode}' from API: '{(string.IsNullOrWhiteSpace(content) ? ex.Message : content)}'";
                         _log.Error(msg, ex);
                         NotifyUser(msg, "General error");
                         break;

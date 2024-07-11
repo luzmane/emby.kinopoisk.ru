@@ -61,7 +61,7 @@ public class KpSeriesProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpSeriesProvider_GetMetadata_Provider_Kp");
+            .Returns(nameof(KpSeriesProvider_GetMetadata_Provider_Kp));
 
         var seriesInfo = new SeriesInfo
         {
@@ -81,7 +81,7 @@ public class KpSeriesProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpSeriesProvider_GetMetadata_Provider_Kp/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpSeriesProvider_GetMetadata_Provider_Kp)}/EmbyKinopoiskRu.xml"), Times.Once());
         _localizationManager.Verify(lm => lm.RemoveDiacritics("Шерлок"), Times.Once());
         VerifyNoOtherCalls();
 
@@ -95,7 +95,7 @@ public class KpSeriesProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpSeriesProvider_GetMetadata_Provider_Imdb");
+            .Returns(nameof(KpSeriesProvider_GetMetadata_Provider_Imdb));
 
         var seriesInfo = new SeriesInfo
         {
@@ -115,7 +115,7 @@ public class KpSeriesProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpSeriesProvider_GetMetadata_Provider_Imdb/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpSeriesProvider_GetMetadata_Provider_Imdb)}/EmbyKinopoiskRu.xml"), Times.Once());
         _localizationManager.Verify(lm => lm.RemoveDiacritics("Шерлок"), Times.Once());
         VerifyNoOtherCalls();
 
@@ -129,7 +129,7 @@ public class KpSeriesProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpSeriesProvider_GetMetadata_Provider_Tmdb");
+            .Returns(nameof(KpSeriesProvider_GetMetadata_Provider_Tmdb));
 
         var seriesInfo = new SeriesInfo
         {
@@ -149,7 +149,7 @@ public class KpSeriesProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpSeriesProvider_GetMetadata_Provider_Tmdb/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpSeriesProvider_GetMetadata_Provider_Tmdb)}/EmbyKinopoiskRu.xml"), Times.Once());
         _localizationManager.Verify(lm => lm.RemoveDiacritics("Шерлок"), Times.Once());
         VerifyNoOtherCalls();
 
@@ -163,7 +163,7 @@ public class KpSeriesProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpSeriesProvider_GetMetadata_NameAndYear");
+            .Returns(nameof(KpSeriesProvider_GetMetadata_NameAndYear));
 
         var seriesInfo = new SeriesInfo
         {
@@ -181,7 +181,7 @@ public class KpSeriesProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpSeriesProvider_GetMetadata_NameAndYear/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpSeriesProvider_GetMetadata_NameAndYear)}/EmbyKinopoiskRu.xml"), Times.Once());
         _localizationManager.Verify(lm => lm.RemoveDiacritics("Шерлок"), Times.Once());
         VerifyNoOtherCalls();
 
@@ -195,7 +195,7 @@ public class KpSeriesProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpSeriesProvider_GetSearchResults_Provider_Kp");
+            .Returns(nameof(KpSeriesProvider_GetSearchResults_Provider_Kp));
 
         var seriesInfo = new SeriesInfo
         {
@@ -211,7 +211,7 @@ public class KpSeriesProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpSeriesProvider_GetSearchResults_Provider_Kp/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpSeriesProvider_GetSearchResults_Provider_Kp)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
         Logger.Info($"Finished '{nameof(KpSeriesProvider_GetSearchResults_Provider_Kp)}'");
@@ -224,7 +224,7 @@ public class KpSeriesProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpSeriesProvider_GetSearchResults_Provider_Imdb");
+            .Returns(nameof(KpSeriesProvider_GetSearchResults_Provider_Imdb));
 
         var seriesInfo = new SeriesInfo
         {
@@ -240,7 +240,7 @@ public class KpSeriesProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpSeriesProvider_GetSearchResults_Provider_Imdb/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpSeriesProvider_GetSearchResults_Provider_Imdb)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
         Logger.Info($"Finished '{nameof(KpSeriesProvider_GetSearchResults_Provider_Imdb)}'");
@@ -253,7 +253,7 @@ public class KpSeriesProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpSeriesProvider_GetSearchResults_NameAndYear");
+            .Returns(nameof(KpSeriesProvider_GetSearchResults_NameAndYear));
 
         var seriesInfo = new SeriesInfo
         {
@@ -267,7 +267,7 @@ public class KpSeriesProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpSeriesProvider_GetSearchResults_NameAndYear/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpSeriesProvider_GetSearchResults_NameAndYear)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
         Logger.Info($"Finished '{nameof(KpSeriesProvider_GetSearchResults_NameAndYear)}'");

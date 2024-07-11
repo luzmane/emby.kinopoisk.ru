@@ -34,19 +34,84 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
 
         private static readonly List<KpLists> KpCollections = new List<KpLists>
         {
-            new KpLists { Slug = "the_closest_releases", Name = "Ближайшие премьеры", Category = "Онлайн-кинотеатр" },
-            new KpLists { Slug = "theme_comics", Name = "Лучшие фильмы, основанные на комиксах", Category = "Фильмы" },
-            new KpLists { Slug = "theme_catastrophe", Name = "Фильмы-катастрофы", Category = "Фильмы" },
-            new KpLists { Slug = "hd-family", Name = "Смотрим всей семьей", Category = "Онлайн-кинотеатр" },
-            new KpLists { Slug = "theme_kids_animation", Name = "Мультфильмы для самых маленьких", Category = "Фильмы" },
-            new KpLists { Slug = "theme_love", Name = "Фильмы про любовь и страсть: список лучших романтических фильмов", Category = "Фильмы" },
-            new KpLists { Slug = "oscar_winners_2021", Name = "«Оскар-2021»: победители", Category = "Премии" },
-            new KpLists { Slug = "series-top250", Name = "250 лучших сериалов", Category = "Сериалы" },
-            new KpLists { Slug = "top250", Name = "250 лучших фильмов", Category = "Фильмы" },
-            new KpLists { Slug = "popular-series", Name = "Популярные сериалы", Category = "Сериалы" },
-            new KpLists { Slug = "popular-films", Name = "Популярные фильмы", Category = "Фильмы" },
-            new KpLists { Slug = "theme_vampire", Name = "Фильмы про вампиров", Category = "Фильмы" },
-            new KpLists { Slug = "theme_zombie", Name = "Фильмы про зомби: список лучших фильмов про живых мертвецов", Category = "Фильмы" }
+            new KpLists
+            {
+                Slug = "the_closest_releases",
+                Name = "Ближайшие премьеры",
+                Category = "Онлайн-кинотеатр"
+            },
+            new KpLists
+            {
+                Slug = "theme_comics",
+                Name = "Лучшие фильмы, основанные на комиксах",
+                Category = "Фильмы"
+            },
+            new KpLists
+            {
+                Slug = "theme_catastrophe",
+                Name = "Фильмы-катастрофы",
+                Category = "Фильмы"
+            },
+            new KpLists
+            {
+                Slug = "hd-family",
+                Name = "Смотрим всей семьей",
+                Category = "Онлайн-кинотеатр"
+            },
+            new KpLists
+            {
+                Slug = "theme_kids_animation",
+                Name = "Мультфильмы для самых маленьких",
+                Category = "Фильмы"
+            },
+            new KpLists
+            {
+                Slug = "theme_love",
+                Name = "Фильмы про любовь и страсть: список лучших романтических фильмов",
+                Category = "Фильмы"
+            },
+            new KpLists
+            {
+                Slug = "oscar_winners_2021",
+                Name = "«Оскар-2021»: победители",
+                Category = "Премии"
+            },
+            new KpLists
+            {
+                Slug = "series-top250",
+                Name = "250 лучших сериалов",
+                Category = "Сериалы"
+            },
+            new KpLists
+            {
+                Slug = "top250",
+                Name = "250 лучших фильмов",
+                Category = "Фильмы"
+            },
+            new KpLists
+            {
+                Slug = "popular-series",
+                Name = "Популярные сериалы",
+                Category = "Сериалы"
+            },
+            new KpLists
+            {
+                Slug = "popular-films",
+                Name = "Популярные фильмы",
+                Category = "Фильмы"
+            },
+            new KpLists
+            {
+                Slug = "theme_vampire",
+                Name = "Фильмы про вампиров",
+                Category = "Фильмы"
+            },
+            new KpLists
+            {
+                Slug = "theme_zombie",
+                Name = "Фильмы про зомби: список лучших фильмов про живых мертвецов",
+                Category = "Фильмы"
+            }
         };
 
         private static readonly Dictionary<string, string> CollectionSlugMap = new Dictionary<string, string>
@@ -66,7 +131,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             { "theme_zombie", "ZOMBIE_THEME" }
         };
 
-        private static readonly List<string> MovieTypes = new List<string> { "FILM", "VIDEO" };
+        private static readonly List<string> MovieTypes = new List<string>
+        {
+            "FILM",
+            "VIDEO"
+        };
 
         internal KinopoiskUnofficialService(
             ILogManager logManager
@@ -83,7 +152,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
 
         public async Task<MetadataResult<Movie>> GetMetadataAsync(MovieInfo info, CancellationToken cancellationToken)
         {
-            var result = new MetadataResult<Movie> { ResultLanguage = "ru" };
+            var result = new MetadataResult<Movie>
+            {
+                ResultLanguage = "ru"
+            };
 
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
@@ -342,7 +414,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
 
         public async Task<MetadataResult<Series>> GetMetadataAsync(SeriesInfo info, CancellationToken cancellationToken)
         {
-            var result = new MetadataResult<Series> { ResultLanguage = "ru" };
+            var result = new MetadataResult<Series>
+            {
+                ResultLanguage = "ru"
+            };
 
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
@@ -512,7 +587,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
 
         public async Task<MetadataResult<Episode>> GetMetadataAsync(EpisodeInfo info, CancellationToken cancellationToken)
         {
-            var result = new MetadataResult<Episode> { ResultLanguage = "ru" };
+            var result = new MetadataResult<Episode>
+            {
+                ResultLanguage = "ru"
+            };
 
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
@@ -595,7 +673,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
 
         public async Task<MetadataResult<Person>> GetMetadataAsync(PersonLookupInfo info, CancellationToken cancellationToken)
         {
-            var result = new MetadataResult<Person> { ResultLanguage = "ru" };
+            var result = new MetadataResult<Person>
+            {
+                ResultLanguage = "ru"
+            };
 
             if (string.IsNullOrWhiteSpace(PluginConfig.GetCurrentToken()))
             {
@@ -654,7 +735,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 KpPerson person = await _api.GetPersonByIdAsync(personId, cancellationToken);
                 if (person != null)
                 {
-                    var item = new RemoteSearchResult { Name = person.NameRu, ImageUrl = person.PosterUrl, SearchProviderName = Plugin.PluginKey };
+                    var item = new RemoteSearchResult
+                    {
+                        Name = person.NameRu,
+                        ImageUrl = person.PosterUrl,
+                        SearchProviderName = Plugin.PluginKey
+                    };
                     item.SetProviderId(Plugin.PluginKey, personId);
                     result.Add(item);
                     return result;
@@ -673,7 +759,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
 
             foreach (KpStaff person in persons.Items)
             {
-                var item = new RemoteSearchResult { Name = person.NameRu, ImageUrl = person.PosterUrl, SearchProviderName = Plugin.PluginKey };
+                var item = new RemoteSearchResult
+                {
+                    Name = person.NameRu,
+                    ImageUrl = person.PosterUrl,
+                    SearchProviderName = Plugin.PluginKey
+                };
                 item.SetProviderId(Plugin.PluginKey, person.KinopoiskId.ToString(CultureInfo.InvariantCulture));
                 result.Add(item);
             }
@@ -692,7 +783,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 SortName = person.NameRu,
                 OriginalTitle = person.NameEn,
                 ProviderIds = new ProviderIdDictionary(
-                    new Dictionary<string, string> { { Plugin.PluginKey, person.PersonId.ToString() } })
+                    new Dictionary<string, string>
+                    {
+                        { Plugin.PluginKey, person.PersonId.ToString() }
+                    })
             };
             if (DateTimeOffset.TryParse(person.Birthday, CultureInfo.InvariantCulture, DateTimeStyles.None, out DateTimeOffset birthDay))
             {
@@ -740,7 +834,13 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 else
                 {
                     _log.Debug($"Adding '{name}' as '{personType}' to '{movieName}'");
-                    var person = new PersonInfo { Name = name, ImageUrl = staff.PosterUrl, Type = (PersonType)personType, Role = staff.Description };
+                    var person = new PersonInfo
+                    {
+                        Name = name,
+                        ImageUrl = staff.PosterUrl,
+                        Type = (PersonType)personType,
+                        Role = staff.Description
+                    };
                     person.SetProviderId(Plugin.PluginKey, staff.StaffId.ToString(CultureInfo.InvariantCulture));
 
                     result.AddPerson(person);
@@ -842,13 +942,21 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 BaseItem item;
                 if (MovieTypes.Contains(m.Type))
                 {
-                    item = new Movie { Name = m.NameRu, OriginalTitle = m.NameOriginal };
+                    item = new Movie
+                    {
+                        Name = m.NameRu,
+                        OriginalTitle = m.NameOriginal
+                    };
                     item.SetProviderId(Plugin.PluginKey, m.KinopoiskId.ToString(CultureInfo.InvariantCulture));
                     item.SetProviderId(MetadataProviders.Imdb.ToString(), m.ImdbId);
                 }
                 else
                 {
-                    item = new Series { Name = m.NameRu, OriginalTitle = m.NameOriginal };
+                    item = new Series
+                    {
+                        Name = m.NameRu,
+                        OriginalTitle = m.NameOriginal
+                    };
                     item.SetProviderId(Plugin.PluginKey, m.KinopoiskId.ToString(CultureInfo.InvariantCulture));
                     item.SetProviderId(MetadataProviders.Imdb.ToString(), m.ImdbId);
                 }
@@ -864,7 +972,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             if (!"imdb".Equals(externalIdType, StringComparison.InvariantCultureIgnoreCase))
             {
                 _log.Info($"Not supported provider: '{externalIdType}'");
-                return new ApiResult<Dictionary<string, long>>(new Dictionary<string, long>()) { HasError = true };
+                return new ApiResult<Dictionary<string, long>>(new Dictionary<string, long>())
+                {
+                    HasError = true
+                };
             }
 
             _log.Info($"Search Kinopoisk ID for {idList.Count()} items by {externalIdType} provider");
@@ -892,6 +1003,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     errorCount++;
                     continue;
                 }
+
                 toReturn.Item.Add(movies.Items[0].ImdbId, movies.Items[0].KinopoiskId);
             }
 
@@ -906,6 +1018,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
 
         private async Task<List<KpFilm>> GetAllCollectionItemsAsync(string collectionId, CancellationToken cancellationToken)
         {
+            _log.Info($"Get all collection items for '{collectionId}'");
             var movies = new List<KpFilm>();
             KpSearchResult<KpFilm> tmp = await _api.GetCollectionItemsAsync(collectionId, 1, cancellationToken);
             if (tmp.HasError)

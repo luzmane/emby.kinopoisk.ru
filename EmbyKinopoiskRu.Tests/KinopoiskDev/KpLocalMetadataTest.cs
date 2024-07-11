@@ -124,7 +124,6 @@ public class KpLocalMetadataTest : BaseTest
         Logger.Info($"Start '{nameof(KpLocalMetadata_ForCodeCoverage)}'");
 
         _kpMovieLocalMetadata.Name.Should().NotBeNull();
-        _ = new KpSeriesLocalMetadata(_logManager.Object);
 
         Logger.Info($"Finish '{nameof(KpLocalMetadata_ForCodeCoverage)}'");
     }

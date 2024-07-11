@@ -150,7 +150,7 @@ public class ApiTests : IDisposable
         var response = await responseMessage.Content.ReadAsStringAsync();
         List<KpFilmStaff>? filmStaffList = JsonSerializer.Deserialize<List<KpFilmStaff>>(response, _jsonOptions);
         filmStaffList.Should().NotBeNull();
-        filmStaffList!.Count.Should().Be(90);
+        filmStaffList!.Count.Should().Be(91);
         KpFilmStaff filmStaff = filmStaffList[1];
         filmStaff.Description.Should().Be("Andy Dufresne");
         filmStaff.NameEn.Should().Be("Tim Robbins");

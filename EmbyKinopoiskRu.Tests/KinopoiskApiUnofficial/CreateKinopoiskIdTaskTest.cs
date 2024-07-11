@@ -43,9 +43,9 @@ public class CreateKinopoiskIdTaskTest : BaseTest
     #endregion
 
     [Fact]
-    public void CreateKinopoiskIdTask_ForCodeCoverage()
+    public void UN_CreateKinopoiskIdTask_ForCodeCoverage()
     {
-        Logger.Info($"Start '{nameof(CreateKinopoiskIdTask_ForCodeCoverage)}'");
+        Logger.Info($"Start '{nameof(UN_CreateKinopoiskIdTask_ForCodeCoverage)}'");
 
         _createKinopoiskIdTask.IsHidden.Should().BeFalse("this is default task config");
         _createKinopoiskIdTask.IsEnabled.Should().BeFalse("this is default task config");
@@ -59,13 +59,13 @@ public class CreateKinopoiskIdTaskTest : BaseTest
 
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(CreateKinopoiskIdTask_ForCodeCoverage)}'");
+        Logger.Info($"Finished '{nameof(UN_CreateKinopoiskIdTask_ForCodeCoverage)}'");
     }
 
     [Fact]
-    public void CreateKinopoiskIdTask_GetTranslation_RU()
+    public void UN_CreateKinopoiskIdTask_GetTranslation_RU()
     {
-        Logger.Info($"Start '{nameof(CreateKinopoiskIdTask_GetTranslation_RU)}'");
+        Logger.Info($"Start '{nameof(UN_CreateKinopoiskIdTask_GetTranslation_RU)}'");
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
@@ -83,13 +83,13 @@ public class CreateKinopoiskIdTaskTest : BaseTest
         _serverConfigurationManager.VerifyGet(scm => scm.Configuration, Times.Exactly(6));
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(CreateKinopoiskIdTask_GetTranslation_RU)}'");
+        Logger.Info($"Finished '{nameof(UN_CreateKinopoiskIdTask_GetTranslation_RU)}'");
     }
 
     [Fact]
-    public void CreateKinopoiskIdTask_GetTranslation_EnUs()
+    public void UN_CreateKinopoiskIdTask_GetTranslation_EnUs()
     {
-        Logger.Info($"Start '{nameof(CreateKinopoiskIdTask_GetTranslation_EnUs)}'");
+        Logger.Info($"Start '{nameof(UN_CreateKinopoiskIdTask_GetTranslation_EnUs)}'");
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
@@ -107,13 +107,13 @@ public class CreateKinopoiskIdTaskTest : BaseTest
         _serverConfigurationManager.VerifyGet(scm => scm.Configuration, Times.Exactly(6));
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(CreateKinopoiskIdTask_GetTranslation_EnUs)}'");
+        Logger.Info($"Finished '{nameof(UN_CreateKinopoiskIdTask_GetTranslation_EnUs)}'");
     }
 
     [Fact]
-    public void CreateKinopoiskIdTask_GetTranslation_UK()
+    public void UN_CreateKinopoiskIdTask_GetTranslation_UK()
     {
-        Logger.Info($"Start '{nameof(CreateKinopoiskIdTask_GetTranslation_UK)}'");
+        Logger.Info($"Start '{nameof(UN_CreateKinopoiskIdTask_GetTranslation_UK)}'");
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
@@ -131,13 +131,13 @@ public class CreateKinopoiskIdTaskTest : BaseTest
         _serverConfigurationManager.VerifyGet(scm => scm.Configuration, Times.Exactly(6));
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(CreateKinopoiskIdTask_GetTranslation_UK)}'");
+        Logger.Info($"Finished '{nameof(UN_CreateKinopoiskIdTask_GetTranslation_UK)}'");
     }
 
     [Fact]
-    public void CreateKinopoiskIdTask_GetTranslation_BG()
+    public void UN_CreateKinopoiskIdTask_GetTranslation_BG()
     {
-        Logger.Info($"Start '{nameof(CreateKinopoiskIdTask_GetTranslation_BG)}'");
+        Logger.Info($"Start '{nameof(UN_CreateKinopoiskIdTask_GetTranslation_BG)}'");
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
@@ -155,17 +155,17 @@ public class CreateKinopoiskIdTaskTest : BaseTest
         _serverConfigurationManager.VerifyGet(scm => scm.Configuration, Times.Exactly(6));
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(CreateKinopoiskIdTask_GetTranslation_BG)}'");
+        Logger.Info($"Finished '{nameof(UN_CreateKinopoiskIdTask_GetTranslation_BG)}'");
     }
 
     [Fact]
-    public async void CreateKinopoiskIdTask_Execute()
+    public async void UN_CreateKinopoiskIdTask_Execute()
     {
-        Logger.Info($"Start '{nameof(CreateKinopoiskIdTask_Execute)}'");
+        Logger.Info($"Start '{nameof(UN_CreateKinopoiskIdTask_Execute)}'");
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("CreateKinopoiskIdTask_Execute");
+            .Returns(nameof(UN_CreateKinopoiskIdTask_Execute));
 
         _ = _serverConfigurationManager
             .SetupGet(scm => scm.Configuration)
@@ -225,12 +225,12 @@ public class CreateKinopoiskIdTaskTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "CreateKinopoiskIdTask_Execute/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(UN_CreateKinopoiskIdTask_Execute)}/EmbyKinopoiskRu.xml"), Times.Once());
         _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Once());
         _libraryManager.Verify(lm => lm.GetItemLinks(It.IsInRange(101L, 102L, Moq.Range.Inclusive), It.IsAny<List<ItemLinkType>>()), Times.Exactly(2));
         _libraryManager.Verify(lm => lm.UpdateItem(It.IsAny<BaseItem>(), It.IsAny<BaseItem>(), ItemUpdateType.MetadataEdit, null), Times.Exactly(2));
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(CreateKinopoiskIdTask_Execute)}'");
+        Logger.Info($"Finished '{nameof(UN_CreateKinopoiskIdTask_Execute)}'");
     }
 }

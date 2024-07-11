@@ -98,7 +98,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
             });
 
         _createKpCollectionsTaskTest.Name.Should().Be("Создать коллекции Кинопоиска");
-        _createKpCollectionsTaskTest.Description.Should().Be("Создать коллекции основываясь на коллекциях Кинопоиска и настройках плагина. Поддерживает только kinopoisk.dev");
+        _createKpCollectionsTaskTest.Description.Should().Be("Создать коллекции основываясь на коллекциях Кинопоиска и настройках плагина.");
         _createKpCollectionsTaskTest.Category.Should().Be("Плагин Кинопоиска");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
@@ -122,7 +122,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
             });
 
         _createKpCollectionsTaskTest.Name.Should().Be("Create Kinopoisk collections");
-        _createKpCollectionsTaskTest.Description.Should().Be("Create collections based on Kinopoisk.ru collections and configuration of the plugin. Support kinopoisk.dev only");
+        _createKpCollectionsTaskTest.Description.Should().Be("Create collections based on Kinopoisk.ru collections and configuration of the plugin.");
         _createKpCollectionsTaskTest.Category.Should().Be("Kinopoisk Plugin");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
@@ -146,7 +146,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
             });
 
         _createKpCollectionsTaskTest.Name.Should().Be("Створити колекції Кінопошуку");
-        _createKpCollectionsTaskTest.Description.Should().Be("Створити колекції ґрунтуючись на колекціях Кінопошуку та налаштуваннях плагіна. Підтримує лише kinopoisk.dev");
+        _createKpCollectionsTaskTest.Description.Should().Be("Створити колекції ґрунтуючись на колекціях Кінопошуку та налаштуваннях плагіна.");
         _createKpCollectionsTaskTest.Category.Should().Be("Плагін Кінопошуку");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
@@ -170,7 +170,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
             });
 
         _createKpCollectionsTaskTest.Name.Should().Be("Create Kinopoisk collections");
-        _createKpCollectionsTaskTest.Description.Should().Be("Create collections based on Kinopoisk.ru collections and configuration of the plugin. Support kinopoisk.dev only");
+        _createKpCollectionsTaskTest.Description.Should().Be("Create collections based on Kinopoisk.ru collections and configuration of the plugin.");
         _createKpCollectionsTaskTest.Category.Should().Be("Kinopoisk Plugin");
 
         _logManager.Verify(lm => lm.GetLogger("KinopoiskRu"), Times.Once());
@@ -199,7 +199,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("CreateKpCollectionsTaskTest_Execute_CollectionExists");
+            .Returns(nameof(CreateKpCollectionsTaskTest_Execute_CollectionExists));
 
         _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
@@ -344,7 +344,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
         _libraryManager.Verify(lm => lm.GetItemLinks(It.IsInRange(103L, 104L, Range.Inclusive), It.IsAny<List<ItemLinkType>>()), Times.Exactly(2));
         _libraryManager.Verify(lm => lm.UpdateItem(It.IsAny<BaseItem>(), It.IsAny<BaseItem>(), ItemUpdateType.MetadataEdit, null), Times.Exactly(2));
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "CreateKpCollectionsTaskTest_Execute_CollectionExists/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(CreateKpCollectionsTaskTest_Execute_CollectionExists)}/EmbyKinopoiskRu.xml"), Times.Once());
 
         VerifyNoOtherCalls();
 
@@ -360,7 +360,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("CreateKpCollectionsTaskTest_Execute_CollectionNotExists");
+            .Returns(nameof(CreateKpCollectionsTaskTest_Execute_CollectionNotExists));
 
         _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
@@ -497,7 +497,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
                     new CollectionFolder
                     {
                         Name = "Collections",
-                        Path = "/CreateKpCollectionsTaskTest_Execute_CollectionNotExists",
+                        Path = nameof(CreateKpCollectionsTaskTest_Execute_CollectionNotExists),
                         InternalId = 2L
                     }
                 }
@@ -511,7 +511,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
             .Returns(new CollectionFolder
             {
                 Name = "Collections",
-                Path = "CreateKpCollectionsTaskTest_Execute_CollectionNotExists"
+                Path = nameof(CreateKpCollectionsTaskTest_Execute_CollectionNotExists)
             });
 
         _ = _collectionManager
@@ -539,7 +539,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
         _itemRepository.Verify(lm => lm.GetItemExtradataValue(It.IsInRange(123L, 126L, Range.Inclusive), 0), Times.Exactly(4));
         _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(10));
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "CreateKpCollectionsTaskTest_Execute_CollectionNotExists/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(CreateKpCollectionsTaskTest_Execute_CollectionNotExists)}/EmbyKinopoiskRu.xml"), Times.Once());
 
         VerifyNoOtherCalls();
 

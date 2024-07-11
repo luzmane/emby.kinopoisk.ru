@@ -188,7 +188,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
 
         private async Task<string> SendRequestAsync(string url, CancellationToken cancellationToken)
         {
-            _log.Info($"Sending request to {url}");
+            _log.Debug($"Sending request to {url}");
             var token = Plugin.Instance?.Configuration.GetCurrentToken();
             if (string.IsNullOrWhiteSpace(token))
             {
@@ -200,8 +200,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             {
                 CancellationToken = cancellationToken,
                 Url = url,
-                LogRequest = false,
-                LogResponse = false,
                 CacheLength = TimeSpan.FromHours(12),
                 CacheMode = CacheMode.Unconditional,
                 TimeoutMs = 30_000,
@@ -211,9 +209,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             };
             options.RequestHeaders.Add("X-API-KEY", token);
             options.Sanitation.SanitizeDefaultParams = false;
+
+            HttpResponseInfo response = null;
             try
             {
-                using (HttpResponseInfo response = await _httpClient.GetResponse(options))
+                using (response = await _httpClient.GetResponse(options))
                 {
                     using (var reader = new StreamReader(response.Content))
                     {
@@ -221,7 +221,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                         switch ((int)response.StatusCode)
                         {
                             case int n when n >= 200 && n < 300:
-                                _log.Info($"Received response: '{result}'");
+                                _log.Debug($"Received response: '{result}'");
                                 return result;
                             case 401:
                                 var msg = $"Token is invalid: '{token}'";
@@ -234,14 +234,14 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                                 NotifyUser(msg, "Request limit exceeded");
                                 return string.Empty;
                             case 404:
-                                _log.Info($"Data not found for URL: {url}");
+                                _log.Info($"Data not found for URL: '{url}'");
                                 return string.Empty;
                             case 429:
                                 _log.Info("Too many requests per second. Waiting 2 sec");
                                 await Task.Delay(2000, cancellationToken);
                                 return await SendRequestAsync(url, cancellationToken);
                             default:
-                                msg = $"Received '{response.StatusCode}' from API: '{result}'";
+                                msg = $"Received '{response.StatusCode}' from API: '{result}' for URL: '{url}'";
                                 _log.Error(msg);
                                 NotifyUser(msg, "API request issue");
                                 return string.Empty;
@@ -251,20 +251,29 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             }
             catch (HttpException ex)
             {
-                switch ((int)ex.StatusCode)
+                var content = string.Empty;
+                if (response?.Content != null)
+                {
+                    using (var reader = new StreamReader(response.Content))
+                    {
+                        content = await reader.ReadToEndAsync();
+                    }
+                }
+
+                switch ((int?)ex.StatusCode)
                 {
                     case 401:
-                        var msg = $"Token is invalid: '{token}'";
+                        var msg = $"Token is invalid: '{token}'.{(string.IsNullOrWhiteSpace(content) ? string.Empty : " Message: '" + content + "'")}";
                         _log.Error(msg);
                         NotifyUser(msg, "Token is invalid");
                         break;
                     case 402:
-                        msg = "Request limit exceeded (either daily or total) for current token";
+                        msg = $"Request limit exceeded (either daily or total) for current token.{(string.IsNullOrWhiteSpace(content) ? string.Empty : " Message: '" + content + "'")}";
                         _log.Warn(msg);
                         NotifyUser(msg, "Request limit exceeded");
                         break;
                     default:
-                        msg = $"Received '{ex.StatusCode}' from API: Message-'{ex.Message}'";
+                        msg = $"Received '{ex.StatusCode}' from API: '{(string.IsNullOrWhiteSpace(content) ? ex.Message : content)}'";
                         _log.Error(msg, ex);
                         NotifyUser(msg, "General error");
                         break;

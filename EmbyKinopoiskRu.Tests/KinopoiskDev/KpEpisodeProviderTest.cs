@@ -72,7 +72,7 @@ public class KpEpisodeProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpEpisodeProvider_GetMetadata_ProviderIds");
+            .Returns(nameof(KpEpisodeProvider_GetMetadata_ProviderIds));
 
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Episode> result = await _kpEpisodeProvider.GetMetadata(episodeInfo, cancellationTokenSource.Token);
@@ -82,7 +82,7 @@ public class KpEpisodeProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpEpisodeProvider_GetMetadata_ProviderIds/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpEpisodeProvider_GetMetadata_ProviderIds)}/EmbyKinopoiskRu.xml"), Times.Once());
         _localizationManager.Verify(lm => lm.RemoveDiacritics("Эпизод 2. А я сказал — оседлаю!"), Times.Once());
         _serverConfigurationManager.VerifyGet(scm => scm.Configuration, Times.Once());
         VerifyNoOtherCalls();
@@ -107,7 +107,7 @@ public class KpEpisodeProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpEpisodeProvider_GetMetadata_SeriesProviderIds");
+            .Returns(nameof(KpEpisodeProvider_GetMetadata_SeriesProviderIds));
 
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Episode> result = await _kpEpisodeProvider.GetMetadata(episodeInfo, cancellationTokenSource.Token);
@@ -117,7 +117,7 @@ public class KpEpisodeProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpEpisodeProvider_GetMetadata_SeriesProviderIds/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpEpisodeProvider_GetMetadata_SeriesProviderIds)}/EmbyKinopoiskRu.xml"), Times.Once());
         _localizationManager.Verify(lm => lm.RemoveDiacritics("Эпизод 2. А я сказал — оседлаю!"), Times.Once());
         _serverConfigurationManager.VerifyGet(scm => scm.Configuration, Times.Once());
         VerifyNoOtherCalls();
@@ -132,7 +132,7 @@ public class KpEpisodeProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpEpisodeProvider_GetSearchResults_Provider_Kp");
+            .Returns(nameof(KpEpisodeProvider_GetSearchResults_Provider_Kp));
 
         var personInfo = new EpisodeInfo
         {
@@ -150,7 +150,7 @@ public class KpEpisodeProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpEpisodeProvider_GetSearchResults_Provider_Kp/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpEpisodeProvider_GetSearchResults_Provider_Kp)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
         Logger.Info($"Finish '{nameof(KpEpisodeProvider_GetSearchResults_Provider_Kp)}'");

@@ -233,7 +233,7 @@ public class KpMovieProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpMovieProvider_GetMetadata_Provider_Kp");
+            .Returns(nameof(KpMovieProvider_GetMetadata_Provider_Kp));
 
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Movie> result = await _kpMovieProvider.GetMetadata(movieInfo, cancellationTokenSource.Token);
@@ -247,7 +247,7 @@ public class KpMovieProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_GetMetadata_Provider_Kp/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpMovieProvider_GetMetadata_Provider_Kp)}/EmbyKinopoiskRu.xml"), Times.Once());
         _localizationManager.Verify(lm => lm.RemoveDiacritics("Побег из Шоушенка"), Times.Once());
         VerifyNoOtherCalls();
 
@@ -269,7 +269,7 @@ public class KpMovieProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpMovieProvider_GetMetadata_Provider_Imdb");
+            .Returns(nameof(KpMovieProvider_GetMetadata_Provider_Imdb));
 
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Movie> result = await _kpMovieProvider.GetMetadata(movieInfo, cancellationTokenSource.Token);
@@ -283,7 +283,7 @@ public class KpMovieProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_GetMetadata_Provider_Imdb/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpMovieProvider_GetMetadata_Provider_Imdb)}/EmbyKinopoiskRu.xml"), Times.Once());
         _localizationManager.Verify(lm => lm.RemoveDiacritics("Побег из Шоушенка"), Times.Once());
         VerifyNoOtherCalls();
 
@@ -305,7 +305,7 @@ public class KpMovieProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpMovieProvider_GetMetadata_Provider_Tmdb");
+            .Returns(nameof(KpMovieProvider_GetMetadata_Provider_Tmdb));
 
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Movie> result = await _kpMovieProvider.GetMetadata(movieInfo, cancellationTokenSource.Token);
@@ -319,7 +319,7 @@ public class KpMovieProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_GetMetadata_Provider_Tmdb/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpMovieProvider_GetMetadata_Provider_Tmdb)}/EmbyKinopoiskRu.xml"), Times.Once());
         _localizationManager.Verify(lm => lm.RemoveDiacritics("Побег из Шоушенка"), Times.Once());
         VerifyNoOtherCalls();
 
@@ -339,7 +339,7 @@ public class KpMovieProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpMovieProvider_GetMetadata_NameAndYear");
+            .Returns(nameof(KpMovieProvider_GetMetadata_NameAndYear));
 
         using var cancellationTokenSource = new CancellationTokenSource();
         MetadataResult<Movie> result = await _kpMovieProvider.GetMetadata(movieInfo, cancellationTokenSource.Token);
@@ -353,7 +353,7 @@ public class KpMovieProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_GetMetadata_NameAndYear/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpMovieProvider_GetMetadata_NameAndYear)}/EmbyKinopoiskRu.xml"), Times.Once());
         _localizationManager.Verify(lm => lm.RemoveDiacritics("Побег из Шоушенка"), Times.Once());
         VerifyNoOtherCalls();
 
@@ -367,7 +367,7 @@ public class KpMovieProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpMovieProvider_GetSearchResults_Provider_Kp");
+            .Returns(nameof(KpMovieProvider_GetSearchResults_Provider_Kp));
 
         var movieInfo = new MovieInfo
         {
@@ -383,7 +383,7 @@ public class KpMovieProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_GetSearchResults_Provider_Kp/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpMovieProvider_GetSearchResults_Provider_Kp)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
         Logger.Info($"Finished '{nameof(KpMovieProvider_GetSearchResults_Provider_Kp)}'");
@@ -396,7 +396,7 @@ public class KpMovieProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpMovieProvider_GetSearchResults_Provider_Imdb");
+            .Returns(nameof(KpMovieProvider_GetSearchResults_Provider_Imdb));
 
         var movieInfo = new MovieInfo
         {
@@ -412,7 +412,7 @@ public class KpMovieProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_GetSearchResults_Provider_Imdb/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpMovieProvider_GetSearchResults_Provider_Imdb)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
         Logger.Info($"Finished '{nameof(KpMovieProvider_GetSearchResults_Provider_Imdb)}'");
@@ -425,7 +425,7 @@ public class KpMovieProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpMovieProvider_GetSearchResults_Name");
+            .Returns(nameof(KpMovieProvider_GetSearchResults_Name));
 
         var movieInfo = new MovieInfo
         {
@@ -439,7 +439,7 @@ public class KpMovieProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_GetSearchResults_Name/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpMovieProvider_GetSearchResults_Name)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
         Logger.Info($"Finished '{nameof(KpMovieProvider_GetSearchResults_Name)}'");
@@ -452,7 +452,7 @@ public class KpMovieProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpMovieProvider_GetSearchResults_NameAndYear");
+            .Returns(nameof(KpMovieProvider_GetSearchResults_NameAndYear));
 
         var movieInfo = new MovieInfo
         {
@@ -466,7 +466,7 @@ public class KpMovieProviderTest : BaseTest
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_GetSearchResults_NameAndYear/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpMovieProvider_GetSearchResults_NameAndYear)}/EmbyKinopoiskRu.xml"), Times.Once());
         VerifyNoOtherCalls();
 
         Logger.Info($"Finished '{nameof(KpMovieProvider_GetSearchResults_NameAndYear)}'");
@@ -500,7 +500,7 @@ public class KpMovieProviderTest : BaseTest
                     new CollectionFolder
                     {
                         Name = "Collections",
-                        Path = "/CreateKpCollectionsTaskTest_Execute_CollectionNotExists",
+                        Path = nameof(KpMovieProvider_WithNameYearAndAddToExistingCollection),
                         InternalId = 2L
                     }
                 }
@@ -572,7 +572,7 @@ public class KpMovieProviderTest : BaseTest
             });
 
         _ = _xmlSerializer
-            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "KpMovieProvider_WithNameYearAndAddToExistingCollection/options.xml"))
+            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), $"{nameof(KpMovieProvider_WithNameYearAndAddToExistingCollection)}/options.xml"))
             .Returns(new LibraryOptions
             {
                 ContentType = CollectionType.BoxSets.ToString(),
@@ -592,14 +592,14 @@ public class KpMovieProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpMovieProvider_WithNameYearAndAddToExistingCollection");
+            .Returns(nameof(KpMovieProvider_WithNameYearAndAddToExistingCollection));
 
         _ = _libraryManager
             .Setup(m => m.GetItemById(It.Is<long>(id => id == 1L)))
             .Returns(new CollectionFolder
             {
                 Name = "Collections",
-                Path = "KpMovieProvider_WithNameYearAndAddToExistingCollection"
+                Path = nameof(KpMovieProvider_WithNameYearAndAddToExistingCollection)
             });
 
         var movieInfo = new MovieInfo();
@@ -628,7 +628,7 @@ public class KpMovieProviderTest : BaseTest
         _libraryManager.Verify(lm => lm.UpdateItem(It.IsAny<BaseItem>(), It.IsAny<BaseItem>(), ItemUpdateType.MetadataEdit, null), Times.Once());
         _localizationManager.Verify(lm => lm.RemoveDiacritics("Гарри Поттер и философский камень"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_WithNameYearAndAddToExistingCollection/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpMovieProvider_WithNameYearAndAddToExistingCollection)}/EmbyKinopoiskRu.xml"), Times.Once());
 
         VerifyNoOtherCalls();
 
@@ -674,7 +674,7 @@ public class KpMovieProviderTest : BaseTest
                     new CollectionFolder
                     {
                         Name = "Collections",
-                        Path = "/CreateKpCollectionsTaskTest_Execute_CollectionNotExists",
+                        Path = nameof(KpMovieProvider_WithNameYearAndAddToNewCollection),
                         InternalId = 2L
                     }
                 }
@@ -738,7 +738,7 @@ public class KpMovieProviderTest : BaseTest
             });
 
         _ = _xmlSerializer
-            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), "KpMovieProvider_WithNameYearAndAddToNewCollection/options.xml"))
+            .Setup(m => m.DeserializeFromFile(typeof(LibraryOptions), $"{nameof(KpMovieProvider_WithNameYearAndAddToNewCollection)}/options.xml"))
             .Returns(new LibraryOptions
             {
                 ContentType = CollectionType.BoxSets.ToString(),
@@ -758,14 +758,14 @@ public class KpMovieProviderTest : BaseTest
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("KpMovieProvider_WithNameYearAndAddToNewCollection");
+            .Returns(nameof(KpMovieProvider_WithNameYearAndAddToNewCollection));
 
         _ = _libraryManager
             .Setup(m => m.GetItemById(It.Is<long>(id => id == 1L)))
             .Returns(new CollectionFolder
             {
                 Name = "Collections",
-                Path = "KpMovieProvider_WithNameYearAndAddToNewCollection"
+                Path = nameof(KpMovieProvider_WithNameYearAndAddToNewCollection)
             });
 
         var movieInfo = new MovieInfo();
@@ -793,7 +793,7 @@ public class KpMovieProviderTest : BaseTest
         _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(3));
         _localizationManager.Verify(lm => lm.RemoveDiacritics("Гарри Поттер и философский камень"), Times.Once());
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), "KpMovieProvider_WithNameYearAndAddToNewCollection/EmbyKinopoiskRu.xml"), Times.Once());
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(KpMovieProvider_WithNameYearAndAddToNewCollection)}/EmbyKinopoiskRu.xml"), Times.Once());
 
         VerifyNoOtherCalls();
 

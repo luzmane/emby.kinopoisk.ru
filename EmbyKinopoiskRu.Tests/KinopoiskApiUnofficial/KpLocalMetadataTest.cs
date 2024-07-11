@@ -64,9 +64,9 @@ public class KpLocalMetadataTest : BaseTest
     #endregion
 
     [Fact]
-    public async void KpLocalMetadata_WithKpInName()
+    public async void UN_KpLocalMetadata_WithKpInName()
     {
-        Logger.Info($"Start '{nameof(KpLocalMetadata_WithKpInName)}'");
+        Logger.Info($"Start '{nameof(UN_KpLocalMetadata_WithKpInName)}'");
 
         var itemInfo = new ItemInfo(new Movie
         {
@@ -90,17 +90,17 @@ public class KpLocalMetadataTest : BaseTest
         _fileSystem.Verify(fs => fs.GetDirectoryName(It.IsAny<string>()), Times.Once());
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(KpLocalMetadata_WithKpInName)}'");
+        Logger.Info($"Finished '{nameof(UN_KpLocalMetadata_WithKpInName)}'");
     }
 
     [Fact]
-    public async void KpLocalMetadata_WithoutKpInName()
+    public async void UN_KpLocalMetadata_WithoutKpInName()
     {
-        Logger.Info($"Start '{nameof(KpLocalMetadata_WithoutKpInName)}'");
+        Logger.Info($"Start '{nameof(UN_KpLocalMetadata_WithoutKpInName)}'");
 
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns("UN_KpLocalMetadata_WithoutKpInName");
+            .Returns(nameof(UN_KpLocalMetadata_WithoutKpInName));
 
         var itemInfo = new ItemInfo(new Movie
         {
@@ -117,20 +117,21 @@ public class KpLocalMetadataTest : BaseTest
         result.Item.Should().BeNull();
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(2));
+        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(UN_KpLocalMetadata_WithoutKpInName)}/EmbyKinopoiskRu.xml"), Times.Once());
         _fileSystem.Verify(fs => fs.GetDirectoryName("/emby/movie_library/Побег из Шоушенка.mkv"), Times.Once());
         VerifyNoOtherCalls();
 
-        Logger.Info($"Finished '{nameof(KpLocalMetadata_WithoutKpInName)}'");
+        Logger.Info($"Finished '{nameof(UN_KpLocalMetadata_WithoutKpInName)}'");
     }
 
     [Fact]
-    public void KpLocalMetadata_ForCodeCoverage()
+    public void UN_KpLocalMetadata_ForCodeCoverage()
     {
-        Logger.Info($"Start '{nameof(KpLocalMetadata_ForCodeCoverage)}'");
+        Logger.Info($"Start '{nameof(UN_KpLocalMetadata_ForCodeCoverage)}'");
 
         _kpMovieLocalMetadata.Name.Should().NotBeNull();
         _ = new KpSeriesLocalMetadata(_logManager.Object);
 
-        Logger.Info($"Finish '{nameof(KpLocalMetadata_ForCodeCoverage)}'");
+        Logger.Info($"Finish '{nameof(UN_KpLocalMetadata_ForCodeCoverage)}'");
     }
 }

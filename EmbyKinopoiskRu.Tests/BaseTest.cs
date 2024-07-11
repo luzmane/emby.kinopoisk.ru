@@ -26,6 +26,9 @@ using MediaBrowser.Model.Serialization;
 namespace EmbyKinopoiskRu.Tests;
 
 /*
+// install the tool
+dotnet tool install --global dotnet-reportgenerator-globaltool --version 5.2.5
+
 dotnet test --collect:"XPlat Code Coverage"
 reportgenerator -reports:"coverage.cobertura.xml" -targetdir:"coveragereport" -reporttypes:Html
 */
