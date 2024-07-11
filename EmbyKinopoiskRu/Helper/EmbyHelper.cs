@@ -88,7 +88,7 @@ namespace EmbyKinopoiskRu.Helper
 
         #region Task Translations
 
-        internal static Dictionary<string, string> GetAvailableTransactions(string key)
+        internal static Dictionary<string, string> GetAvailableTranslations(string key)
         {
             var basePath = Plugin.Instance.GetType().Namespace + $".i18n.{key}.";
             return typeof(EmbyHelper).Assembly.GetManifestResourceNames()

@@ -35,7 +35,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
         {
             _jsonSerializer = jsonSerializer;
             _serverConfigurationManager = serverConfigurationManager;
-            _availableTranslations = EmbyHelper.GetAvailableTransactions($"ScheduledTasks.{taskKey}");
+            _availableTranslations = EmbyHelper.GetAvailableTranslations($"ScheduledTasks.{taskKey}");
         }
 
         /// <summary>

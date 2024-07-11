@@ -7,14 +7,14 @@ using System.Threading;
 using System.Threading.Tasks;
 
 using EmbyKinopoiskRu.Helper;
-using EmbyKinopoiskRu.YtDownloader.Model;
+using EmbyKinopoiskRu.TrailerDownloader.Youtube.Model;
 
 using MediaBrowser.Common.Net;
 using MediaBrowser.Model.Logging;
 
-namespace EmbyKinopoiskRu.YtDownloader
+namespace EmbyKinopoiskRu.TrailerDownloader.Youtube
 {
-    internal abstract class YoutubeDownloader
+    internal abstract class YoutubeDownloader : ITrailerDownloader
     {
         private readonly ILogger _logger;
         private readonly IHttpClient _httpClient;
@@ -26,16 +26,16 @@ namespace EmbyKinopoiskRu.YtDownloader
             _httpClient = httpClient;
         }
 
-        public async Task<string> DownloadYoutubeLink(string youtubeId, string videoName, int preferableQuality, string basePath, CancellationToken cancellationToken)
+        public async Task<string> DownloadTrailerByLink(string youtubeId, string videoName, int preferableQuality, string basePath, CancellationToken cancellationToken)
         {
             try
             {
-                var userAgent = await YtHelper.GetUserAgent(_httpClient, _logger, _cancellationToken);
+                var userAgent = await TrailerDlHelper.GetUserAgent(_httpClient, _logger, _cancellationToken);
                 var analyzeResponse = await Analyze(youtubeId, userAgent, _cancellationToken);
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    _logger.Info("Cancellation requested. Stop convert");
-                    return String.Empty;
+                    _logger.Info($"Cancellation requested. Stop download '{youtubeId}'");
+                    return string.Empty;
                 }
 
                 if (analyzeResponse.Count == 0)
@@ -47,7 +47,7 @@ namespace EmbyKinopoiskRu.YtDownloader
                     else
                     {
                         _logger.Info($"The trailer doesn't exist on youtube anymore: {youtubeId}");
-                        return CreateMock(youtubeId, basePath);
+                        return CreateMissedFilePlaceholder(youtubeId, basePath);
                     }
 
                     return string.Empty;
@@ -65,11 +65,11 @@ namespace EmbyKinopoiskRu.YtDownloader
 
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    _logger.Info($"Cancellation requested. Stop convert '{youtubeId}'");
-                    return String.Empty;
+                    _logger.Info($"Cancellation requested. Stop download '{youtubeId}'");
+                    return string.Empty;
                 }
 
-                _logger.Info($"Chosen link: YoutubeId: '{youtubeId}', Quality: '{trailerFormat.Value.Quality}', Size: '{trailerFormat.Value.Size}', Format: '{trailerFormat.Value.Format}'");
+                _logger.Debug($"Chosen link: YoutubeId: '{youtubeId}', Quality: '{trailerFormat.Value.Quality}', Size: '{trailerFormat.Value.Size}', Format: '{trailerFormat.Value.Format}'");
                 var downloadLink = await Convert(youtubeId, trailerFormat.Value.Key, userAgent, _cancellationToken);
                 if (string.IsNullOrEmpty(downloadLink))
                 {
@@ -80,11 +80,11 @@ namespace EmbyKinopoiskRu.YtDownloader
                 if (cancellationToken.IsCancellationRequested)
                 {
                     _logger.Info($"Cancellation requested. Stop download '{youtubeId}'");
-                    return String.Empty;
+                    return string.Empty;
                 }
 
                 return await DownloadLink(
-                    Path.Combine(basePath, YtHelper.GetIntroName(videoName, youtubeId, trailerFormat.Value.Format)),
+                    Path.Combine(basePath, TrailerDlHelper.GetIntroName(videoName, youtubeId, trailerFormat.Value.Format)),
                     downloadLink,
                     userAgent,
                     _cancellationToken);
@@ -96,23 +96,23 @@ namespace EmbyKinopoiskRu.YtDownloader
             }
         }
 
-        private string CreateMock(string youtubeId, string basePath)
+        private string CreateMissedFilePlaceholder(string youtubeId, string basePath)
         {
+            if (!VerifyRootFolderExists(basePath))
+            {
+                return String.Empty;
+            }
+
             try
             {
-                if (!Directory.Exists(basePath))
-                {
-                    Directory.CreateDirectory(basePath);
-                }
-
-                var filePath = Path.Combine(basePath, $"[{youtubeId}]{YtHelper.NotExistsOnYoutube}");
+                var filePath = Path.Combine(basePath, $"[{youtubeId}]{TrailerDlHelper.NotExists}");
                 File.WriteAllText(filePath, string.Empty);
-                _logger.Info($"Mock file created: '{filePath}'");
+                _logger.Debug($"Mock file created: '{filePath}'");
                 return filePath;
             }
             catch (Exception ex)
             {
-                _logger.ErrorException($"Unable to create mock file: '{youtubeId}{YtHelper.NotExistsOnYoutube}', due to: '{ex.Message}'", ex);
+                _logger.ErrorException($"Unable to create mock file: '{youtubeId}{TrailerDlHelper.NotExists}', due to: '{ex.Message}'", ex);
             }
 
             return string.Empty;
@@ -212,6 +212,12 @@ namespace EmbyKinopoiskRu.YtDownloader
                 return string.Empty;
             }
 
+            string parentPath = Path.GetDirectoryName(filePath);
+            if (!VerifyRootFolderExists(parentPath))
+            {
+                return string.Empty;
+            }
+
             var downloadUrl = new Uri(downloadLink);
             var options = new HttpRequestOptions
             {
@@ -223,7 +229,9 @@ namespace EmbyKinopoiskRu.YtDownloader
                 Url = downloadLink,
                 UserAgent = userAgent,
                 Progress = new Progress<double>(),
-                TimeoutMs = 300_000
+                TimeoutMs = 300_000,
+                LogRequestAsDebug = true,
+                DownloadFilePath = filePath
             };
             options.RequestHeaders.Add("Accept-Language", "en-US,en;q=0.5");
             options.RequestHeaders.Add("Upgrade-Insecure-Requests", "1");
@@ -233,15 +241,8 @@ namespace EmbyKinopoiskRu.YtDownloader
             options.RequestHeaders.Add("Sec-Fetch-User", "?1");
             try
             {
-                var tempFilePath = await _httpClient.GetTempFile(options);
-                string parentPath = Path.GetDirectoryName(filePath);
-                if (!Directory.Exists(parentPath) && parentPath != null)
-                {
-                    Directory.CreateDirectory(parentPath);
-                }
-
-                File.Move(tempFilePath, filePath);
-                _logger.Info($"The file is downloaded to {filePath}");
+                filePath = await _httpClient.GetTempFile(options);
+                _logger.Debug($"The file is downloaded to {filePath}");
             }
             catch (Exception ex)
             {
@@ -264,9 +265,9 @@ namespace EmbyKinopoiskRu.YtDownloader
                     CancellationToken = cancellationToken,
                     DecompressionMethod = CompressionMethod.Gzip,
                     EnableHttpCompression = true,
-                    LogRequestAsDebug = true,
                     Url = $"https://www.youtube.com/watch?v={youtubeId}",
                     EnableDefaultUserAgent = true,
+                    LogRequestAsDebug = true,
                     Sanitation =
                     {
                         SanitizeDefaultParams = false
@@ -291,8 +292,37 @@ namespace EmbyKinopoiskRu.YtDownloader
         }
 
         protected abstract HttpRequestOptions GetAnalyzeRequestOptions(string youtubeId, string userAgent, CancellationToken cancellationToken);
+
         protected abstract Dictionary<int, TrailerFormat> ParseLinksAnalyzeResponse(JsonElement linksElement);
+
         protected abstract HttpRequestOptions GetConvertRequestOptions(string youtubeId, string videoKey, string userAgent, CancellationToken cancellationToken);
+
         protected abstract string GetDownloadReferer();
+
+        private bool VerifyRootFolderExists(string folderPath)
+        {
+            if (string.IsNullOrWhiteSpace(folderPath))
+            {
+                _logger.Error($"Provided path in invalid: '{folderPath}'");
+                return false;
+            }
+
+            if (Directory.Exists(folderPath))
+            {
+                return true;
+            }
+
+            try
+            {
+                _ = Directory.CreateDirectory(folderPath);
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException($"Unable to create collection folder '{folderPath}' due to '{ex.Message}'", ex);
+                return false;
+            }
+
+            return true;
+        }
     }
 }

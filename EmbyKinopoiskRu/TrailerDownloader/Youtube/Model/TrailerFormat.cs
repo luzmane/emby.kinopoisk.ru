@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace EmbyKinopoiskRu.YtDownloader.Model
+namespace EmbyKinopoiskRu.TrailerDownloader.Youtube.Model
 {
     internal class TrailerFormat
     {

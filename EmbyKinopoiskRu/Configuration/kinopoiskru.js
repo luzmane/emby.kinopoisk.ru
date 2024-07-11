@@ -9,6 +9,7 @@
 
     const groupBy = (x, f) => x.reduce((a, b, i) => ((a[f(b, i, x)] ||= []).push(b), a), {});
     page.querySelector('.txtToken').value = config.Token || '';
+    page.querySelector('.trailerMaxDuration').value = config.TrailerMaxDuration || '5';
     page.querySelector('.chkCreateSeqCollections').checked = (config.ApiType === "kinopoisk.dev" && config.CreateSeqCollections);
     if (config.ApiType === "kinopoisk.dev") page.querySelectorAll('.kinopoiskDevOnly').forEach(item => item.style.display = '');
     page.querySelector('.kinopoiskUnofficial').checked = (config.ApiType === "kinopoiskapiunofficial.tech");
@@ -58,7 +59,7 @@
         });
     } else {
       let div = document.createElement("div");
-      div.textContent = 'Сохраните конфигурацию (кнопка "Сохранить") и обновите страницу чтоб показать список коллекций Кинопоиска';
+      div.textContent = 'Сохраните конфигурацию (кнопка "Сохранить") и обновите страницу чтоб показать список коллекций КиноПоиска';
       template.parentNode.appendChild(div);
       template.parentNode.appendChild(document.createElement("br"));
       template.parentNode.appendChild(document.createElement("br"));
@@ -76,6 +77,7 @@
     const form = this;
     getConfig().then(function (config) {
       config.Token = form.querySelector('.txtToken').value;
+      config.TrailerMaxDuration = form.querySelector('.trailerMaxDuration').value;
       config.CreateSeqCollections = form.querySelector('.chkCreateSeqCollections').checked;
       config.ApiType = form.querySelector('input[name="radioAPI"]:checked').value;
       const list = form.querySelectorAll('div.pluginConfigurationPage:not(.hide) label.kpCollectionList');

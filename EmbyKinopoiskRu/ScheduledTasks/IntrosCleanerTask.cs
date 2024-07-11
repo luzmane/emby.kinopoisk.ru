@@ -120,7 +120,7 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                 var idList = (await Plugin.Instance.GetKinopoiskService().GetTrailersFromCollectionAsync(collection, cancellationToken))
                     .Select(t => t.Url)
                     .Where(u => !string.IsNullOrWhiteSpace(u) && u.Contains("you"))
-                    .Select(YtHelper.GetYoutubeId)
+                    .Select(TrailerDlHelper.GetYoutubeId)
                     .ToList();
 
                 if (idList.Count == 0)

@@ -15,5 +15,7 @@
   "This is still preferable": "The quality is preferable - if no video with target quality exists, a video with near quality will be downloaded",
   "List of Kinopoisk collections": "List of Kinopoisk collections",
   "Save": "Save",
-  "Download only trailers on Russian language": "Download only trailers on Russian language"
+  "Download only trailers on Russian language": "Download only trailers on Russian language",
+  "Trailer Max Duration (min)": "Trailer Max Duration (min)",
+  "Max duration of the trailer in whole minutes. 0 to take all": "Max duration of the trailer in whole minutes. 0 to take all"
 }

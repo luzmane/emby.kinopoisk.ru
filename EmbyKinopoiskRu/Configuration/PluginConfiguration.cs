@@ -65,6 +65,11 @@ namespace EmbyKinopoiskRu.Configuration
         /// </summary>
         public bool OnlyRussianTrailers { get; set; }
 
+        /// <summary>
+        /// Max duration of trailers
+        /// </summary>
+        public int TrailerMaxDuration { get; set; }
+
         internal List<CollectionItem> CollectionsList = new List<CollectionItem>();
         private static bool s_fetchingCollections;
 

@@ -2,7 +2,7 @@
      data-controller="__plugin/kinopoiskrujs" data-title="${Kinopoisk.Ru}">
   <div class="content-primary padded-top">
     <form class="kinopoiskRuConfigurationForm">
-      <div class="paperList checkboxList checkboxList-paperList">
+      <div class="paperList checkboxList checkboxList-paperList" style="border: 2px solid black; border-radius: 10px; padding: 5px">
         <h3 class="checkboxListLabel">${Token configuration}</h3>
         <div class="inputContainer" style="display: block">
           <input is="emby-input" type="text" class="txtToken" label="${Token}">
@@ -21,44 +21,48 @@
                                                                         target="_blank" href="https://kinopoiskapiunofficial.tech">${Get Token From Here}</a></span>
         </label></div>
       </div><!-- end token config -->
-      <div class="paperList checkboxList checkboxList-paperList kinopoiskDevOnly" style="display: none;">
+      <div class="paperList checkboxList checkboxList-paperList kinopoiskDevOnly" style="display: none; border: 2px solid black; border-radius: 10px; padding: 5px">
         <h3 class="checkboxListLabel">${KinopoiskDev API configuration}</h3>
         <label class="checkboxContainer">
           <input is="emby-checkbox" type="checkbox" class="chkCreateSeqCollections">
           <span class="checkboxButtonLabel">${Group sequels and prequels into a collection}</span>
         </label>
-        <div style="border: 2px solid black; border-radius: 10px; padding: 5px">
-          <h4 class="checkboxListLabel">${Trailers for CinemaMode configuration}</h4>
-          <div class="inputContainer">
-            <div class="flex align-items-center">
-              <div class="flex-grow">
-                <input is="emby-input" type="text" class="introPath" label="${Path to download trailers}">
-              </div>
-              <button type="button" is="paper-icon-button-light" class="btnSelectDownloadLocation emby-input-iconbutton"><i class="md-icon">&#xE8B6;</i></button>
-            </div>
-            <div class="fieldDescription">${Without correct path no intros}</div>
-          </div>
-          <div class="inputContainer">
-            <label class="inputLabel" for="uaKey">${Key for UserAgent API} (<a is="emby-linkbutton" class="button-link" target="_blank" href="https://apilayer.com/">https://apilayer.com</a>)</label>
-            <input id="uaKey" is="emby-input" type="text" class="uaKey">
-            <div class="fieldDescription">${Without the key low chance to download}</div>
-          </div>
-          <div class="selectContainer">
-            <label class="selectLabel" for="preferableQuality">${In what quality the plugin will try to download a trailer}: </label>
-            <select is="emby-select" id="preferableQuality" name="preferableQuality" class="preferableQuality">
-              <option value="480">480</option>
-              <option value="720">720</option>
-              <option value="1080">1080</option>
-            </select>
-            <div class="fieldDescription">${This is still preferable}</div>
-          </div>
-          <label class="checkboxContainer">
-            <input is="emby-checkbox" type="checkbox" class="chkOnlyRussianTrailers">
-            <span class="checkboxButtonLabel">${Download only trailers on Russian language}</span>
-          </label>
-        </div>
       </div><!-- end kinopois.dev config -->
-      <div class="paperList checkboxList checkboxList-paperList">
+      <div class="paperList checkboxList checkboxList-paperList" style="border: 2px solid black; border-radius: 10px; padding: 5px">
+        <h3 class="checkboxListLabel">${Trailers for CinemaMode configuration}</h3>
+        <div class="inputContainer">
+          <div class="flex align-items-center">
+            <div class="flex-grow">
+              <input is="emby-input" type="text" class="introPath" label="${Path to download trailers}">
+            </div>
+            <button type="button" is="paper-icon-button-light" class="btnSelectDownloadLocation emby-input-iconbutton"><i class="md-icon">&#xE8B6;</i></button>
+          </div>
+          <div class="fieldDescription">${Without correct path no intros}</div>
+        </div>
+        <div class="inputContainer">
+          <label class="inputLabel" for="uaKey">${Key for UserAgent API} (<a is="emby-linkbutton" class="button-link" target="_blank" href="https://apilayer.com/">https://apilayer.com</a>)</label>
+          <input id="uaKey" is="emby-input" type="text" class="uaKey">
+          <div class="fieldDescription">${Without the key low chance to download}</div>
+        </div>
+        <div class="selectContainer">
+          <label class="selectLabel" for="preferableQuality">${In what quality the plugin will try to download a trailer}: </label>
+          <select is="emby-select" id="preferableQuality" name="preferableQuality" class="preferableQuality">
+            <option value="480">480</option>
+            <option value="720">720</option>
+            <option value="1080">1080</option>
+          </select>
+          <div class="fieldDescription">${This is still preferable}</div>
+        </div>
+        <label class="checkboxContainer">
+          <input is="emby-checkbox" type="checkbox" class="chkOnlyRussianTrailers">
+          <span class="checkboxButtonLabel">${Download only trailers on Russian language}</span>
+        </label>
+        <div class="inputContainer" style="display: block">
+          <input is="emby-input" type="text" class="trailerMaxDuration" label="${Trailer Max Duration (min)}">
+          <div class="fieldDescription">${Max duration of the trailer in whole minutes. 0 to take all}</div>
+        </div>
+      </div> <!-- end trailers config -->
+      <div class="paperList checkboxList checkboxList-paperList" style="border: 2px solid black; border-radius: 10px; padding: 5px">
         <h3 class="checkboxListLabel">${List of Kinopoisk collections}</h3>
         <p id="list-warning" style="display: none;">Please save the configuration and refresh the page to see updated
           the list of collections<br/><br/>Пожалуйста, сохраните конфигурацию и обновите страницу, чтоб увидеть

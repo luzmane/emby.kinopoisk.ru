@@ -1,8 +1,9 @@
 namespace EmbyKinopoiskRu.Helper
 {
-    internal enum YoutubeType
+    internal enum DownloaderType
     {
         Y2Mate,
-        Tomp3
+        Tomp3,
+        EmbyKp
     }
 }

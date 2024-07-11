@@ -1,25 +1,26 @@
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
+using System.Linq;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 
-using EmbyKinopoiskRu.YtDownloader.Model;
+using EmbyKinopoiskRu.TrailerDownloader.Youtube.Model;
 
 using MediaBrowser.Common.Net;
 using MediaBrowser.Model.Logging;
 
-namespace EmbyKinopoiskRu.YtDownloader
+namespace EmbyKinopoiskRu.TrailerDownloader.Youtube
 {
-    internal class Tomp3Downloader : YoutubeDownloader
+    internal class Y2MateDownloader : YoutubeDownloader
     {
-        private const string AnalyzeUrlString = "https://tomp3.cc/api/ajax/search";
-        private const string ConvertUrlString = "https://tomp3.cc/api/ajax/convert";
+        private const string AnalyzeUrlString = "https://www.y2mate.com/mates/en943/analyzeV2/ajax";
+        private const string ConvertUrlString = "https://www.y2mate.com/mates/convertV2/index";
         private static readonly Regex Quality = new Regex(@"\d+p", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly int SizeStringLength = " MB".Length;
 
-        public Tomp3Downloader(ILogManager logManager, IHttpClient httpClient)
-            : base(logManager, httpClient, "Tomp3Downloader")
+        internal Y2MateDownloader(ILogManager logManager, IHttpClient httpClient)
+            : base(logManager, httpClient, "Y2MateDownloader")
         {
         }
 
@@ -32,8 +33,8 @@ namespace EmbyKinopoiskRu.YtDownloader
                 CancellationToken = cancellationToken,
                 DecompressionMethod = CompressionMethod.Gzip,
                 EnableHttpCompression = true,
-                Host = "tomp3.cc",
-                Referer = $"https://tomp3.cc/youtube-downloader/{youtubeId}",
+                Host = "www.y2mate.com",
+                Referer = "https://www.y2mate.com/en943",
                 UserAgent = userAgent,
                 TimeoutMs = 120_000,
                 Url = AnalyzeUrlString,
@@ -42,8 +43,10 @@ namespace EmbyKinopoiskRu.YtDownloader
                 /*@formatter:off*/
                 RequestHttpContent = new FormUrlEncodedContent(new[]
                 {
-                    new KeyValuePair<string, string>("query", $"https://www.youtube.com/watch?v={youtubeId}"),
-                    new KeyValuePair<string, string>("vt", "downloader")
+                    new KeyValuePair<string, string>("k_query", $"https://www.youtube.com/watch?v={youtubeId}"),
+                    new KeyValuePair<string, string>("k_page", "home"),
+                    new KeyValuePair<string, string>("hl", "en"),
+                    new KeyValuePair<string, string>("q_auto", "1")
                 }),
                 /*@formatter:on*/
                 EnableDefaultUserAgent = false,
@@ -56,8 +59,8 @@ namespace EmbyKinopoiskRu.YtDownloader
             options.RequestHeaders.Add("Sec-Fetch-Site", "same-origin");
             options.RequestHeaders.Add("Sec-Fetch-Mode", "cors");
             options.RequestHeaders.Add("Sec-Fetch-Dest", "");
-            options.RequestHeaders.Add("TE", "trailers");
-            options.RequestHeaders.Add("Origin", "https://tomp3.cc");
+            options.RequestHeaders.Add("Alt-Used", "www.y2mate.com");
+            options.RequestHeaders.Add("Origin", "https://www.y2mate.com");
             options.RequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
             options.RequestHeaders.Add("Accept-Language", "en-US,en;q=0.5");
             options.RequestHeaders.Add("charset", "UTF-8");
@@ -72,11 +75,12 @@ namespace EmbyKinopoiskRu.YtDownloader
                     .Select(p => p.Value.Deserialize<TrailerFormat>())
                     .Where(p => Quality.IsMatch(p.Quality))
                     .Select(tFormat => int.TryParse(tFormat.Quality.Replace("p", ""), out int quality) ? (quality, tFormat) : (quality: 0, tFormat: null))
-                    .Where(p => p.quality > 0)
+                    .Where(p => p.quality > 0 && p.tFormat?.Size?.Length > SizeStringLength)
                     .GroupBy(p => p.quality)
                     .Select(grp => grp.FirstOrDefault())
                     .ToDictionary(p => p.quality, p => p.tFormat)
-                : new Dictionary<int, TrailerFormat>();        }
+                : new Dictionary<int, TrailerFormat>();
+        }
 
         protected override HttpRequestOptions GetConvertRequestOptions(string youtubeId, string videoKey, string userAgent, CancellationToken cancellationToken)
         {
@@ -87,8 +91,8 @@ namespace EmbyKinopoiskRu.YtDownloader
                 CancellationToken = cancellationToken,
                 DecompressionMethod = CompressionMethod.Gzip,
                 EnableHttpCompression = true,
-                Host = "tomp3.cc",
-                Referer = $"https://tomp3.cc/youtube-downloader/{youtubeId}",
+                Host = "www.y2mate.com",
+                Referer = $"https://www.y2mate.com/youtube/{youtubeId}",
                 UserAgent = userAgent,
                 TimeoutMs = 120_000,
                 Url = ConvertUrlString,
@@ -111,18 +115,18 @@ namespace EmbyKinopoiskRu.YtDownloader
             options.RequestHeaders.Add("Sec-Fetch-Site", "same-origin");
             options.RequestHeaders.Add("Sec-Fetch-Mode", "cors");
             options.RequestHeaders.Add("Sec-Fetch-Dest", "");
+            options.RequestHeaders.Add("Alt-Used", "www.y2mate.com");
+            options.RequestHeaders.Add("Origin", "https://www.y2mate.com");
             options.RequestHeaders.Add("X-Requested-With", "XMLHttpRequest");
             options.RequestHeaders.Add("Accept-Language", "en-US,en;q=0.5");
             options.RequestHeaders.Add("charset", "UTF-8");
-            options.RequestHeaders.Add("TE", "trailers");
-            options.RequestHeaders.Add("Origin", "https://tomp3.cc");
 
             return options;
         }
 
         protected override string GetDownloadReferer()
         {
-            return "https://tomp3.cc/";
+            return "https://www.y2mate.com/";
         }
     }
 }

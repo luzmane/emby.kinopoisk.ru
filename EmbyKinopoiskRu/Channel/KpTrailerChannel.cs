@@ -6,16 +6,21 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
-using EmbyKinopoiskRu.Configuration;
+using EmbyKinopoiskRu.Api;
 using EmbyKinopoiskRu.Helper;
 using EmbyKinopoiskRu.ScheduledTasks.Model;
-using EmbyKinopoiskRu.YtDownloader;
+using EmbyKinopoiskRu.TrailerDownloader.Youtube;
+using EmbyKinopoiskRu.TrailerDownloader;
+using EmbyKinopoiskRu.TrailerDownloader.Kinopoisk;
 
+using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Controller.Channels;
 using MediaBrowser.Controller.Configuration;
+using MediaBrowser.Controller.MediaEncoding;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Channels;
+using MediaBrowser.Model.Dlna;
 using MediaBrowser.Model.Drawing;
 using MediaBrowser.Model.Dto;
 using MediaBrowser.Model.Entities;
@@ -33,8 +38,9 @@ namespace EmbyKinopoiskRu.Channel
         private const int MaxDownloadWaitingSeconds = 15;
         private const int MinDownloadWaitingSeconds = 5;
         private static readonly Regex ContainsRussianChar = new Regex("[а-яА-Я]+", RegexOptions.Compiled);
-        private static readonly Dictionary<YoutubeType, YoutubeDownloader> YoutubeDownloaderDictionary = new Dictionary<YoutubeType, YoutubeDownloader>();
-        private readonly ILogger _log;
+        private static readonly Dictionary<DownloaderType, ITrailerDownloader> TrailersDownloaderDictionary = new Dictionary<DownloaderType, ITrailerDownloader>();
+        private static readonly CancellationToken CancellationTokenNone = CancellationToken.None;
+        private readonly ILogger _logger;
         private readonly Random _random = new Random();
         private readonly Dictionary<string, TaskTranslation> _translations = new Dictionary<string, TaskTranslation>();
         private readonly Dictionary<string, string> _availableTranslations;
@@ -42,6 +48,9 @@ namespace EmbyKinopoiskRu.Channel
         private readonly IJsonSerializer _jsonSerializer;
         private readonly ILogManager _logManager;
         private readonly IHttpClient _httpClient;
+        private readonly IApplicationPaths _appPaths;
+        private readonly IFfmpegManager _ffmpegManager;
+        private readonly IMediaProbeManager _mediaProbeManager;
 
         /// <inheritdoc />
         public ChannelParentalRating ParentalRating => ChannelParentalRating.GeneralAudience;
@@ -58,29 +67,36 @@ namespace EmbyKinopoiskRu.Channel
         /// <param name="logManager"></param>
         /// <param name="httpClient"></param>
         /// <param name="jsonSerializer"></param>
+        /// <param name="ffmpegManager"></param>
+        /// <param name="mediaProbeManager"></param>
         /// <param name="serverConfigurationManager"></param>
+        /// <param name="appPaths"></param>
         public KpTrailerChannel(
             ILogManager logManager,
             IHttpClient httpClient,
             IJsonSerializer jsonSerializer,
+            IApplicationPaths appPaths,
+            IFfmpegManager ffmpegManager,
+            IMediaProbeManager mediaProbeManager,
             IServerConfigurationManager serverConfigurationManager)
         {
-            _log = logManager.GetLogger(GetType().Name);
+            _logger = logManager.GetLogger(GetType().Name);
             _jsonSerializer = jsonSerializer;
             _serverConfigurationManager = serverConfigurationManager;
-            _availableTranslations = EmbyHelper.GetAvailableTransactions("KpTrailerChannel");
+            _availableTranslations = EmbyHelper.GetAvailableTranslations(nameof(KpTrailerChannel));
             _httpClient = httpClient;
             _logManager = logManager;
+            _ffmpegManager = ffmpegManager;
+            _appPaths = appPaths;
+            _mediaProbeManager = mediaProbeManager;
         }
 
         /// <inheritdoc />
         public async Task<ChannelItemResult> GetChannelItems(InternalChannelItemQuery query, CancellationToken cancellationToken)
         {
-            return PluginConfiguration.KinopoiskDev.Equals(Plugin.Instance.Configuration.ApiType)
-                ? query.FolderId == null
-                    ? await GetRootFolders(cancellationToken).ConfigureAwait(false)
-                    : await GetStreamItems(query, cancellationToken).ConfigureAwait(false)
-                : new ChannelItemResult();
+            return query.FolderId == null
+                ? await GetRootFolders(cancellationToken).ConfigureAwait(false)
+                : await GetStreamItems(query, cancellationToken).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -114,7 +130,7 @@ namespace EmbyKinopoiskRu.Channel
         /// <returns></returns>
         private async Task<ChannelItemResult> GetRootFolders(CancellationToken cancellationToken)
         {
-            _log.Info("GetRootFolders. Fetch collections from API");
+            _logger.Info("GetRootFolders. Fetch collections from API");
             var toReturn = new ChannelItemResult
             {
                 TotalRecordCount = 0
@@ -123,7 +139,7 @@ namespace EmbyKinopoiskRu.Channel
             var basePath = Plugin.Instance.Configuration.IntrosPath;
             if (string.IsNullOrWhiteSpace(basePath) || !Directory.Exists(basePath))
             {
-                _log.Info($"Intros path from the plugin configuration is invalid: '{basePath}'");
+                _logger.Info($"Intros path from the plugin configuration is invalid: '{basePath}'");
                 return toReturn;
             }
 
@@ -133,7 +149,7 @@ namespace EmbyKinopoiskRu.Channel
                 .ToList();
             if (selectedCollections.Count == 0)
             {
-                _log.Info("No collection was selected");
+                _logger.Info("No collection was selected");
                 return toReturn;
             }
 
@@ -152,7 +168,7 @@ namespace EmbyKinopoiskRu.Channel
                 .ToList();
             toReturn.TotalRecordCount = toReturn.Items.Count;
 
-            _log.Info($"Fetched {toReturn.TotalRecordCount} collections");
+            _logger.Info($"Fetched {toReturn.TotalRecordCount} collections");
             return toReturn;
         }
 
@@ -164,119 +180,88 @@ namespace EmbyKinopoiskRu.Channel
         /// <returns></returns>
         private async Task<ChannelItemResult> GetStreamItems(InternalChannelItemQuery query, CancellationToken cancellationToken)
         {
-            _log.Info($"GetStreamItems. InternalChannelItemQuery: [FolderId: '{query.FolderId}', Limit: '{query.Limit}', SortBy: '{query.SortBy}'" +
-                      $", SortDescending: '{query.SortDescending}', StartIndex: '{query.StartIndex}', UserId: '{query.UserId}']");
+            _logger.Info($"GetStreamItems. InternalChannelItemQuery: [FolderId: '{query.FolderId}', Limit: '{query.Limit}', SortBy: '{query.SortBy}'" +
+                         $", SortDescending: '{query.SortDescending}', StartIndex: '{query.StartIndex}', UserId: '{query.UserId}']");
 
             var toReturn = new ChannelItemResult();
             if (cancellationToken.IsCancellationRequested)
             {
-                _log.Warn("Cancellation was requested");
+                _logger.Info("Cancellation was requested");
                 return toReturn;
             }
 
             var basePath = Plugin.Instance.Configuration.IntrosPath;
             if (string.IsNullOrWhiteSpace(basePath) || !Directory.Exists(basePath))
             {
-                _log.Error($"Intros path from the plugin configuration is invalid: '{basePath}'");
+                _logger.Error($"Intros path from the plugin configuration is invalid: '{basePath}'");
                 return toReturn;
             }
 
             var introsQuality = Plugin.Instance.Configuration.IntrosQuality;
             if (introsQuality <= 0)
             {
-                _log.Error($"Intros quality is invalid: '{introsQuality}'");
+                _logger.Error($"Intros quality is invalid: '{introsQuality}'");
                 return toReturn;
             }
 
-            _log.Info($"Intros quality from the plugin configuration: '{introsQuality}', collection slug: '{query.FolderId}'");
+            _logger.Info($"Intros quality from the plugin configuration: '{introsQuality}', collection slug: '{query.FolderId}'");
 
-            if (YoutubeDownloaderDictionary.Count == 0)
+            if (TrailersDownloaderDictionary.Count == 0)
             {
-                YoutubeDownloaderDictionary.Add(YoutubeType.Y2Mate, new Y2MateDownloader(_logManager, _httpClient));
-                YoutubeDownloaderDictionary.Add(YoutubeType.Tomp3, new Tomp3Downloader(_logManager, _httpClient));
+                TrailersDownloaderDictionary.Add(DownloaderType.Y2Mate, new Y2MateDownloader(_logManager, _httpClient));
+                TrailersDownloaderDictionary.Add(DownloaderType.Tomp3, new Tomp3Downloader(_logManager, _httpClient));
+                TrailersDownloaderDictionary.Add(DownloaderType.EmbyKp, new KinopoiskDownloader(_logManager, _httpClient, _appPaths, _ffmpegManager));
             }
 
-            var intros = await Plugin.Instance.GetKinopoiskService().GetTrailersFromCollectionAsync(query.FolderId, cancellationToken);
-            _log.Info($"Found {intros.Count} trailers");
+            var trailers = await Plugin.Instance.GetKinopoiskService().GetTrailersFromCollectionAsync(query.FolderId, cancellationToken);
+            _logger.Info($"Found {trailers.Count} trailers");
             var collectionFolder = Path.Combine(basePath, query.FolderId);
             List<ChannelItemInfo> items = new List<ChannelItemInfo>();
-            foreach (var intro in intros)
+            var maxTrailerDuration = Plugin.Instance.Configuration.TrailerMaxDuration * 60L;
+            _logger.Info($"Max trailer duration: {maxTrailerDuration}");
+            foreach (var trailer in trailers)
             {
                 if (cancellationToken.IsCancellationRequested)
                 {
-                    _log.Info($"Cancellation was requested. Exit with fetched till now intros: '{items.Count}'");
+                    _logger.Info($"Cancellation was requested. Exit with fetched '{items.Count}' trailers till now");
                     break;
                 }
 
-                string youtubeId = YtHelper.GetYoutubeId(intro.Url);
-                if (youtubeId.Contains("http"))
+                if (Plugin.Instance.Configuration.OnlyRussianTrailers && !IsContainsRussianCharacter(trailer.TrailerName))
                 {
-                    _log.Warn($"The intro is not from youtube - ask for plugin update: '{intro.Url}' and provide the link");
+                    _logger.Info($"Configured to download only trailers on Russian. Skip trailer name: '{trailer.TrailerName}', link: '{trailer.Url}'");
                     continue;
                 }
 
-                if (Plugin.Instance.Configuration.OnlyRussianTrailers && !IsContainsRussianCharacter(intro.TrailerName))
+                ChannelItemInfo item = null;
+                if (trailer.Url.Contains("kinopoisk")
+                    || trailer.Url.Contains("trailers.s3.mds.yandex.net"))
                 {
-                    _log.Info($"Configured to download only trailers on Russian. Skip trailer name: '{intro.TrailerName}', link: '{intro.Url}'");
-                    continue;
+                    item = await ChannelItemInfoFromKinopoisk(trailer, collectionFolder, cancellationToken);
+                }
+                else if (trailer.Url.Contains("youtu"))
+                {
+                    item = await ChannelItemInfoFromYoutube(trailer, collectionFolder, cancellationToken);
+                }
+                else
+                {
+                    _logger.Warn($"Such link is not supported, ask for plugin update and provide the link: '{trailer.Url}'");
                 }
 
-                var filePath = GetFileFromFileSystem(collectionFolder, youtubeId);
-                var partialFileName = YtHelper.GetPartialIntroName(intro);
-                if (string.IsNullOrEmpty(filePath))
+                if (item != null
+                    && await VerifyTrailerDuration(item, maxTrailerDuration, cancellationToken))
                 {
-                    _log.Info($"The file doesn't exist for youtubeId: '{youtubeId}'. Going to download it");
-                    await Task.Delay(TimeSpan.FromSeconds(_random.Next(MinDownloadWaitingSeconds, MaxDownloadWaitingSeconds)), cancellationToken);
-                    filePath = await YoutubeDownloaderDictionary[YoutubeType.Tomp3].DownloadYoutubeLink(youtubeId, partialFileName, introsQuality, collectionFolder, cancellationToken);
-                    if (string.IsNullOrEmpty(filePath))
-                    {
-                        _log.Info("Failed to download video via tomp3.cc, trying y2mate");
-                        filePath = await YoutubeDownloaderDictionary[YoutubeType.Y2Mate].DownloadYoutubeLink(youtubeId, partialFileName, introsQuality, collectionFolder, cancellationToken);
-                    }
-
-                    if (string.IsNullOrEmpty(filePath))
-                    {
-                        _log.Warn($"Unable to download '{intro.Url}'");
-                        continue;
-                    }
+                    _logger.Debug($"Added channel item [name: '{item.Name}', Id: '{item.Id}']");
+                    items.Add(item);
                 }
-
-                if (filePath.Contains(YtHelper.NotExistsOnYoutube))
+                else if (item != null)
                 {
-                    _log.Info("Looks like the trailer doesn't exist on youtube anymore. Skip");
-                    continue;
+                    _logger.Info($"Skip adding channel item [name: '{item.Name}', Id: '{item.Id}'] as too long");
+                    RemoveFile(item.MediaSources[0].Path);
                 }
-
-                items.Add(new ChannelItemInfo
-                {
-                    ContentType = ChannelMediaContentType.MovieExtra,
-                    OriginalTitle = intro.VideoName,
-                    Name = intro.VideoName,
-                    Id = youtubeId,
-                    ImageUrl = intro.ImageUrl,
-                    MediaType = ChannelMediaType.Video,
-                    ExtraType = ExtraType.Trailer,
-                    PremiereDate = intro.PremierDate,
-                    Overview = intro.Overview,
-                    Type = ChannelItemType.Media,
-                    ProviderIds = intro.ProviderIds,
-                    MediaSources = new List<MediaSourceInfo>
-                    {
-                        new MediaInfo
-                        {
-                            Protocol = MediaProtocol.File,
-                            Id = youtubeId,
-                            Name = $"{partialFileName} {youtubeId}",
-                            Path = filePath,
-                            Type = MediaSourceType.Default,
-                            IsRemote = false
-                        }
-                    }
-                });
-                _log.Info($"Added intro [name: '{intro.VideoName}', youtubeId: '{youtubeId}', file path: '{filePath}']");
             }
 
-            _log.Info($"Prepared for a view {items.Count} trailers");
+            _logger.Info($"Prepared for a view {items.Count} trailers");
             return new ChannelItemResult
             {
                 Items = items,
@@ -284,14 +269,204 @@ namespace EmbyKinopoiskRu.Channel
             };
         }
 
-        private static string GetFileFromFileSystem(string collectionFolder, string youtubeId)
+        private void RemoveFile(string path)
+        {
+            try
+            {
+                File.Delete(path);
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException($"Unable to delete extra long trailer '{path}' due to: '{ex.Message}'", ex);
+            }
+        }
+
+        private async Task<bool> VerifyTrailerDuration(ChannelItemInfo item, long maxTrailerDuration, CancellationToken cancellationToken)
+        {
+            if (maxTrailerDuration == 0)
+            {
+                _logger.Debug("Trailer duration limit turned off - max trailer duration is 0");
+                return true;
+            }
+
+            long? runTimeTicks = null;
+            try
+            {
+                var mediaInfoRequest = new MediaInfoRequest()
+                {
+                    MediaType = DlnaProfileType.Video,
+                    ExtractChapters = false,
+                    MediaSource = new MediaSourceInfo()
+                    {
+                        Protocol = MediaProtocol.File,
+                        Path = item.MediaSources[0].Path,
+                        Type = MediaSourceType.Default,
+                        IsRemote = false
+                    }
+                };
+
+                var mediaInfo = await _mediaProbeManager.GetMediaInfo(mediaInfoRequest, cancellationToken);
+                runTimeTicks = mediaInfo.RunTimeTicks;
+                var durationSec = runTimeTicks / 10_000_000;
+                if (durationSec == null || durationSec == 0)
+                {
+                    _logger.Warn($"Unable to detect trailer duration, ignore verification result. RunTimeTicks: '{runTimeTicks}', Path: '{item.MediaSources[0].Path}'");
+                    return true;
+                }
+
+                _logger.Debug($"Max trailer duration '{maxTrailerDuration}', media duration '{durationSec}' sec");
+                return durationSec <= maxTrailerDuration;
+            }
+            catch (Exception ex)
+            {
+                _logger.ErrorException($"Unable to detect trailer duration due to: '{ex.Message}'. RunTimeTicks: '{runTimeTicks}'", ex);
+                return true;
+            }
+        }
+
+        private async Task<ChannelItemInfo> ChannelItemInfoFromYoutube(KpTrailer trailer, string collectionFolder, CancellationToken cancellationToken)
+        {
+            string youtubeId = TrailerDlHelper.GetYoutubeId(trailer.Url);
+            if (youtubeId.Contains("http"))
+            {
+                _logger.Warn($"Such youtube link is not supported, ask for plugin update and provide the link: '{trailer.Url}'");
+                return null;
+            }
+
+            var filePath = GetFileFromFileSystem(collectionFolder, youtubeId);
+            var partialFileName = TrailerDlHelper.GetPartialTrailerName(trailer);
+            if (string.IsNullOrEmpty(filePath))
+            {
+                _logger.Info($"The file doesn't exist for youtubeId: '{youtubeId}' ('{trailer.TrailerName}' from '{trailer.VideoName}'). Going to download it");
+                await Task.Delay(TimeSpan.FromSeconds(_random.Next(MinDownloadWaitingSeconds, MaxDownloadWaitingSeconds)), CancellationTokenNone);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    _logger.Info($"Cancellation requested. Stop download youtube Id: '{youtubeId}'");
+                    return null;
+                }
+
+                filePath = await TrailersDownloaderDictionary[DownloaderType.Tomp3].DownloadTrailerByLink(youtubeId, partialFileName, Plugin.Instance.Configuration.IntrosQuality, collectionFolder, cancellationToken);
+                if (string.IsNullOrEmpty(filePath))
+                {
+                    _logger.Info("Failed to download video via tomp3.cc, trying y2mate");
+                    filePath = await TrailersDownloaderDictionary[DownloaderType.Y2Mate].DownloadTrailerByLink(youtubeId, partialFileName, Plugin.Instance.Configuration.IntrosQuality, collectionFolder, cancellationToken);
+                }
+
+                if (string.IsNullOrEmpty(filePath))
+                {
+                    _logger.Error($"Unable to download '{trailer.Url}'");
+                    return null;
+                }
+            }
+
+            if (filePath.Contains(TrailerDlHelper.NotExists))
+            {
+                _logger.Info("Looks like the trailer doesn't exist on youtube anymore. Skip");
+                return null;
+            }
+
+            _logger.Info($"Downloaded trailer [name: '{trailer.VideoName}', youtubeId: '{youtubeId}', file path: '{filePath}']");
+            return new ChannelItemInfo
+            {
+                ContentType = ChannelMediaContentType.MovieExtra,
+                OriginalTitle = trailer.VideoName,
+                Name = trailer.VideoName,
+                Id = youtubeId,
+                ImageUrl = trailer.ImageUrl,
+                MediaType = ChannelMediaType.Video,
+                ExtraType = ExtraType.Trailer,
+                PremiereDate = trailer.PremierDate,
+                Overview = trailer.Overview,
+                Type = ChannelItemType.Media,
+                ProviderIds = trailer.ProviderIds,
+                MediaSources = new List<MediaSourceInfo>
+                {
+                    new MediaInfo
+                    {
+                        Protocol = MediaProtocol.File,
+                        Id = youtubeId,
+                        Name = $"{partialFileName} {youtubeId}",
+                        Path = filePath,
+                        Type = MediaSourceType.Default,
+                        IsRemote = false
+                    }
+                }
+            };
+        }
+
+        private async Task<ChannelItemInfo> ChannelItemInfoFromKinopoisk(KpTrailer trailer, string collectionFolder, CancellationToken cancellationToken)
+        {
+            string kpId = TrailerDlHelper.GetKinopoiskTrailerId(trailer.Url);
+            if (string.IsNullOrWhiteSpace(kpId))
+            {
+                _logger.Warn($"Such kinopoisk link is not supported, ask for plugin update and provide the link: '{trailer.Url}'");
+                return null;
+            }
+
+            var kinopoiskId = $"{KinopoiskDownloader.KpFileSuffix}{kpId}";
+            var filePath = GetFileFromFileSystem(collectionFolder, kinopoiskId);
+            var partialFileName = TrailerDlHelper.GetPartialTrailerName(trailer);
+            if (string.IsNullOrEmpty(filePath))
+            {
+                _logger.Info($"The file doesn't exist for kinopoiskId: '{kpId}' ('{trailer.TrailerName}' from '{trailer.VideoName}'). Going to download it");
+                await Task.Delay(TimeSpan.FromSeconds(_random.Next(MinDownloadWaitingSeconds, MaxDownloadWaitingSeconds)), CancellationTokenNone);
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    _logger.Info($"Cancellation requested. Stop download KpID: '{kinopoiskId}'");
+                    return null;
+                }
+
+                filePath = await TrailersDownloaderDictionary[DownloaderType.EmbyKp].DownloadTrailerByLink(kpId, partialFileName, Plugin.Instance.Configuration.IntrosQuality, collectionFolder, cancellationToken);
+                if (string.IsNullOrEmpty(filePath))
+                {
+                    _logger.Error($"Unable to download '{trailer.Url}'");
+                    return null;
+                }
+            }
+
+            if (filePath.Contains(TrailerDlHelper.NotExists))
+            {
+                _logger.Info("Looks like the trailer doesn't exist on Kinopoisk anymore. Skip");
+                return null;
+            }
+
+            _logger.Info($"Downloaded trailer [name: '{trailer.VideoName}', kinopoiskId: '{kinopoiskId}', file path: '{filePath}']");
+            return new ChannelItemInfo
+            {
+                ContentType = ChannelMediaContentType.MovieExtra,
+                OriginalTitle = trailer.VideoName,
+                Name = trailer.VideoName,
+                Id = kinopoiskId,
+                ImageUrl = trailer.ImageUrl,
+                MediaType = ChannelMediaType.Video,
+                ExtraType = ExtraType.Trailer,
+                PremiereDate = trailer.PremierDate,
+                Overview = trailer.Overview,
+                Type = ChannelItemType.Media,
+                ProviderIds = trailer.ProviderIds,
+                MediaSources = new List<MediaSourceInfo>
+                {
+                    new MediaInfo
+                    {
+                        Protocol = MediaProtocol.File,
+                        Id = kinopoiskId,
+                        Name = $"{partialFileName} {kinopoiskId}",
+                        Path = filePath,
+                        Type = MediaSourceType.Default,
+                        IsRemote = false
+                    }
+                }
+            };
+        }
+
+        private static string GetFileFromFileSystem(string collectionFolder, string trailerId)
         {
             if (!Directory.Exists(collectionFolder))
             {
                 return string.Empty;
             }
 
-            var files = Directory.GetFiles(collectionFolder, $"*[{youtubeId}].*");
+            var files = Directory.GetFiles(collectionFolder, $"*[{trailerId}].*");
             if (files.Length == 1)
             {
                 return files[0];
@@ -313,7 +488,7 @@ namespace EmbyKinopoiskRu.Channel
         private static bool IsContainsRussianCharacter(string name)
         {
             return string.IsNullOrWhiteSpace(name)
-                   || name.Length != ContainsRussianChar.Replace(name, String.Empty).Length;
+                   || name.Length != ContainsRussianChar.Replace(name, string.Empty).Length;
         }
 
         #endregion

@@ -1051,10 +1051,55 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             return movies;
         }
 
-        public Task<List<KpTrailer>> GetTrailersFromCollectionAsync(string collectionId, CancellationToken cancellationToken)
+        public async Task<List<KpTrailer>> GetTrailersFromCollectionAsync(string collectionId, CancellationToken cancellationToken)
         {
-            _log.Info($"Not supported by kinopoiskapiunofficial.tech");
-            return Task.FromResult(new List<KpTrailer>());
+            _log.Info($"Get trailers for '{collectionId}'");
+            var toReturn = new HashSet<KpTrailer>(new KpTrailerComparer());
+            if (!CollectionSlugMap.TryGetValue(collectionId, out var slug))
+            {
+                _log.Error($"Unable to map '{collectionId}' to collection id of kinopoiskapiunofficial.tech");
+                return toReturn.ToList();
+            }
+
+            _log.Info($"'{collectionId}' mapped to '{slug}'");
+            List<KpFilm> movies = await GetAllCollectionItemsAsync(slug, cancellationToken);
+            foreach (var movie in movies)
+            {
+                ProviderIdDictionary providerIdDictionary = new ProviderIdDictionary
+                {
+                    { Plugin.PluginKey, movie.KinopoiskId.ToString() }
+                };
+                if (!string.IsNullOrWhiteSpace(movie.ImdbId))
+                {
+                    providerIdDictionary.Add(MetadataProviders.Imdb.ToString(), movie.ImdbId);
+                }
+
+                var tmp = await _api.GetVideosByFilmIdAsync(movie.KinopoiskId.ToString(), cancellationToken);
+                if (tmp.HasError)
+                {
+                    _log.Error($"Failed to fetch trailers from API for videoId '{movie.KinopoiskId}'");
+                }
+                else
+                {
+                    _log.Debug($"Video with Id '{movie.KinopoiskId}' has '{tmp.Items.Count}' trailers");
+                    tmp.Items.ForEach(t => toReturn.Add(new KpTrailer
+                    {
+                        ImageUrl = string.IsNullOrWhiteSpace(movie.PosterUrlPreview) ? movie.PosterUrl : movie.PosterUrlPreview,
+                        VideoName = movie.NameRu,
+                        TrailerName = t.Name,
+                        Overview = movie.Description,
+                        ProviderIds = providerIdDictionary,
+                        Url = t.Url,
+                        PremierDate = movie.Year > 1000 && movie.Year < 3000
+                            ? new DateTimeOffset((int)movie.Year, 1, 1, 0, 0, 0, TimeSpan.Zero)
+                            : (DateTimeOffset?)null
+                    }));
+                }
+            }
+
+            _log.Info($"Return {toReturn.Count} items for collection '{collectionId}'");
+
+            return toReturn.ToList();
         }
 
         #endregion
