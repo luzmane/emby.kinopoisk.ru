@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 
@@ -25,6 +26,7 @@ namespace EmbyKinopoiskRu
     /// <summary>
     /// The main plugin.
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class Plugin : BasePlugin<PluginConfiguration>, IHasThumbImage, IHasWebPages, IHasTranslations
     {
         internal const string PluginKey = "KinopoiskRu";
@@ -102,7 +104,19 @@ namespace EmbyKinopoiskRu
         /// <inheritdoc />
         public IEnumerable<PluginPageInfo> GetPages()
         {
-            return new[] { new PluginPageInfo { Name = "kinopoiskru", EmbeddedResourcePath = GetType().Namespace + ".Configuration.kinopoiskru.html" }, new PluginPageInfo { Name = "kinopoiskrujs", EmbeddedResourcePath = GetType().Namespace + ".Configuration.kinopoiskru.js" } };
+            return new[]
+            {
+                new PluginPageInfo
+                {
+                    Name = "kinopoiskru",
+                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.kinopoiskru.html"
+                },
+                new PluginPageInfo
+                {
+                    Name = "kinopoiskrujs",
+                    EmbeddedResourcePath = GetType().Namespace + ".Configuration.kinopoiskru.js"
+                }
+            };
         }
 
         /// <inheritdoc />
@@ -112,7 +126,11 @@ namespace EmbyKinopoiskRu
             return GetType().Assembly.GetManifestResourceNames()
                 .Where(i => i.StartsWith(basePath, StringComparison.OrdinalIgnoreCase))
                 .Select(i =>
-                    new TranslationInfo { Locale = Path.GetFileNameWithoutExtension(i.Substring(basePath.Length)), EmbeddedResourcePath = i })
+                    new TranslationInfo
+                    {
+                        Locale = Path.GetFileNameWithoutExtension(i.Substring(basePath.Length)),
+                        EmbeddedResourcePath = i
+                    })
                 .ToArray();
         }
 

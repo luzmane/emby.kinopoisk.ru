@@ -1,3 +1,5 @@
+using System.Diagnostics.CodeAnalysis;
+
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Providers;
 using MediaBrowser.Model.Entities;
@@ -7,6 +9,7 @@ namespace EmbyKinopoiskRu.Provider.ExternalId
     /// <summary>
     /// Add link on kinopoisk page to metadata of the Trailer
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class TrailerExternalIdProvider : IExternalId
     {
         /// <inheritdoc />
