@@ -24,11 +24,37 @@ namespace EmbyKinopoiskRu.Helper
         private static readonly Regex KpWidgetPlayer = new Regex(@"https?://widgets\.kinopoisk\.ru/discovery/trailer/(?<id>\d+)\?.*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex S3YandexNet = new Regex(@"https?://trailers\.s3\.mds\.yandex\.net/video_original/(?<id>\d+)-.+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
-
         private static readonly Random Random = new Random();
         private static readonly Regex InvalidFileNameChars = new Regex($"[{string.Join(string.Empty, Path.GetInvalidFileNameChars())}]+", RegexOptions.Compiled);
 
         internal const string NotExists = ".not_exists";
+
+        internal static readonly List<string> TrailerStopWordList = new List<string>
+        {
+            "фрагмент",
+            "интервью",
+            "видео со съемок",
+            "fragment",
+            "interview",
+        };
+
+        internal static readonly List<string> RussianStopWordList = new List<string>
+        {
+            "испанский",
+            "итальянский",
+            "португальский",
+            "японский",
+            "тайский",
+            "немецкий",
+            "французский",
+            "британский",
+        };
+
+        internal static bool CheckTrailerDuration(long durationSec, long maxTrailerDuration)
+        {
+            return Constants.OneMinuteInSec <= durationSec
+                && durationSec <= maxTrailerDuration;
+        }
 
         internal static string GetYoutubeId(string youtubeUrl)
         {

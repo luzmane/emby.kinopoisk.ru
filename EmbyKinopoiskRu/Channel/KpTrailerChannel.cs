@@ -217,7 +217,7 @@ namespace EmbyKinopoiskRu.Channel
             _logger.Info($"Found {trailers.Count} trailers");
             var collectionFolder = Path.Combine(basePath, query.FolderId);
             List<ChannelItemInfo> items = new List<ChannelItemInfo>();
-            var maxTrailerDuration = Plugin.Instance.Configuration.TrailerMaxDuration * 60L;
+            var maxTrailerDuration = Plugin.Instance.Configuration.TrailerMaxDuration * Constants.OneMinuteInSec;
             _logger.Info($"Max trailer duration: {maxTrailerDuration}");
             foreach (var trailer in trailers)
             {
@@ -227,7 +227,14 @@ namespace EmbyKinopoiskRu.Channel
                     break;
                 }
 
-                if (Plugin.Instance.Configuration.OnlyRussianTrailers && !IsContainsRussianCharacter(trailer.TrailerName))
+                if (!IsValidTrailer(trailer))
+                {
+                    _logger.Warn($"This video not a trailer: '{trailer}'");
+                    continue;
+                }
+
+                if (Plugin.Instance.Configuration.OnlyRussianTrailers
+                    && !IsRussianTrailer(trailer))
                 {
                     _logger.Info($"Configured to download only trailers on Russian. Skip trailer name: '{trailer.TrailerName}', link: '{trailer.Url}'");
                     continue;
@@ -256,7 +263,7 @@ namespace EmbyKinopoiskRu.Channel
                 }
                 else if (item != null)
                 {
-                    _logger.Info($"Skip adding channel item [name: '{item.Name}', Id: '{item.Id}'] as too long");
+                    _logger.Info($"Skip adding channel item [name: '{item.Name}', Id: '{item.Id}'] - it doesn't suits by duration criteria");
                     RemoveFile(item.MediaSources[0].Path);
                 }
             }
@@ -289,7 +296,7 @@ namespace EmbyKinopoiskRu.Channel
                 return true;
             }
 
-            long? runTimeTicks = null;
+            long runTimeTicks = 0;
             try
             {
                 var mediaInfoRequest = new MediaInfoRequest()
@@ -306,16 +313,16 @@ namespace EmbyKinopoiskRu.Channel
                 };
 
                 var mediaInfo = await _mediaProbeManager.GetMediaInfo(mediaInfoRequest, cancellationToken);
-                runTimeTicks = mediaInfo.RunTimeTicks;
+                runTimeTicks = mediaInfo.RunTimeTicks ?? 0;
                 var durationSec = runTimeTicks / 10_000_000;
-                if (durationSec == null || durationSec == 0)
+                if (durationSec == 0)
                 {
                     _logger.Warn($"Unable to detect trailer duration, ignore verification result. RunTimeTicks: '{runTimeTicks}', Path: '{item.MediaSources[0].Path}'");
                     return true;
                 }
 
                 _logger.Debug($"Max trailer duration '{maxTrailerDuration}', media duration '{durationSec}' sec");
-                return durationSec <= maxTrailerDuration;
+                return TrailerDlHelper.CheckTrailerDuration(durationSec, maxTrailerDuration);
             }
             catch (Exception ex)
             {
@@ -485,10 +492,62 @@ namespace EmbyKinopoiskRu.Channel
             return EmbyHelper.GetTaskTranslation(_translations, _serverConfigurationManager, _jsonSerializer, _availableTranslations);
         }
 
-        private static bool IsContainsRussianCharacter(string name)
+        private static bool IsValidTrailer(KpTrailer trailer)
         {
-            return string.IsNullOrWhiteSpace(name)
-                   || name.Length != ContainsRussianChar.Replace(name, string.Empty).Length;
+            var videoName = trailer.VideoName;
+            if (string.IsNullOrWhiteSpace(videoName))
+            {
+                // no video name - invalid
+                return false;
+            }
+
+            var trailerName = trailer.TrailerName;
+            if (string.IsNullOrWhiteSpace(trailerName))
+            {
+                // no trailer name - invalid
+                return false;
+            }
+
+            videoName = videoName.ToLower();
+            trailerName = trailerName.ToLower();
+            var name = trailerName.Replace(videoName, String.Empty);
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                // trailer name equal to video name (trailer doesn't have its own name)
+                return true;
+            }
+
+            var hasStopWord = TrailerDlHelper.TrailerStopWordList.Any(n => name.Contains(n));
+            if (hasStopWord)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool IsRussianTrailer(KpTrailer trailer)
+        {
+            var name = trailer.TrailerName.ToLower().Replace(trailer.VideoName.ToLower(), String.Empty);
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                // trailer name equal to video name (trailer doesn't have its own name)
+                return false;
+            }
+
+            var hasRussianChars = name.Length != ContainsRussianChar.Replace(name, string.Empty).Length;
+            if (!hasRussianChars)
+            {
+                return false;
+            }
+
+            var hasStopWord = TrailerDlHelper.RussianStopWordList.Any(n => name.Contains(n));
+            if (hasStopWord)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         #endregion

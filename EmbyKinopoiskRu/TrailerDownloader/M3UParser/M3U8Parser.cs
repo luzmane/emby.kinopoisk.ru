@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 
+using EmbyKinopoiskRu.Helper;
 using EmbyKinopoiskRu.TrailerDownloader.M3UParser.Model;
 
 using MediaBrowser.Model.Logging;
@@ -89,7 +90,7 @@ namespace EmbyKinopoiskRu.TrailerDownloader.M3UParser
 
         internal List<string> ParseM3U8(string m3U8Content)
         {
-            var maxDurationSec = Plugin.Instance.Configuration.TrailerMaxDuration * 60;
+            var maxDurationSec = Plugin.Instance.Configuration.TrailerMaxDuration * Constants.OneMinuteInSec;
             if (maxDurationSec > 0)
             {
                 var list = m3U8Content.Split(NewLineSplitter, StringSplitOptions.RemoveEmptyEntries);
@@ -116,7 +117,7 @@ namespace EmbyKinopoiskRu.TrailerDownloader.M3UParser
                 {
                     var durationSec = targetDurationLength * toReturn.Count;
                     _logger.Debug($"Max trailer duration '{maxDurationSec}', media duration '{durationSec}' sec");
-                    return durationSec <= maxDurationSec ? toReturn : new List<string>();
+                    return TrailerDlHelper.CheckTrailerDuration(durationSec, maxDurationSec) ? toReturn : new List<string>();
                 }
 
                 return toReturn;
