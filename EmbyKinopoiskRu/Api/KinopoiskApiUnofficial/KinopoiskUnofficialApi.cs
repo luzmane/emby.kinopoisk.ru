@@ -229,7 +229,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                                 NotifyUser(msg, "Token is invalid");
                                 return string.Empty;
                             case 402:
-                                msg = "Request limit exceeded (either daily or total) for current token";
+                                msg = $"Request limit exceeded (either daily or total) for current token.{(string.IsNullOrWhiteSpace(result) ? string.Empty : " Message: '" + result + "'.")} For '{url}'";
                                 _log.Warn(msg);
                                 NotifyUser(msg, "Request limit exceeded");
                                 return string.Empty;

@@ -333,7 +333,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                         NotifyUser(msg, "Token is invalid");
                         break;
                     case 403:
-                        msg = $"Request limit exceeded (either daily or total) for current token.{(string.IsNullOrWhiteSpace(content) ? string.Empty : " Message: '" + content + "'")}";
+                        msg = $"Request limit exceeded (either daily or total) for current token.{(string.IsNullOrWhiteSpace(content) ? string.Empty : " Message: '" + content + "'.")} For '{url}'";
                         _log.Warn(msg);
                         NotifyUser(msg, "Request limit exceeded");
                         break;
