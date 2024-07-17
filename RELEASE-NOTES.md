@@ -1,3 +1,6 @@
+v.1.27.0
+- improvement: filter out videos that are not trailers during internet channel update flow. Logic - min duration, keywords in the name of a trailer
+
 v.1.26.0
 - feature: support download intro (trailer) from Kinopoisk
 - feature: support trailers info from kinopoiskapiunofficial.tech
