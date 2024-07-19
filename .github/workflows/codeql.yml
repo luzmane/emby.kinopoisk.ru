@@ -18,15 +18,15 @@ jobs:
 
     steps:
     - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v3.0.3
+      uses: actions/setup-dotnet@6bd8b7f7774af54e05809fcc5431931b3eb1ddee #4.0.1
       with:
         dotnet-version: 6.x
 
     - name: Checkout repository
-      uses: actions/checkout@v4
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #4.1.7
 
     - name: Initialize CodeQL
-      uses: github/codeql-action/init@v2
+      uses: github/codeql-action/init@064a406de026ea27990a5b507b56911401ca2f95 # 2.18.0
       with:
         languages: 'csharp'
         queries: +security-and-quality
@@ -36,6 +36,6 @@ jobs:
       run: dotnet build
 
     - name: Perform CodeQL Analysis
-      uses: github/codeql-action/analyze@v2
+      uses: github/codeql-action/analyze@064a406de026ea27990a5b507b56911401ca2f95 # 2.18.0
       with:
         category: "/language:'csharp'"

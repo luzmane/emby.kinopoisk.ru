@@ -21,26 +21,26 @@ jobs:
 
     steps:
     - name: Setup .NET Core SDK
-      uses: actions/setup-dotnet@v3.0.3
+      uses: actions/setup-dotnet@6bd8b7f7774af54e05809fcc5431931b3eb1ddee #4.0.1
       with:
         dotnet-version: 6.x
 
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 #4.1.7
 
     - name: Build projects
       run: dotnet build
-    
+
     - name: Run tests
       continue-on-error: true
       env:
         KINOPOISK_DEV_TOKEN: ${{ secrets.KINOPOISK_DEV_TOKEN }}
         KINOPOISK_UNOFFICIAL_TOKEN: ${{ secrets.KINOPOISK_UNOFFICIAL_TOKEN }}
       run: dotnet test --logger "trx;LogFileName=test-results.trx"
-    
+
     - name: Test Report
-      uses: dorny/test-reporter@v1
-      with: 
+      uses: dorny/test-reporter@31a54ee7ebcacc03a09ea97a7e5465a47b84aea5 #1.9.1
+      with:
         name: 'Test report'
         path: 'EmbyKinopoiskRu.Tests/TestResults/test-results.trx'
         reporter: 'dotnet-trx'
