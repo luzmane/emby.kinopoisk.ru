@@ -51,6 +51,7 @@ namespace EmbyKinopoiskRu.Channel
         private readonly IApplicationPaths _appPaths;
         private readonly IFfmpegManager _ffmpegManager;
         private readonly IMediaProbeManager _mediaProbeManager;
+        private static readonly object Lock = new object();
 
         /// <inheritdoc />
         public ChannelParentalRating ParentalRating => ChannelParentalRating.GeneralAudience;
@@ -206,11 +207,17 @@ namespace EmbyKinopoiskRu.Channel
 
             _logger.Info($"Intros quality from the plugin configuration: '{introsQuality}', collection slug: '{query.FolderId}'");
 
-            if (TrailersDownloaderDictionary.Count == 0)
+            lock (Lock)
             {
-                TrailersDownloaderDictionary.Add(DownloaderType.Y2Mate, new Y2MateDownloader(_logManager, _httpClient));
-                TrailersDownloaderDictionary.Add(DownloaderType.Tomp3, new Tomp3Downloader(_logManager, _httpClient));
-                TrailersDownloaderDictionary.Add(DownloaderType.EmbyKp, new KinopoiskDownloader(_logManager, _httpClient, _appPaths, _ffmpegManager));
+                if (TrailersDownloaderDictionary.Count == 0)
+                {
+                    lock (Lock)
+                    {
+                        TrailersDownloaderDictionary.Add(DownloaderType.Y2Mate, new Y2MateDownloader(_logManager, _httpClient));
+                        TrailersDownloaderDictionary.Add(DownloaderType.Tomp3, new Tomp3Downloader(_logManager, _httpClient));
+                        TrailersDownloaderDictionary.Add(DownloaderType.EmbyKp, new KinopoiskDownloader(_logManager, _httpClient, _appPaths, _ffmpegManager));
+                    }
+                }
             }
 
             var trailers = await Plugin.Instance.GetKinopoiskService().GetTrailersFromCollectionAsync(query.FolderId, cancellationToken);
@@ -352,11 +359,22 @@ namespace EmbyKinopoiskRu.Channel
                     return null;
                 }
 
-                filePath = await TrailersDownloaderDictionary[DownloaderType.Tomp3].DownloadTrailerByLink(youtubeId, partialFileName, Plugin.Instance.Configuration.IntrosQuality, collectionFolder, cancellationToken);
+                ITrailerDownloader downloader;
+                lock (Lock)
+                {
+                    downloader = TrailersDownloaderDictionary[DownloaderType.Tomp3];
+                }
+
+                filePath = await downloader.DownloadTrailerByLink(youtubeId, partialFileName, Plugin.Instance.Configuration.IntrosQuality, collectionFolder, cancellationToken);
                 if (string.IsNullOrEmpty(filePath))
                 {
                     _logger.Info("Failed to download video via tomp3.cc, trying y2mate");
-                    filePath = await TrailersDownloaderDictionary[DownloaderType.Y2Mate].DownloadTrailerByLink(youtubeId, partialFileName, Plugin.Instance.Configuration.IntrosQuality, collectionFolder, cancellationToken);
+                    lock (Lock)
+                    {
+                        downloader = TrailersDownloaderDictionary[DownloaderType.Y2Mate];
+                    }
+
+                    filePath = await downloader.DownloadTrailerByLink(youtubeId, partialFileName, Plugin.Instance.Configuration.IntrosQuality, collectionFolder, cancellationToken);
                 }
 
                 if (string.IsNullOrEmpty(filePath))
@@ -423,7 +441,13 @@ namespace EmbyKinopoiskRu.Channel
                     return null;
                 }
 
-                filePath = await TrailersDownloaderDictionary[DownloaderType.EmbyKp].DownloadTrailerByLink(kpId, partialFileName, Plugin.Instance.Configuration.IntrosQuality, collectionFolder, cancellationToken);
+                ITrailerDownloader downloader;
+                lock (Lock)
+                {
+                    downloader = TrailersDownloaderDictionary[DownloaderType.EmbyKp];
+                }
+
+                filePath = await downloader.DownloadTrailerByLink(kpId, partialFileName, Plugin.Instance.Configuration.IntrosQuality, collectionFolder, cancellationToken);
                 if (string.IsNullOrEmpty(filePath))
                 {
                     _logger.Error($"Unable to download '{trailer.Url}'");
