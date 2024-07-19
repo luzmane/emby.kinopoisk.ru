@@ -23,7 +23,6 @@ using MediaBrowser.Model.Activity;
 
 namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
 
-[Collection("Sequential")]
 public class KpMovieProviderTest : BaseTest
 {
     private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpMovieProviderTest));
@@ -200,7 +199,7 @@ public class KpMovieProviderTest : BaseTest
     #endregion
 
     [Fact]
-    public async void KpMovieProvider_ForCodeCoverage()
+    public async Task KpMovieProvider_ForCodeCoverage()
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_ForCodeCoverage)}'");
 
@@ -219,7 +218,7 @@ public class KpMovieProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpMovieProvider_GetMetadata_Provider_Kp()
+    public async Task KpMovieProvider_GetMetadata_Provider_Kp()
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_GetMetadata_Provider_Kp)}'");
 
@@ -255,7 +254,7 @@ public class KpMovieProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpMovieProvider_GetMetadata_Provider_Imdb()
+    public async Task KpMovieProvider_GetMetadata_Provider_Imdb()
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_GetMetadata_Provider_Imdb)}'");
 
@@ -291,7 +290,7 @@ public class KpMovieProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpMovieProvider_GetMetadata_Provider_Tmdb()
+    public async Task KpMovieProvider_GetMetadata_Provider_Tmdb()
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_GetMetadata_Provider_Tmdb)}'");
 
@@ -327,7 +326,7 @@ public class KpMovieProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpMovieProvider_GetMetadata_NameAndYear()
+    public async Task KpMovieProvider_GetMetadata_NameAndYear()
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_GetMetadata_NameAndYear)}'");
 
@@ -361,7 +360,7 @@ public class KpMovieProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpMovieProvider_GetSearchResults_Provider_Kp()
+    public async Task KpMovieProvider_GetSearchResults_Provider_Kp()
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_GetSearchResults_Provider_Kp)}'");
 
@@ -390,7 +389,7 @@ public class KpMovieProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpMovieProvider_GetSearchResults_Provider_Imdb()
+    public async Task KpMovieProvider_GetSearchResults_Provider_Imdb()
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_GetSearchResults_Provider_Imdb)}'");
 
@@ -419,7 +418,7 @@ public class KpMovieProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpMovieProvider_GetSearchResults_Name()
+    public async Task KpMovieProvider_GetSearchResults_Name()
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_GetSearchResults_Name)}'");
 
@@ -446,7 +445,7 @@ public class KpMovieProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpMovieProvider_GetSearchResults_NameAndYear()
+    public async Task KpMovieProvider_GetSearchResults_NameAndYear()
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_GetSearchResults_NameAndYear)}'");
 
@@ -473,7 +472,7 @@ public class KpMovieProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpMovieProvider_WithNameYearAndAddToExistingCollection()
+    public async Task KpMovieProvider_WithNameYearAndAddToExistingCollection()
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_WithNameYearAndAddToExistingCollection)}'");
 
@@ -637,7 +636,7 @@ public class KpMovieProviderTest : BaseTest
 
     // Will create a Collections virtual folder
     [Fact]
-    public async void KpMovieProvider_WithNameYearAndAddToNewCollection()
+    public async Task KpMovieProvider_WithNameYearAndAddToNewCollection()
     {
         Logger.Info($"Start '{nameof(KpMovieProvider_WithNameYearAndAddToNewCollection)}'");
 

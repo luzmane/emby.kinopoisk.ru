@@ -17,18 +17,11 @@ public class TrailerDlHelperTest : BaseTest
         ConfigXmlSerializer();
     }
 
-    [Fact]
-    public void YtHelper_GetYoutubeId()
+    [Theory]
+    [MemberData(nameof(GetYoutubeIdData))]
+    public void YtHelper_GetYoutubeId(string url, string youtubeId)
     {
-        const string youtubeId = "_-m3YhxJ8U0";
-        TrailerDlHelper.GetYoutubeId($"https://www.youtube.com/watch?v={youtubeId}").Should().Be(youtubeId);
-        TrailerDlHelper.GetYoutubeId($"https://www.youtube.com/embed/{youtubeId}").Should().Be(youtubeId);
-        TrailerDlHelper.GetYoutubeId($"https://www.youtube.com/v/{youtubeId}").Should().Be(youtubeId);
-        TrailerDlHelper.GetYoutubeId($"https://www.youtu.be/{youtubeId}").Should().Be(youtubeId);
-        TrailerDlHelper.GetYoutubeId($"http://www.youtube.com/watch?v={youtubeId}").Should().Be(youtubeId);
-        TrailerDlHelper.GetYoutubeId($"http://www.youtube.com/embed/{youtubeId}").Should().Be(youtubeId);
-        TrailerDlHelper.GetYoutubeId($"http://www.youtube.com/v/{youtubeId}").Should().Be(youtubeId);
-        TrailerDlHelper.GetYoutubeId($"http://www.youtu.be/{youtubeId}").Should().Be(youtubeId);
+        TrailerDlHelper.GetYoutubeId(url).Should().Be(youtubeId);
     }
 
     [Fact]
@@ -49,33 +42,14 @@ public class TrailerDlHelperTest : BaseTest
 
     [Theory]
     [MemberData(nameof(KpTrailerData))]
-    public void YtHelper_GetPartialIntroName(KpTrailer trailer, bool withDate)
+    public void YtHelper_GetPartialIntroName(KpTrailer trailer, string expectedResult)
     {
         var introName = TrailerDlHelper.GetPartialTrailerName(trailer);
-        introName.Should().Be(withDate ? "videoName (2024)" : "videoName");
+        introName.Should().Be(expectedResult);
     }
 
-    public static TheoryData<KpTrailer, bool> KpTrailerData => new()
-    {
-        {
-            new KpTrailer()
-            {
-                VideoName = "videoName",
-                PremierDate = new DateTimeOffset(2024, 1, 1, 1, 1, 1, TimeSpan.Zero)
-            },
-            true
-        },
-        {
-            new KpTrailer()
-            {
-                VideoName = "videoName"
-            },
-            false
-        }
-    };
-
     [Fact]
-    public async void YtHelper_GetUserAgent_Local()
+    public async Task YtHelper_GetUserAgent_Local()
     {
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
@@ -85,7 +59,7 @@ public class TrailerDlHelperTest : BaseTest
     }
 
     [Fact]
-    public async void YtHelper_GetUserAgent_API()
+    public async Task YtHelper_GetUserAgent_API()
     {
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
@@ -108,4 +82,58 @@ public class TrailerDlHelperTest : BaseTest
         Logger.Info($"UserAGent API key length is: {apiKey?.Length ?? 0}");
         return string.IsNullOrWhiteSpace(apiKey) ? UserAgentApiKey : apiKey;
     }
+
+    #region MemberData
+
+    public static TheoryData<KpTrailer, string> KpTrailerData => new()
+    {
+        {
+            new KpTrailer()
+            {
+                VideoName = "videoName",
+                TrailerName = "trailerName",
+                PremierDate = new DateTimeOffset(2024, 1, 1, 1, 1, 1, TimeSpan.Zero)
+            },
+            "videoName (2024) (trailerName)"
+        },
+        {
+            new KpTrailer()
+            {
+                VideoName = "videoName",
+                TrailerName = "trailerName",
+            },
+            "videoName (trailerName)"
+        },
+        {
+            new KpTrailer()
+            {
+                VideoName = "videoName",
+                TrailerName = "videoName",
+                PremierDate = new DateTimeOffset(2024, 1, 1, 1, 1, 1, TimeSpan.Zero)
+            },
+            "videoName (2024)"
+        },
+        {
+            new KpTrailer()
+            {
+                VideoName = "videoName",
+                TrailerName = "videoName",
+            },
+            "videoName"
+        },
+    };
+
+    public static TheoryData<string, string> GetYoutubeIdData => new()
+    {
+        { "http://www.youtube.com/watch?v=_-m3YhxJ8U0", "_-m3YhxJ8U0" },
+        { "http://www.youtube.com/embed/_-m3YhxJ8U0", "_-m3YhxJ8U0" },
+        { "http://www.youtube.com/v/_-m3YhxJ8U0", "_-m3YhxJ8U0" },
+        { "http://www.youtube.com/watch?v=_-m3YhxJ8U0", "_-m3YhxJ8U0" },
+        { "https://www.youtube.com/watch?v=_-m3YhxJ8U0", "_-m3YhxJ8U0" },
+        { "https://www.youtube.com/embed/_-m3YhxJ8U0", "_-m3YhxJ8U0" },
+        { "https://www.youtube.com/v/_-m3YhxJ8U0", "_-m3YhxJ8U0" },
+        { "https://www.youtube.com/watch?v=_-m3YhxJ8U0", "_-m3YhxJ8U0" },
+    };
+
+    #endregion
 }

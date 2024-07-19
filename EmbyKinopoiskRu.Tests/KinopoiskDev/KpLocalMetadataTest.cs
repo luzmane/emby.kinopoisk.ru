@@ -8,7 +8,6 @@ using MediaBrowser.Model.Configuration;
 
 namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
 
-[Collection("Sequential")]
 public class KpLocalMetadataTest : BaseTest
 {
     private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpLocalMetadataTest));
@@ -60,7 +59,7 @@ public class KpLocalMetadataTest : BaseTest
     #endregion
 
     [Fact]
-    public async void KpLocalMetadata_With_KpInName()
+    public async Task KpLocalMetadata_With_KpInName()
     {
         Logger.Info($"Start '{nameof(KpLocalMetadata_With_KpInName)}'");
 
@@ -91,7 +90,7 @@ public class KpLocalMetadataTest : BaseTest
     }
 
     [Fact]
-    public async void KpLocalMetadata_Without_KpInName()
+    public async Task KpLocalMetadata_Without_KpInName()
     {
         Logger.Info($"Start '{nameof(KpLocalMetadata_Without_KpInName)}'");
 

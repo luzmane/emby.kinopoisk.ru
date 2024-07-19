@@ -14,7 +14,6 @@ using MediaBrowser.Model.Querying;
 
 namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
 
-[Collection("Sequential")]
 public class CreateKinopoiskIdTaskTest : BaseTest
 {
     private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(CreateKinopoiskIdTaskTest));
@@ -158,7 +157,7 @@ public class CreateKinopoiskIdTaskTest : BaseTest
     }
 
     [Fact]
-    public async void CreateKinopoiskIdTask_Execute()
+    public async Task CreateKinopoiskIdTask_Execute()
     {
         Logger.Info($"Start '{nameof(CreateKinopoiskIdTask_Execute)}'");
 

@@ -14,7 +14,6 @@ using MediaBrowser.Model.Providers;
 
 namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
 
-[Collection("Sequential")]
 public class KpSeriesProviderTest : BaseTest
 {
     private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpSeriesProviderTest));
@@ -38,7 +37,7 @@ public class KpSeriesProviderTest : BaseTest
     #endregion
 
     [Fact]
-    public async void KpSeriesProvider_ForCodeCoverage()
+    public async Task KpSeriesProvider_ForCodeCoverage()
     {
         Logger.Info($"Start '{nameof(KpSeriesProvider_ForCodeCoverage)}'");
 
@@ -55,7 +54,7 @@ public class KpSeriesProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpSeriesProvider_GetMetadata_Provider_Kp()
+    public async Task KpSeriesProvider_GetMetadata_Provider_Kp()
     {
         Logger.Info($"Start '{nameof(KpSeriesProvider_GetMetadata_Provider_Kp)}'");
 
@@ -76,7 +75,7 @@ public class KpSeriesProviderTest : BaseTest
         result.HasMetadata.Should().BeTrue();
         VerifySeries502838(result.Item);
 
-        result.People.Should().HaveCount(24);
+        result.People.Should().HaveCount(64);
         VerifyPersonInfo34549(result.People.FirstOrDefault(p => "Бенедикт Камбербэтч".Equals(p.Name, StringComparison.Ordinal)));
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
@@ -89,7 +88,7 @@ public class KpSeriesProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpSeriesProvider_GetMetadata_Provider_Imdb()
+    public async Task KpSeriesProvider_GetMetadata_Provider_Imdb()
     {
         Logger.Info($"Start '{nameof(KpSeriesProvider_GetMetadata_Provider_Imdb)}'");
 
@@ -110,7 +109,7 @@ public class KpSeriesProviderTest : BaseTest
         result.HasMetadata.Should().BeTrue();
         VerifySeries502838(result.Item);
 
-        result.People.Should().HaveCount(24);
+        result.People.Should().HaveCount(64);
         VerifyPersonInfo34549(result.People.FirstOrDefault(p => "Бенедикт Камбербэтч".Equals(p.Name, StringComparison.Ordinal)));
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
@@ -123,7 +122,7 @@ public class KpSeriesProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpSeriesProvider_GetMetadata_Provider_Tmdb()
+    public async Task KpSeriesProvider_GetMetadata_Provider_Tmdb()
     {
         Logger.Info($"Start '{nameof(KpSeriesProvider_GetMetadata_Provider_Tmdb)}'");
 
@@ -144,7 +143,7 @@ public class KpSeriesProviderTest : BaseTest
         result.HasMetadata.Should().BeTrue();
         VerifySeries502838(result.Item);
 
-        result.People.Should().HaveCount(24);
+        result.People.Should().HaveCount(64);
         VerifyPersonInfo34549(result.People.FirstOrDefault(p => "Бенедикт Камбербэтч".Equals(p.Name, StringComparison.Ordinal)));
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
@@ -157,7 +156,7 @@ public class KpSeriesProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpSeriesProvider_GetMetadata_NameAndYear()
+    public async Task KpSeriesProvider_GetMetadata_NameAndYear()
     {
         Logger.Info($"Start '{nameof(KpSeriesProvider_GetMetadata_NameAndYear)}'");
 
@@ -176,7 +175,7 @@ public class KpSeriesProviderTest : BaseTest
         result.HasMetadata.Should().BeTrue();
         VerifySeries502838(result.Item);
 
-        result.People.Should().HaveCount(24);
+        result.People.Should().HaveCount(64);
         VerifyPersonInfo34549(result.People.FirstOrDefault(p => "Бенедикт Камбербэтч".Equals(p.Name, StringComparison.Ordinal)));
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
@@ -189,7 +188,7 @@ public class KpSeriesProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpSeriesProvider_GetSearchResults_Provider_Kp()
+    public async Task KpSeriesProvider_GetSearchResults_Provider_Kp()
     {
         Logger.Info($"Start '{nameof(KpSeriesProvider_GetSearchResults_Provider_Kp)}'");
 
@@ -218,7 +217,7 @@ public class KpSeriesProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpSeriesProvider_GetSearchResults_Provider_Imdb()
+    public async Task KpSeriesProvider_GetSearchResults_Provider_Imdb()
     {
         Logger.Info($"Start '{nameof(KpSeriesProvider_GetSearchResults_Provider_Imdb)}'");
 
@@ -247,7 +246,7 @@ public class KpSeriesProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpSeriesProvider_GetSearchResults_NameAndYear()
+    public async Task KpSeriesProvider_GetSearchResults_NameAndYear()
     {
         Logger.Info($"Start '{nameof(KpSeriesProvider_GetSearchResults_NameAndYear)}'");
 

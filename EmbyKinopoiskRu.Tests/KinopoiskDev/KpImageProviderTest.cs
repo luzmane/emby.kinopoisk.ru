@@ -15,7 +15,6 @@ using MediaBrowser.Model.Providers;
 
 namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
 
-[Collection("Sequential")]
 public class KpImageProviderTest : BaseTest
 {
     private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpImageProviderTest));
@@ -34,7 +33,7 @@ public class KpImageProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpImageProviderTest_GetImages_ByProviderId()
+    public async Task KpImageProviderTest_GetImages_ByProviderId()
     {
         Logger.Info($"Started '{nameof(KpImageProviderTest_GetImages_ByProviderId)}'");
 
@@ -91,7 +90,7 @@ public class KpImageProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpImageProviderTest_GetImages_ByOriginalTitle()
+    public async Task KpImageProviderTest_GetImages_ByOriginalTitle()
     {
         Logger.Info($"Started '{nameof(KpImageProviderTest_GetImages_ByOriginalTitle)}'");
 
@@ -143,7 +142,7 @@ public class KpImageProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpImageProviderTest_GetImages_ByOriginalTitleAndYear()
+    public async Task KpImageProviderTest_GetImages_ByOriginalTitleAndYear()
     {
         Logger.Info($"Started '{nameof(KpImageProviderTest_GetImages_ByOriginalTitleAndYear)}'");
 
@@ -196,7 +195,7 @@ public class KpImageProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpImageProviderTest_GetImages_NothingFound()
+    public async Task KpImageProviderTest_GetImages_NothingFound()
     {
         Logger.Info($"Started '{nameof(KpImageProviderTest_GetImages_NothingFound)}'");
 
@@ -225,7 +224,7 @@ public class KpImageProviderTest : BaseTest
     }
 
     [Fact]
-    public async void KpImageProviderTest_ForCodeCoverage()
+    public async Task KpImageProviderTest_ForCodeCoverage()
     {
         Logger.Info($"Started '{nameof(KpImageProviderTest_ForCodeCoverage)}'");
 

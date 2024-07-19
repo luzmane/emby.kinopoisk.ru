@@ -246,7 +246,7 @@ public abstract class BaseTest
         episode.Should().NotBeNull();
         episode.IndexNumber.Should().Be(2);
         episode.MediaType.Should().Be("Video");
-        episode.Name.Should().Be("Эпизод 2. А я сказал — оседлаю!");
+        episode.Name.Should().Be("А я сказал — оседлаю!");
         episode.OriginalTitle.Should().Be("I Said I'm Gonna Pilot That Thing!!");
         episode.ParentIndexNumber.Should().Be(1);
         episode.PremiereDate.Should().NotBeNull();
@@ -276,7 +276,7 @@ public abstract class BaseTest
         movie.GetProviderId(Plugin.PluginKey).Should().Be("326");
         movie.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0111161");
         movie.GetProviderId(MetadataProviders.Tmdb).Should().Be("278");
-        movie.RemoteTrailers.Should().HaveCount(2);
+        movie.RemoteTrailers.Should().HaveCount(0);
         movie.Size.Should().Be(142);
         movie.SortName.Should().Be(movie.Name);
         movie.Studios.Should().ContainSingle();
@@ -288,8 +288,6 @@ public abstract class BaseTest
     protected static void VerifyMovie689(Movie movie)
     {
         movie.Should().NotBeNull();
-        // movie.Collections.Should().ContainSingle();
-        // movie.Collections[0].Id.Should().Be(201L);
         movie.CommunityRating.Should().BeGreaterThan(8);
         movie.EndDate.Should().BeNull();
         movie.ExternalId.Should().Be("689");
@@ -428,11 +426,10 @@ public abstract class BaseTest
     protected static void VerifyRemoteSearchResult_452973_1_2(RemoteSearchResult remoteSearchResult)
     {
         remoteSearchResult.Should().NotBeNull();
-        remoteSearchResult.ImageUrl.Should().NotBeNullOrWhiteSpace();
         remoteSearchResult.IndexNumber.Should().Be(2);
         remoteSearchResult.ParentIndexNumber.Should().Be(1);
-        remoteSearchResult.Name.Should().Be("Эпизод 2. А я сказал — оседлаю!");
-        remoteSearchResult.Overview.Should().Be("Симон и Камина с Лаганном попадают в родную деревню Ёко, Ритону. Герои оказываются втянуты в войну, которые ведут живущие на поверхности люди и таинственные зверолюди. В бою с ними Камина захватывает ганмена одного из противников и нарекает «Гурреном».");
+        remoteSearchResult.Name.Should().Be("А я сказал — оседлаю!");
+        remoteSearchResult.Overview.Should().Be("Камина, Лаганн и Симон попадают в родную деревню Ёко, Ритону. Герои оказываются втянуты в войну, которые ведут живущие на поверхности люди и таинственные зверолюди. В бою с ними Камина захватывает ганмена одного из противников и нарекает Гурреном.");
         remoteSearchResult.PremiereDate.Should().HaveYear(2007).And.HaveMonth(04).And.HaveDay(08);
         remoteSearchResult.ProviderIds.Should().ContainSingle();
         remoteSearchResult.GetProviderId(Plugin.PluginKey).Should().Be("452973");

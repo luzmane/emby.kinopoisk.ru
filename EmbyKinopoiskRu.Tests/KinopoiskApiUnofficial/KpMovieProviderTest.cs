@@ -15,7 +15,6 @@ using MediaBrowser.Model.Providers;
 
 namespace EmbyKinopoiskRu.Tests.KinopoiskApiUnofficial;
 
-[Collection("Sequential")]
 public class KpMovieProviderTest : BaseTest
 {
     private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpMovieProviderTest));
@@ -40,7 +39,7 @@ public class KpMovieProviderTest : BaseTest
     #endregion
 
     [Fact]
-    public async void UN_KpMovieProvider_ForCodeCoverage()
+    public async Task UN_KpMovieProvider_ForCodeCoverage()
     {
         Logger.Info($"Start '{nameof(UN_KpMovieProvider_ForCodeCoverage)}'");
 
@@ -59,7 +58,7 @@ public class KpMovieProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpMovieProvider_GetMetadata_Provider_Kp()
+    public async Task UN_KpMovieProvider_GetMetadata_Provider_Kp()
     {
         Logger.Info($"Start '{nameof(UN_KpMovieProvider_GetMetadata_Provider_Kp)}'");
 
@@ -115,7 +114,7 @@ public class KpMovieProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpMovieProvider_GetMetadata_Provider_Imdb()
+    public async Task UN_KpMovieProvider_GetMetadata_Provider_Imdb()
     {
         Logger.Info($"Start '{nameof(UN_KpMovieProvider_GetMetadata_Provider_Imdb)}'");
 
@@ -171,7 +170,7 @@ public class KpMovieProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpMovieProvider_GetMetadata_NameAndYear()
+    public async Task UN_KpMovieProvider_GetMetadata_NameAndYear()
     {
         Logger.Info($"Start '{nameof(UN_KpMovieProvider_GetMetadata_NameAndYear)}'");
 
@@ -225,7 +224,7 @@ public class KpMovieProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpMovieProvider_GetSearchResults_Provider_Kp()
+    public async Task UN_KpMovieProvider_GetSearchResults_Provider_Kp()
     {
         Logger.Info($"Start '{nameof(UN_KpMovieProvider_GetSearchResults_Provider_Kp)}'");
 
@@ -261,7 +260,7 @@ public class KpMovieProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpMovieProvider_GetSearchResults_Provider_Imdb()
+    public async Task UN_KpMovieProvider_GetSearchResults_Provider_Imdb()
     {
         Logger.Info($"Start '{nameof(UN_KpMovieProvider_GetSearchResults_Provider_Imdb)}'");
 
@@ -297,7 +296,7 @@ public class KpMovieProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpMovieProvider_GetSearchResults_NameAndYear()
+    public async Task UN_KpMovieProvider_GetSearchResults_NameAndYear()
     {
         Logger.Info($"Start '{nameof(UN_KpMovieProvider_GetSearchResults_NameAndYear)}'");
 

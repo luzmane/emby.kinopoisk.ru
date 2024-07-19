@@ -14,7 +14,6 @@ using MediaBrowser.Model.Providers;
 
 namespace EmbyKinopoiskRu.Tests.KinopoiskApiUnofficial;
 
-[Collection("Sequential")]
 public class KpSeriesProviderTest : BaseTest
 {
     private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpSeriesProviderTest));
@@ -39,7 +38,7 @@ public class KpSeriesProviderTest : BaseTest
     #endregion
 
     [Fact]
-    public async void UN_KpSeriesProvider_ForCodeCoverage()
+    public async Task UN_KpSeriesProvider_ForCodeCoverage()
     {
         Logger.Info($"Start '{nameof(UN_KpSeriesProvider_ForCodeCoverage)}'");
 
@@ -56,7 +55,7 @@ public class KpSeriesProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpSeriesProvider_GetMetadata_Provider_Kp()
+    public async Task UN_KpSeriesProvider_GetMetadata_Provider_Kp()
     {
         Logger.Info($"Start '{nameof(UN_KpSeriesProvider_GetMetadata_Provider_Kp)}'");
 
@@ -111,7 +110,7 @@ public class KpSeriesProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpSeriesProvider_GetMetadata_NameAndYear()
+    public async Task UN_KpSeriesProvider_GetMetadata_NameAndYear()
     {
         Logger.Info($"Start '{nameof(UN_KpSeriesProvider_GetMetadata_NameAndYear)}'");
 
@@ -164,7 +163,7 @@ public class KpSeriesProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpSeriesProvider_GetSearchResults_Provider_Kp()
+    public async Task UN_KpSeriesProvider_GetSearchResults_Provider_Kp()
     {
         Logger.Info($"Start '{nameof(UN_KpSeriesProvider_GetSearchResults_Provider_Kp)}'");
 
@@ -201,7 +200,7 @@ public class KpSeriesProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpSeriesProvider_GetSearchResults_NameAndYear()
+    public async Task UN_KpSeriesProvider_GetSearchResults_NameAndYear()
     {
         Logger.Info($"Start '{nameof(UN_KpSeriesProvider_GetSearchResults_NameAndYear)}'");
 

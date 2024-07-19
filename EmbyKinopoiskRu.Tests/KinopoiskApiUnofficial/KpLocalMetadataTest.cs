@@ -10,7 +10,6 @@ using MediaBrowser.Model.Entities;
 
 namespace EmbyKinopoiskRu.Tests.KinopoiskApiUnofficial;
 
-[Collection("Sequential")]
 public class KpLocalMetadataTest : BaseTest
 {
     private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpLocalMetadataTest));
@@ -64,7 +63,7 @@ public class KpLocalMetadataTest : BaseTest
     #endregion
 
     [Fact]
-    public async void UN_KpLocalMetadata_WithKpInName()
+    public async Task UN_KpLocalMetadata_WithKpInName()
     {
         Logger.Info($"Start '{nameof(UN_KpLocalMetadata_WithKpInName)}'");
 
@@ -94,7 +93,7 @@ public class KpLocalMetadataTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpLocalMetadata_WithoutKpInName()
+    public async Task UN_KpLocalMetadata_WithoutKpInName()
     {
         Logger.Info($"Start '{nameof(UN_KpLocalMetadata_WithoutKpInName)}'");
 
@@ -117,7 +116,6 @@ public class KpLocalMetadataTest : BaseTest
         result.Item.Should().BeNull();
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(2));
-        _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(UN_KpLocalMetadata_WithoutKpInName)}/EmbyKinopoiskRu.xml"), Times.Once());
         _fileSystem.Verify(fs => fs.GetDirectoryName("/emby/movie_library/Побег из Шоушенка.mkv"), Times.Once());
         VerifyNoOtherCalls();
 

@@ -20,7 +20,6 @@ using Range = Moq.Range;
 
 namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
 
-[Collection("Sequential")]
 public class CreateKpCollectionsTaskTest : BaseTest
 {
     private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(CreateKpCollectionsTaskTest));
@@ -182,7 +181,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
     }
 
     [Fact]
-    public async void CreateKpCollectionsTaskTest_Execute_CollectionExists()
+    public async Task CreateKpCollectionsTaskTest_Execute_CollectionExists()
     {
         Logger.Info($"Start '{nameof(CreateKpCollectionsTaskTest_Execute_CollectionExists)}'");
 
@@ -203,8 +202,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
 
         _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
-                true.Equals(query.HasPath)
-                && true.Equals(query.IsFolder)
+                true.Equals(query.IsFolder)
                 && false.Equals(query.IsVirtualItem)
                 && query.IncludeItemTypes.Length == 1
                 && "CollectionFolder".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))
@@ -244,7 +242,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
                 true.Equals(query.Recursive)
                 && false.Equals(query.IsVirtualItem)
-                && true.Equals(query.HasPath)
                 && query.IncludeItemTypes.Length == 2
                 && "Movie".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
                 && "Series".Equals(query.IncludeItemTypes[1], StringComparison.Ordinal)
@@ -261,7 +258,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
                 true.Equals(query.Recursive)
                 && false.Equals(query.IsVirtualItem)
-                && true.Equals(query.HasPath)
                 && query.IncludeItemTypes.Length == 2
                 && "Movie".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
                 && "Series".Equals(query.IncludeItemTypes[1], StringComparison.Ordinal)
@@ -340,7 +336,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
         // uncomment in case single test run (static/cache invocations)
         //_itemRepository.Verify(lm => lm.GetExtradataTypeId("LibraryOptions"), Times.Exactly(4));
         //_itemRepository.Verify(lm => lm.GetItemExtradataValue(It.IsInRange(123L, 126L, Range.Inclusive), 0), Times.Exactly(4));
-        _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(11));
+        _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(9));
         _libraryManager.Verify(lm => lm.GetItemLinks(It.IsInRange(103L, 104L, Range.Inclusive), It.IsAny<List<ItemLinkType>>()), Times.Exactly(2));
         _libraryManager.Verify(lm => lm.UpdateItem(It.IsAny<BaseItem>(), It.IsAny<BaseItem>(), ItemUpdateType.MetadataEdit, null), Times.Exactly(2));
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
@@ -352,7 +348,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
     }
 
     [Fact]
-    public async void CreateKpCollectionsTaskTest_Execute_CollectionNotExists()
+    public async Task CreateKpCollectionsTaskTest_Execute_CollectionNotExists()
     {
         Logger.Info($"Start '{nameof(CreateKpCollectionsTaskTest_Execute_CollectionNotExists)}'");
 
@@ -364,8 +360,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
 
         _ = _libraryManager
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
-                true.Equals(query.HasPath)
-                && true.Equals(query.IsFolder)
+                true.Equals(query.IsFolder)
                 && false.Equals(query.IsVirtualItem)
                 && query.IncludeItemTypes.Length == 1
                 && "CollectionFolder".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal))
@@ -405,7 +400,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
                 true.Equals(query.Recursive)
                 && false.Equals(query.IsVirtualItem)
-                && true.Equals(query.HasPath)
                 && query.IncludeItemTypes.Length == 2
                 && "Movie".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
                 && "Series".Equals(query.IncludeItemTypes[1], StringComparison.Ordinal)
@@ -422,7 +416,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
             .Setup(m => m.QueryItems(It.Is<InternalItemsQuery>(query =>
                 true.Equals(query.Recursive)
                 && false.Equals(query.IsVirtualItem)
-                && true.Equals(query.HasPath)
                 && query.IncludeItemTypes.Length == 2
                 && "Movie".Equals(query.IncludeItemTypes[0], StringComparison.Ordinal)
                 && "Series".Equals(query.IncludeItemTypes[1], StringComparison.Ordinal)
@@ -537,7 +530,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
         _collectionManager.Verify(cm => cm.CreateCollection(It.IsAny<CollectionCreationOptions>()), Times.Once());
         _itemRepository.Verify(lm => lm.GetExtradataTypeId("LibraryOptions"), Times.Exactly(4));
         _itemRepository.Verify(lm => lm.GetItemExtradataValue(It.IsInRange(123L, 126L, Range.Inclusive), 0), Times.Exactly(4));
-        _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(10));
+        _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(9));
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
         _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(CreateKpCollectionsTaskTest_Execute_CollectionNotExists)}/EmbyKinopoiskRu.xml"), Times.Once());
 

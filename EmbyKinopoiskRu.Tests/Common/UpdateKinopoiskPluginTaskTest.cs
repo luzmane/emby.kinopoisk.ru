@@ -16,7 +16,6 @@ using NLog;
 
 namespace EmbyKinopoiskRu.Tests.Common;
 
-[Collection("Sequential")]
 public class UpdateKinopoiskPluginTaskTest : BaseTest
 {
     private static readonly ILogger Logger = LogManager.GetLogger(nameof(UpdateKinopoiskPluginTaskTest));
@@ -155,7 +154,7 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
     }
 
     [Fact]
-    public async void UpdateKinopoiskPluginTask_Execute_NoChanges()
+    public async Task UpdateKinopoiskPluginTask_Execute_NoChanges()
     {
         Logger.Info($"Start '{nameof(UpdateKinopoiskPluginTask_Execute_NoChanges)}'");
 
@@ -177,7 +176,7 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
     }
 
     [Fact]
-    public async void UpdateKinopoiskPluginTask_Execute_Updated_OldTag()
+    public async Task UpdateKinopoiskPluginTask_Execute_Updated_OldTag()
     {
         Logger.Info($"Start '{nameof(UpdateKinopoiskPluginTask_Execute_Updated_OldTag)}'");
 
@@ -204,7 +203,7 @@ public class UpdateKinopoiskPluginTaskTest : BaseTest
     }
 
     [Fact]
-    public async void UpdateKinopoiskPluginTask_Execute_Updated_NewTag()
+    public async Task UpdateKinopoiskPluginTask_Execute_Updated_NewTag()
     {
         Logger.Info($"Start '{nameof(UpdateKinopoiskPluginTask_Execute_Updated_NewTag)}'");
 

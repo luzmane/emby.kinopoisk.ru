@@ -13,7 +13,6 @@ using MediaBrowser.Model.Providers;
 
 namespace EmbyKinopoiskRu.Tests.KinopoiskApiUnofficial;
 
-[Collection("Sequential")]
 public class KpPersonProviderTest : BaseTest
 {
     private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpPersonProviderTest));
@@ -38,7 +37,7 @@ public class KpPersonProviderTest : BaseTest
     #endregion
 
     [Fact]
-    public async void UN_KpPersonProvider_ForCodeCoverage()
+    public async Task UN_KpPersonProvider_ForCodeCoverage()
     {
         Logger.Info($"Start '{nameof(UN_KpPersonProvider_ForCodeCoverage)}'");
 
@@ -56,7 +55,7 @@ public class KpPersonProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpPersonProvider_GetMetadata_Provider_Kp()
+    public async Task UN_KpPersonProvider_GetMetadata_Provider_Kp()
     {
         Logger.Info($"Start '{nameof(UN_KpPersonProvider_GetMetadata_Provider_Kp)}'");
 
@@ -95,7 +94,7 @@ public class KpPersonProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpPersonProvider_GetMetadata_ByName()
+    public async Task UN_KpPersonProvider_GetMetadata_ByName()
     {
         Logger.Info($"Start '{nameof(UN_KpPersonProvider_GetMetadata_ByName)}'");
 
@@ -132,7 +131,7 @@ public class KpPersonProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpPersonProvider_GetMetadata_ByEnName()
+    public async Task UN_KpPersonProvider_GetMetadata_ByEnName()
     {
         Logger.Info($"Start '{nameof(UN_KpPersonProvider_GetMetadata_ByEnName)}'");
 
@@ -169,7 +168,7 @@ public class KpPersonProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpPersonProvider_GetSearchResults_Provider_Kp()
+    public async Task UN_KpPersonProvider_GetSearchResults_Provider_Kp()
     {
         Logger.Info($"Start '{nameof(UN_KpPersonProvider_GetSearchResults_Provider_Kp)}'");
 
@@ -203,7 +202,7 @@ public class KpPersonProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpPersonProvider_GetSearchResults_ByName()
+    public async Task UN_KpPersonProvider_GetSearchResults_ByName()
     {
         Logger.Info($"Start '{nameof(UN_KpPersonProvider_GetSearchResults_ByName)}'");
 
@@ -236,7 +235,7 @@ public class KpPersonProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpPersonProvider_GetSearchResults_ByEnName()
+    public async Task UN_KpPersonProvider_GetSearchResults_ByEnName()
     {
         Logger.Info($"Start '{nameof(UN_KpPersonProvider_GetSearchResults_ByEnName)}'");
 

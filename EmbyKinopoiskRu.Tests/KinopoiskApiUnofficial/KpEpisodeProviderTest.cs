@@ -12,7 +12,6 @@ using MediaBrowser.Model.Entities;
 
 namespace EmbyKinopoiskRu.Tests.KinopoiskApiUnofficial;
 
-[Collection("Sequential")]
 public class KpEpisodeProviderTest : BaseTest
 {
     private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpEpisodeProviderTest));
@@ -37,7 +36,7 @@ public class KpEpisodeProviderTest : BaseTest
     #endregion
 
     [Fact]
-    public async void UN_KpEpisodeProvider_ForCodeCoverage()
+    public async Task UN_KpEpisodeProvider_ForCodeCoverage()
     {
         Logger.Info($"Start '{nameof(UN_KpEpisodeProvider_ForCodeCoverage)}'");
 
@@ -55,7 +54,7 @@ public class KpEpisodeProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpEpisodeProvider_GetMetadata_ProviderIds()
+    public async Task UN_KpEpisodeProvider_GetMetadata_ProviderIds()
     {
         Logger.Info($"Start '{nameof(UN_KpEpisodeProvider_GetMetadata_ProviderIds)}'");
 
@@ -100,7 +99,7 @@ public class KpEpisodeProviderTest : BaseTest
     }
 
     [Fact]
-    public async void UN_KpEpisodeProvider_GetMetadata_SeriesProviderIds()
+    public async Task UN_KpEpisodeProvider_GetMetadata_SeriesProviderIds()
     {
         Logger.Info($"Start '{nameof(UN_KpEpisodeProvider_GetMetadata_SeriesProviderIds)}'");
 
