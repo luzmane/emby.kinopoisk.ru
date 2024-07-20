@@ -14,6 +14,7 @@ namespace EmbyKinopoiskRu.Tests.KinopoiskApiUnofficial;
 public class ApiTests : IDisposable
 {
     private const string KinopoiskUnofficialToken = "0f162131-81c1-4979-b46c-3eea4263fb11";
+
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
     private readonly ILogger _logger;
@@ -33,7 +34,7 @@ public class ApiTests : IDisposable
 
     #region Tests
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task GetFilmById()
     {
         const string request = "https://kinopoiskapiunofficial.tech/api/v2.2/films/326";
@@ -45,7 +46,7 @@ public class ApiTests : IDisposable
         VerifyKpFilm326(film);
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task SearchFilmByName()
     {
         const string request = "https://kinopoiskapiunofficial.tech/api/v2.2/films?keyword=Побег из Шоушенка";
@@ -59,7 +60,7 @@ public class ApiTests : IDisposable
         VerifyKpFilm326(filmSearchResult.Items.First(x => x.KinopoiskId == 326), true);
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task SearchFilmByNameAndYear()
     {
         const string request = "https://kinopoiskapiunofficial.tech/api/v2.2/films?keyword=Побег из Шоушенка&yearFrom=1994&yearTo=1994";
@@ -73,7 +74,7 @@ public class ApiTests : IDisposable
         VerifyKpFilm326(filmSearchResult.Items.First(x => x.KinopoiskId == 326), true);
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task SearchFilmByImdb()
     {
         const string request = "https://kinopoiskapiunofficial.tech/api/v2.2/films?imdbId=tt0111161";
@@ -87,7 +88,7 @@ public class ApiTests : IDisposable
         VerifyKpFilm326(filmSearchResult.Items.First(x => x.KinopoiskId == 326), true);
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task GetSeasons()
     {
         const string request = "https://kinopoiskapiunofficial.tech/api/v2.2/films/77044/seasons";
@@ -107,7 +108,7 @@ public class ApiTests : IDisposable
         kpEpisode.ReleaseDate.Should().Be("1995-05-18");
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task GetVideos()
     {
         const string request = "https://kinopoiskapiunofficial.tech/api/v2.2/films/77044/videos";
@@ -121,7 +122,7 @@ public class ApiTests : IDisposable
         kpVideo.Url.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task GetStaffById()
     {
         const string request = "https://kinopoiskapiunofficial.tech/api/v1/staff/7987";
@@ -141,7 +142,7 @@ public class ApiTests : IDisposable
         kpPerson.PosterUrl.Should().NotBeNullOrWhiteSpace();
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task GetStaffByFilmId()
     {
         const string request = "https://kinopoiskapiunofficial.tech/api/v1/staff?filmId=326";
@@ -160,7 +161,7 @@ public class ApiTests : IDisposable
         filmStaff.StaffId.Should().Be(7987);
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task SearchStaffByName()
     {
         const string request = "https://kinopoiskapiunofficial.tech/api/v1/persons?name=Тим Роббинс";
@@ -180,7 +181,7 @@ public class ApiTests : IDisposable
 
     #region Fetch collection tests
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task FetchCollection_TOP_POPULAR_ALL()
     {
         KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("TOP_POPULAR_ALL");
@@ -188,7 +189,7 @@ public class ApiTests : IDisposable
         collectionFilms!.Items.Should().NotBeEmpty();
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task FetchCollection_TOP_POPULAR_MOVIES()
     {
         KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("TOP_POPULAR_MOVIES");
@@ -196,7 +197,7 @@ public class ApiTests : IDisposable
         collectionFilms!.Items.Should().NotBeEmpty();
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task FetchCollection_TOP_250_TV_SHOWS()
     {
         KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("TOP_250_TV_SHOWS");
@@ -204,7 +205,7 @@ public class ApiTests : IDisposable
         collectionFilms!.Items.Should().NotBeEmpty();
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task FetchCollection_TOP_250_MOVIES()
     {
         KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("TOP_250_MOVIES");
@@ -212,7 +213,7 @@ public class ApiTests : IDisposable
         collectionFilms!.Items.Should().NotBeEmpty();
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task FetchCollection_VAMPIRE_THEME()
     {
         KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("VAMPIRE_THEME");
@@ -220,7 +221,7 @@ public class ApiTests : IDisposable
         collectionFilms!.Items.Should().NotBeEmpty();
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task FetchCollection_COMICS_THEME()
     {
         KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("COMICS_THEME");
@@ -228,7 +229,7 @@ public class ApiTests : IDisposable
         collectionFilms!.Items.Should().NotBeEmpty();
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task FetchCollection_CLOSES_RELEASES()
     {
         KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("CLOSES_RELEASES");
@@ -236,7 +237,7 @@ public class ApiTests : IDisposable
         collectionFilms!.Items.Should().NotBeEmpty();
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task FetchCollection_FAMILY()
     {
         KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("FAMILY");
@@ -244,7 +245,7 @@ public class ApiTests : IDisposable
         collectionFilms!.Items.Should().NotBeEmpty();
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task FetchCollection_OSKAR_WINNERS_2021()
     {
         KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("OSKAR_WINNERS_2021");
@@ -252,7 +253,7 @@ public class ApiTests : IDisposable
         collectionFilms!.Items.Should().NotBeEmpty();
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task FetchCollection_LOVE_THEME()
     {
         KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("LOVE_THEME");
@@ -260,7 +261,7 @@ public class ApiTests : IDisposable
         collectionFilms!.Items.Should().NotBeEmpty();
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task FetchCollection_ZOMBIE_THEME()
     {
         KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("ZOMBIE_THEME");
@@ -268,7 +269,7 @@ public class ApiTests : IDisposable
         collectionFilms!.Items.Should().NotBeEmpty();
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task FetchCollection_CATASTROPHE_THEME()
     {
         KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("CATASTROPHE_THEME");
@@ -276,7 +277,7 @@ public class ApiTests : IDisposable
         collectionFilms!.Items.Should().NotBeEmpty();
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task FetchCollection_KIDS_ANIMATION_THEME()
     {
         KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("KIDS_ANIMATION_THEME");

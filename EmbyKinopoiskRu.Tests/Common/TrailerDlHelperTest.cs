@@ -1,5 +1,6 @@
 using EmbyKinopoiskRu.Api;
 using EmbyKinopoiskRu.Helper;
+using EmbyKinopoiskRu.Tests.Utils;
 
 using FluentAssertions;
 
@@ -9,8 +10,10 @@ namespace EmbyKinopoiskRu.Tests.Common;
 
 public class TrailerDlHelperTest : BaseTest
 {
-    private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(TrailerDlHelperTest));
     private const string UserAgentApiKey = "wd0fL7jxJVrF6K0g2Zb3y1tN3lLHkRwz";
+
+    private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(TrailerDlHelperTest));
+    private static readonly char[] InvalidFileNameChars = Path.GetInvalidFileNameChars();
 
     public TrailerDlHelperTest() : base(Logger)
     {
@@ -19,51 +22,42 @@ public class TrailerDlHelperTest : BaseTest
 
     [Theory]
     [MemberData(nameof(GetYoutubeIdData))]
-    public void YtHelper_GetYoutubeId(string url, string youtubeId)
+    public void TrailerDlHelper_GetYoutubeId(string url, string youtubeId)
     {
         TrailerDlHelper.GetYoutubeId(url).Should().Be(youtubeId);
     }
 
-    [Fact]
-    public void YtHelper_GetIntroName_WithInvalidChars()
+    [Theory]
+    [MemberData(nameof(GetIntroNameData))]
+    public void TrailerDlHelper_GetIntroName(IntroNameData introNameData, string expectedResult)
     {
-        var invalid = Path.GetInvalidFileNameChars();
-        if (invalid.Length > 0)
-        {
-            TrailerDlHelper.GetIntroName($"videoName{invalid[0]}", "youtubeId", "mp4").Should().Be("videoName [youtubeId].mp4");
-        }
-    }
-
-    [Fact]
-    public void YtHelper_GetIntroName_WithoutInvalidChars()
-    {
-        TrailerDlHelper.GetIntroName("videoName", "youtubeId", "mp4").Should().Be("videoName [youtubeId].mp4");
+        TrailerDlHelper.GetIntroName(introNameData.VideoName, introNameData.VideoId, introNameData.Extension).Should().Be(expectedResult);
     }
 
     [Theory]
-    [MemberData(nameof(KpTrailerData))]
-    public void YtHelper_GetPartialIntroName(KpTrailer trailer, string expectedResult)
+    [MemberData(nameof(GetPartialIntroNameData))]
+    public void TrailerDlHelper_GetPartialIntroName(KpTrailer trailer, string expectedResult)
     {
         var introName = TrailerDlHelper.GetPartialTrailerName(trailer);
         introName.Should().Be(expectedResult);
     }
 
     [Fact]
-    public async Task YtHelper_GetUserAgent_Local()
+    public async Task TrailerDlHelper_GetUserAgent_Local()
     {
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns(nameof(YtHelper_GetUserAgent_Local));
+            .Returns(nameof(TrailerDlHelper_GetUserAgent_Local));
 
         (await TrailerDlHelper.GetUserAgent(_httpClient, new Mock<ILogger>().Object, CancellationToken.None)).Should().BeOneOf(TrailerDlHelper.UserAgents);
     }
 
     [Fact]
-    public async Task YtHelper_GetUserAgent_API()
+    public async Task TrailerDlHelper_GetUserAgent_API()
     {
         _ = _applicationPaths
             .SetupGet(m => m.PluginConfigurationsPath)
-            .Returns(nameof(YtHelper_GetUserAgent_Local));
+            .Returns(nameof(TrailerDlHelper_GetUserAgent_Local));
 
         _pluginConfiguration.UserAgentApiKey = GetUserAgentApiKey();
 
@@ -76,6 +70,28 @@ public class TrailerDlHelperTest : BaseTest
         logger.Verify(l => l.Info("Successfully fetched User Agent"), Times.Once());
     }
 
+    [Theory]
+    [MemberData(nameof(GetKinopoiskTrailerIdData))]
+    public void TrailerDlHelper_GetKinopoiskTrailerId(string url, string kpId)
+    {
+        TrailerDlHelper.GetKinopoiskTrailerId(url).Should().Be(kpId);
+    }
+
+    [Theory]
+    [MemberData(nameof(IsValidTrailerData))]
+    public void TrailerDlHelper_IsValidTrailer(KpTrailer trailer, bool expectedResult)
+    {
+        TrailerDlHelper.IsValidTrailer(trailer).Should().Be(expectedResult);
+    }
+
+    [Theory]
+    [MemberData(nameof(IsRussianTrailerData))]
+    public void TrailerDlHelper_IsRussianTrailer(KpTrailer trailer, bool expectedResult)
+    {
+        TrailerDlHelper.IsRussianTrailer(trailer).Should().Be(expectedResult);
+    }
+
+
     private static string GetUserAgentApiKey()
     {
         var apiKey = Environment.GetEnvironmentVariable("USER_AGENT_API_KEY");
@@ -85,10 +101,96 @@ public class TrailerDlHelperTest : BaseTest
 
     #region MemberData
 
-    public static TheoryData<KpTrailer, string> KpTrailerData => new()
+    public static TheoryData<KpTrailer, bool> IsRussianTrailerData => new()
     {
         {
-            new KpTrailer()
+            new KpTrailer
+            {
+                VideoName = "trailer Name Equal To Video Name",
+                TrailerName = "trailer name equal to video name"
+            },
+            false
+        },
+        {
+            new KpTrailer
+            {
+                VideoName = "video Name",
+                TrailerName = "название трейлера"
+            },
+            true
+        },
+        {
+            new KpTrailer
+            {
+                VideoName = "video Name",
+                TrailerName = "испанский трейлер"
+            },
+            false
+        },
+        {
+            new KpTrailer
+            {
+                VideoName = "video Name",
+                TrailerName = "трейлер"
+            },
+            true
+        },
+    };
+
+    public static TheoryData<KpTrailer, bool> IsValidTrailerData => new()
+    {
+        {
+            new KpTrailer
+            {
+                TrailerName = "no video name - invalid"
+            },
+            false
+        },
+        {
+            new KpTrailer
+            {
+                VideoName = "no trailer name - invalid",
+            },
+            false
+        },
+        {
+            new KpTrailer
+            {
+                VideoName = "trailer name equal to video name",
+                TrailerName = "trailer name equal to video name "
+            },
+            true
+        },
+        {
+            new KpTrailer
+            {
+                VideoName = "TrailerStopWordList",
+                TrailerName = "TrailerStopWord фрагмент"
+            },
+            false
+        },
+        {
+            new KpTrailer
+            {
+                VideoName = "TrailerStopWordList",
+                TrailerName = "TrailerStopWord fragment"
+            },
+            false
+        },
+        {
+            new KpTrailer
+            {
+                VideoName = "valid video name",
+                TrailerName = "valid trailer name"
+            },
+            true
+        },
+    };
+
+    public static TheoryData<KpTrailer, string> GetPartialIntroNameData => new()
+    {
+        {
+            new KpTrailer
             {
                 VideoName = "videoName",
                 TrailerName = "trailerName",
@@ -97,7 +199,7 @@ public class TrailerDlHelperTest : BaseTest
             "videoName (2024) (trailerName)"
         },
         {
-            new KpTrailer()
+            new KpTrailer
             {
                 VideoName = "videoName",
                 TrailerName = "trailerName",
@@ -105,7 +207,7 @@ public class TrailerDlHelperTest : BaseTest
             "videoName (trailerName)"
         },
         {
-            new KpTrailer()
+            new KpTrailer
             {
                 VideoName = "videoName",
                 TrailerName = "videoName",
@@ -114,7 +216,7 @@ public class TrailerDlHelperTest : BaseTest
             "videoName (2024)"
         },
         {
-            new KpTrailer()
+            new KpTrailer
             {
                 VideoName = "videoName",
                 TrailerName = "videoName",
@@ -133,6 +235,22 @@ public class TrailerDlHelperTest : BaseTest
         { "https://www.youtube.com/embed/_-m3YhxJ8U0", "_-m3YhxJ8U0" },
         { "https://www.youtube.com/v/_-m3YhxJ8U0", "_-m3YhxJ8U0" },
         { "https://www.youtube.com/watch?v=_-m3YhxJ8U0", "_-m3YhxJ8U0" },
+    };
+
+    public static TheoryData<string, string> GetKinopoiskTrailerIdData => new()
+    {
+        { "https://widgets.kinopoisk.ru/discovery/trailer/1234?onlyPlayer=1&autoplay=1&cover=1", "1234" },
+        { "http://widgets.kinopoisk.ru/discovery/trailer/4321?onlyPlayer=1&autoplay=1&cover=1", "4321" },
+        { "https://trailers.s3.mds.yandex.net/video_original/183824-7139700739965229.mp4", "183824" },
+        { "http://trailers.s3.mds.yandex.net/video_original/172729-c5c47f9b0dd2d39452c40c5a8766f3ba.mov", "172729" },
+    };
+
+    public static TheoryData<IntroNameData, string> GetIntroNameData => new()
+    {
+        { new IntroNameData("All Valid Chars", "videoId", "mp4"), "All Valid Chars [videoId].mp4" },
+        { new IntroNameData("All Valid Chars Trim ", "videoId", "mp4"), "All Valid Chars Trim [videoId].mp4" },
+        { new IntroNameData($"Has Invalid Chars{(InvalidFileNameChars.Length > 0 ? InvalidFileNameChars[0] : "")}", "videoId", "mp4"), "Has Invalid Chars [videoId].mp4" },
+        { new IntroNameData($"Has Invalid Chars Trim {(InvalidFileNameChars.Length > 0 ? InvalidFileNameChars[0] : "")}", "videoId", "mp4"), "Has Invalid Chars Trim [videoId].mp4" },
     };
 
     #endregion

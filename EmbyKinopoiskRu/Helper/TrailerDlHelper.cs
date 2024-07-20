@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text.Json;
 using System.Text.RegularExpressions;
@@ -26,10 +27,11 @@ namespace EmbyKinopoiskRu.Helper
 
         private static readonly Random Random = new Random();
         private static readonly Regex InvalidFileNameChars = new Regex($"[{string.Join(string.Empty, Path.GetInvalidFileNameChars())}]+", RegexOptions.Compiled);
+        private static readonly Regex ContainsRussianChar = new Regex("[а-яА-Я]+", RegexOptions.Compiled);
 
         internal const string NotExists = ".not_exists";
 
-        internal static readonly List<string> TrailerStopWordList = new List<string>
+        private static readonly List<string> TrailerStopWordList = new List<string>
         {
             "фрагмент",
             "интервью",
@@ -38,7 +40,7 @@ namespace EmbyKinopoiskRu.Helper
             "interview",
         };
 
-        internal static readonly List<string> RussianStopWordList = new List<string>
+        private static readonly List<string> RussianStopWordList = new List<string>
         {
             "испанский",
             "итальянский",
@@ -49,30 +51,6 @@ namespace EmbyKinopoiskRu.Helper
             "французский",
             "британский",
         };
-
-        internal static bool CheckTrailerDuration(long durationSec, long maxTrailerDuration)
-        {
-            return Constants.OneMinuteInSec <= durationSec
-                && durationSec <= maxTrailerDuration;
-        }
-
-        internal static string GetYoutubeId(string youtubeUrl)
-        {
-            return YoutubeWatch.Replace(
-                YoutubeV.Replace(
-                    YoutubeEmbed.Replace(
-                        YoutuBe.Replace(
-                            youtubeUrl,
-                            string.Empty),
-                        string.Empty),
-                    string.Empty),
-                string.Empty);
-        }
-
-        internal static string GetIntroName(string videoName, string videoId, string extension)
-        {
-            return $"{InvalidFileNameChars.Replace(videoName, string.Empty)} [{videoId}].{extension}";
-        }
 
         #region User Agent
 
@@ -146,6 +124,30 @@ namespace EmbyKinopoiskRu.Helper
 
         #endregion
 
+        internal static bool CheckTrailerDuration(long durationSec, long maxTrailerDuration)
+        {
+            return Constants.OneMinuteInSec <= durationSec
+                   && durationSec <= maxTrailerDuration;
+        }
+
+        internal static string GetYoutubeId(string youtubeUrl)
+        {
+            return YoutubeWatch.Replace(
+                YoutubeV.Replace(
+                    YoutubeEmbed.Replace(
+                        YoutuBe.Replace(
+                            youtubeUrl,
+                            string.Empty),
+                        string.Empty),
+                    string.Empty),
+                string.Empty);
+        }
+
+        internal static string GetIntroName(string videoName, string videoId, string extension)
+        {
+            return $"{InvalidFileNameChars.Replace(videoName, string.Empty).Trim()} [{videoId}].{extension}";
+        }
+
         /// <summary>
         /// &lt;video name&gt; (&lt;year&gt;) (&lt;trailer name&gt;)
         /// </summary>
@@ -167,5 +169,64 @@ namespace EmbyKinopoiskRu.Helper
 
             return match.Success ? match.Groups["id"].Value : string.Empty;
         }
+
+        internal static bool IsValidTrailer(KpTrailer trailer)
+        {
+            var videoName = trailer.VideoName;
+            if (string.IsNullOrWhiteSpace(videoName))
+            {
+                // no video name - invalid
+                return false;
+            }
+
+            var trailerName = trailer.TrailerName;
+            if (string.IsNullOrWhiteSpace(trailerName))
+            {
+                // no trailer name - invalid
+                return false;
+            }
+
+            videoName = videoName.ToLower();
+            trailerName = trailerName.ToLower();
+            var name = trailerName.Replace(videoName, String.Empty);
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                // trailer name equal to video name (trailer doesn't have its own name)
+                return true;
+            }
+
+            var hasStopWord = TrailerStopWordList.Any(n => name.Contains(n));
+            if (hasStopWord)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        internal static bool IsRussianTrailer(KpTrailer trailer)
+        {
+            var name = trailer.TrailerName.ToLower().Replace(trailer.VideoName.ToLower(), String.Empty);
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                // trailer name equal to video name (trailer doesn't have its own name)
+                return false;
+            }
+
+            var hasRussianChars = name.Length != ContainsRussianChar.Replace(name, string.Empty).Length;
+            if (!hasRussianChars)
+            {
+                return false;
+            }
+
+            var hasStopWord = RussianStopWordList.Any(n => name.Contains(n));
+            if (hasStopWord)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
     }
 }

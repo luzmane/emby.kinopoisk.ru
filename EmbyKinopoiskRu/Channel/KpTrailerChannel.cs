@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -37,7 +36,6 @@ namespace EmbyKinopoiskRu.Channel
     {
         private const int MaxDownloadWaitingSeconds = 15;
         private const int MinDownloadWaitingSeconds = 5;
-        private static readonly Regex ContainsRussianChar = new Regex("[а-яА-Я]+", RegexOptions.Compiled);
         private static readonly Dictionary<DownloaderType, ITrailerDownloader> TrailersDownloaderDictionary = new Dictionary<DownloaderType, ITrailerDownloader>();
         private static readonly CancellationToken CancellationTokenNone = CancellationToken.None;
         private readonly ILogger _logger;
@@ -123,6 +121,11 @@ namespace EmbyKinopoiskRu.Channel
         }
 
         #region private
+
+        private TaskTranslation GetTranslation()
+        {
+            return EmbyHelper.GetTaskTranslation(_translations, _serverConfigurationManager, _jsonSerializer, _availableTranslations);
+        }
 
         /// <summary>
         /// Build collections folder structure, where each folder is a collection
@@ -234,14 +237,14 @@ namespace EmbyKinopoiskRu.Channel
                     break;
                 }
 
-                if (!IsValidTrailer(trailer))
+                if (!TrailerDlHelper.IsValidTrailer(trailer))
                 {
                     _logger.Warn($"This video not a trailer: '{trailer}'");
                     continue;
                 }
 
                 if (Plugin.Instance.Configuration.OnlyRussianTrailers
-                    && !IsRussianTrailer(trailer))
+                    && !TrailerDlHelper.IsRussianTrailer(trailer))
                 {
                     _logger.Info($"Configured to download only trailers on Russian. Skip trailer name: '{trailer.TrailerName}', link: '{trailer.Url}'");
                     continue;
@@ -509,69 +512,6 @@ namespace EmbyKinopoiskRu.Channel
             }
 
             return string.Empty;
-        }
-
-        private TaskTranslation GetTranslation()
-        {
-            return EmbyHelper.GetTaskTranslation(_translations, _serverConfigurationManager, _jsonSerializer, _availableTranslations);
-        }
-
-        private static bool IsValidTrailer(KpTrailer trailer)
-        {
-            var videoName = trailer.VideoName;
-            if (string.IsNullOrWhiteSpace(videoName))
-            {
-                // no video name - invalid
-                return false;
-            }
-
-            var trailerName = trailer.TrailerName;
-            if (string.IsNullOrWhiteSpace(trailerName))
-            {
-                // no trailer name - invalid
-                return false;
-            }
-
-            videoName = videoName.ToLower();
-            trailerName = trailerName.ToLower();
-            var name = trailerName.Replace(videoName, String.Empty);
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                // trailer name equal to video name (trailer doesn't have its own name)
-                return true;
-            }
-
-            var hasStopWord = TrailerDlHelper.TrailerStopWordList.Any(n => name.Contains(n));
-            if (hasStopWord)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        private static bool IsRussianTrailer(KpTrailer trailer)
-        {
-            var name = trailer.TrailerName.ToLower().Replace(trailer.VideoName.ToLower(), String.Empty);
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                // trailer name equal to video name (trailer doesn't have its own name)
-                return false;
-            }
-
-            var hasRussianChars = name.Length != ContainsRussianChar.Replace(name, string.Empty).Length;
-            if (!hasRussianChars)
-            {
-                return false;
-            }
-
-            var hasStopWord = TrailerDlHelper.RussianStopWordList.Any(n => name.Contains(n));
-            if (hasStopWord)
-            {
-                return false;
-            }
-
-            return true;
         }
 
         #endregion

@@ -99,7 +99,7 @@ public class ApiTests : IDisposable
 
     #region Tests
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task GetMovieById()
     {
         var request = new Uri("https://api.kinopoisk.dev/v1.4/movie/435");
@@ -110,7 +110,7 @@ public class ApiTests : IDisposable
         VerifyMovie435(JsonSerializer.Deserialize<KpMovie>(response, _jsonOptions));
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task GetMovies_Universal_Ids()
     {
         var request = "https://api.kinopoisk.dev/v1.4/movie?";
@@ -128,7 +128,7 @@ public class ApiTests : IDisposable
         VerifyMovie435(searchResultMovie.Docs.FirstOrDefault(i => i.Id == 435), true);
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task GetMovies_Query_Name_Year()
     {
         var request = "https://api.kinopoisk.dev/v1.4/movie/search?";
@@ -144,7 +144,7 @@ public class ApiTests : IDisposable
         VerifyMovie689(searchResultMovie.Docs.FirstOrDefault(x => x.Id == 689), isQuerySearch: true);
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task GetMovies_Query_AlternativeName_Year()
     {
         var request = "https://api.kinopoisk.dev/v1.4/movie/search?";
@@ -160,7 +160,7 @@ public class ApiTests : IDisposable
         VerifyMovie689(searchResultMovie.Docs.FirstOrDefault(x => x.Id == 689), isQuerySearch: true);
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task GetMovies_Universal_List_Top500()
     {
         var request = "https://api.kinopoisk.dev/v1.4/movie?";
@@ -176,7 +176,7 @@ public class ApiTests : IDisposable
         kpMovie.Pages.Should().Be(2);
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task GetMovies_Universal_ExternalIds()
     {
         var request = "https://api.kinopoisk.dev/v1.4/movie?";
@@ -194,7 +194,7 @@ public class ApiTests : IDisposable
         VerifyMovie435(searchResultMovie.Docs.FirstOrDefault(i => i.Id == 435), true);
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task GetPersonById()
     {
         const string request = "https://api.kinopoisk.dev/v1.4/person/7987";
@@ -205,7 +205,7 @@ public class ApiTests : IDisposable
         VerifyPerson7987(JsonSerializer.Deserialize<KpPerson>(response, _jsonOptions));
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task GetPersons_Query_Name()
     {
         var request = "https://api.kinopoisk.dev/v1.4/person/search?";
@@ -221,7 +221,7 @@ public class ApiTests : IDisposable
         VerifyPerson7987(searchResultKpPerson.Docs.FirstOrDefault(x => x.Id == 7987), true);
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task GetPersons_Universal_MoviesId()
     {
         var request = "https://api.kinopoisk.dev/v1.4/person?";
@@ -238,7 +238,7 @@ public class ApiTests : IDisposable
         VerifyPerson7987(searchResultKpPerson.Docs.FirstOrDefault(i => i.Id == 7987));
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task GetEpisodes_Universal_MovieId()
     {
         var request = "https://api.kinopoisk.dev/v1.4/season?";
@@ -256,7 +256,7 @@ public class ApiTests : IDisposable
         VerifySeries77044Season5(searchResultKpSeason.Docs.FirstOrDefault(i => i.Number == 5));
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task GetEpisodes_Universal_MovieId_Season()
     {
         var request = "https://api.kinopoisk.dev/v1.4/season?";
@@ -273,7 +273,7 @@ public class ApiTests : IDisposable
         VerifySeries77044Season5(searchResultKpSeason.Docs.FirstOrDefault(i => i.Number == 5));
     }
 
-    [Fact]
+    [Fact(Skip = BaseTest.Skip)]
     public async Task GetAllKinopoiskLists()
     {
         var request = "https://api.kinopoisk.dev/v1.4/list?limit=200";

@@ -39,6 +39,8 @@ public abstract class BaseTest
 
     private readonly NLog.ILogger _logger;
 
+    internal const string? Skip = null;
+    // internal const string Skip = "Class ApiTests disabled";
 
     #region Mock
 
