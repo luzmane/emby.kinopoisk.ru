@@ -30,8 +30,6 @@ public class CreateKinopoiskIdTaskTest : BaseTest
 
         ConfigLibraryManager();
 
-        ConfigXmlSerializer();
-
         _createKinopoiskIdTask = new CreateKinopoiskIdTask(
             _logManager.Object,
             _libraryManager.Object,

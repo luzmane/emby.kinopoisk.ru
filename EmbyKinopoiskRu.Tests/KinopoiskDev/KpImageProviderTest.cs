@@ -27,8 +27,6 @@ public class KpImageProviderTest : BaseTest
 
         ConfigLibraryManager();
 
-        ConfigXmlSerializer();
-
         _kpImageProvider = new KpImageProvider(_httpClient);
     }
 

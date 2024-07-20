@@ -28,8 +28,6 @@ public class KpPersonProviderTest : BaseTest
 
         ConfigLibraryManager();
 
-        ConfigXmlSerializer();
-
         _kpPersonProvider = new KpPersonProvider(_httpClient, _logManager.Object);
     }
 

@@ -17,7 +17,6 @@ public class TrailerDlHelperTest : BaseTest
 
     public TrailerDlHelperTest() : base(Logger)
     {
-        ConfigXmlSerializer();
     }
 
     [Theory]

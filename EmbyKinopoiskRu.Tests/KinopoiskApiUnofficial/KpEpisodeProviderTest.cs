@@ -28,8 +28,6 @@ public class KpEpisodeProviderTest : BaseTest
 
         ConfigLibraryManager();
 
-        ConfigXmlSerializer();
-
         _kpEpisodeProvider = new KpEpisodeProvider(_httpClient, _logManager.Object);
     }
 

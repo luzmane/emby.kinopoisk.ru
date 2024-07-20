@@ -100,6 +100,10 @@ public abstract class BaseTest
             .Setup(lm => lm.GetLogger(It.IsAny<string>()))
             .Returns((string name) => new EmbyLogger(NLog.LogManager.GetLogger(name)));
 
+        _ = _xmlSerializer
+            .Setup(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), It.IsAny<string>()))
+            .Returns(_pluginConfiguration);
+
         BaseItem.ConfigurationManager = _serverConfigurationManager.Object;
         BaseItem.FileSystem = _fileSystem.Object;
         BaseItem.LibraryManager = _libraryManager.Object;
@@ -165,13 +169,6 @@ public abstract class BaseTest
 
         _ = _libraryManager
             .Setup(lm => lm.AddVirtualFolder("Collections", It.IsAny<LibraryOptions>(), true));
-    }
-
-    protected void ConfigXmlSerializer()
-    {
-        _ = _xmlSerializer
-            .Setup(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), It.IsAny<string>()))
-            .Returns(_pluginConfiguration);
     }
 
     #endregion

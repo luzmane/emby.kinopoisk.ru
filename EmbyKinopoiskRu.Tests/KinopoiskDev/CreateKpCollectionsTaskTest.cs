@@ -52,8 +52,6 @@ public class CreateKpCollectionsTaskTest : BaseTest
 
         ConfigLibraryManager();
 
-        ConfigXmlSerializer();
-
         _createKpCollectionsTaskTest = new CreateKpCollectionsTask(
             _logManager.Object,
             _libraryManager.Object,

@@ -29,8 +29,6 @@ public class KpSeriesProviderTest : BaseTest
 
         ConfigLibraryManager();
 
-        ConfigXmlSerializer();
-
         _kpSeriesProvider = new KpSeriesProvider(_httpClient, _logManager.Object);
     }
 

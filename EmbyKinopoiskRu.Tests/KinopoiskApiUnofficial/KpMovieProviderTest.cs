@@ -31,8 +31,6 @@ public class KpMovieProviderTest : BaseTest
 
         ConfigLibraryManager();
 
-        ConfigXmlSerializer();
-
         _kpMovieProvider = new KpMovieProvider(_httpClient, _logManager.Object);
     }
 

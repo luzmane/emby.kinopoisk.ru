@@ -23,8 +23,6 @@ public class KpLocalMetadataTest : BaseTest
 
         ConfigLibraryManager();
 
-        ConfigXmlSerializer();
-
         _movieLibraryOptions = new LibraryOptions
         {
             ContentType = "movies",
