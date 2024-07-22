@@ -1,3 +1,6 @@
+v.1.28.0
+- improvement: add additional Kp trailer URL kind to download during Intro update
+
 v.1.27.0
 - improvement: filter out videos that are not trailers during internet channel update flow. Logic - min duration, keywords in the name of a trailer
 
