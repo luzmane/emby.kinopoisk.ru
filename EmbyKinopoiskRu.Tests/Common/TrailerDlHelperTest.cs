@@ -238,10 +238,16 @@ public class TrailerDlHelperTest : BaseTest
 
     public static TheoryData<string, string> GetKinopoiskTrailerIdData => new()
     {
+        { "HTTPS://WIDGETS.KINOPOISK.RU/DISCOVERY/TRAILER/1234?ONLYPLAYER=1&AUTOPLAY=1&COVER=1", "1234" },
         { "https://widgets.kinopoisk.ru/discovery/trailer/1234?onlyPlayer=1&autoplay=1&cover=1", "1234" },
         { "http://widgets.kinopoisk.ru/discovery/trailer/4321?onlyPlayer=1&autoplay=1&cover=1", "4321" },
+        { "HTTPS://TRAILERS.S3.MDS.YANDEX.NET/VIDEO_ORIGINAL/183824-7139700739965229.MP4", "183824" },
         { "https://trailers.s3.mds.yandex.net/video_original/183824-7139700739965229.mp4", "183824" },
         { "http://trailers.s3.mds.yandex.net/video_original/172729-c5c47f9b0dd2d39452c40c5a8766f3ba.mov", "172729" },
+        { "HTTPS://WWW.KINOPOISK.RU/FILM/464963/VIDEO/157767/", "157767" },
+        { "https://www.kinopoisk.ru/film/464963/video/157767/", "157767" },
+        { "http://www.kinopoisk.ru/film/464963/video/157767/", "157767" },
+        { "https://www.kinopoisk.ru/film/464963/video/157767", "157767" },
     };
 
     public static TheoryData<IntroNameData, string> GetIntroNameData => new()

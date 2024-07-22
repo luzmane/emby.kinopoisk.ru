@@ -24,6 +24,7 @@ namespace EmbyKinopoiskRu.Helper
 
         private static readonly Regex KpWidgetPlayer = new Regex(@"https?://widgets\.kinopoisk\.ru/discovery/trailer/(?<id>\d+)\?.*", RegexOptions.Compiled | RegexOptions.IgnoreCase);
         private static readonly Regex S3YandexNet = new Regex(@"https?://trailers\.s3\.mds\.yandex\.net/video_original/(?<id>\d+)-.+", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex KpFilmVideo = new Regex(@"https?://www\.kinopoisk\.ru/film/\d+/video/(?<id>\d+)/?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         private static readonly Random Random = new Random();
         private static readonly Regex InvalidFileNameChars = new Regex($"[{string.Join(string.Empty, Path.GetInvalidFileNameChars())}]+", RegexOptions.Compiled);
@@ -167,6 +168,11 @@ namespace EmbyKinopoiskRu.Helper
                 match = S3YandexNet.Match(url);
             }
 
+            if (!match.Success)
+            {
+                match = KpFilmVideo.Match(url);
+            }
+
             return match.Success ? match.Groups["id"].Value : string.Empty;
         }
 
@@ -227,6 +233,5 @@ namespace EmbyKinopoiskRu.Helper
 
             return true;
         }
-
     }
 }
