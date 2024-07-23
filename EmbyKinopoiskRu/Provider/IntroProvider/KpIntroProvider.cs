@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,6 +13,7 @@ namespace EmbyKinopoiskRu.Provider.IntroProvider
     /// <summary>
     /// Kinopoisk intro provider
     /// </summary>
+    [ExcludeFromCodeCoverage]
     public class KpIntroProvider : IIntroProvider
     {
         private readonly ILogger _logger;
