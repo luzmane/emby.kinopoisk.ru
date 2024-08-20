@@ -474,19 +474,20 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return result;
             }
 
-            _log.Info($"Searching episode by series id '{seriesId}', season index '{info.ParentIndexNumber}' and episode index '{info.IndexNumber}'");
-            KpSearchResult<KpSeason> item = await _api.GetSeasonBySeriesIdAsync(seriesId, (int)info.ParentIndexNumber, cancellationToken);
-            KpSeason kpSeason = item?.Docs.FirstOrDefault(s => s.Number == info.ParentIndexNumber);
+            var parentIndexNumber = info.ParentIndexNumber.GetValueOrDefault();
+            _log.Info($"Searching episode by series id '{seriesId}', season index '{parentIndexNumber}' and episode index '{info.IndexNumber}'");
+            KpSearchResult<KpSeason> item = await _api.GetSeasonBySeriesIdAsync(seriesId, parentIndexNumber, cancellationToken);
+            KpSeason kpSeason = item?.Docs.FirstOrDefault(s => s.Number == parentIndexNumber);
             if (kpSeason == null)
             {
-                _log.Info($"Season with index '{info.ParentIndexNumber}' not found for series with id '{seriesId}'");
+                _log.Info($"Season with index '{parentIndexNumber}' not found for series with id '{seriesId}'");
                 return result;
             }
 
             KpEpisode kpEpisode = kpSeason.Episodes?.FirstOrDefault(e => e.Number == info.IndexNumber);
             if (kpEpisode == null)
             {
-                _log.Info($"Episode with index '{info.IndexNumber}' not found in season '{info.ParentIndexNumber}' and series '{seriesId}'");
+                _log.Info($"Episode with index '{info.IndexNumber}' not found in season '{parentIndexNumber}' and series '{seriesId}'");
                 return result;
             }
 
@@ -502,11 +503,11 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 OriginalTitle = kpEpisode.EnName,
                 Overview = kpEpisode.Description,
                 IndexNumber = info.IndexNumber,
-                ParentIndexNumber = info.ParentIndexNumber,
+                ParentIndexNumber = parentIndexNumber,
                 PremiereDate = premiereDate
             };
             result.HasMetadata = true;
-            _log.Info($"Episode {info.IndexNumber} of season {info.ParentIndexNumber} of series {seriesId} found");
+            _log.Info($"Episode {info.IndexNumber} of season {parentIndexNumber} of series {seriesId} found");
             return result;
         }
 
@@ -532,11 +533,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 seriesId = searchInfo.GetProviderId(Plugin.PluginKey);
             }
 
-            _log.Info($"Searching episode by SeriesId '{seriesId}', season number '{searchInfo.ParentIndexNumber}' and episode number '{searchInfo.IndexNumber}'");
-            KpSearchResult<KpSeason> kpSearchResult = await _api.GetSeasonBySeriesIdAsync(seriesId, searchInfo.ParentIndexNumber.Value, cancellationToken);
+            var parentIndexNumber = searchInfo.ParentIndexNumber.GetValueOrDefault();
+            _log.Info($"Searching episode by SeriesId '{seriesId}', season number '{parentIndexNumber}' and episode number '{searchInfo.IndexNumber}'");
+            KpSearchResult<KpSeason> kpSearchResult = await _api.GetSeasonBySeriesIdAsync(seriesId, parentIndexNumber, cancellationToken);
             if (kpSearchResult == null || kpSearchResult.HasError || !kpSearchResult.Docs.Any())
             {
-                _log.Info($"Nothing found for SeriesId '{seriesId}', season number '{searchInfo.ParentIndexNumber}'");
+                _log.Info($"Nothing found for SeriesId '{seriesId}', season number '{parentIndexNumber}'");
                 return Enumerable.Empty<RemoteSearchResult>();
             }
 
@@ -544,7 +546,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             KpEpisode episode = season.Episodes.FirstOrDefault(x => x.Number == searchInfo.IndexNumber);
             if (episode == null)
             {
-                _log.Info($"Season '{searchInfo.ParentIndexNumber}' doesn't have episode '{searchInfo.IndexNumber}'");
+                _log.Info($"Season '{parentIndexNumber}' doesn't have episode '{searchInfo.IndexNumber}'");
                 return Enumerable.Empty<RemoteSearchResult>();
             }
 
@@ -553,7 +555,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 Name = episode.Name,
                 ImageUrl = (episode.Still?.PreviewUrl ?? episode.Still?.Url) ?? string.Empty,
                 IndexNumber = episode.Number,
-                ParentIndexNumber = searchInfo.ParentIndexNumber,
+                ParentIndexNumber = parentIndexNumber,
                 SearchProviderName = Plugin.PluginKey,
                 Overview = episode.Description
             };
@@ -570,7 +572,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             result.Add(item);
-            _log.Info($"Found metadata for seriesId '{seriesId}', season number '{searchInfo.ParentIndexNumber}' and episode number '{searchInfo.IndexNumber}'");
+            _log.Info($"Found metadata for seriesId '{seriesId}', season number '{parentIndexNumber}' and episode number '{searchInfo.IndexNumber}'");
             return result;
         }
 
@@ -876,7 +878,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             releaseYears
                 .Where(i => i.End != null)
                 .ToList()
-                .ForEach(i => max = Math.Min(max, i.End.Value));
+                .ForEach(i => max = Math.Min(max, i.End.GetValueOrDefault()));
 
             return DateTimeOffset.TryParseExact(
                 max.ToString(CultureInfo.InvariantCulture),

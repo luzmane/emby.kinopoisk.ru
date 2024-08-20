@@ -243,7 +243,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                             default:
                                 msg = $"Received '{response.StatusCode}' from API: '{result}' for URL: '{url}'";
                                 _log.Error(msg);
-                                NotifyUser(msg, "API request issue");
                                 return string.Empty;
                         }
                     }
@@ -275,7 +274,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                     default:
                         msg = $"Received '{ex.StatusCode}' from API: '{(string.IsNullOrWhiteSpace(content) ? ex.Message : content)}'";
                         _log.Error(msg, ex);
-                        NotifyUser(msg, "General error");
                         break;
                 }
 
@@ -285,7 +283,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
             {
                 var msg = $"Unable to fetch data from URL '{url}' due to {ex.Message}";
                 _log.ErrorException(msg, ex);
-                NotifyUser(msg, "General error");
                 return string.Empty;
             }
         }

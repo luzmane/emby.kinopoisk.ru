@@ -284,7 +284,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                                 var error = _jsonSerializer.DeserializeFromString<KpErrorResponse>(result);
                                 var msg = $"{error.Error}: {error.Message.FirstOrDefault()} for URL: '{url}'";
                                 _log.Error(msg);
-                                NotifyUser(msg, $"{error.Error}");
                                 return string.Empty;
                             case 401:
                                 msg = $"Token is invalid: '{token}'";
@@ -299,16 +298,10 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                             default:
                                 error = _jsonSerializer.DeserializeFromString<KpErrorResponse>(result);
                                 msg = $"Received '{response.StatusCode}' from API";
-                                if (error == null)
-                                {
-                                    msg += $": '{result}' for URL: '{url}'";
-                                }
-                                else
-                                {
-                                    msg += $" - Error:'{error.Error}', Message:'{error.Message.FirstOrDefault()}' for URL: '{url}'";
-                                }
+                                msg += error == null
+                                    ? $": '{result}' for URL: '{url}'"
+                                    : $" - Error:'{error.Error}', Message:'{error.Message.FirstOrDefault()}' for URL: '{url}'";
                                 _log.Error(msg);
-                                NotifyUser(msg, "API request issue");
                                 return string.Empty;
                         }
                     }
@@ -340,7 +333,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                     default:
                         msg = $"Received '{ex.StatusCode}' from API: '{(string.IsNullOrWhiteSpace(content) ? ex.Message : content)}'";
                         _log.Error(msg, ex);
-                        NotifyUser(msg, "General error");
                         break;
                 }
 
@@ -350,7 +342,6 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             {
                 var msg = $"Unable to fetch data from URL '{url}' due to {ex.Message}";
                 _log.ErrorException(msg, ex);
-                NotifyUser(msg, "General error");
                 return string.Empty;
             }
         }
