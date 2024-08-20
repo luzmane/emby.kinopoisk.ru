@@ -1,3 +1,6 @@
+v.1.29.0
+- improvement: leave user notification only for invalid token and limit exceed cases
+
 v.1.28.0
 - improvement: add additional Kp trailer URL kind to download during Intro update
 
@@ -82,9 +85,9 @@ v.1.14.1
 - Fix in "Add KinopoiskId based on IMDB, TMDB" series search
 
 v.1.14.0
-- Fix KeyDuplication exception during Kp Id search based on IMDB, TMDB
+- Fix KeyDuplication exception during Kp ID search based on IMDB, TMDB
 - Normalize name before search
-- Update Kinoposik.dev to use API 1.3
+- Update Kinopoisk.dev to use API 1.3
 - Add search by other providers before search by name and year
 
 v.1.13.0
@@ -118,10 +121,10 @@ v.1.8.0
 - Append facts to movie/series description
 - New created by plugin collection will have name of the first video in sequels
 - Fix Create Top250 collections task: fix incorrect item detection
-- Fix Update Kp Id by IMDB/TMDB id task: fix incorrect item detection
+- Fix Update Kp ID by IMDB/TMDB id task: fix incorrect item detection
 
 v.1.7.0
-- During metadata update if found several movies will choose the one with highest rating
+- During metadata update if found several movies will choose the one with the highest rating
 - Add search by English name of the person
 - Support of the new API version of kinopoisk.dev
 - Added option to create collections based on sequels data from kinopoisk.dev. Configured by the checkbox in plugin setup page
@@ -144,7 +147,7 @@ v.1.5.0
 
 v.1.4.0
 - Change default sort name to be taken from Russian and not the original title
-- Add trailers from youtube only - emby can play trailers only from youtube
+- Add trailers from YouTube only - emby can play trailers only from YouTube
 
 v.1.3.0
 - Update plugin due to changes in KinopoiskDev API
@@ -153,7 +156,7 @@ v.1.2.0
 - Add entry to activity log once an error happens on request to external API
 
 v.1.1.0
-- Add detection of КиноПоиск Id in file name
+- Add detection of КиноПоиск ID in file name
 - Bug fixes
 - Refactoring
 - Add external API tests
