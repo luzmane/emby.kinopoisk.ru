@@ -177,7 +177,7 @@ namespace EmbyKinopoiskRu.Helper
             int page,
             int pageSize)
         {
-            return libraryManager.QueryItems(new InternalItemsQuery
+            return libraryManager.GetItemList(new InternalItemsQuery
                 {
                     IncludeItemTypes = new[] { nameof(Movie), nameof(Series) },
                     AnyProviderIdEquals = providerIdList.Skip(page * pageSize).Take(pageSize).ToList(),
@@ -185,8 +185,7 @@ namespace EmbyKinopoiskRu.Helper
                     IsVirtualItem = false,
                     ParentIds = librariesIds,
                     HasPath = true
-                })
-                .Items;
+                });
         }
 
         /// <summary>
@@ -212,13 +211,12 @@ namespace EmbyKinopoiskRu.Helper
         /// <returns></returns>
         internal static IEnumerable<CollectionFolder> GetLibraries(ILibraryManager libraryManager)
         {
-            return libraryManager.QueryItems(new InternalItemsQuery
+            return libraryManager.GetItemList(new InternalItemsQuery
                 {
                     IncludeItemTypes = new[] { nameof(CollectionFolder) },
                     IsFolder = true,
                     IsVirtualItem = false
                 })
-                .Items
                 .Cast<CollectionFolder>();
         }
     }
