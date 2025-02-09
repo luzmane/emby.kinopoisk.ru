@@ -116,19 +116,12 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
 
         private static readonly Dictionary<string, string> CollectionSlugMap = new Dictionary<string, string>
         {
-            { "the_closest_releases", "CLOSES_RELEASES" },
             { "theme_comics", "COMICS_THEME" },
-            { "theme_catastrophe", "CATASTROPHE_THEME" },
-            { "hd-family", "FAMILY" },
-            { "theme_kids_animation", "KIDS_ANIMATION_THEME" },
-            { "theme_love", "LOVE_THEME" },
-            { "oscar_winners_2021", "OSKAR_WINNERS_2021" },
             { "series-top250", "TOP_250_TV_SHOWS" },
             { "top250", "TOP_250_MOVIES" },
             { "popular-series", "TOP_POPULAR_ALL" },
             { "popular-films", "TOP_POPULAR_MOVIES" },
             { "theme_vampire", "VAMPIRE_THEME" },
-            { "theme_zombie", "ZOMBIE_THEME" }
         };
 
         private static readonly List<string> MovieTypes = new List<string>

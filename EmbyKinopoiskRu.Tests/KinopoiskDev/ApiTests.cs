@@ -7,6 +7,7 @@ using EmbyKinopoiskRu.Api.KinopoiskDev.Model;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Movie;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Person;
 using EmbyKinopoiskRu.Api.KinopoiskDev.Model.Season;
+using EmbyKinopoiskRu.Tests.Utils;
 
 using NLog;
 
@@ -300,7 +301,7 @@ public class ApiTests : IDisposable
         kpMovie.Backdrop!.PreviewUrl.Should().NotBeNullOrWhiteSpace();
         kpMovie.Countries.Should().NotBeNull();
         kpMovie.Countries!.Count.Should().Be(1);
-        kpMovie.Description.Should().Be("Пол Эджкомб — начальник блока смертников в тюрьме «Холодная гора», каждый из узников которого однажды проходит «зеленую милю» по пути к месту казни. Пол повидал много заключённых и надзирателей за время работы. Однако гигант Джон Коффи, обвинённый в страшном преступлении, стал одним из самых необычных обитателей блока.");
+        kpMovie.Description.NormalizeRusString().Should().Be("Пол Эджкомб — начальник блока смертников в тюрьме «Холодная гора», каждый из узников которого однажды проходит «зеленую милю» по пути к месту казни. Пол повидал много заключённых и надзирателей за время работы. Однако гигант Джон Коффи, обвинённый в страшном преступлении, стал одним из самых необычных обитателей блока.".NormalizeRusString());
         kpMovie.ExternalId.Should().NotBeNull();
         kpMovie.ExternalId!.Imdb.Should().Be("tt0120689");
         kpMovie.ExternalId!.Tmdb.Should().Be(497);
@@ -380,10 +381,10 @@ public class ApiTests : IDisposable
         {
             kpMovie.SequelsAndPrequels.Should().NotBeNull();
             kpMovie.SequelsAndPrequels.Should().BeEmpty();
-            kpMovie.Slogan.Should().Be("Пол Эджкомб не верил в чудеса. Пока не столкнулся с одним из них");
+            kpMovie.Slogan.NormalizeRusString().Should().Be("«Пол Эджкомб не верил в чудеса. Пока не столкнулся с одним из них»".NormalizeRusString());
             kpMovie.Videos.Should().NotBeNull();
             kpMovie.Videos!.Teasers.Should().BeEmpty();
-            kpMovie.Videos!.Trailers.Should().BeEmpty();
+            kpMovie.Videos!.Trailers.Should().NotBeEmpty();
         }
 
         kpMovie.Year.Should().Be(1999);

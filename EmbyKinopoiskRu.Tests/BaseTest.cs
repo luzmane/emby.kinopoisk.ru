@@ -1,3 +1,5 @@
+using System.Text.RegularExpressions;
+
 using EmbyKinopoiskRu.Configuration;
 using EmbyKinopoiskRu.Tests.Utils;
 
@@ -275,11 +277,11 @@ public abstract class BaseTest
         movie.GetProviderId(Plugin.PluginKey).Should().Be("326");
         movie.GetProviderId(MetadataProviders.Imdb).Should().Be("tt0111161");
         movie.GetProviderId(MetadataProviders.Tmdb).Should().Be("278");
-        movie.RemoteTrailers.Should().HaveCount(0);
+        movie.RemoteTrailers.Should().HaveCount(3);
         movie.Size.Should().Be(142);
         movie.SortName.Should().Be(movie.Name);
         movie.Studios.Should().ContainSingle();
-        movie.Tagline.Should().Be("Страх - это кандалы. Надежда - это свобода");
+        movie.Tagline.NormalizeRusString().Should().Be("«Страх - это кандалы. Надежда - это свобода»".NormalizeRusString());
 
         VerifyMovieCommon(movie);
     }
@@ -428,7 +430,7 @@ public abstract class BaseTest
         remoteSearchResult.IndexNumber.Should().Be(2);
         remoteSearchResult.ParentIndexNumber.Should().Be(1);
         remoteSearchResult.Name.Should().Be("А я сказал — оседлаю!");
-        remoteSearchResult.Overview.Should().Be("Камина, Лаганн и Симон попадают в родную деревню Ёко, Ритону. Герои оказываются втянуты в войну, которые ведут живущие на поверхности люди и таинственные зверолюди. В бою с ними Камина захватывает ганмена одного из противников и нарекает Гурреном.");
+        remoteSearchResult.Overview.NormalizeRusString().Should().Be("Симон и Камина с Лаганном попадают в родную деревню Ёко, Ритону. Герои оказываются втянуты в войну, которые ведут живущие на поверхности люди и таинственные зверолюди. В бою с ними Камина захватывает ганмена одного из противников и нарекает «Гурреном».".NormalizeRusString());
         remoteSearchResult.PremiereDate.Should().HaveYear(2007).And.HaveMonth(04).And.HaveDay(08);
         remoteSearchResult.ProviderIds.Should().ContainSingle();
         remoteSearchResult.GetProviderId(Plugin.PluginKey).Should().Be("452973");

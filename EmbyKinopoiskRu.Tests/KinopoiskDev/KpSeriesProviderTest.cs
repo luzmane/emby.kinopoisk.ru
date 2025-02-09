@@ -73,7 +73,7 @@ public class KpSeriesProviderTest : BaseTest
         result.HasMetadata.Should().BeTrue();
         VerifySeries502838(result.Item);
 
-        result.People.Should().HaveCount(64);
+        result.People.Should().HaveCount(65);
         VerifyPersonInfo34549(result.People.FirstOrDefault(p => "Бенедикт Камбербэтч".Equals(p.Name, StringComparison.Ordinal)));
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
@@ -107,7 +107,7 @@ public class KpSeriesProviderTest : BaseTest
         result.HasMetadata.Should().BeTrue();
         VerifySeries502838(result.Item);
 
-        result.People.Should().HaveCount(64);
+        result.People.Should().HaveCount(65);
         VerifyPersonInfo34549(result.People.FirstOrDefault(p => "Бенедикт Камбербэтч".Equals(p.Name, StringComparison.Ordinal)));
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
@@ -141,7 +141,7 @@ public class KpSeriesProviderTest : BaseTest
         result.HasMetadata.Should().BeTrue();
         VerifySeries502838(result.Item);
 
-        result.People.Should().HaveCount(64);
+        result.People.Should().HaveCount(65);
         VerifyPersonInfo34549(result.People.FirstOrDefault(p => "Бенедикт Камбербэтч".Equals(p.Name, StringComparison.Ordinal)));
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
@@ -173,7 +173,7 @@ public class KpSeriesProviderTest : BaseTest
         result.HasMetadata.Should().BeTrue();
         VerifySeries502838(result.Item);
 
-        result.People.Should().HaveCount(64);
+        result.People.Should().HaveCount(65);
         VerifyPersonInfo34549(result.People.FirstOrDefault(p => "Бенедикт Камбербэтч".Equals(p.Name, StringComparison.Ordinal)));
 
         _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));

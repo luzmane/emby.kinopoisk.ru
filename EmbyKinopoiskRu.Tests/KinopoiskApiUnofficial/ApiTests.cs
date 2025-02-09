@@ -229,62 +229,6 @@ public class ApiTests : IDisposable
         collectionFilms!.Items.Should().NotBeEmpty();
     }
 
-    [Fact(Skip = BaseTest.Skip)]
-    public async Task FetchCollection_CLOSES_RELEASES()
-    {
-        KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("CLOSES_RELEASES");
-        collectionFilms.Should().NotBeNull();
-        collectionFilms!.Items.Should().NotBeEmpty();
-    }
-
-    [Fact(Skip = BaseTest.Skip)]
-    public async Task FetchCollection_FAMILY()
-    {
-        KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("FAMILY");
-        collectionFilms.Should().NotBeNull();
-        collectionFilms!.Items.Should().NotBeEmpty();
-    }
-
-    [Fact(Skip = BaseTest.Skip)]
-    public async Task FetchCollection_OSKAR_WINNERS_2021()
-    {
-        KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("OSKAR_WINNERS_2021");
-        collectionFilms.Should().NotBeNull();
-        collectionFilms!.Items.Should().NotBeEmpty();
-    }
-
-    [Fact(Skip = BaseTest.Skip)]
-    public async Task FetchCollection_LOVE_THEME()
-    {
-        KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("LOVE_THEME");
-        collectionFilms.Should().NotBeNull();
-        collectionFilms!.Items.Should().NotBeEmpty();
-    }
-
-    [Fact(Skip = BaseTest.Skip)]
-    public async Task FetchCollection_ZOMBIE_THEME()
-    {
-        KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("ZOMBIE_THEME");
-        collectionFilms.Should().NotBeNull();
-        collectionFilms!.Items.Should().NotBeEmpty();
-    }
-
-    [Fact(Skip = BaseTest.Skip)]
-    public async Task FetchCollection_CATASTROPHE_THEME()
-    {
-        KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("CATASTROPHE_THEME");
-        collectionFilms.Should().NotBeNull();
-        collectionFilms!.Items.Should().NotBeEmpty();
-    }
-
-    [Fact(Skip = BaseTest.Skip)]
-    public async Task FetchCollection_KIDS_ANIMATION_THEME()
-    {
-        KpSearchResult<KpFilm>? collectionFilms = await FetchCollectionFilms("KIDS_ANIMATION_THEME");
-        collectionFilms.Should().NotBeNull();
-        collectionFilms!.Items.Should().NotBeEmpty();
-    }
-
     private async Task<KpSearchResult<KpFilm>?> FetchCollectionFilms(string collectionId)
     {
         var request = $"https://kinopoiskapiunofficial.tech/api/v2.2/films/collections?page=1&type={collectionId}";

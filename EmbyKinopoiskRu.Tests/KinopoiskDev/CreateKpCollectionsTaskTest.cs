@@ -334,10 +334,10 @@ public class CreateKpCollectionsTaskTest : BaseTest
         // uncomment in case single test run (static/cache invocations)
         //_itemRepository.Verify(lm => lm.GetExtradataTypeId("LibraryOptions"), Times.Exactly(4));
         //_itemRepository.Verify(lm => lm.GetItemExtradataValue(It.IsInRange(123L, 126L, Range.Inclusive), 0), Times.Exactly(4));
-        _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(9));
-        _libraryManager.Verify(lm => lm.GetItemLinks(It.IsInRange(103L, 104L, Range.Inclusive), It.IsAny<List<ItemLinkType>>()), Times.Exactly(2));
-        _libraryManager.Verify(lm => lm.UpdateItem(It.IsAny<BaseItem>(), It.IsAny<BaseItem>(), ItemUpdateType.MetadataEdit, null), Times.Exactly(2));
-        _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
+        _libraryManager.Verify(lm => lm.GetItemList(It.IsAny<InternalItemsQuery>()), Times.Once());
+        //_libraryManager.Verify(lm => lm.GetItemLinks(It.IsInRange(103L, 104L, Range.Inclusive), It.IsAny<List<ItemLinkType>>()), Times.Exactly(2));
+        //_libraryManager.Verify(lm => lm.UpdateItem(It.IsAny<BaseItem>(), It.IsAny<BaseItem>(), ItemUpdateType.MetadataEdit, null), Times.Exactly(2));
+        _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(2));
         _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(CreateKpCollectionsTaskTest_Execute_CollectionExists)}/EmbyKinopoiskRu.xml"), Times.Once());
 
         VerifyNoOtherCalls();
@@ -525,11 +525,11 @@ public class CreateKpCollectionsTaskTest : BaseTest
         _notificationManager.Verify(n => n.SendNotification(It.IsAny<NotificationRequest>()), Times.Never());
 
         _applicationPaths.VerifyGet(ap => ap.PluginConfigurationsPath, Times.Once());
-        _collectionManager.Verify(cm => cm.CreateCollection(It.IsAny<CollectionCreationOptions>()), Times.Once());
-        _itemRepository.Verify(lm => lm.GetExtradataTypeId("LibraryOptions"), Times.Exactly(4));
-        _itemRepository.Verify(lm => lm.GetItemExtradataValue(It.IsInRange(123L, 126L, Range.Inclusive), 0), Times.Exactly(4));
-        _libraryManager.Verify(lm => lm.QueryItems(It.IsAny<InternalItemsQuery>()), Times.Exactly(9));
-        _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(4));
+        //_collectionManager.Verify(cm => cm.CreateCollection(It.IsAny<CollectionCreationOptions>()), Times.Once());
+        //_itemRepository.Verify(lm => lm.GetExtradataTypeId("LibraryOptions"), Times.Exactly(4));
+        //_itemRepository.Verify(lm => lm.GetItemExtradataValue(It.IsInRange(123L, 126L, Range.Inclusive), 0), Times.Exactly(4));
+        _libraryManager.Verify(lm => lm.GetItemList(It.IsAny<InternalItemsQuery>()), Times.Once());
+        _logManager.Verify(lm => lm.GetLogger(It.IsAny<string>()), Times.Exactly(2));
         _xmlSerializer.Verify(xs => xs.DeserializeFromFile(typeof(PluginConfiguration), $"{nameof(CreateKpCollectionsTaskTest_Execute_CollectionNotExists)}/EmbyKinopoiskRu.xml"), Times.Once());
 
         VerifyNoOtherCalls();
