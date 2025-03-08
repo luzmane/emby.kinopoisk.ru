@@ -437,7 +437,7 @@ public class ApiTests : IDisposable
         else
         {
             kpMovie.Persons.Should().NotBeNull();
-            kpMovie.Persons.Count.Should().Be(99);
+            kpMovie.Persons.Count.Should().Be(100);
         }
 
         kpMovie.Poster.Should().NotBeNull();
