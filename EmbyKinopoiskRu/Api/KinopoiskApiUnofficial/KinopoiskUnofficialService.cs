@@ -992,7 +992,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskApiUnofficial
                 KpSearchResult<KpFilm> movies = await _api.GetKpIdByImdbAsync(imdb, cancellationToken);
                 if (movies.HasError || movies.Items.Count == 0)
                 {
-                    _log.Info($"Failed to get Kinopoisk ID by IMDB '{externalIdType}'");
+                    _log.Info($"Failed to get Kinopoisk ID by IMDB '{imdb}'");
                     errorCount++;
                     continue;
                 }
