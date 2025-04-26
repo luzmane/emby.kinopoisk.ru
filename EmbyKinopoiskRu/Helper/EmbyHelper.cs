@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
+using Emby.Resources.App;
+
 using EmbyKinopoiskRu.ScheduledTasks.Model;
 
 using MediaBrowser.Controller.Configuration;
@@ -12,6 +14,7 @@ using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Entities;
+using MediaBrowser.Model.Extensions;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Plugins;
 using MediaBrowser.Model.Querying;
@@ -35,10 +38,11 @@ namespace EmbyKinopoiskRu.Helper
                     IncludeItemTypes = new[] { nameof(CollectionFolder) },
                     Recursive = true,
                     IsFolder = true,
-                    Name = "Collections"
+                    Name = AppResources.ResourceManager.GetString("Collections")
                 })
                 .Items
-                .Cast<CollectionFolder>();
+                .Cast<CollectionFolder>()
+                .Where(folder => "boxsets".EqualsIgnoreCase(folder.CollectionType));
         }
 
         /// <summary>
@@ -55,14 +59,15 @@ namespace EmbyKinopoiskRu.Helper
                 return folders.FirstOrDefault();
             }
 
-            logger.Info("Creating 'Collections' virtual folder");
+            var collectionsName = AppResources.ResourceManager.GetString("Collections");
+            logger.Info($"Creating 'Collections' virtual folder with name: '{collectionsName}'");
             var options = new LibraryOptions
             {
                 EnableRealtimeMonitor = false,
                 SaveLocalMetadata = true,
                 ContentType = CollectionType.BoxSets.ToString()
             };
-            libraryManager.AddVirtualFolder("Collections", options, true);
+            libraryManager.AddVirtualFolder(collectionsName, options, true);
             return FindCollectionFolders(libraryManager).FirstOrDefault();
         }
 

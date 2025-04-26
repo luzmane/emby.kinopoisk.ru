@@ -42,9 +42,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="mediabrowser.server.core" Version="4.8.5"/>
-    <PackageReference Include="System.Memory" Version="4.5.5"/>
-    <PackageReference Include="System.Text.Json" Version="6.0.9" />
+    <PackageReference Include="mediabrowser.server.core" Version="4.8.11" />
+    <PackageReference Include="System.Memory" Version="4.6.3" />
+    <PackageReference Include="System.Text.Json" Version="6.0.11" />
   </ItemGroup>
 
   <ItemGroup>
@@ -97,6 +97,12 @@
     <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskCollections/en-US.json"/>
     <EmbeddedResource Include="i18n/ScheduledTasks/KinopoiskCollections/uk.json"/>
 
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Emby.Resources"> <!-- used in EmbyHelper to fetch the "Collections" folder name -->
+      <HintPath>..\packages\Emby.Resources.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>
