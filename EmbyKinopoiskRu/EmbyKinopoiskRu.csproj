@@ -48,35 +48,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="thumb.png"/>
-    <None Remove="Configuration/kinopoiskru.html"/>
-    <None Remove="Configuration/kinopoiskru.js"/>
-
-    <None Remove="i18n/Configuration/ru.json"/>
-    <None Remove="i18n/Configuration/en-US.json"/>
-    <None Remove="i18n/Configuration/uk.json"/>
-
-    <None Remove="i18n/ScheduledTasks/KinopoiskFromOther/ru.json"/>
-    <None Remove="i18n/ScheduledTasks/KinopoiskFromOther/en-US.json"/>
-    <None Remove="i18n/ScheduledTasks/KinopoiskFromOther/uk.json"/>
-
-    <None Remove="i18n/ScheduledTasks/KinopoiskNewVersion/ru.json"/>
-    <None Remove="i18n/ScheduledTasks/KinopoiskNewVersion/en-US.json"/>
-    <None Remove="i18n/ScheduledTasks/KinopoiskNewVersion/uk.json"/>
-
-    <None Remove="i18n/ScheduledTasks/KinopoiskCollections/ru.json"/>
-    <None Remove="i18n/ScheduledTasks/KinopoiskCollections/en-US.json"/>
-    <None Remove="i18n/ScheduledTasks/KinopoiskCollections/uk.json"/>
-
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="i18n\KpTrailerChannel\en-US.json" />
-    <EmbeddedResource Include="i18n\KpTrailerChannel\ru.json" />
-    <EmbeddedResource Include="i18n\KpTrailerChannel\uk.json" />
-    <EmbeddedResource Include="i18n\ScheduledTasks\KinopoiskCleanIntros\en-US.json" />
-    <EmbeddedResource Include="i18n\ScheduledTasks\KinopoiskCleanIntros\ru.json" />
-    <EmbeddedResource Include="i18n\ScheduledTasks\KinopoiskCleanIntros\uk.json" />
     <EmbeddedResource Include="thumb.png"/>
     <EmbeddedResource Include="Configuration/kinopoiskru.html"/>
     <EmbeddedResource Include="Configuration/kinopoiskru.js"/>

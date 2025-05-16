@@ -45,31 +45,6 @@ namespace EmbyKinopoiskRu.Configuration
             set => SetCollection(value);
         }
 
-        /// <summary>
-        /// Base folder to download trailers
-        /// </summary>
-        public string IntrosPath { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Preferable quality of downloaded trailers
-        /// </summary>
-        public int IntrosQuality { get; set; } = 480;
-
-        /// <summary>
-        /// API from https://apilayer.com/marketplace/user_agent-api
-        /// </summary>
-        public string UserAgentApiKey { get; set; } = string.Empty;
-
-        /// <summary>
-        /// Download only trailers in Russian
-        /// </summary>
-        public bool OnlyRussianTrailers { get; set; }
-
-        /// <summary>
-        /// Max duration of trailers
-        /// </summary>
-        public int TrailerMaxDuration { get; set; }
-
         internal List<CollectionItem> CollectionsList = new List<CollectionItem>();
         private static bool s_fetchingCollections;
 

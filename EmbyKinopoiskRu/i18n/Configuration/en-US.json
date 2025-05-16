@@ -6,16 +6,6 @@
   "Get Token From Here": "Get token from here",
   "KinopoiskDev API configuration": "KinopoiskDev API configuration",
   "Group sequels and prequels into a collection": "Group sequels and prequels into a collection",
-  "Trailers for CinemaMode configuration": "Trailers for CinemaMode configuration",
-  "Path to download trailers": "Path to download trailers",
-  "Without correct path no intros": "Without correct and valid path no intros will be downloaded => nothing to show in CinemaMode",
-  "Key for UserAgent API": "Key to use in UserAgent API",
-  "Without the key low chance to download": "Without UserAgent API the trailer download might be blocked by y2mate.com",
-  "In what quality the plugin will try to download a trailer": "In what quality the plugin will try to download a trailer",
-  "This is still preferable": "The quality is preferable - if no video with target quality exists, a video with near quality will be downloaded",
   "List of Kinopoisk collections": "List of Kinopoisk collections",
-  "Save": "Save",
-  "Download only trailers on Russian language": "Download only trailers on Russian language",
-  "Trailer Max Duration (min)": "Trailer Max Duration (min)",
-  "Max duration of the trailer in whole minutes. Minimum duration is 1 minute. 0 to take all": "Max duration of the trailer in whole minutes. Minimum duration is 1 minute. 0 to take all"
+  "Save": "Save"
 }

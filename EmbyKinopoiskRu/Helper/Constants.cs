@@ -6,7 +6,5 @@ namespace EmbyKinopoiskRu.Helper
         internal const string YoutubeEmbed = "https://www.youtube.com/embed/";
         internal const string YoutubeV = "https://www.youtube.com/v/";
         internal const string Youtube = "youtube";
-
-        internal const long OneMinuteInSec = 60L;
     }
 }

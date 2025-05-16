@@ -9,7 +9,6 @@
 
     const groupBy = (x, f) => x.reduce((a, b, i) => ((a[f(b, i, x)] ||= []).push(b), a), {});
     page.querySelector('.txtToken').value = config.Token || '';
-    page.querySelector('.trailerMaxDuration').value = config.TrailerMaxDuration || '5';
     page.querySelector('.chkCreateSeqCollections').checked = (config.ApiType === "kinopoisk.dev" && config.CreateSeqCollections);
     if (config.ApiType === "kinopoisk.dev") page.querySelectorAll('.kinopoiskDevOnly').forEach(item => item.style.display = '');
     page.querySelector('.kinopoiskUnofficial').checked = (config.ApiType === "kinopoiskapiunofficial.tech");
@@ -22,11 +21,6 @@
       if (event.currentTarget.checked) page.querySelectorAll('.kinopoiskDevOnly').forEach(item => item.style.display = '');
       showWarning(page);
     });
-    page.querySelector('.chkOnlyRussianTrailers').checked = config.OnlyRussianTrailers;
-    page.querySelector('.introPath').value = config.IntrosPath;
-    page.querySelector('.btnSelectDownloadLocation').addEventListener('click', () => selectDownloadDirectory(page, config));
-    page.querySelector('#uaKey').value = config.UserAgentApiKey;
-    page.querySelector('#preferableQuality').value = config.IntrosQuality;
     const result = JSON.parse(config.Collections);
     const template = page.querySelector('div.pluginConfigurationPage:not(.hide) label.kpCollectionTemplate');
     if (result && result.length !== 0) {
@@ -77,7 +71,6 @@
     const form = this;
     getConfig().then(function (config) {
       config.Token = form.querySelector('.txtToken').value;
-      config.TrailerMaxDuration = form.querySelector('.trailerMaxDuration').value;
       config.CreateSeqCollections = form.querySelector('.chkCreateSeqCollections').checked;
       config.ApiType = form.querySelector('input[name="radioAPI"]:checked').value;
       const list = form.querySelectorAll('div.pluginConfigurationPage:not(.hide) label.kpCollectionList');
@@ -100,36 +93,9 @@
         if (Id) tmp.push({Id, Name, IsEnable, Category, MovieCount});
       });
       config.Collections = JSON.stringify(tmp);
-      config.IntrosPath = form.querySelector('.introPath').value;
-      config.UserAgentApiKey = form.querySelector('#uaKey').value;
-      config.IntrosQuality = form.querySelector('#preferableQuality').value;
-      config.OnlyRussianTrailers = form.querySelector('.chkOnlyRussianTrailers').checked;
       ApiClient.updatePluginConfiguration('0417364b-5a93-4ad0-a5f0-b8756957cf80', config).then(Dashboard.processServerConfigurationUpdateResult);
     });
     return false;
-  }
-
-  function selectDirectory(prompt, callback) {
-    require(['directorybrowser'], function (directoryBrowser) {
-      const picker = new directoryBrowser();
-      picker.show({
-        includeFiles: false,
-        header: prompt,
-        callback: function (selected) {
-          picker.close();
-          callback(selected);
-        }
-      });
-    });
-  }
-
-  function selectDownloadDirectory(form, config) {
-    selectDirectory("Please select download location", function (selected) {
-      if (selected) {
-        form.querySelector('.introPath').value = selected;
-        config.IntrosPath = selected;
-      }
-    });
   }
 
   function getConfig() {
