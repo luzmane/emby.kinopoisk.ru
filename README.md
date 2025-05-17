@@ -69,6 +69,3 @@ Fetches metadata from [kinopoisk.ru](https://www.kinopoisk.ru). This site is pop
 * Плагин тестировался на версии 4.8.8
 * Собирался c .Net 7.0 для .NetStandard 2.0
 * Поддерживает Emby соответствующих версий на Android устройствах (спасибо [Sanchous98](https://github.com/Sanchous98))
-
-### TODO
-* add tests to trailer functionality
