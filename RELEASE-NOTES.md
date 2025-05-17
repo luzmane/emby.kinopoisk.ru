@@ -1,3 +1,7 @@
+v.1.30.0
+- fix: "Collections" folder creation ignored language configuration
+- improvement: moved trailer downloader to a separate project emby.kinopoisk.trailers
+
 v.1.29.0
 - improvement: leave user notification only for invalid token and limit exceed cases
 
