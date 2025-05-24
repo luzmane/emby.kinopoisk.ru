@@ -1,3 +1,6 @@
+v.1.31.0
+- improvement: add kinopoisk url in the Identify pop-up
+
 v.1.30.0
 - fix: "Collections" folder creation ignored language configuration
 - improvement: moved trailer downloader to a separate project emby.kinopoisk.trailers
