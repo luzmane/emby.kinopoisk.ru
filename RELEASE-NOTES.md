@@ -1,3 +1,6 @@
+v.1.32.1
+- fix: restore 'Identify' action
+
 v.1.32.0
 - fix: restore 'Identify' action
 
