@@ -5,19 +5,25 @@ using System.Threading.Tasks;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Providers;
+using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Providers;
 
 namespace EmbyKinopoiskRu.Provider.RemoteMetadata
 {
     /// <inheritdoc />
-    public class KpPersonProvider : IRemoteMetadataProvider<Person, PersonLookupInfo>
+    public class KpPersonProvider : IRemoteMetadataProvider<Person, PersonLookupInfo>, IHasMetadataFeatures, IHasSupportedExternalIdentifiers
     {
         private readonly IHttpClient _httpClient;
         private readonly ILogger _log;
 
         /// <inheritdoc />
         public string Name => Plugin.PluginName;
+
+        /// <inheritdoc />
+        public MetadataFeatures[] Features => FeaturesArray;
+
+        private static readonly MetadataFeatures[] FeaturesArray = { MetadataFeatures.Collections, MetadataFeatures.Adult, MetadataFeatures.RequiredSetup };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KpPersonProvider"/> class.
@@ -54,5 +60,15 @@ namespace EmbyKinopoiskRu.Provider.RemoteMetadata
             _log.Info($"GetSearchResults by PersonLookupInfo:'{searchInfo.Name}'");
             return await Plugin.Instance.GetKinopoiskService().GetSearchResultsAsync(searchInfo, cancellationToken);
         }
+
+        /// <inheritdoc />
+        public string[] GetSupportedExternalIdentifiers()
+        {
+            return new string[1]
+            {
+                Plugin.PluginKey
+            };
+        }
+
     }
 }

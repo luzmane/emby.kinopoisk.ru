@@ -6,19 +6,25 @@ using System.Threading.Tasks;
 using MediaBrowser.Common.Net;
 using MediaBrowser.Controller.Entities.TV;
 using MediaBrowser.Controller.Providers;
+using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Logging;
 using MediaBrowser.Model.Providers;
 
 namespace EmbyKinopoiskRu.Provider.RemoteMetadata
 {
     /// <inheritdoc />
-    public class KpEpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>
+    public class KpEpisodeProvider : IRemoteMetadataProvider<Episode, EpisodeInfo>, IHasMetadataFeatures, IHasSupportedExternalIdentifiers
     {
         private readonly IHttpClient _httpClient;
         private readonly ILogger _log;
 
         /// <inheritdoc />
         public string Name => Plugin.PluginName;
+
+        /// <inheritdoc />
+        public MetadataFeatures[] Features => FeaturesArray;
+
+        private static readonly MetadataFeatures[] FeaturesArray = { MetadataFeatures.Collections, MetadataFeatures.Adult, MetadataFeatures.RequiredSetup };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="KpEpisodeProvider"/> class.
@@ -57,5 +63,15 @@ namespace EmbyKinopoiskRu.Provider.RemoteMetadata
                       $"ProviderIds='{string.Join(",", searchInfo.ProviderIds.Select(x => x.Key))}', ProviderIds='{string.Join(",", searchInfo.SeriesProviderIds.Select(x => x.Key))}']");
             return await Plugin.Instance.GetKinopoiskService().GetSearchResultsAsync(searchInfo, cancellationToken);
         }
+
+        /// <inheritdoc />
+        public string[] GetSupportedExternalIdentifiers()
+        {
+            return new string[1]
+            {
+                Plugin.PluginKey
+            };
+        }
+
     }
 }

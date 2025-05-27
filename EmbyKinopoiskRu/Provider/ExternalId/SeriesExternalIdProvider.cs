@@ -10,7 +10,7 @@ namespace EmbyKinopoiskRu.Provider.ExternalId
     /// Add link on kinopoisk page to metadata of the Series
     /// </summary>
     [ExcludeFromCodeCoverage]
-    public class SeriesExternalIdProvider : IExternalId, IHasWebsite, IHasSupportedExternalIdentifiers
+    public class SeriesExternalIdProvider : IExternalId, IHasWebsite
     {
         /// <inheritdoc />
         public string Name => Plugin.PluginName;
@@ -30,10 +30,5 @@ namespace EmbyKinopoiskRu.Provider.ExternalId
         /// <inheritdoc />
         public string Website => "https://www.kinopoisk.ru";
 
-        /// <inheritdoc />
-        public string[] GetSupportedExternalIdentifiers()
-        {
-            return new[] { Plugin.PluginKey };
-        }
     }
 }

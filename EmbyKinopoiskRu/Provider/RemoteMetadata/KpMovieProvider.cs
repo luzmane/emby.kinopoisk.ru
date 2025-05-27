@@ -12,7 +12,7 @@ using MediaBrowser.Model.Providers;
 namespace EmbyKinopoiskRu.Provider.RemoteMetadata
 {
     /// <inheritdoc />
-    public class KpMovieProvider : IRemoteMetadataProvider<Movie, MovieInfo>, IHasMetadataFeatures
+    public class KpMovieProvider : IRemoteMetadataProvider<Movie, MovieInfo>, IHasMetadataFeatures, IHasSupportedExternalIdentifiers
     {
         private readonly IHttpClient _httpClient;
         private readonly ILogger _log;
@@ -60,5 +60,15 @@ namespace EmbyKinopoiskRu.Provider.RemoteMetadata
             _log.Info($"GetSearchResults by MovieInfo:'{searchInfo.Name}', '{searchInfo.Year}'");
             return await Plugin.Instance.GetKinopoiskService().GetSearchResultsAsync(searchInfo, cancellationToken);
         }
+
+        /// <inheritdoc />
+        public string[] GetSupportedExternalIdentifiers()
+        {
+            return new string[1]
+            {
+                Plugin.PluginKey
+            };
+        }
+
     }
 }
