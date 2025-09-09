@@ -259,13 +259,18 @@ namespace EmbyKinopoiskRu.ScheduledTasks
                     }
                     else
                     {
-                        _ = await _collectionManager.CreateCollection(new CollectionCreationOptions
+                        var currentCollection = await _collectionManager.CreateCollection(new CollectionCreationOptions
                         {
                             IsLocked = false,
                             Name = collectionName,
                             ParentId = rootCollectionFolder.InternalId,
                             ItemIdList = itemsList.Select(m => m.InternalId).ToArray()
                         });
+
+                        // Update collection sort name
+                        currentCollection.SortName = $"\"{collectionName}\"";
+                        currentCollection.UpdateToRepository(ItemUpdateType.MetadataEdit);
+
                         _logger.Info($"The collection '{collectionName}' created");
                     }
 
