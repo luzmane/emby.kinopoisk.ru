@@ -1,3 +1,6 @@
+v.1.33.0
+- improvement: surround sort name of the collections created by the "Create Kinopoisk Collections" task with double quotes, so they will appear at the top of the Collections folder
+
 v.1.32.1
 - fix: restore 'Identify' action
 
