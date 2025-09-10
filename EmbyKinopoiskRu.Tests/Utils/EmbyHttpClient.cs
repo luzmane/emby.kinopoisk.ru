@@ -22,11 +22,7 @@ public class EmbyHttpClient : IHttpClient
             return ReturnResponse;
         }
 
-        if (options == null)
-        {
-            throw new ArgumentNullException(nameof(options));
-        }
-
+        ArgumentNullException.ThrowIfNull(options);
         CacheValue<string> cachedResponse = CacheManager.GetFromCache(options.Url);
         if (cachedResponse.HasValue)
         {

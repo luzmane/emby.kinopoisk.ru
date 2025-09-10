@@ -16,7 +16,7 @@ namespace EmbyKinopoiskRu.Tests.KinopoiskApiUnofficial;
 
 public class KpSeriesProviderTest : BaseTest
 {
-    private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpSeriesProviderTest));
+    private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger(nameof(KpSeriesProviderTest));
 
     private readonly KpSeriesProvider _kpSeriesProvider;
 

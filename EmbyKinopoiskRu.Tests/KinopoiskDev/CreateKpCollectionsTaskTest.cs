@@ -9,7 +9,6 @@ using FluentAssertions;
 using MediaBrowser.Controller.Collections;
 using MediaBrowser.Controller.Entities;
 using MediaBrowser.Controller.Entities.Movies;
-using MediaBrowser.Controller.Library;
 using MediaBrowser.Model.Activity;
 using MediaBrowser.Model.Configuration;
 using MediaBrowser.Model.Dto;
@@ -22,7 +21,7 @@ namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
 
 public class CreateKpCollectionsTaskTest : BaseTest
 {
-    private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(CreateKpCollectionsTaskTest));
+    private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger(nameof(CreateKpCollectionsTaskTest));
 
     private readonly CreateKpCollectionsTask _createKpCollectionsTaskTest;
 
@@ -32,8 +31,8 @@ public class CreateKpCollectionsTaskTest : BaseTest
     public CreateKpCollectionsTaskTest() : base(Logger)
     {
         _pluginConfiguration.Token = GetKinopoiskDevToken();
-        _pluginConfiguration.CollectionsList = new List<CollectionItem>
-        {
+        _pluginConfiguration.CollectionsList =
+        [
             new()
             {
                 Category = "Онлайн-кинотеатр",
@@ -48,7 +47,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
                 IsEnable = false,
                 Name = "Not valid"
             }
-        };
+        ];
 
         ConfigLibraryManager();
 
@@ -207,8 +206,8 @@ public class CreateKpCollectionsTaskTest : BaseTest
             ))
             .Returns(new QueryResult<BaseItem>
             {
-                Items = new BaseItem[]
-                {
+                Items =
+                [
                     new CollectionFolder
                     {
                         Name = "My Movies",
@@ -233,7 +232,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
                         Path = "/emby/audio_library",
                         InternalId = 126L
                     }
-                }
+                ]
             });
 
         _ = _libraryManager
@@ -249,7 +248,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
             ))
             .Returns(new QueryResult<BaseItem>
             {
-                Items = Array.Empty<BaseItem>()
+                Items = []
             });
 
         _ = _libraryManager
@@ -266,8 +265,8 @@ public class CreateKpCollectionsTaskTest : BaseTest
             )))
             .Returns(new QueryResult<BaseItem>
             {
-                Items = new BaseItem[]
-                {
+                Items =
+                [
                     new Movie
                     {
                         Name = "Гарри Поттер и философский камень",
@@ -287,17 +286,17 @@ public class CreateKpCollectionsTaskTest : BaseTest
                         {
                             { Plugin.PluginKey, "8124" }
                         }),
-                        Collections = new[]
-                        {
+                        Collections =
+                        [
                             new LinkedItemInfo
                             {
                                 Id = 321L,
                                 Name = "Смотрим всей семьей",
                                 ProviderIds = new ProviderIdDictionary()
                             }
-                        }
+                        ]
                     }
-                }
+                ]
             });
 
         _ = _libraryManager
@@ -310,15 +309,15 @@ public class CreateKpCollectionsTaskTest : BaseTest
             .Returns(new QueryResult<BaseItem>
             {
                 TotalRecordCount = 1,
-                Items = new BaseItem[]
-                {
+                Items =
+                [
                     new BoxSet
                     {
                         Name = "Смотрим всей семьей",
                         Path = "/emby/hd-family",
                         InternalId = 321L
                     }
-                }
+                ]
             });
 
         #endregion
@@ -365,8 +364,8 @@ public class CreateKpCollectionsTaskTest : BaseTest
             ))
             .Returns(new QueryResult<BaseItem>
             {
-                Items = new BaseItem[]
-                {
+                Items =
+                [
                     new CollectionFolder
                     {
                         Name = "My Movies",
@@ -391,7 +390,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
                         Path = "/emby/audio_library_ext",
                         InternalId = 126L
                     }
-                }
+                ]
             });
 
         _ = _libraryManager
@@ -407,7 +406,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
             ))
             .Returns(new QueryResult<BaseItem>
             {
-                Items = Array.Empty<BaseItem>()
+                Items = []
             });
 
         _ = _libraryManager
@@ -424,8 +423,8 @@ public class CreateKpCollectionsTaskTest : BaseTest
             )))
             .Returns(new QueryResult<BaseItem>
             {
-                Items = new BaseItem[]
-                {
+                Items =
+                [
                     new Movie
                     {
                         Name = "Гарри Поттер и философский камень",
@@ -445,17 +444,17 @@ public class CreateKpCollectionsTaskTest : BaseTest
                         {
                             { Plugin.PluginKey, "8124" }
                         }),
-                        Collections = new[]
-                        {
+                        Collections =
+                        [
                             new LinkedItemInfo
                             {
                                 Id = 321L,
                                 Name = "Смотрим всей семьей",
                                 ProviderIds = new ProviderIdDictionary()
                             }
-                        }
+                        ]
                     }
-                }
+                ]
             });
 
         _ = _libraryManager
@@ -468,7 +467,7 @@ public class CreateKpCollectionsTaskTest : BaseTest
             .Returns(new QueryResult<BaseItem>
             {
                 TotalRecordCount = 0,
-                Items = Array.Empty<BaseItem>()
+                Items = []
             });
 
         // FindCollectionFolders
@@ -483,20 +482,20 @@ public class CreateKpCollectionsTaskTest : BaseTest
             .Returns(new QueryResult<BaseItem>
             {
                 TotalRecordCount = 0,
-                Items = new BaseItem[]
-                {
+                Items =
+                [
                     new CollectionFolder
                     {
                         Name = "Collections",
                         Path = nameof(CreateKpCollectionsTaskTest_Execute_CollectionNotExists),
                         InternalId = 2L
                     }
-                }
+                ]
             });
 
         _ = _libraryManager
             .Setup(m => m.GetInternalItemIds(It.Is<InternalItemsQuery>(q => true.Equals(q.IsFolder))))
-            .Returns(new[] { 1L });
+            .Returns([1L]);
         _ = _libraryManager
             .Setup(m => m.GetItemById(It.Is<long>(id => id == 1L)))
             .Returns(new CollectionFolder

@@ -15,7 +15,7 @@ namespace EmbyKinopoiskRu.Tests.KinopoiskApiUnofficial;
 
 public class KpPersonProviderTest : BaseTest
 {
-    private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpPersonProviderTest));
+    private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger(nameof(KpPersonProviderTest));
 
     private readonly KpPersonProvider _kpPersonProvider;
 

@@ -17,7 +17,7 @@ namespace EmbyKinopoiskRu.Tests.KinopoiskApiUnofficial;
 
 public class KpMovieProviderTest : BaseTest
 {
-    private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpMovieProviderTest));
+    private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger(nameof(KpMovieProviderTest));
 
     private readonly KpMovieProvider _kpMovieProvider;
 
@@ -120,7 +120,7 @@ public class KpMovieProviderTest : BaseTest
         {
             ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
             {
-                { MetadataProviders.Imdb.ToString(), "tt0111161" }
+                { nameof(MetadataProviders.Imdb), "tt0111161" }
             })
         };
 

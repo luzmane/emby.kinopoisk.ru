@@ -18,7 +18,7 @@ namespace EmbyKinopoiskRu.Tests.Common;
 
 public class UpdateKinopoiskPluginTaskTest : BaseTest
 {
-    private static readonly ILogger Logger = LogManager.GetLogger(nameof(UpdateKinopoiskPluginTaskTest));
+    private static readonly Logger Logger = LogManager.GetLogger(nameof(UpdateKinopoiskPluginTaskTest));
 
     private readonly UpdateKinopoiskPluginTask _updateKinopoiskPluginTask;
     private readonly Mock<IInstallationManager> _installationManager = new();

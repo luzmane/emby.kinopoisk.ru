@@ -10,7 +10,7 @@ namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
 
 public class KpLocalMetadataTest : BaseTest
 {
-    private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(KpLocalMetadataTest));
+    private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger(nameof(KpLocalMetadataTest));
 
     private readonly KpMovieLocalMetadata _kpMovieLocalMetadata;
     private readonly LibraryOptions _movieLibraryOptions;
@@ -30,25 +30,25 @@ public class KpLocalMetadataTest : BaseTest
             ImportCollections = true,
             MetadataCountryCode = "RU",
             MinCollectionItems = 1,
-            PathInfos = new[]
-            {
+            PathInfos =
+            [
                 new MediaPathInfo
                 {
                     NetworkPath = null,
                     Path = "/emby/movie_library"
                 }
-            },
+            ],
             PreferredImageLanguage = "ru",
             PreferredMetadataLanguage = "ru",
             SkipSubtitlesIfEmbeddedSubtitlesPresent = true,
             SkipSubtitlesIfAudioTrackMatches = true,
-            TypeOptions = new[]
-            {
+            TypeOptions =
+            [
                 new TypeOptions
                 {
                     Type = "Movie"
                 }
-            }
+            ]
         };
 
         _kpMovieLocalMetadata = new KpMovieLocalMetadata(_logManager.Object);

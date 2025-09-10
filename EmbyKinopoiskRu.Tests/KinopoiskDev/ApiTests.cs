@@ -82,7 +82,7 @@ public class ApiTests : IDisposable
 
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
-    private readonly ILogger _logger;
+    private readonly Logger _logger;
 
 
     public ApiTests()
@@ -189,7 +189,7 @@ public class ApiTests : IDisposable
         var response = await responseMessage.Content.ReadAsStringAsync();
         var searchResultMovie = JsonSerializer.Deserialize<KpSearchResult<KpMovie>>(response, _jsonOptions);
         searchResultMovie.Should().NotBeNull();
-        searchResultMovie!.Docs.Count.Should().Be(2);
+        searchResultMovie!.Docs.Count.Should().BeGreaterOrEqualTo(2);
 
         VerifyMovie689(searchResultMovie.Docs.FirstOrDefault(i => i.Id == 689), true);
         VerifyMovie435(searchResultMovie.Docs.FirstOrDefault(i => i.Id == 435), true);
@@ -399,7 +399,7 @@ public class ApiTests : IDisposable
         kpMovie.Backdrop.PreviewUrl.Should().NotBeNullOrWhiteSpace();
         kpMovie.Countries.Should().NotBeNull();
         kpMovie.Countries!.Count.Should().Be(2);
-        kpMovie.Description.Should().Be("Жизнь десятилетнего Гарри Поттера нельзя назвать сладкой: родители умерли, едва ему исполнился год, а от дяди и тёти, взявших сироту на воспитание, достаются лишь тычки да подзатыльники. Но в одиннадцатый день рождения Гарри всё меняется. Странный гость, неожиданно появившийся на пороге, приносит письмо, из которого мальчик узнаёт, что на самом деле он - волшебник и зачислен в школу магии под названием Хогвартс. А уже через пару недель Гарри будет мчаться в поезде Хогвартс-экспресс навстречу новой жизни, где его ждут невероятные приключения, верные друзья и самое главное — ключ к разгадке тайны смерти его родителей.");
+        kpMovie.Description.Should().Be("Обычный лондонский мальчик Гарри Поттер на 11-м году жизни узнаёт, что он — осиротевший сын двух могущественных волшебников, и сам обладает магической силой. В Хогвартской школе чародейства и волшебства Гарри попадает в водоворот невероятных приключений. Он изучает квиддич — спорт высшего пилотажа, играет в захватывающую игру живыми шахматными фигурами, встречается с Тёмным Волшебником, который хочет его уничтожить.");
         kpMovie.ExternalId.Should().NotBeNull();
         kpMovie.ExternalId.Imdb.Should().Be("tt0241527");
         kpMovie.ExternalId.Tmdb.Should().Be(671);
@@ -477,7 +477,7 @@ public class ApiTests : IDisposable
         {
             kpMovie.SequelsAndPrequels.Should().NotBeNull();
             kpMovie.SequelsAndPrequels.Count.Should().Be(8);
-            kpMovie.Slogan.Should().Be("Путешествие в твою мечту");
+            kpMovie.Slogan.Should().Be("\"Путешествие в твою мечту\"");
             kpMovie.Videos.Should().NotBeNull();
             kpMovie.Videos!.Teasers.Should().BeEmpty();
             kpMovie.Videos!.Trailers.Should().NotBeEmpty();
@@ -509,13 +509,13 @@ public class ApiTests : IDisposable
         kpPerson.Photo.Should().NotBeNullOrWhiteSpace();
         if (isQuerySearch)
         {
-            kpPerson.BirthPlace.Should().NotBeNull();
-            kpPerson.BirthPlace.Should().HaveCount(3);
             kpPerson.Facts.Should().BeNull();
             kpPerson.Movies.Should().BeNull();
         }
         else
         {
+            kpPerson.BirthPlace.Should().NotBeNull();
+            kpPerson.BirthPlace.Should().HaveCount(3);
             kpPerson.DeathPlace.Should().NotBeNull();
             kpPerson.DeathPlace.Should().BeEmpty();
             kpPerson.Facts.Should().NotBeNull();

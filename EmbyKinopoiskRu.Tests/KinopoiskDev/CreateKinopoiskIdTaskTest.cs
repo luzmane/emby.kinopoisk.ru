@@ -16,7 +16,7 @@ namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
 
 public class CreateKinopoiskIdTaskTest : BaseTest
 {
-    private static readonly NLog.ILogger Logger = NLog.LogManager.GetLogger(nameof(CreateKinopoiskIdTaskTest));
+    private static readonly NLog.Logger Logger = NLog.LogManager.GetLogger(nameof(CreateKinopoiskIdTaskTest));
 
     private readonly CreateKinopoiskIdTask _createKinopoiskIdTask;
 
@@ -178,21 +178,21 @@ public class CreateKinopoiskIdTaskTest : BaseTest
                 && query.MissingAnyProviderId.Length == 1
                 && Plugin.PluginKey.Equals(query.MissingAnyProviderId[0], StringComparison.Ordinal)
                 && query.HasAnyProviderId.Length == 2
-                && MetadataProviders.Imdb.ToString().Equals(query.HasAnyProviderId[0], StringComparison.Ordinal)
-                && MetadataProviders.Tmdb.ToString().Equals(query.HasAnyProviderId[1], StringComparison.Ordinal))))
+                && nameof(MetadataProviders.Imdb).Equals(query.HasAnyProviderId[0], StringComparison.Ordinal)
+                && nameof(MetadataProviders.Tmdb).Equals(query.HasAnyProviderId[1], StringComparison.Ordinal))))
             .Returns(new QueryResult<BaseItem>
             {
                 TotalRecordCount = 3,
-                Items = new BaseItem[]
-                {
+                Items =
+                [
                     new Movie
                     {
                         Name = "Гарри Поттер и Тайная комната",
                         InternalId = 101L,
                         ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
-                            { MetadataProviders.Imdb.ToString(), "tt0295297" },
-                            { MetadataProviders.Tmdb.ToString(), "672" }
+                            { nameof(MetadataProviders.Imdb), "tt0295297" },
+                            { nameof(MetadataProviders.Tmdb), "672" }
                         })
                     },
                     new Movie
@@ -201,7 +201,7 @@ public class CreateKinopoiskIdTaskTest : BaseTest
                         InternalId = 102L,
                         ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
-                            { MetadataProviders.Tmdb.ToString(), "673" }
+                            { nameof(MetadataProviders.Tmdb), "673" }
                         })
                     },
                     new Movie
@@ -210,10 +210,10 @@ public class CreateKinopoiskIdTaskTest : BaseTest
                         InternalId = 103L,
                         ProviderIds = new ProviderIdDictionary(new Dictionary<string, string>
                         {
-                            { MetadataProviders.Imdb.ToString(), "tt0330373" }
+                            { nameof(MetadataProviders.Imdb), "tt0330373" }
                         })
                     }
-                }
+                ]
             });
 
         using var cancellationTokenSource = new CancellationTokenSource();

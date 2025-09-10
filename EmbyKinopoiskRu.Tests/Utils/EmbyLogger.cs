@@ -105,11 +105,7 @@ public class EmbyLogger : ILogger
 
     public void LogMultiline(string message, LogSeverity severity, StringBuilder additionalContent)
     {
-        if (additionalContent == null)
-        {
-            throw new ArgumentNullException(nameof(additionalContent));
-        }
-
+        ArgumentNullException.ThrowIfNull(additionalContent);
         Log(severity, additionalContent.Insert(0, message + "\n").ToString());
     }
 

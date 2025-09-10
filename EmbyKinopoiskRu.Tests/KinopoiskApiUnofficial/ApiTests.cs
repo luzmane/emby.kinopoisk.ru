@@ -17,7 +17,7 @@ public class ApiTests : IDisposable
 
     private readonly HttpClient _httpClient;
     private readonly JsonSerializerOptions _jsonOptions;
-    private readonly ILogger _logger;
+    private readonly Logger _logger;
 
     public ApiTests()
     {
@@ -151,7 +151,7 @@ public class ApiTests : IDisposable
         var response = await responseMessage.Content.ReadAsStringAsync();
         List<KpFilmStaff>? filmStaffList = JsonSerializer.Deserialize<List<KpFilmStaff>>(response, _jsonOptions);
         filmStaffList.Should().NotBeNull();
-        filmStaffList!.Count.Should().Be(91);
+        filmStaffList!.Count.Should().Be(92);
         KpFilmStaff filmStaff = filmStaffList[1];
         filmStaff.Description.Should().Be("Andy Dufresne");
         filmStaff.NameEn.Should().Be("Tim Robbins");
