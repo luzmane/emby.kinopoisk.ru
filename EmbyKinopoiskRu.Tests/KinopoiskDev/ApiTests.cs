@@ -15,9 +15,9 @@ namespace EmbyKinopoiskRu.Tests.KinopoiskDev;
 
 /// <summary>
 /// Swagger documentation:
-///     https://api.kinopoisk.dev/v1/documentation-json
-///     https://api.kinopoisk.dev/v1/documentation-yaml
-///     https://api.kinopoisk.dev/v1/documentation#/
+///     https://api.poiskkino.dev/v1/documentation-json
+///     https://api.poiskkino.dev/v1/documentation-yaml
+///     https://api.poiskkino.dev/v1/documentation#/
 /// </summary>
 public class ApiTests : IDisposable
 {
@@ -103,7 +103,7 @@ public class ApiTests : IDisposable
     [Fact(Skip = BaseTest.Skip)]
     public async Task GetMovieById()
     {
-        var request = new Uri("https://api.kinopoisk.dev/v1.4/movie/435");
+        var request = new Uri("https://api.poiskkino.dev/v1.4/movie/435");
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(request);
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
@@ -114,7 +114,7 @@ public class ApiTests : IDisposable
     [Fact(Skip = BaseTest.Skip)]
     public async Task GetMovies_Universal_Ids()
     {
-        var request = "https://api.kinopoisk.dev/v1.4/movie?";
+        var request = "https://api.poiskkino.dev/v1.4/movie?";
         request += $"limit={RequestLimit}";
         request += $"&selectFields={string.Join("&selectFields=", MovieUniversalSelectFields)}";
         request += "&id=689&id=435";
@@ -132,7 +132,7 @@ public class ApiTests : IDisposable
     [Fact(Skip = BaseTest.Skip)]
     public async Task GetMovies_Query_Name_Year()
     {
-        var request = "https://api.kinopoisk.dev/v1.4/movie/search?";
+        var request = "https://api.poiskkino.dev/v1.4/movie/search?";
         request += $"limit={RequestLimit}";
         request += "&query=Гарри Поттер и философский камень 2001"; // 689
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
@@ -148,7 +148,7 @@ public class ApiTests : IDisposable
     [Fact(Skip = BaseTest.Skip)]
     public async Task GetMovies_Query_AlternativeName_Year()
     {
-        var request = "https://api.kinopoisk.dev/v1.4/movie/search?";
+        var request = "https://api.poiskkino.dev/v1.4/movie/search?";
         request += $"limit={RequestLimit}";
         request += "&query=Harry Potter and the Sorcerer's Stone 2001"; // 689
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
@@ -164,7 +164,7 @@ public class ApiTests : IDisposable
     [Fact(Skip = BaseTest.Skip)]
     public async Task GetMovies_Universal_List_Top500()
     {
-        var request = "https://api.kinopoisk.dev/v1.4/movie?";
+        var request = "https://api.poiskkino.dev/v1.4/movie?";
         request += $"limit={RequestLimit}";
         request += $"&selectFields={string.Join("&selectFields=", MovieUniversalSelectFields)}";
         request += "&lists=top500";
@@ -180,7 +180,7 @@ public class ApiTests : IDisposable
     [Fact(Skip = BaseTest.Skip)]
     public async Task GetMovies_Universal_ExternalIds()
     {
-        var request = "https://api.kinopoisk.dev/v1.4/movie?";
+        var request = "https://api.poiskkino.dev/v1.4/movie?";
         request += $"limit={RequestLimit}";
         request += $"&selectFields={string.Join("&selectFields=", MovieUniversalSelectFields)}";
         request += "&externalId.imdb=tt0241527&externalId.imdb=tt0120689";
@@ -198,7 +198,7 @@ public class ApiTests : IDisposable
     [Fact(Skip = BaseTest.Skip)]
     public async Task GetPersonById()
     {
-        const string request = "https://api.kinopoisk.dev/v1.4/person/7987";
+        const string request = "https://api.poiskkino.dev/v1.4/person/7987";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();
         var response = await responseMessage.Content.ReadAsStringAsync();
@@ -209,7 +209,7 @@ public class ApiTests : IDisposable
     [Fact(Skip = BaseTest.Skip)]
     public async Task GetPersons_Query_Name()
     {
-        var request = "https://api.kinopoisk.dev/v1.4/person/search?";
+        var request = "https://api.poiskkino.dev/v1.4/person/search?";
         request += $"limit={RequestLimit}";
         request += "&query=Тим Роббинс";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
@@ -225,7 +225,7 @@ public class ApiTests : IDisposable
     [Fact(Skip = BaseTest.Skip)]
     public async Task GetPersons_Universal_MoviesId()
     {
-        var request = "https://api.kinopoisk.dev/v1.4/person?";
+        var request = "https://api.poiskkino.dev/v1.4/person?";
         request += $"limit={RequestLimit}";
         request += $"&selectFields={string.Join("&selectFields=", PersonUniversalSelectFields)}";
         request += "&movies.id=326";
@@ -242,7 +242,7 @@ public class ApiTests : IDisposable
     [Fact(Skip = BaseTest.Skip)]
     public async Task GetEpisodes_Universal_MovieId()
     {
-        var request = "https://api.kinopoisk.dev/v1.4/season?";
+        var request = "https://api.poiskkino.dev/v1.4/season?";
         request += $"limit={RequestLimit}";
         request += $"&selectFields={string.Join("&selectFields=", SeasonUniversalSelectFields)}";
         request += "&movieId=77044";
@@ -260,7 +260,7 @@ public class ApiTests : IDisposable
     [Fact(Skip = BaseTest.Skip)]
     public async Task GetEpisodes_Universal_MovieId_Season()
     {
-        var request = "https://api.kinopoisk.dev/v1.4/season?";
+        var request = "https://api.poiskkino.dev/v1.4/season?";
         request += $"limit={RequestLimit}";
         request += $"&selectFields={string.Join("&selectFields=", SeasonUniversalSelectFields)}";
         request += "&movieId=77044&number=5";
@@ -277,7 +277,7 @@ public class ApiTests : IDisposable
     [Fact(Skip = BaseTest.Skip)]
     public async Task GetAllKinopoiskLists()
     {
-        var request = "https://api.kinopoisk.dev/v1.4/list?limit=200";
+        var request = "https://api.poiskkino.dev/v1.4/list?limit=200";
         request += "&selectFields=name&selectFields=slug&selectFields=moviesCount&selectFields=cover&selectFields=category";
         using HttpResponseMessage responseMessage = await _httpClient.GetAsync(new Uri(request));
         _ = responseMessage.EnsureSuccessStatusCode();

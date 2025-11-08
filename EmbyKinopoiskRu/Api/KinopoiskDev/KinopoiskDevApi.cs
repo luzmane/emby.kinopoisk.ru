@@ -102,7 +102,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         internal async Task<KpMovie> GetMovieByIdAsync(string movieId, CancellationToken cancellationToken)
         {
-            var json = await SendRequestAsync($"https://api.kinopoisk.dev/v1.4/movie/{movieId}", cancellationToken);
+            var json = await SendRequestAsync($"https://api.poiskkino.dev/v1.4/movie/{movieId}", cancellationToken);
             return _jsonSerializer.DeserializeFromString<KpMovie>(json);
         }
 
@@ -114,7 +114,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
                 return new KpSearchResult<KpMovie>();
             }
 
-            var url = new StringBuilder($"https://api.kinopoisk.dev/v1.4/movie?limit={ApiResponseLimit}")
+            var url = new StringBuilder($"https://api.poiskkino.dev/v1.4/movie?limit={ApiResponseLimit}")
                 .Append($"&id={string.Join("&id=", movieIdList)}")
                 .Append($"&selectFields={string.Join("&selectFields=", MoviePropertiesList)}")
                 .ToString();
@@ -129,7 +129,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         internal async Task<KpSearchResult<KpMovie>> GetMoviesByMovieDetailsAsync(string name, string alternativeName, int? year, CancellationToken cancellationToken)
         {
-            var url = $"https://api.kinopoisk.dev/v1.4/movie/search?limit={ApiResponseLimit}";
+            var url = $"https://api.poiskkino.dev/v1.4/movie/search?limit={ApiResponseLimit}";
             if (!string.IsNullOrWhiteSpace(name))
             {
                 var query = KpHelper.MultiWhitespace.Replace($"&query={name} {year}", "");
@@ -162,7 +162,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         internal async Task<KpSearchResult<KpMovie>> GetCollectionItemsAsync(string collectionId, int page, CancellationToken cancellationToken)
         {
-            var request = new StringBuilder($"https://api.kinopoisk.dev/v1.4/movie?limit=250&page={page}&lists={collectionId}")
+            var request = new StringBuilder($"https://api.poiskkino.dev/v1.4/movie?limit=250&page={page}&lists={collectionId}")
                 .Append($"&selectFields={string.Join("&selectFields=", TrailerPropertiesList)}")
                 .ToString();
             var json = await SendRequestAsync(request, cancellationToken);
@@ -177,13 +177,13 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         internal async Task<KpPerson> GetPersonByIdAsync(string personId, CancellationToken cancellationToken)
         {
-            var json = await SendRequestAsync($"https://api.kinopoisk.dev/v1.4/person/{personId}", cancellationToken);
+            var json = await SendRequestAsync($"https://api.poiskkino.dev/v1.4/person/{personId}", cancellationToken);
             return _jsonSerializer.DeserializeFromString<KpPerson>(json);
         }
 
         internal async Task<KpSearchResult<KpPerson>> GetPersonsByNameAsync(string name, CancellationToken cancellationToken)
         {
-            var url = $"https://api.kinopoisk.dev/v1.4/person/search?limit={ApiResponseLimit}&query={name}";
+            var url = $"https://api.poiskkino.dev/v1.4/person/search?limit={ApiResponseLimit}&query={name}";
             var json = await SendRequestAsync(url, cancellationToken);
             var toReturn = _jsonSerializer.DeserializeFromString<KpSearchResult<KpPerson>>(json);
             if (toReturn == null)
@@ -197,7 +197,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         internal async Task<KpSearchResult<KpSeason>> GetSeasonBySeriesIdAsync(string seriesId, int parentIndexNumber, CancellationToken cancellationToken)
         {
-            var url = new StringBuilder($"https://api.kinopoisk.dev/v1.4/season?limit={ApiResponseLimit}")
+            var url = new StringBuilder($"https://api.poiskkino.dev/v1.4/season?limit={ApiResponseLimit}")
                 .Append($"&selectFields={string.Join("&selectFields=", FullSeasonPropertiesList)}")
                 .Append($"&movieId={seriesId}&number={parentIndexNumber}")
                 .ToString();
@@ -214,7 +214,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
             }
 
             externalIdType = externalIdType.ToLowerInvariant();
-            var request = $"https://api.kinopoisk.dev/v1.4/movie?limit={ApiResponseLimit}";
+            var request = $"https://api.poiskkino.dev/v1.4/movie?limit={ApiResponseLimit}";
             request += "&selectFields=externalId&selectFields=id";
             var delimiter = $"&externalId.{externalIdType}=";
             request += $"{delimiter}{string.Join(delimiter, idList)}";
@@ -230,7 +230,7 @@ namespace EmbyKinopoiskRu.Api.KinopoiskDev
 
         internal async Task<KpSearchResult<KpLists>> GetKpCollectionsAsync(CancellationToken cancellationToken)
         {
-            var request = "https://api.kinopoisk.dev/v1.4/list?limit=100";
+            var request = "https://api.poiskkino.dev/v1.4/list?limit=100";
             request += "&selectFields=name&selectFields=slug&selectFields=moviesCount&selectFields=cover&selectFields=category";
             var json = await SendRequestAsync(request, cancellationToken);
             var hasError = json.Length == 0;
